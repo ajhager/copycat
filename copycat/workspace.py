@@ -463,8 +463,27 @@ class Workspace(object):
     def top_down_bond_scout__direction(self, direction):
         print 'Top Down Bond Scout - Direction'
 
-    def top_down_description_scout(self):
-        print 'Top Down Description Scout'
+    def top_down_description_scout(self, description_type):
+        '''
+        Chooses an object probabilistically by total salience, checking if it
+        fits any of the descriptions in the description_type's "has instance"
+        list. If so, proposes a description based on the property and posts a
+        description strength tester codelet with urgency a funtion of the
+        activation of the proposed descriptor.
+        '''
+        # Choose an object.
+        object = self.choose_object('total_salience')
+
+        # Choose a relevant descriptor.
+        descriptors = description_type.possible_descriptors(object)
+        if not descriptors:
+            return
+        activations = [descriptor.activation for descriptor in descriptors]
+        index = util.select_list_position(activations)
+        descriptor = descriptors[index]
+
+        # Propose the description.
+        self.propose_description(object, description_type, descriptor)
 
     def top_down_group_scout__category(self, category):
         print 'Top Down Group Scout - Category'
