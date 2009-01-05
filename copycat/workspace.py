@@ -481,7 +481,7 @@ class Workspace(object):
         object1 = self.initial_string.choose_object('inter_string_salience')
         object2 = self.target_string.choose_object('inter_string_salience')
 
-        # If one object spans the whole string and the other does not, fizzle
+        # If one object spans the whole string and the other does not, fizzle.
         if object1.spans_whole_string() != object2.spans_whole_string():
             return
 
@@ -503,7 +503,7 @@ class Workspace(object):
             return
 
         # Check if there are any distinguishing mappings.
-        distinguished_mappings = [m.distinguished() for m in mappings]
+        distinguished_mappings = [m.distinguishing() for m in mappings]
         if not distinguished_mappings:
             return
 
@@ -655,7 +655,92 @@ class Workspace(object):
         print 'Group Strength Tester'
 
     def important_object_correspondence_scout(self):
-        print 'Important Object Correspondence Scout'
+        '''
+        Chooses an object from the initial string probabilistically based on
+        importance. Picks a description of the object probabilistically and
+        looks for an object in the target string with the same description,
+        modulo the appropriate slippage, if any of the slippages currently in
+        the workspace apply. Then finds all concept mappings between nodes at
+        most one link away. Makes a proposed correspondence between the two
+        objects, including all the concept mappings. Posts a correspondence
+        strength tester codelet with urgency a function of the average
+        strength of the distinguishing concept mappings.
+        '''
+        # Choose an object.
+        object1 = self.initial_string.choose_object('relative_importance')
+
+        # Choose a description by conceptual depth.
+        object1_description = object1.choose_relative_distinguishing_description_by_conceptual_depth()
+        if not object1_description:
+            return
+        object1_descriptor = object1_description.descriptor
+
+        # Find the corresponding object2_descriptor.
+        object2_descriptor = object1_descriptor
+        for slippage in self.slippages:
+            if slippage.descriptor1 == object1_descriptor:
+                object2_descriptor = slippage.descriptor2
+
+        # Find an object with that descriptor in the target string.
+        object2_candidates = []
+        for object in self.target_string.objects():
+            for description in object.relevant_descriptions():
+                if description.descriptor == object2_descriptor:
+                    object2_candidates.append(object)
+        if not object2_candidates:
+            return
+        values = [obj.inter_string_salience() for obj in object2_candidates]
+        index = util.select_list_position(values)
+        object2 = object2_candidates[index]
+
+        # If one object spans the whole string and the other does not, fizzle.
+        if object1.spans_whole_string() != object2.spans_whole_string():
+            return
+
+        # Get the possible concept mappings.
+        mappings = self.concept_mappings(object1, object2,
+                                         object1.relevant_descriptions(),
+                                         object2.relevant_descriptions())
+        if not mappings:
+            return
+
+        # Decide whether or not to continue based on slippability.
+        possible = False
+        for mapping in mappings:
+            probability = mapping.slippablity() / 100.0
+            probability = self.temperature_adjusted_probability(probability)
+            if util.flip_coin(probability):
+                possible = True
+        if not possible:
+            return
+
+        # Check if there are any distinguishing mappings.
+        distinguished_mappings = [m.distinguishing() for m in mappings]
+        if not distinguished_mappings:
+            return
+
+        # If both objects span the strings, check if description needs flipped.
+        possible_opposite_mappings = []
+        for mapping in distinguishing_mappings:
+            description_type = mapping.description_type1
+            if description_type != 'plato_string_position_category' and \
+               description_type != 'plato_bond_facet':
+                   possible_opposite_mappings.append(mapping)
+
+        opposite_descriptions = [m.description_type1 for m in mappings]
+        if all([object1.string_spanning_group(),
+                object2.string_spanning_group(),
+                # FIXME: not plato_opposite.is_active(),
+                self.all_opposite_concept_mappings(possible_opposite_mappings),
+                'plato_direction_category' in opposite_descriptions]):
+            old_object2_string_number = object2.string_number
+            object2 = object2.flipped_version()
+            object2.string_number = old_object2_string_number
+            mappings = self.concept_mappings(object1, object2,
+                                             object1.relevant_descriptions(),
+                                             object2.relevant_descriptions())
+
+        return self.propose_correspondence(object1, object2, mappings, True)
 
     def replacement_finder(self):
         print 'Replacement Finder'
