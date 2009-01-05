@@ -426,7 +426,22 @@ class Workspace(object):
         print 'Correspondence Strength Tester'
 
     def description_builder(self, description):
-        print 'Description Builder'
+        '''
+        Attempts to build the proposed description. If it already exists, its
+        activations are boosted.
+        '''
+        # Make sure the object still exists.
+        if description.object not in self.objects():
+            return
+
+        # Make sure the description does not exist.
+        if description in description.object.descriptions():
+            description.description_type.activation += self.activation
+            description.descriptor.activation += self.activation
+            return
+
+        # Build the description.
+        self.build_description(description)
 
     def description_strength_tester(self, description):
         '''
