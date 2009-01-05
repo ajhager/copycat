@@ -91,7 +91,8 @@ class Run(object):
         dictionary and run with the codelets argument attribute.
         '''
         if codelet:
-            getattr(self.workspace, codelet.name)(*codelet.arguments)
+            to_post = getattr(self.workspace, codelet.name)(*codelet.arguments)
+            self.coderack.post(to_post)
 
     def deal_with_snag(self):
         '''

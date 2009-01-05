@@ -36,6 +36,7 @@ class Workspace(object):
         self.target_string = String(target)
         self.answer_string = None
 
+        self.activation = 0
         self.temperature = 0
         self.clamp_temperature = False
 
@@ -428,7 +429,25 @@ class Workspace(object):
         print 'Description Builder'
 
     def description_strength_tester(self, description):
-        print 'Description Strength Tester'
+        '''
+        Calculates the proposed descriptions's strength and probabilistically
+        decides whether or not to post a description builder codelet with
+        urgnency as a function of the strength.
+        '''
+        # Activate the descriptor.
+        description.descriptor.activation += self.activation
+
+        # Update the strength values for the description.
+        description.update_strength_values()
+        strength = description.total_strength()
+
+        # Decide whether or not to post the description builder codelet.
+        probability = strength / 100.0
+        probability = self.temperature_adjusted_probability(probability)
+        if not util.flip_coin(probability):
+            return
+        
+        return [Codelet('description_builder', (description,), strength)]
 
     def group_builder(self, group):
         print 'Group Builder'
