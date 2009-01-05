@@ -36,7 +36,7 @@ class Workspace(object):
         self.target_string = String(target)
         self.answer_string = None
 
-        self.activation = 0
+        self.activation = 100
         self.temperature = 0
         self.clamp_temperature = False
 
@@ -604,7 +604,46 @@ class Workspace(object):
         print 'Correspondence Builder'
 
     def correspondence_strength_tester(self, correspondence, flip_object2):
-        print 'Correspondence Strength Tester'
+        '''
+        Calculates the proposed correspondence's strength and probabilistically
+        decides whether or not to post a correspondence builder codelt with
+        urgency a function of the strength.
+        '''
+        object1 = correspondence.object1
+        object2 = correspondence.object2
+        flipped = object2.flipped_version()
+
+        # If the objects do not exist anymore, then fizzle.
+        objects = self.objects()
+        if (object1 not in objects) or \
+            ((object2 not in objects) and \
+            (not (flip_object2 and self.target_string.group_present(flipped)))):
+            return
+
+        # Calculate the proposed correspondence's strength.
+        correspondence.update_strength_values()
+        stength = correspondence.total_strength()
+
+        # Decide whether to post a corresondpondence builder codelet or not.
+        probability = strength / 100.0
+        probability = self.temperature_adjusted_probability(probability)
+        if not util.flip_coin(probability):
+            self.delete_proposed_correspondenc(correspondence)
+            return
+
+        # Add some activation to some descriptions.
+        for mapping in correspondence.concept_mappings:
+            mapping.description_type1.buffer += self.activation
+            mapping.descriptor1.buffer += self.activation
+            mapping.description_type2.buffer += self.activation
+            mapping.descriptor2.buffer += self.activation
+
+        # Set correspondence proposal level.
+        correspondence.proposal_level = 2
+
+        # Post the correspondence builder codelet.
+        return [Codelet('correspondence_buidler',
+                        (correspondence, flip_object2), strength)]
 
     def description_builder(self, description):
         '''
