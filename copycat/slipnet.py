@@ -19,7 +19,7 @@ class Slipnode(object):
         self.name = ""
         self.conceptual_depth = 0
         self.activation = 0
-        self.activation_buffer = 0
+        self.buffer = 0
         self.initially_clamped = False
         self.clamp = False
         self.directed = False
@@ -79,7 +79,7 @@ class Slipnode(object):
 
     def decay(self):
         amount = int(((100 - self.conceptual_depth) / 100.0) * self.activation)
-        self.activation_buffer -= amount
+        self.buffer -= amount
 
     def get_label_node(self, to_node):
         if self == to_node:
@@ -146,10 +146,10 @@ class Slipnet(object):
                 for link in node.outgoing_links():
                     amount_to_spread = int(node.activation * \
                             (link.intrinsic_degree_of_association() / 100.0))
-                    link.to_node.activation_buffer += amount_to_spread
+                    link.to_node.buffer += amount_to_spread
             
         for node in self.slipnodes:
-            node.activation = min(100, node.activation + node.activation_buffer)
+            node.activation = min(100, node.activation + node.buffer)
             if node.clamp:
                 node.activation = 100
             else:
@@ -157,14 +157,14 @@ class Slipnet(object):
                     full_activation_probability = (node.activation / 100.0) ** 3
                     if util.flip_coin(full_activation_probability):
                         node.activation = 100
-            node.activation_buffer = 0
+            node.buffer = 0
 
     def clear(self):
         '''
         Zero out the acitivations of all slipnodes.
         '''
         for node in self.slipnodes:
-            node.activation_buffer = 0
+            node.buffer = 0
             node.activation = 0
 
     def clamp_initial_nodes(self):

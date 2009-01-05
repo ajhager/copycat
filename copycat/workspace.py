@@ -338,7 +338,72 @@ class Workspace(object):
         print 'Answer Builder'
 
     def bond_builder(self, bond):
-        print 'Bond Builder'
+        '''
+        Attempts to build the proposed bond, fighting with competitiors if
+        necessary.
+        '''
+        string = bond.string
+        from_object = bond.from_object
+        to_object = bond.to_object
+
+        # Make sure these objects still exist.
+        objects = self.objects()
+        if (from_object not in objects) or (to_object not in objects):
+            return
+
+        # Make sure the bond does not exist.
+        existing_bond = string.is_bond_present(bond)
+        if existing_bond:
+            existing_bond.bond_category.buffer += self.activation
+            if existing_bond.direction_category:
+                existing_bond.direction_category.buffer += self.activation
+            string.delete_proposed_bond(bond)
+            return
+
+        # Remove the proposed bond from the list of proposed bonds.
+        string.delete_proposed_bond(bond)
+
+        # Fight any incompatible bonds.
+        incompatible_bonds = bond.incompatible_bonds()
+        if incompatible_bonds:
+            if not self.fight_it_out(bond, 1, incompatible_bonds, 1):
+
+        # Try to break any groups shared by from_object and to_object.
+        incompatible_groups = from_object.common_groups(to_object)
+        if incompatible_groups:
+            # FIXME: This fizzles if the bond wins.  (from copycat code)
+            # I think it should fizzle if it loses.
+            if self.fight_it_out(bond, 1, incompatible_groups,
+                max([group.letter_span() for group in incompatible_groups])):
+                return
+
+        # Try to break any incompatible correspondences.
+        if bond.direction_category and (bond.is_leftmost_in_string() or \
+                                        bond.is_rightmost_in_string()):
+            incompatible_correspondences = bond.incompatible_correspondences()
+            if incompatible_corresondences:
+                # FIXME: This fizzles if the bond wins.  (from copycat code)
+                # I think it should fizzle if it loses.
+                if self.fight_it_out(bond, 2, incompatible_correspondences, 3):
+                    return
+
+        # Break incompatible bonds, if any.
+        if incompatible_bonds:
+            for bond in incompatible_bonds:
+                self.break_bond(bond)
+
+        # Break incompatible groups, if any.
+        if incompatible_groups:
+            for group in incompatible_groups:
+                self.break_group(group)
+
+        # Break incompatible correspondences, if any.
+        if incompatible_correspondences:
+            for correrspondence in incompatible_correspondences:
+                self.break_correspondence(correspondence)
+
+        # Build the new bond.
+        self.build_bond(bond)
 
     def bond_strength_tester(self, bond):
         '''
@@ -358,14 +423,14 @@ class Workspace(object):
             return
 
         # Add activation to some relevant descriptions.
-        bond.from_object_descriptor.activation += self.activation
-        bond.to_object_descriptor.activation += self.activation
-        bond.bond_facet.activation += self.activation
+        bond.from_object_descriptor.buffer += self.activation
+        bond.to_object_descriptor.buffer += self.activation
+        bond.bond_facet.buffer += self.activation
 
         # Change bond's proposal level.
         bond.proposal_level = 2
 
-        return [Codelet('build_builder', (bond,), strength)]
+        return [Codelet('bond_builder', (bond,), strength)]
         
     def bottom_up_bond_scout(self):
         '''
@@ -433,7 +498,7 @@ class Workspace(object):
 
         # Choose a property by degree of association and activation.
         associations = [link.degree_of_association() for link in links]
-        activations = [link.to_node().activation() for link in links]
+        activations = [link.to_node().activation for link in links]
         choices = map(lambda a, b: a * b, associations, activations)
         index = util.select_list_position(choices)
         property = links[index].to_node()
@@ -494,8 +559,8 @@ class Workspace(object):
 
         # Make sure the description does not exist.
         if description in description.object.descriptions():
-            description.description_type.activation += self.activation
-            description.descriptor.activation += self.activation
+            description.description_type.buffer += self.activation
+            description.descriptor.buffer += self.activation
             return
 
         # Build the description.
@@ -508,7 +573,7 @@ class Workspace(object):
         urgency as a function of the strength.
         '''
         # Activate the descriptor.
-        description.descriptor.activation += self.activation
+        description.descriptor.buffer += self.activation
 
         # Update the strength values for the description.
         description.update_strength_values()
