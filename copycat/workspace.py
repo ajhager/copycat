@@ -341,7 +341,31 @@ class Workspace(object):
         print 'Bond Builder'
 
     def bond_strength_tester(self, bond):
-        print 'Bond Strength Tester'
+        '''
+        Calculates the proposed bond's strength and decides probabilistically
+        wheither or not to post a bond builder codelet with urgency as a
+        function of the strength.
+        '''
+        # Update the strength values for the bond.
+        bond.update_strength_values()
+        strength = description.total_strength()
+
+        # Decide whether or not to post the bond builder codelet.
+        probability = strength / 100.0
+        probability = self.temperature_adjusted_probability(probability)
+        if not util.flip_coin(probability):
+            bond.string.delete_proposed_bond(bond)
+            return
+
+        # Add activation to some relevant descriptions.
+        bond.from_object_descriptor.activation += self.activation
+        bond.to_object_descriptor.activation += self.activation
+        bond.bond_facet.activation += self.activation
+
+        # Change bond's proposal level.
+        bond.proposal_level = 2
+
+        return [Codelet('build_builder', (bond,), strength)]
         
     def bottom_up_bond_scout(self):
         '''
@@ -481,7 +505,7 @@ class Workspace(object):
         '''
         Calculates the proposed descriptions's strength and probabilistically
         decides whether or not to post a description builder codelet with
-        urgnency as a function of the strength.
+        urgency as a function of the strength.
         '''
         # Activate the descriptor.
         description.descriptor.activation += self.activation
@@ -614,7 +638,6 @@ class Workspace(object):
             neighbor = object.choose_right_neighbor()
         if not neighbor:
             return
-
 
         # Choose bond facet.
         facet = object.choose_bond_facet(neighbor)
