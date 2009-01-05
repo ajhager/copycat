@@ -583,8 +583,58 @@ class Workspace(object):
         return self.propose_bond(from_object, to_object, category, facet,
                                  from_descriptor, to_descriptor)
 
-    def top_down_bond_scout__direction(self, direction):
-        print 'Top Down Bond Scout - Direction'
+    def top_down_bond_scout__direction(self, category):
+        '''
+        Chooses a string probabilistically by the relevance of the direction
+        category in the string and the string's unhappiness. Chooses an object
+        in the string probabilisitically by intra string salience. Chooses a
+        neighbor of the object in the given direction. Chooses a bond facet
+        probabilistically by relevance in the string. Checks if there is a
+        bond of the given direction between the two descriptors of the facet,
+        posting a bond strength tester codelet with urgency a function of the
+        degree of association of bonds of the bond category.
+        '''
+        # Choose a string.
+        initial_string = self.initial_string
+        target_string = self.target_string
+        i_relevance = initial_string.local_direction_category_relevance(category)
+        t_relevance = target_string.local_direction_category_relevance(category)
+        i_unhappiness = initial_string.intra_string_unhappiness()
+        t_unhappiness = target_string.intra_string_unhappiness()
+        values = [round(util.average(i_relevance, i_unhappiness)),
+                  round(util.average(t_relevance, t_unhappiness))]
+        index = util.select_list_position(values)
+        string = [initial_string, target_string][index]
+
+        # Choose an object and neighbor.
+        object = string.choose_object('intra_string_salience')
+        if category.name = 'plato_left':
+            neighbor = object.choose_left_neighbor()
+        elif category.name = 'plato_right':
+            neighbor = object.choose_right_neighbor()
+        if not neighbor:
+            return
+
+
+        # Choose bond facet.
+        facet = object.choose_bond_facet(neighbor)
+        if not facet:
+            return
+        
+        # Get the descriptors of the facet if they exist.
+        object_descriptor = object.descriptor(facet)
+        neighbor_descriptor = neighbor.descriptor(facet)
+        if (not object_descriptor) or (not neighbor_descriptor):
+            return
+
+        # Check for a possible bond.
+        bond_category = from_descriptor.bond_category(to_descriptor)
+        if (not bond_category) or (not bond_category.directed):
+            return
+
+        # Propose the bond.
+        return self.propose_bond(from_object, to_object, bond_category, facet,
+                                 from_descriptor, to_descriptor)
 
     def top_down_description_scout(self, description_type):
         '''
