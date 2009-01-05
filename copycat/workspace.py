@@ -15,6 +15,7 @@
 # 02110-1301, USA.
 
 import math
+import random
 
 import util
 from string import String
@@ -91,11 +92,11 @@ class Workspace(object):
         have been made.  If so, see if the snag condition should be ended.
         This will also need work as we learn more about handling snags.
         '''
+        return # need to revisit this
         if self.snag_object and self.snag_condition:
             new_structures = []
             for structure in self.structures:
-                if structure.name != 'bond' and \
-                        not self.is_structure_in_snag_structures(structure):
+                if snag_structures(structure):
                     new_structures.append(structure)
             
             unclamp_probability = 0
@@ -340,7 +341,40 @@ class Workspace(object):
         print 'Bottom Up Description Scout'
 
     def breaker(self):
-        print 'Breaker'
+        '''
+        Chooses a structure at random and decides whether or not to break it
+        as a function of its total weakness.
+        '''
+        # Probabilistically fizzle based on temperature.
+        if util.flip_coin((100.0 - self.temperature) / 100.0):
+            return
+
+        # Choose a structure at random.
+        structure = random.choice(self.structures())
+        if not structure:
+            return
+
+        # If the structure is a bond in a group, have to break the group first.
+        if isinstance(structure, Bond) and structure.group:
+            structures = [structure, structure.group]
+        else:
+            structures = [structure]
+
+        # See if the structures can be broken.
+        for structure in structures:
+            probability = structure.total_weakness() / 100.0
+            probability = self.temperature_adjusted_probability(probability)
+            if not util.flip_coin(probability):
+                return
+
+        # Break the structures.
+        for structure in structues:
+            if isinstance(structure, Bond):
+                self.break_bond(structure)
+            elif isinstance(structure, Group):
+                self.break_group(structure)
+            elif isinstance(structure, Correspondence):
+                self.break_correspondence(structure)
 
     def correspondence_builder(self, correspondence, flip_object2):
         print 'Correspondence Builder'

@@ -104,7 +104,6 @@ class Slipnode(object):
                 similar_links.append(link)
         return similar_links
 
-
 class Sliplink(object):
     # TODO: Add docs.
     def __init__(self, from_node, to_node, label=None, fixed_length=None):
@@ -124,7 +123,6 @@ class Sliplink(object):
             return 100 - self.fixed_length
         else:
             return self.label.degree_of_association()
-
 
 class Slipnet(object):
     '''
