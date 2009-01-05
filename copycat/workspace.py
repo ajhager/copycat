@@ -111,6 +111,17 @@ class Workspace(object):
                     description.set_clamp(False)
                 self.snag_object.set_clamp_salience(False)
 
+    def choose_object(self, method):
+        '''
+        Returns an object chosen by temperature adjusted probability according
+        to the given method.
+        '''
+        objects = self.objects()
+        values = [getattr(object, method)() for object in objects]
+        values = self.temperature_adjusted_values(values)
+        index = util.select_list_position(values)]
+        return objects[index]
+
     def delete_proposed_structure(self, structure):
         pass
 
@@ -338,7 +349,38 @@ class Workspace(object):
         print 'Bottom Up Correspondence Scout'
 
     def bottom_up_description_scout(self):
-        print 'Bottom Up Description Scout'
+        '''
+        Chooses an object probabilistically by total salience and chooses a
+        relevant description of the object probabilistically by activation.
+        If the description has any "has property" links that are short enough,
+        chooses one of the properties probabilistically based on degree of
+        association and activation. Then proposes a description based on the
+        property and posts a description strength tester codelet with urgency
+        a function of the activation of the property.
+        '''
+        # Choose an object.
+        object = self.workspace.choose_object('total_salience')
+
+        # Choose a relevant description of the object.
+        description = object.choose_relevant_description_by_activation()
+        if not description:
+            return
+        descriptor = description.descriptor
+
+        # Check for short enough "has property" links.
+        links = descriptor.similar_has_property_links()
+        if not links:
+            return
+
+        # Choose a property by degree of association and activation.
+        associations = [link.degree_of_association() for link in links]
+        activations = [link.to_node().activation() for link in links]
+        choices = map(lambda a, b: a * b, associations, activations)
+        index = util.select_list_position(choices)
+        property = links[index].to_node()
+        
+        # Propose the description.
+        self.propose_description(object, property.category(), property)
 
     def breaker(self):
         '''
