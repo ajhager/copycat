@@ -371,9 +371,7 @@ class Workspace(object):
         # Try to break any groups shared by from_object and to_object.
         incompatible_groups = from_object.common_groups(to_object)
         if incompatible_groups:
-            # FIXME: This fizzles if the bond wins.  (from copycat code)
-            # I think it should fizzle if it loses.
-            if self.fight_it_out(bond, 1, incompatible_groups,
+            if  not self.fight_it_out(bond, 1, incompatible_groups,
                 max([group.letter_span() for group in incompatible_groups])):
                 return
 
@@ -382,9 +380,8 @@ class Workspace(object):
                                         bond.is_rightmost_in_string()):
             incompatible_correspondences = bond.incompatible_correspondences()
             if incompatible_corresondences:
-                # FIXME: This fizzles if the bond wins.  (from copycat code)
-                # I think it should fizzle if it loses.
-                if self.fight_it_out(bond, 2, incompatible_correspondences, 3):
+                if not self.fight_it_out(bond, 2,
+                                         incompatible_correspondences, 3):
                     return
 
         # Break incompatible bonds, if any.
@@ -470,7 +467,68 @@ class Workspace(object):
                                  from_descriptor, to_descriptor)
 
     def bottom_up_correspondence_scout(self):
-        print 'Bottom Up Correspondence Scout'
+        '''
+        Chooses two objects, one from the initial string and one from the
+        target string, probabilistically by inter string salience. Finds all
+        concept mappings between nodes at most one link away. If any concept
+        mappings can be made between distinguishing descriptors, propoes a
+        correspondence between the two objects, including all the concept
+        mappings. Posts a correspondence strength tester codelet with urgency
+        a funcion of the average strength of the distinguishing concept
+        mappings.
+        '''
+        # Choose two objects.
+        object1 = self.initial_string.choose_object('inter_string_salience')
+        object2 = self.target_string.choose_object('inter_string_salience')
+
+        # If one object spans the whole string and the other does not, fizzle
+        if object1.spans_whole_string() != object2.spans_whole_string():
+            return
+
+        # Get the possible concept mappings.
+        mappings = self.concept_mappings(object1, object2,
+                                         object1.relevant_descriptions(),
+                                         object2.relevant_descriptions())
+        if not mappings:
+            return
+
+        # Decide whether or not to continue based on slippability.
+        possible = False
+        for mapping in mappings:
+            probability = mapping.slippablity() / 100.0
+            probability = self.temperature_adjusted_probability(probability)
+            if util.flip_coin(probability):
+                possible = True
+        if not possible:
+            return
+
+        # Check if there are any distinguishing mappings.
+        distinguished_mappings = [m.distinguished() for m in mappings]
+        if not distinguished_mappings:
+            return
+
+        # If both objects span the strings, check if description needs flipped.
+        possible_opposite_mappings = []
+        for mapping in distinguishing_mappings:
+            description_type = mapping.description_type1
+            if description_type != 'plato_string_position_category' and \
+               description_type != 'plato_bond_facet':
+                   possible_opposite_mappings.append(mapping)
+
+        opposite_descriptions = [m.description_type1 for m in mappings]
+        if all([object1.string_spanning_group(),
+                object2.string_spanning_group(),
+                # FIXME: not plato_opposite.is_active(),
+                self.all_opposite_concept_mappings(possible_opposite_mappings),
+                'plato_direction_category' in opposite_descriptions]):
+            old_object2_string_number = object2.string_number
+            object2 = object2.flipped_version()
+            object2.string_number = old_object2_string_number
+            mappings = self.concept_mappings(object1, object2,
+                                             object1.relevant_descriptions(),
+                                             object2.relevant_descriptions())
+
+        return self.propose_correspondence(object1, object2, mappings, True)
 
     def bottom_up_description_scout(self):
         '''
