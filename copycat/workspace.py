@@ -377,8 +377,8 @@ class Workspace(object):
             return
 
         # Propose the bond.
-        self.propose_bond(from_object, to_object, facet,
-                          from_descriptor, to_descriptor)
+        return self.propose_bond(from_object, to_object, facet,
+                                 from_descriptor, to_descriptor)
 
     def bottom_up_correspondence_scout(self):
         print 'Bottom Up Correspondence Scout'
@@ -415,7 +415,7 @@ class Workspace(object):
         property = links[index].to_node()
         
         # Propose the description.
-        self.propose_description(object, property.category(), property)
+        return self.propose_description(object, property.category(), property)
 
     def breaker(self):
         '''
@@ -526,7 +526,62 @@ class Workspace(object):
         print 'Rule Translator'
 
     def top_down_bond_scout__category(self, category):
-        print 'Top Down Bond Scout - Category'
+        '''
+        Chooses a string probabilistically by the relevance of the category in
+        the string and the string's unhappiness. Chooses an object and a
+        neighbor of the object in the string probabilistically by instra
+        string salience. Chooses a bond facet probabilistically by relevance
+        in the string. Checks if there is a bond of the category between the
+        two descriptors of the facet, posting a bond strength tester codelet
+        with urgency a function of the degree of association of bonds of the
+        category.
+        '''
+        # Choose a string.
+        initial_string = self.initial_string
+        target_string = self.target_string
+        i_relevance = initial_string.local_bond_category_relevance(category)
+        t_relevance = target_string.local_bond_category_relevance(category)
+        i_unhappiness = initial_string.intra_string_unhappiness()
+        t_unhappiness = target_string.intra_string_unhappiness()
+        values = [round(util.average(i_relevance, i_unhappiness)),
+                  round(util.average(t_relevance, t_unhappiness))]
+        index = util.select_list_position(values)
+        string = [initial_string, target_string][index]
+
+        # Choose an object and neighbor.
+        object = string.choose_object('intra_string_salience')
+        neighbor = object.choose_neighbor()
+        if not neighbor:
+            return
+
+        # Choose bond facet.
+        facet = object.choose_bond_facet(neighbor)
+        if not facet:
+            return
+
+        # Get the descriptors of the facet if they exist.
+        object_descriptor = object.descriptor(facet)
+        neighbor_descriptor = neighbor.descriptor(facet)
+        if (not object_descriptor) or (not neighbor_descriptor):
+            return
+
+        # Check for a possible bond.
+        if object_descriptor.bond_category(neighbor_descriptor) == category:
+            from_object = object
+            to_object = neighbor
+            from_descriptor = object_descriptor
+            to_descriptor = neighbor_descriptor
+        elif neighbor_descriptor.bond_category(object_descriptor) == category:
+            from_object = neighbor
+            to_object = object
+            from_descriptor = neighbor_descriptor
+            to_descriptor = object_descriptor
+        else:
+            return
+
+        # Propose the bond.
+        return self.propose_bond(from_object, to_object, category, facet,
+                                 from_descriptor, to_descriptor)
 
     def top_down_bond_scout__direction(self, direction):
         print 'Top Down Bond Scout - Direction'
@@ -551,7 +606,7 @@ class Workspace(object):
         descriptor = descriptors[index]
 
         # Propose the description.
-        self.propose_description(object, description_type, descriptor)
+        return self.propose_description(object, description_type, descriptor)
 
     def top_down_group_scout__category(self, category):
         print 'Top Down Group Scout - Category'

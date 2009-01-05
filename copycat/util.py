@@ -80,6 +80,12 @@ def flip_coin(prob_of_true = .5):
     return select_assoc([[True, int(prob_of_true * 1000)]
                         ,[False, int((1 - prob_of_true) * 1000)]])
 
+def average(*args):
+    '''
+    Returns the arithmetic mean of its arguments.
+    '''
+    return sum(args) / float(len(args))
+
 def weighted_average(*value_weight_pairs):
     '''
     Return the weighted arithmetic mean of arguments: (value, weight), . . .
