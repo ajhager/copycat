@@ -887,7 +887,31 @@ class Workspace(object):
                                   direction_category)
 
     def group_strength_tester(self, group):
-        print 'Group Strength Tester'
+        '''
+        Calculates the proposed group's strength and probabilistically decides
+        whether or not to post a group builder codelet with urgency a function
+        of the strength.
+        '''
+        # Calculate the group's stength.
+        group.update_strength_values()
+        stength = group.total_stength()
+
+        # Decide whether or not to post the group builder codelet.
+        probability = strength / 100.0
+        probability = self.temperature_adjusted_probability(probability)
+        if not util.flip_coin(probability):
+            group.string.delete_proposed_group(group)
+            return
+
+        # Add some activation to descriptions.
+        group.bond_category.buffer += self.activation
+        if group.direction_category:
+            group.direction_category.buffer += self.activation
+
+        # Set group's proposal level.
+        group.proposal_level = 2
+
+        return Codelet('group_builder', (group,), strength)
 
     def important_object_correspondence_scout(self):
         '''
