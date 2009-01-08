@@ -847,7 +847,44 @@ class Workspace(object):
         print 'Group Builder'
 
     def group_scout__whole_string(self):
-        print 'Group Scout - Whole String'
+        '''
+        Tries to make a group out of the entire string. If possible, makes a
+        proposed string spanning group and posts a group strength tester
+        codelet with urgency a function of the degree of association of bonds
+        of the given bond category.
+        '''
+        string = self.random_string()
+
+        # Choose a salient leftmost object and get objects and bonds.
+        if not string.bonds():
+            return
+        left_object = string.choose_leftmost_object()
+        next_bond = left_object.right_bond
+        objects = [left_object]
+        bonds = []
+        while next_bond:
+            bonds.append(next_bond)
+            next_object = next_bond.right_object
+            objects.append(next_object)
+            next_bond = next_object.right_bond
+        right_object = next_object
+        if (not bonds) or (not right_object.rightmost_in_string()):
+            return
+
+        # Choose a random bond and try making a group based on it.
+        bond = random.choice(bonds)
+        bond_category = bond.bond_category
+        direction_category = bond.direction_category
+        facet = bond.bond_facet
+        bonds = self.possible_group_bonds(bond_category, direction_category,
+                                          facet, bonds)
+        if not bonds:
+            return
+
+        group_category = bond_category.related_node(plato_group_category)
+
+        return self.propose_group(objects, bonds, group_category,
+                                  direction_category)
 
     def group_strength_tester(self, group):
         print 'Group Strength Tester'
