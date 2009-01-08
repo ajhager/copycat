@@ -1088,7 +1088,125 @@ class Workspace(object):
         return self.propose_description(object, description_type, descriptor)
 
     def top_down_group_scout__category(self, category):
-        print 'Top Down Group Scout - Category'
+        '''
+        Chooses an object, a direction to scan in, and a number of bonds to
+        scan in that direction. The direction category of the group is the
+        direction of the first bond scanned. If there are no bonds and the
+        group category is not plato-same-group, the chooses a direction
+        category probabilistically as a function of global and local relevance.
+        Scans until no more bonds of the necessary type and direction are
+        found. If possible, makes a proposed group of the given type of the
+        objects scanned and posts a group length tester codelet with urgency
+        a function of the degree of association of bonds of the given bond
+        category.
+        '''
+        bond_category = category.related_node('plato_bond_category')
+
+        # Choose a string based on local bond category relevance.
+        i_string = self.initial_string
+        i_relevance = i_string.local_bond_category_relevance(bond_category)
+        i_unhappiness = i_string.intra_string_unhappiness()
+        t_string = self.target_string
+        t_relevance = t_string.local_bond_category_relevance(bond_category)
+        t_unhappiness = t_string.intra_string_unhappiness()
+        choices = [i_string, t_string]
+        weights = [round(util.average(i_relevance, i_unhappiness)),
+                   round(util.average(t_relevance, t_unhappniess))]
+        string = choices[util.select_list_position(weights)]
+
+        # Choose an object by intra string salience.
+        object = string.choose_object('intra_string_salience')
+        if object.spans_whole_string():
+            return
+
+        # Choose a direction in which to scan.
+        # FIXME: no access to slipnodes.
+        if object.leftmost_in_string():
+            direction = plato_right
+        elif object.rightmost_in_string():
+            direction = plato_left
+        else:
+            activations = [plato_left.activation, plato_right.activation]
+            index = util.select_list_position(activations)
+            direction = [plato_left, plato_right][index]
+
+        # Choose the number of bonds to scan.
+        number = util.select_list_position(string.bonds_to_scan_distribution())
+
+        # Get the first bond in that direction.
+        if direction == plato_left:
+            bond = object.left_bond
+        else:
+            bond = object.right_bond
+
+        if (not bond) or (bond.bond_category != bond_category):
+            if isinstance(object, Group):
+                return
+            objects = [object]
+            bonds = []
+            if category == plato_samegroup:
+                possible_single_letter_group_direction = None
+            else:
+                choices = [plato_left, plato_right]
+                weights = [node.local_descriptor_support(string, plato_group) \
+                            for node in choices]
+                index = util.select_list_position(weights)
+                possible_single_letter_group_direction = choices[index]
+
+            possible_single_letter_group = Group(category,
+                                                 possible_single_letter_direction,
+                                                 object, object, objects, bonds)
+
+            probility = possible_possible_single_letter_group.single_letter_group_probability()
+            if util.flip_coin(probability):
+                return self.propose_group(objects, bonds, category,
+                                          possible_single_letter_group_direction)
+        
+        direction_category = bond.direction_category
+        facet = bond.bond_facet
+        opposite_bond_category = bond_category.get_related_node(plato_opposite)
+        if direction_category:
+            opposite_direction_category = direction_category.get_related_node(plato_opposite)
+
+        # Get objects and bonds.
+        objects = [bond.left_object, bond.right_object]
+        bonds = [bond]
+        next_bond = bond
+        for i in range(2, number):
+            bond_to_add = None
+            if direction = plato_left:
+                next_bond = next_bond.choose_left_neighbor()
+                if not next_bond:
+                    break
+                else:
+                    next_object = next_bond.left_object
+            else:
+                next_bond = next_bond.choose_right_neighbor()
+                if not next_bond:
+                    break
+                else:
+                    next_object = next_bond.right_object
+
+            # Decide whether or not to add bond.
+            if not next_bond:
+                bond_to_add = None
+            elif (next_bond.bond_category = bond_category) and \
+                 (next_bond.direction_category = direction_category)
+                 (next_bond.bond_facet = facet):
+                bond_to_add = next_bond
+            elif (next_bond.bond_category = opposite_bond_category) and \
+                 (next_bond.direction_category = opposite_direction_category)
+                 (next_bond.bond_facet = facet):
+                bond_to_add = next_bond.flipped_version()
+
+            if bond_to_add:
+                objects.append(next_object)
+                bonds.append(bond_to_add)
+            else:
+                break
+
+        # Propose the group.
+        return self.propose_group(objects, bonds, category, direction_category)
 
     def top_down_group_scout__direction(self, direction):
         print 'Top Down Group Scout - Direction'
