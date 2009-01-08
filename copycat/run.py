@@ -52,19 +52,22 @@ class Run(object):
 
         if len(self.coderack) == 0:
             self.slipnet.clamp_initial_nodes()
-            initial_codelets = [Codelet('bottom_up_bond_scout'),
-                                Codelet('replacement_finder'),
-                                Codelet('bottom_up_correspondence_scout')]
-            codelets_needed = len(self.workspace.objects()) * 2
-            removed = self.coderack.post(initial_codelets * codelets_needed)
-            for codelet in removed:
-                self.workspace.delete_proposed_structure(codelet.arguments)
+            self.post(self.workspace.initial_codelets())
 
         self.run(self.coderack.choose())
 
         if self.workspace.translated_rule:
-            self.workspace.answer_builder()
+            self.run(Codelet('answer_builder'))
             self.update()
+
+    def post(self, codelets):
+        '''
+        Post some codelets to the coderack. Any codelets that had to be removed
+        should have their proposed structures removed from the workspace.
+        '''
+        removed = self.coderack.post(codelets)
+        for codelet in removed:
+            self.workspace.delete_proposed_structure(codelet.arguments)
 
     def update(self):
         '''
@@ -76,10 +79,8 @@ class Run(object):
             self.slipnet.unclamp_initial_nodes()
 
         self.coderack.update(self.workspace.temperature)
-        removed = self.coderack.post(self.workspace.bottom_up_codelets())
-        removed += self.coderack.post(self.slipnet.top_down_codelets())
-        for codelet in removed:
-            self.workspace.delete_proposed_structure(codelet.arguments)
+        self.post(self.workspace.bottom_up_codelets())
+        self.post(self.slipnet.top_down_codelets())
         self.slipnet.update()
 
     def run(self, codelet):
@@ -88,22 +89,21 @@ class Run(object):
         of a couple of bookkeeping values and their name.  The name is really
         just the name of a workspace method.  When a codelet is sent here to
         be run, the codelet's name is looked up in the workspace's atrribute
-        dictionary and run with the codelets argument attribute.
+        dictionary and run with the codelets argument attribute. The codelet
+        method can return a flag to clear the coderack and a list of codelets
+        to post.
         '''
         if codelet:
-            to_post = getattr(self.workspace, codelet.name)(*codelet.arguments)
-            self.coderack.post(to_post)
-
-    def deal_with_snag(self):
-        '''
-        If there is a snag while attempting to build an answer, delete all
-        proposed structures, empty the coderack, raise and clamp the
-        temperature, and activate and clamp the activation of all the
-        desriptions of the objects causing the snag.
-        '''
-        self.workspace.set_snag_condition()
-        self.coderack.empty()
-        removed = self.coderack.post(self.workspace.initial_codelets())
-        for codelet in removed:
-            self.workspace.delete_proposed_structure(codelet.arguments)
-        self.update()
+            method = getattr(self.workspace, codelet.name)
+            result = method(*codelet.arguments)
+            if result is None:
+                return
+            elif len(result) == 1:
+                codelets = result
+            elif len(result) == 2:
+                replacing, codelets = result
+                if replacing:
+                    self.coderack.empty()
+            else:
+                return
+            self.post(codelets)

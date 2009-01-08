@@ -70,22 +70,12 @@ class Workspace(object):
 
         self.update_temperature()
 
-    def set_snag_condition(self):
-        '''
-        Called when dealing with a snag.  This is most definitely going to
-        need some work as we get a better idea of snags.
-        '''
-        self.snag_count += 1
-        self.last_snag_time = self.coderack.codelets_run
-        self.snag_structures = self.workspace.structures()
-        self.translated_rule = None
-        self.answer_string = None
-        self.snag_conition = True
-        self.temperature = 100
-        self.clamp_temperature = True
-        for description in self.snag_object.descriptions():
-            description.descriptor.set_clamp(True)
-        self.snag_object.set_clamp_salience(True)
+    def initial_codelets(self):
+        codelets = [Codelet('bottom_up_bond_scout'),
+                    Codelet('replacement_finder'),
+                    Codelet('bottom_up_correspondence_scout')]
+        number_needed = len(self.objects()) * 2
+        return initial_codelets * number_needed
 
     def test_snag_condition(self):
         '''
@@ -335,7 +325,79 @@ class Workspace(object):
 
     # Codelet methods.
     def answer_builder(self):
-        print 'Answer Builder'
+        # Runs the translated rule on the target string to build the answer.
+        self.answer_string = String('')
+        self.answer_string.highest_string_number = -1
+
+        # Used when the answer involves changing the length of a group.
+        self.changed_length_group = None
+
+        # Used in case there is a snag while trying to build the answer.
+        self.snag_object = None
+
+        # Get objects in the target string that need changing.
+        if self.translated_rule.no_change()
+            objects_to_change = None
+        else:
+            objects_to_change = self.objects_to_change_for_answer()
+
+        # Get the description type to change.
+        description_type = self.translated_rule.replaced_description_type
+
+        # Change the objects needed in the target string.
+        answer_string_letters = []
+        for object in self.target_string.objects():
+            if object in objects_to_change:
+                letters = self.modified_letters_for_answer(object,
+                                                           description_type)
+                answer_string_letters.extend(letters)
+
+        # If there was snag building the answer, deal with it and fizzle.
+        if self.snag_object:
+            self.snag_count += 1
+            self.snag_structures = self.structures()
+
+            # Remove proposed structures.
+            for bond in self.proposed_bonds:
+                bond.string.delete_proposed_bond(bond)
+            for group in self.proposed_groups:
+                group.string.delete_proposed_group(g)
+            for correspondence in self.proposed_correspondences:
+                self.delete_proposed_correspondence(correspondence)
+        
+            # Reset answer variables, clamp temperature, and clamp snag nodes.
+            self.translated = None
+            self.answer_string = None
+            self.snag_condition = True
+            self.temperature = 100
+            self.clamp_temperature = True
+            for description in self.snag_object.descriptions():
+                description.clamp = True
+            self.snag_object.clamp_salience = True
+
+            # Set flag to empty the coderack and post initial codelets.
+            return (True, self.initial_codelets()]
+
+        # Set up the answer string.
+        # Add unmodified letters.
+        letters = self.unmodified_letters_for_answer(objects_to_change)
+        answer_string_letters.extend(letters)
+
+        # If the rule directed a length change, fix the letter positions.
+        if self.changed_length_group:
+            for letter in answer_string_letters:
+                left_position = letter.left_string_position
+                right_position = letter.right_string_position
+                group_position = self.changed_length_group.right_string_position
+                if (letter not in self.modified_letters) and \
+                   (left_position > group_position):
+                    letter.left_string_position += self.amount_length_chnaged
+                    letter.right_string_position = letter.left_string_position+\
+                            self.amount_length_changed
+
+        # Set up the answer string.
+        for letter in answer_string_letters:
+            self.answer_string.add_letter(letter)
 
     def bond_builder(self, bond):
         '''
@@ -601,7 +663,104 @@ class Workspace(object):
                 self.break_correspondence(structure)
 
     def correspondence_builder(self, correspondence, flip_object2):
-        print 'Correspondence Builder'
+        '''
+        Attempts to build the proposed correspondence, fighting it out with
+        competitors if necessary.
+        '''
+        object1 = correspondence.object1
+        object2 = correspondence.object2
+        flipped = object2.flipped_version()
+        existing_object2_group = self.target_string.group_present(flipped)
+
+        # If the objects do not exist anymore, then fizzle.
+        objects = self.objects()
+        if (object1 not in objects) or \
+            ((object2 not in objects) and \
+            (not (flip_object2 and existing_object2_group))):
+            return
+
+        # If the correspondence exists, add and activiate concept mappings.
+        existing_correspondence = self.correspondence_present(correspondence)
+        if existing_correspondence:
+            self.delete_proposed_correspondence(correspondence)
+            labels = [m.label for m in correspondence.concept_mappings]
+            for label in labels:
+                label.buffer += self.activation
+            mappings_to_add = []
+            for mapping in correspondence.concept_mappings:
+                if not correspondence.mapping_present(mapping):
+                    mappings_to_add.append(mapping)
+            existing_correspondence.add_concept_mappings(mappings_to_add)
+            return
+
+        # If any concept mappings are no longer relevant, then fizzle.
+        for mapping in correspondence.concept_mappings:
+            if not mapping.relevant:
+                return
+
+        # Remove the proposed correpondence from proposed correspondences.
+        self.delete_proposed_correspondence(correspondence)
+
+        # The proposed correspondence must win against all incompatible ones.
+        incompatible_correspondences = correspondence.incompatible_corresondences()
+        for incompatible_correspondence in incompatible_correspondences:
+            if not self.fight_it_out(correspondence,
+                                     correspondence.letter_span,
+                                     [incompatible_correspondence],
+                                     incompatible_correspondence.letter_span):
+                return
+
+        # The proposed correspondence must win against any incompatible bond.
+        if (object1.leftmost_in_string or object1.rightmost_in_string) and \
+               (object2.leftmost_in_string or object2.rightmost_in_string):
+            incompatible_bond = correspondence.incompatible_bond()
+            if incompatible_bond:
+                if not self.fight_it_out(correspondence, 3,
+                                         [incompatible_bond], 2):
+                    return
+                # If the bond is in a group, fight against it as well.
+                incompatible_group = incompatible_bond.group
+                if incompatible_group:
+                    if not self.fight_it_out(correspondence, 1,
+                                             [incompatible_group], 1):
+                        return
+
+        # If the desired object2 is flipped its existing group.
+        if flip_object2:
+            if not self.fight_it_out(correspondence, 1,
+                                     [existing_object2_group], 1):
+                return
+
+        # The proposed corresondence must win against an incompatible rule.
+        incompatible_rule = correspondence.incompatible_rule()
+        if incompatible_rule:
+            if not self.fight_it_out(correspondence, 1, [self.rule], 1):
+                return
+
+        # Break all incompatible structures.
+        if incompatible_correspondences:
+            for incompatible_correspondence in incompatible_correspondences:
+                self.break_correspondence(incompatible_correspondence)
+
+        if incompatible_bond:
+            self.break_bond(incompatible_bond)
+
+        if incompatible_group:
+            self.break_group(incompatible_group)
+
+        if existing_object2_group:
+            self.break_group(existing_object2_group)
+            for bond in existing_object2_group.bonds():
+                self.break_bond(bond)
+            for bond in object2.bonds():
+                self.build_bond(bond)
+            self.build_group(object2)
+
+        if incompatible_rule:
+            self.break_rule(self.rule)
+
+        # Build the correspondence.
+        self.build_correspondence(correspondence)
 
     def correspondence_strength_tester(self, correspondence, flip_object2):
         '''
