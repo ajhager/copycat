@@ -1115,7 +1115,7 @@ class Workspace(object):
             change_relation = slipnet.label_node(i_letter_category,
                                                  m_letter_category)
             if change_relation:
-                description = ExtrinsicDescription(chang_relation,
+                description = ExtrinsicDescription(change_relation,
                                                    plato_letter_category,
                                                    i_letter)
                 m_letter.add_extrinsic_description(description)
@@ -1128,7 +1128,81 @@ class Workspace(object):
         print 'Rule Builder'
 
     def rule_scout(self):
-        print 'Rule Scout'
+        '''
+        Fills in the rule template, "Replace _____ by _____". To do this, it
+        chooses descriptions of the changed object in the initial string and
+        the object in the modified string that replaces it. If a rule can be
+        made, it is proposed, and a rule strength tester codelet is posted with
+        urgency a function of the degree of conceptual depth of the chosen
+        descriptions.
+        '''
+        # If not all replacements have been found, then fizzle.
+        if self.null_replacement():
+            return
+
+        # Find changed object.
+        changed_objects = []
+        for object in self.initial_string.objects()
+            if object.changed():
+                changed_objects.append(object)
+
+        # If there is more than one changed object signal an error and quit.
+        if len(changed_objects) > 1:
+            print "Can't solve problems with more than one letter changed."
+            sys.exit()
+
+        # If not changed object, propose rule specifying no changes.
+        if not changed_objects:
+            self.propose_rule(None, None, None, None)
+            return
+
+        i_object = changed_objects[0]
+        m_object = i_object.replacement.object2
+
+        # Get all relevant distinguishing descriptions.
+        if not i_object.correspondences:
+            i_descriptions = i_object.rule_initial_string_descriptions
+        else:
+            correspondence_slippages = i_object.correspondence.slippages
+            i_descriptions = []
+            for description in i_object.rule_initial_string_descriptions:
+                # FIXME: Where is this defined?
+                applied_slippages = description.apply_slippages(i_object,
+                        correspondence_slippages)
+                relevant_descriptions = i_object.correspondence.object2.relevant_descriptions()
+                if description_member(applied_slippages, relevant_descriptions):
+                    i_descriptions.append(description)
+        if not i_descriptions:
+            return
+
+        # Choose the descriptior for the initial string object.
+        depths = [desription.conceptual_depth for description in i_descriptions]
+        i_probabilities = self.temperature_adjusted_values(depths)
+        index = util.select_list_position(i_probabilities)
+        i_description = i_descriptions[index]
+
+        # Choose the descriptor for the modified string object.
+        m_descriptions = m_object.extrinsic_descriptions() + \
+                         m_object.rule_modified_string_descriptions()
+        if not m_descriptions:
+            return
+        depths = [desription.conceptual_depth for description in m_descriptions]
+        m_probabilities = self.temperature_adjusted_values(depths)
+        index = util.select_list_position(m_probabilities)
+        m_description = m_descriptions[index]
+
+        # Kludge to avoid rules like "Replace C by succesor of C".
+        relation = m_description.relatino
+        related_descriptor = i_description.descriptor.related_node(relation)
+        if isinstance(m_description, ExtrinsicDescription) and \
+                related_descriptor:
+            for description in m_object.descriptions:
+                if description.descriptor = related_descriptor:
+                    m_desription = description
+                    break
+
+        # Propose the rule.
+        self.propose_rule(i_object, i_description, m_object, m_description)
 
     def rule_strength_tester(self, rule):
         print 'Rule Strength Test'
