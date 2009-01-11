@@ -844,7 +844,98 @@ class Workspace(object):
         return [Codelet('description_builder', (description,), strength)]
 
     def group_builder(self, group):
-        print 'Group Builder'
+        '''
+        Tries to build the proposed group, fighting with any competitors.
+        '''
+        string = group.string
+
+        # Make sure this group doesn't already exist.
+        existing_group = string.group_present(group)
+        if existing_group:
+            for description in existing_group.descriptions:
+                description.desriptor.buffer += self.activation
+            for description in group.descriptions:
+                if not existing_group.description_present(description):
+                    new_description = Description(existing_group,
+                                                  description.description_type,
+                                                  description.descriptor)
+                    self.build_description(new_description)
+            string.delete_proposed_group(group)
+            return
+
+        # Make sure all bonds or their flipped versions are still there.
+        all_bonds_exist = True
+        for bond in group.bonds():
+            flipped = bond.flipped_version()
+            if not (string.bond_present(bond) or string.bond_present(flipped)):
+                all_bonds_exist = False
+                break
+        if not all_bonds_exist:
+            string.delete_proposed_group(group)
+            return
+
+        # Take the proposed group off the list of proposed groups.
+        string.delete_proposed_group(group)
+
+        # Check if any bonds need to be flipped and fight if so.
+        bonds_to_flip = group.bonds_to_be_flipped()
+        if bonds_to_flip:
+            result = self.fight_it_out(group, group.letter_span,
+                                       bonds_to_flip, 1)
+            if not result:
+                return
+
+        # Fight any incompatible groups.
+        incompatible_groups = group.incompatible_groups()
+        for incompatible_group in incompatible_groups:
+            if (group.group_category == incompatible_group.group_category) and\
+            (group.direction_category == incompatible_group.direction_category):
+                group_weight = group.length
+                incompatible_weight = incompatible_group.length
+            else:
+                group_weight = 1
+                incompatible_weight = 1
+            result = self.fight_it_out(group, group_weight,
+                                       incompatible_group, incompatible_weight)
+            if not result:
+                return
+
+        # Fight any incompatible correspondences.
+        incompatible_correspondences = group.incompatible_correspondences()
+        if group.direction_category and incompatible_correspondences:
+            result = self.fight_it_out(group, 1,
+                                       incompatible_correspondences, 1)
+            if not result:
+                return
+
+        # Break incompatible groups.
+        for incompatible_group in incompatible_groups:
+            self.break_group(incompatible_group)
+
+        # Flip any bonds that need it and replace any bonds that were rebuilt.
+        new_bonds = []
+        if bonds_to_flip:
+            for bond in group.bonds():
+                flipped_bond = string.bond_present(bond.flipped_version())
+                if flipped_bond:
+                    self.break_bond(flipped_bond)
+                    self.build_bond(bond)
+                    new_bonds.append(bond)
+                else:
+                    existing_bond = string.bond_present(bond)
+                    if existing_bond != bond:
+                        new_bonds.append(existing_bond)
+                    else:
+                        new_bonds.append(bond)
+        # FIXME: Actually replacing the bonds is not in the copycat source.
+        #group.bonds = new_bonds
+
+        # Break incompatible correspondences.
+        for incompatible_correspondence in incompatible_correspondences:
+            self.break_correspondence(incompatible_correspondence)
+
+        # Build the group.
+        self.build_group(group)
 
     def group_scout__whole_string(self):
         '''
