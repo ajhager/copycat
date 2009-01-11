@@ -1093,7 +1093,36 @@ class Workspace(object):
         return self.propose_correspondence(object1, object2, mappings, True)
 
     def replacement_finder(self):
-        print 'Replacement Finder'
+        '''
+        Chooses a letter at random in the initial string. Checks if it is the
+        changed leter and marks it as changed. Adds a description of the 
+        relation describing the change if there is one. Can only deal with
+        letters changing into letters, not letters changing into groups or
+        vice versa.
+        '''
+        i_letter = self.initial_string.random_letter()
+        if i_letter.replacement:
+            return
+
+        m_letter = self.modified_string.letter(i_letter.left_string_position)
+
+        # Check if m_letter's letter_category is different form i_letter's.
+        i_letter_category = i_letter.get_descriptor(plato_letter_category)
+        m_letter_category = m_letter.get_descriptor(plato_letter_category)
+        if i_letter_category != m_letter_category:
+            i_letter.changed = True
+            # FIXME: Another example of needing slipnet information.
+            change_relation = slipnet.label_node(i_letter_category,
+                                                 m_letter_category)
+            if change_relation:
+                description = ExtrinsicDescription(chang_relation,
+                                                   plato_letter_category,
+                                                   i_letter)
+                m_letter.add_extrinsic_description(description)
+
+        replacement = Replacement(i_letter, m_letter)
+        self.add_replacement(replacement)
+        i_letter.replacement = replacement
 
     def rule_builder(self, rule):
         print 'Rule Builder'
