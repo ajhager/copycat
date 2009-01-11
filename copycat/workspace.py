@@ -1240,7 +1240,59 @@ class Workspace(object):
         return Codelet('rule_builder', (rule,), strength)
 
     def rule_translator(self):
-        print 'Rule Translator'
+        '''
+        Translate the rule according to the translation rules given in the
+        slippages on the workspace.
+        '''
+        # Make sure there is a rule.
+        if not self.rule:
+            return
+        if self.rule.no_change:
+            self.translated_rule = NonRelationRule(None, None, None,
+                                                   None, None, None)
+            return
+
+        # If the temperature is too high, fizzle.
+        threshold = self.answer_temperature_threshold_distribution.choose()
+        if self.temperature > threshold:
+            return
+
+        # Build the translation of the rule.
+        changed_object = None
+        for object in self.initial_string.objects():
+            if object.changed:
+                changed_object = object.
+                break
+        if not changed_object:
+            return
+
+        changed_object_correspondence = changed_object.correspondence
+
+        # Get the slippages to use.
+        slippages = self.slippages
+        if changed_object_correspondence:
+            for slippage in self.slippages:
+                for mapping in changed_object_correspondence.concept_mapptings:
+                    if self.contradictory_concept_mappings(mapping, slippage):
+                        slippages.remove(slippage)
+
+        rule = self.rule
+        if rule.relation():
+            args = []
+            for arg in [rule.object_category1, rule.descriptor1_face,
+                        rule.descriptor1, rule.object_category2,
+                        rule.replaced_description_type, rule.relation]:
+                args.append(arg.apply_slippages(slippages))
+                translated_rule = RelationRule(*args)
+        else:
+            args = []
+            for arg in [rule.object_category1, rule.descriptor1_facet,
+                        rule.descriptor1, rule.object_category2,
+                        rule.replaced_description_type, rule.descriptor2]:
+                args.append(arg.apply_slippages(slippages))
+                translated_rule = NonRelationRule(*args)
+
+        self.build_translated_rule(translated_rule)
 
     def top_down_bond_scout__category(self, category):
         '''
