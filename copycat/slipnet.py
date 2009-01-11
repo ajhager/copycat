@@ -169,13 +169,13 @@ class Slipnet(object):
         right.codelets.append('top_down_group_scout__direction')
 
         # Bond nodes
-        predecessor = self.add_slipnode('predecessor', 60)
+        predecessor = self.add_slipnode('predecessor', 50, 60)
         predecessor.directed = True
         predecessor.codelets.append('top_down_bond_scout__category')
-        successor = self.add_slipnode('successor', 60)
+        successor = self.add_slipnode('successor', 50, 60)
         successor.directed = True
         successor.codelets.append('top_down_bond_scout__category')
-        sameness = self.add_slipnode('sameness', 80)
+        sameness = self.add_slipnode('sameness', 80, 0)
         sameness.codelets.append('top_down_bond_scout_category')
 
         # Group nodes
@@ -189,8 +189,8 @@ class Slipnet(object):
         sameness_group.codelets.append('top_down_group_scout__category')
 
         # Other relation nodes
-        identity = self.add_slipnode('identity', 90)
-        opposite = self.add_slipnode('opposite', 90)
+        identity = self.add_slipnode('identity', 90, 0)
+        opposite = self.add_slipnode('opposite', 90, 80)
 
         # Object nodes
         letter = self.add_slipnode('letter', 20)
@@ -403,8 +403,11 @@ class Slipnet(object):
         elif kind == 'category':
             from_node.category_links.append(sliplink)
 
-    def add_slipnode(self, name, conceptual_depth):
+    def add_slipnode(self, name, conceptual_depth, intrinsic_link_length=None):
         slipnode = Slipnode(name, conceptual_depth)
+        if intrinsic_link_length != None:
+            slipnode.intrinsic_link_length = intrinsic_link_length
+            slipnode.shrunk_link_length = round(intrinsic_link_length * .4)
         self.slipnodes.append(slipnode)
         return slipnode
 
