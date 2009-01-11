@@ -1125,7 +1125,24 @@ class Workspace(object):
         i_letter.replacement = replacement
 
     def rule_builder(self, rule):
-        print 'Rule Builder'
+        '''
+        Tries to build the proposed rule, fighting with competitors as needed.
+        '''
+        # Make sure this rule doesn't already exist.
+        if self.rule = rule:
+            rule.activate_descriptions_from_workspace(rule, self.activation)
+            return
+
+        # Fight an existing rule.
+        if self.rule:
+            result = self.fight_it_out(rule, 1, self.rule, 1)
+            if not result:
+                return
+
+        # Build the rule.
+        if self.rule:
+            self.break_rule(self.rule)
+        self.build_rule(rule)
 
     def rule_scout(self):
         '''
@@ -1205,7 +1222,22 @@ class Workspace(object):
         self.propose_rule(i_object, i_description, m_object, m_description)
 
     def rule_strength_tester(self, rule):
-        print 'Rule Strength Test'
+        '''
+        Calculates the proposed rule's strength and probabilistically decides
+        whether or not to post a rule builder codelet with urgency a fucntion
+        for its strength.
+        '''
+        # Calculate strength.
+        rule.update_strength_values()
+        strength = rule.total_strength()
+
+        # Decide whether or not to post a rule builder codelet.
+        probability = strength / 100.0
+        probability = self.temperature_adjusted_probability(probability)
+        if not util.flip_coin(probability):
+            return
+
+        return Codelet('rule_builder', (rule,), strength)
 
     def rule_translator(self):
         print 'Rule Translator'
