@@ -14,6 +14,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import string
+
 class Slipnode(object):
     def __init__(self, name, depth):
         self.name = name
@@ -39,10 +41,10 @@ class Slipnode(object):
         self.iterate_group = None
 
     def outgoing_links(self):
-        return self.has_property_links +\
-               self.lateral_slip_links +\
-               self.lateral_nonslip_links +\
-               self.category_links +\
+        return self.has_property_links + \
+               self.lateral_slip_links + \
+               self.lateral_nonslip_links + \
+               self.category_links + \
                self.instance_links
 
     def category(self):
@@ -83,14 +85,15 @@ class Slipnode(object):
 
     def get_label_node(self, to_node):
         if self == to_node:
-            return None # plato_identity
+            return None
         else:
             for link in self.outgoing_links():
                 if link.to_node == to_node:
                     return link.label
 
     def get_related_node(self, relation):
-        # if relation == plato_identity: return self
+        if relation.name == 'identity':
+            return self
         for link in self.outgoing_links():
             if link.label == relation:
                 return link.to_node
@@ -124,30 +127,20 @@ class Sliplink(object):
             return self.label.degree_of_association()
 
 class Slipnet(object):
-    '''
-    The slipnet is copycat's log term memory and consists of a network of
-    conceptual nodes called slipnodes.
-    '''
     def __init__(self):
-        '''
-        So far we are just setting up an empty list of slipnodes.  We need to
-        decide what the best data structure should be for the slipnet.
-        '''
         self.slipnodes = []
         self.sliplinks = []
+        self.clamp_time = 50
 
         # Letter nodes
         slipnet_letters = []
-        letters = map(chr, range(65, 91))
-        for letter in letters:
-            slipnode = SlipNode(letter, 10)
-            slipnet_letters.append(self.add_slipnode(slipnode))
+        for letter in string.ascii_lowercase:
+            slipnet_letters.append(self.add_slipnode(letter, 10))
 
         # Number nodes
         slipnet_numbers = []
         for number in range(1, 6):
-            slipnode = Slipnode(str(number), 30)
-            slipnet_numbers.append(self.add_slipnode(slipnode))
+            slipnet_numbers.append(self.add_slipnode(str(number), 30))
 
         # String position nodes
         leftmost = self.add_slipnode('leftmost', 40)
@@ -185,7 +178,7 @@ class Slipnet(object):
         successor_group = self.add_slipnode('successor group', 50)
         successor_group.directed = True
         successor_group.codelets.append('top_down_group_scout__category')
-        samenes_group = self.add_slipnode('sameness group', 80)
+        sameness_group = self.add_slipnode('sameness group', 80)
         sameness_group.codelets.append('top_down_group_scout__category')
 
         # Other relation nodes
@@ -206,7 +199,7 @@ class Slipnet(object):
         alphabetic_position_category.codelets.append('top_down_description_scout')
         direction_category = self.add_slipnode('direction category', 70)
         bond_category = self.add_slipnode('bond category', 80)
-        group_category = self.add_slpnode('group category', 80)
+        group_category = self.add_slipnode('group category', 80)
         length = self.add_slipnode('length', 60)
         object_category = self.add_slipnode('object category', 90)
         bond_facet = self.add_slipnode('bond facet', 90)
@@ -227,7 +220,7 @@ class Slipnet(object):
 
         # Letter category links
         for i in range(26):
-            l = slipnet_letter[i]
+            l = slipnet_letters[i]
             fixed_length = letter_category.conceptual_depth - l.conceptual_depth
             self.add_sliplink('category', l, letter_category, None, fixed_length)
             self.add_sliplink('instance', letter_category, l, None, 97)
@@ -325,11 +318,11 @@ class Slipnet(object):
           group_category.conceptual_depth - predecessor_group.conceptual_depth)
         self.add_sliplink('instance', group_category, predecessor_group,
                           None, 100)
-        self.add_sliplink('category', sucessor_group, group_category, None,
+        self.add_sliplink('category', successor_group, group_category, None,
           group_category.conceptual_depth - successor_group.conceptual_depth)
         self.add_sliplink('instance', group_category, successor_group,
                           None, 100)
-        self.add_sliplink('category', sameness_gruop, group_category, None,
+        self.add_sliplink('category', sameness_group, group_category, None,
           group_category.conceptual_depth - sameness_group.conceptual_depth)
         self.add_sliplink('instance', group_category, sameness_group,
                           None, 100)
@@ -386,7 +379,7 @@ class Slipnet(object):
 
         # Other links
         self.add_sliplink('slip', single, whole, None, 90)
-        self.add_sliplink('slip', whole, single, None 90)
+        self.add_sliplink('slip', whole, single, None, 90)
 
     def add_sliplink(self, kind, from_node, to_node, label, fixed_length):
         sliplink = Sliplink(from_node, to_node, label, fixed_length)
@@ -463,7 +456,6 @@ class Slipnet(object):
         Ask each node at or above the activation threshold for any codelets
         attached to them and return them all.
         '''
-        # TODO: Make sure all these exist.
         codelets = []
         for node in self.slipnodes:
             if node.activation >= 50:

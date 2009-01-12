@@ -22,14 +22,6 @@ from string import String
 from coderack import Codelet
 
 class Workspace(object):
-    '''
-    First we construct workspace strings out of the puzzle strings passed in.
-    The temperature is initialized and unclamped.  The workspace contains a
-    list of replacements (mappings from the initial string to the modified
-    string), correspondences (mappings from the inital string to the target
-    string), and proposed correspondences.  The workspace also keeps track
-    of whether we have a rule and translated rule and what they are if so.
-    '''
     def __init__(self, initial, modified, target):
         self.initial_string = String(initial)
         self.modified_string = String(modified)
@@ -110,7 +102,7 @@ class Workspace(object):
         objects = self.objects()
         values = [getattr(object, method)() for object in objects]
         values = self.temperature_adjusted_values(values)
-        index = util.select_list_position(values)]
+        index = util.select_list_position(values)
         return objects[index]
 
     def delete_proposed_structure(self, structure):
@@ -336,7 +328,7 @@ class Workspace(object):
         self.snag_object = None
 
         # Get objects in the target string that need changing.
-        if self.translated_rule.no_change()
+        if self.translated_rule.no_change():
             objects_to_change = None
         else:
             objects_to_change = self.objects_to_change_for_answer()
@@ -376,7 +368,7 @@ class Workspace(object):
             self.snag_object.clamp_salience = True
 
             # Set flag to empty the coderack and post initial codelets.
-            return (True, self.initial_codelets()]
+            return (True, self.initial_codelets())
 
         # Set up the answer string.
         # Add unmodified letters.
@@ -429,6 +421,7 @@ class Workspace(object):
         incompatible_bonds = bond.incompatible_bonds()
         if incompatible_bonds:
             if not self.fight_it_out(bond, 1, incompatible_bonds, 1):
+                return
 
         # Try to break any groups shared by from_object and to_object.
         incompatible_groups = from_object.common_groups(to_object)
@@ -1129,7 +1122,7 @@ class Workspace(object):
         Tries to build the proposed rule, fighting with competitors as needed.
         '''
         # Make sure this rule doesn't already exist.
-        if self.rule = rule:
+        if self.rule == rule:
             rule.activate_descriptions_from_workspace(rule, self.activation)
             return
 
@@ -1159,7 +1152,7 @@ class Workspace(object):
 
         # Find changed object.
         changed_objects = []
-        for object in self.initial_string.objects()
+        for object in self.initial_string.objects():
             if object.changed():
                 changed_objects.append(object)
 
@@ -1214,7 +1207,7 @@ class Workspace(object):
         if isinstance(m_description, ExtrinsicDescription) and \
                 related_descriptor:
             for description in m_object.descriptions:
-                if description.descriptor = related_descriptor:
+                if description.descriptor == related_descriptor:
                     m_desription = description
                     break
 
@@ -1261,7 +1254,7 @@ class Workspace(object):
         changed_object = None
         for object in self.initial_string.objects():
             if object.changed:
-                changed_object = object.
+                changed_object = object
                 break
         if not changed_object:
             return
@@ -1377,9 +1370,9 @@ class Workspace(object):
 
         # Choose an object and neighbor.
         object = string.choose_object('intra_string_salience')
-        if category.name = 'plato_left':
+        if category.name == 'plato_left':
             neighbor = object.choose_left_neighbor()
-        elif category.name = 'plato_right':
+        elif category.name == 'plato_right':
             neighbor = object.choose_right_neighbor()
         if not neighbor:
             return
@@ -1513,7 +1506,7 @@ class Workspace(object):
         next_bond = bond
         for i in range(2, number):
             bond_to_add = None
-            if direction = plato_left:
+            if direction == plato_left:
                 next_bond = next_bond.choose_left_neighbor()
                 if not next_bond:
                     break
@@ -1529,13 +1522,13 @@ class Workspace(object):
             # Decide whether or not to add bond.
             if not next_bond:
                 bond_to_add = None
-            elif (next_bond.bond_category = bond_category) and \
-                 (next_bond.direction_category = direction_category)
-                 (next_bond.bond_facet = facet):
+            elif (next_bond.bond_category == bond_category) and \
+                 (next_bond.direction_category == direction_category) and\
+                 (next_bond.bond_facet == facet):
                 bond_to_add = next_bond
-            elif (next_bond.bond_category = opposite_bond_category) and \
-                 (next_bond.direction_category = opposite_direction_category)
-                 (next_bond.bond_facet = facet):
+            elif (next_bond.bond_category == opposite_bond_category) and \
+                 (next_bond.direction_category == opposite_direction_category) and \
+                 (next_bond.bond_facet == facet):
                 bond_to_add = next_bond.flipped_version()
 
             if bond_to_add:
@@ -1594,7 +1587,7 @@ class Workspace(object):
         else:
             bond = object.right_bond
 
-        if (not bond) or (bond.direction_category ~= category):
+        if (not bond) or (bond.direction_category != category):
             return
 
         bond_category = bond.bond_category
@@ -1609,7 +1602,7 @@ class Workspace(object):
         next_bond = bond
         for i in range(2, number):
             bond_to_add = None
-            if direction = plato_left:
+            if direction == plato_left:
                 next_bond = next_bond.choose_left_neighbor()
                 if not next_bond:
                     break
@@ -1625,13 +1618,13 @@ class Workspace(object):
             # Decide whether or not to add bond.
             if not next_bond:
                 bond_to_add = None
-            elif (next_bond.bond_category = bond_category) and \
-                 (next_bond.direction_category = direction_category)
-                 (next_bond.bond_facet = facet):
+            elif (next_bond.bond_category == bond_category) and \
+                 (next_bond.direction_category == direction_category) and \
+                 (next_bond.bond_facet == facet):
                 bond_to_add = next_bond
-            elif (next_bond.bond_category = opposite_bond_category) and \
-                 (next_bond.direction_category = opposite_direction_category)
-                 (next_bond.bond_facet = facet):
+            elif (next_bond.bond_category == opposite_bond_category) and \
+                 (next_bond.direction_category == opposite_direction_category) and \
+                 (next_bond.bond_facet == facet):
                 bond_to_add = next_bond.flipped_version()
 
             if bond_to_add:

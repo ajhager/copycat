@@ -17,26 +17,35 @@
 import math
 import random
 
-def select_list_position(int_list):
-    ''' 
-    Probabilistically chooses one of the integers in the list according to
-    value.  Returns the position of that integer.
+def weighted_average(weights, values):
     '''
-    if int_list == []:
-        return
+    Return the weighted arithmetic mean of arguments.
+    '''
+    weight_sum = sum(weights)
+    value_sum = sum(map(lambda a, b: a * b, weights, values))
+    return int(value_sum / float(weight_sum))
 
-    int_list_sum = sum(int_list)
-    if int_list_sum <= 0:
-        return random.randint(0, len(int_list) - 1)
+def weighted_index(weights):
+    ''' 
+    Probabilistically chooses one of the weights by value, returning its index.
+    '''
+    total = sum(weights)
+    if total <= 0:
+        return random.randint(0, len(weights) - 1)
+    value = random.randint(0, total - 1)
+    new_total = 0
+    index = 0
+    for weight in weights:
+        new_total += weight
+        index += 1
+        if new_total > value:
+            return index - 1
 
-    value = random.randint(0, int_list_sum - 1)
-    new_int_sum = 0
-    counter = 0
-    for item in int_list:
-        new_int_sum += item
-        counter += 1
-        if new_int_sum > value:
-            return counter - 1
+def weighted_select(weights, items):
+    '''
+    Returns one of the items probabilistically by weight.
+    '''
+    return items[weighted_index(weights)]
 
 def select_assoc(assoc_list):
     '''
@@ -60,14 +69,14 @@ def select_assoc(assoc_list):
         if new_probability_sum > value:
             return item
 
-def flatten(list_):
+def flatten(sequence):
     '''
-    Flattens a list so that it has no nested structure.
+    Flattens a sequence so that it has no nested structure.
     '''
-    if isinstance(list_, list):
-        return sum(map(flatten, list_), [])
+    if isinstance(sequence, list):
+        return sum(map(flatten, sequence), [])
     else:
-        return [list_]
+        return [sequence]
 
 def flip_coin(prob_of_true = .5):
     '''
@@ -76,7 +85,6 @@ def flip_coin(prob_of_true = .5):
     '''
     if prob_of_true >= 1:
         return True
-
     return select_assoc([[True, int(prob_of_true * 1000)]
                         ,[False, int((1 - prob_of_true) * 1000)]])
 
@@ -85,17 +93,6 @@ def average(*args):
     Returns the arithmetic mean of its arguments.
     '''
     return sum(args) / float(len(args))
-
-def weighted_average(*value_weight_pairs):
-    '''
-    Return the weighted arithmetic mean of arguments: (value, weight), . . .
-    '''
-    value_sum = 0
-    weight_sum = 0
-    for value, weight in value_weight_pairs:
-        value_sum += value * weight
-        weight_sum += weight
-    return int(value_sum / weight_sum)
 
 def blur(number):
     '''
