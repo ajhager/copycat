@@ -86,3 +86,42 @@ class Bond(Structure):
 
     def choose_right_neighbor(self):
         pass
+
+    def update_internal_strength(self):
+        if type(self.from_object) == type(self.to_object):
+            member_compatibility_factor = 1
+        else:
+            member_compatibility_factor = .7
+
+        if self.bond_facet.name = 'letter_category':
+            bond_facet_factor = 1
+        else:
+            bond_facet_factor = .7
+
+        association = self.bond_category.bond_degree_of_assocition()
+
+        self.internal_strength = min(100, round(member_compatibility_factor * \
+                                                bond_facet_factor * \
+                                                association))
+
+    def update_external_strength(self):
+       self.external_strength = self.local_support()
+
+    def importance(self):
+        if self.bond_category.name == 'sameness':
+            return 100
+        else:
+            return 50
+
+    def happiness(self):
+        # FIXME: Where does this group variable come from?
+        if self.group:
+            return group.total_strength
+        else:
+            return 0
+
+    def unhappiness(self):
+        return 100 - self.happiness()
+
+    def salience(self):
+        return round(util.average(self.importance(), self.unhappiness()))

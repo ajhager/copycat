@@ -62,6 +62,9 @@ class Slipnode(object):
         else:
             return self.intrinsic_link_length
 
+    def bond_degree_of_association(self):
+        return min(100, round(11 * self.degree_of_association()))
+
     def is_active(self):
         return self.activation == 100
 
