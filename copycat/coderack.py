@@ -16,52 +16,40 @@
 
 import util
 
-class Codelet(object):
-    def __init__(self, argument=None, urgency=0):
-        self.argument = argument
-        self.urgency_code = min(7, int((urgency * 7) / 100.0) + 1)
-        self.timestamp = -1
-
-    def run(self, coderack, slipnet, workspace):
-        raise NotImplementedError, 'Must override the Codelet run method.'
-
-class Coderack(object):
-    def __init__(self):
+class Coderack:
+    def __init__(self, max_codelets, max_bins):
+        self.max_codelets = max_codelets
+        self.max_bins = max_bins
         self.codelets = []
+        self.modifier = 0
         self.time = 0
-        self.temperature = 0
-
-    def is_empty(self):
-        return len(self.codelets) == 0
 
     def update(self, temperature):
-        self.temperature = temperature
+        self.modifier = (110.0 - temperature) / 15.0
 
-    def post(self, codelets):
-        removed = []
-        for codelet in list(codelets):
-            if len(self.codelets) == 100:
-                modifier = (110 - self.temperature) / 15.0
-                max_urgency = round(7 ** modifier)
-                probabilities = []
-                for codelet in self.codelets:
-                    urgency = round(codelet.urgency_code ** modifier)
-                    age = self.time - codelet.timestamp
-                    probability = age * (1 + max_urgency - urgency)
-                    probabilities.append(probability)
-                old_codelet = util.weighted_select(probabilities, self.codelets)
-                self.codelets.remove(old_codelet)
-                removed.append(old_codelet)
-            codelet.timestamp = self.time
-            self.codelets.append(codelet)
-        return removed
+    def urgency(self, urgency_bin):
+        return round(urgency_bin ** self.modifier)
+
+    def post(self, urgency, function, arguments):
+        bin = min(self.max_bins, int((urgency * self.max_bins) / 100.0) + 1)
+        codelet = dict(urgency_bin=bin, timestamp=self.time,
+                       function=function, arguments=arguments)
+        self.codelets.append(codelet)
+        if len(self.codelets) > self.max_codelets:
+            max_urgency = self.urgency(self.max_bins)
+            weights = []
+            for codelet in self.codelets:
+                age = self.time - codelet['timestamp']
+                codelet_urgency = self.urgency(codelet['urgency_bin'])
+                weights.append(age * (1 + max_urgency - codelet_urgency))
+            codelet = self.codelets.pop(util.weighted_index(weights))
+            return codelet['function'], codelet['arguments']
 
     def choose(self):
+        if len(self.codelets) == 0:
+            return
         self.time += 1
-        modifier = (110 - self.temperature) / 15.0
-        urgencies = []
-        for codelet in self.codelets:
-            urgencies.append(round(codelet.urgency_code ** modifier))
-        codelet = util.weighted_select(urgencies, self.codelets)
-        self.codelets.remove(codelet)
-        return codelet
+        weights = [self.urgency(codelet['urgency_bin'])
+                    for codelet in self.codelets]
+        codelet = self.codelets.pop(util.weighted_index(weights))
+        return codelet['function'], codelet['arguments']
