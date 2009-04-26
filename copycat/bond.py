@@ -17,9 +17,9 @@
 from structure import Structure
 
 class Bond(Structure):
-    def __init__(self, from_object, to_object, bond_category, bond_facet,
+    def __init__(self, state, from_object, to_object, bond_category, bond_facet,
                  from_object_descriptor, to_object_descriptor):
-        super(Bond, self).__init__()
+        super(Bond, self).__init__(state)
         self.from_object = from_object
         self.to_object = to_object
         self.structure_category = 'bond'

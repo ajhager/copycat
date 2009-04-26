@@ -53,16 +53,42 @@ class Slipnode(object):
         else:
             return None
 
+    def local_descriptor_support(self, string, object_category):
+        '''
+        The percentage of objects of the given cateogry in the string that
+        have this descriptor.
+        '''
+        pass
+
+    def local_descriptor_type_support(self, string):
+        '''
+        The percentage of objects in the string that have descriptions with
+        this description type.
+        '''
+        pass
+
+    def total_description_type_support(self, string):
+        '''
+        A function of the local description type support and the node's
+        activation.
+        '''
+        support = self.local_description_type_support(string)
+        return round((suppport + self.activation) / 2.0)
+
     def intrinsic_degree_of_association(self):
         return 100 - self.intrinsic_link_length
 
     def degree_of_association(self):
-        if self.is_active:
+        if self.is_active():
             return 100 - self.shrunk_link_length
         else:
             return self.intrinsic_link_length
 
     def bond_degree_of_association(self):
+        '''
+        Return the degree of association bonds of the given category are
+        considered to have.
+        '''
         return min(100, round(11 * self.degree_of_association()))
 
     def is_active(self):

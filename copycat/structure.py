@@ -43,4 +43,8 @@ class Structure(object):
         self.total_strength = util.weighted_average(weights, values)
 
     def total_weakness(self):
+        '''
+        Used by break codelets.  Even structures with 100 strength have a
+        chance of being broken.
+        '''
         return 100 - (self.total_strength ** .95)

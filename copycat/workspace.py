@@ -19,7 +19,6 @@ import random
 
 import util
 from string import String
-from coderack import Codelet
 
 class Workspace(object):
     def __init__(self, initial, modified, target):

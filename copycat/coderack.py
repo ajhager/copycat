@@ -30,6 +30,9 @@ class Coderack:
     def urgency(self, urgency_bin):
         return round(urgency_bin ** self.modifier)
 
+    def is_empty(self):
+        return self.codelets == []
+
     def post(self, urgency, function, arguments):
         bin = min(self.max_bins, int((urgency * self.max_bins) / 100.0) + 1)
         codelet = dict(urgency_bin=bin, timestamp=self.time,
