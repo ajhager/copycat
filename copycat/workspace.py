@@ -19,6 +19,200 @@ import random
 
 import util
 from string import String
+from letter import Letter
+from group import Group
+
+class Object(object):
+    def __init__(self):
+        self.string = None
+        self.string_number = None
+        self.left_string_position = None
+        self.right_string_position = None
+        self.raw_importance = 0
+        self.intra_string_happiness = 0
+        self.intra_string_unhappiness = 0
+        self.inter_string_happiness = 0
+        self.inter_string_unhappiness = 0
+        self.total_happiness = 0
+        self.total_unhappiness = 0
+        self.intra_string_salience = 0
+        self.inter_string_salience = 0
+        self.total_salience = 0
+        self.descriptions = None
+        self.extrinsic_descriptions = None
+        self.outgoing_bonds = None
+        self.incoming_bonds = None
+        self.left_bond = None
+        self.right_bond = None
+        self.group = None
+        self.replacement = None
+        self.corresonpondence = None
+        self.is_changed = False
+        self.is_new_answer_letter = False
+        self.clamp_salience = False
+
+    def letter_span(self):
+        '''
+        Return the number of letters spanned by the object.
+        '''
+        if isinstance(self, Letter):
+            return 1
+        return sum([obj.letter_span() for obj in self.objects])
+
+    def letters(self):
+        '''
+        Return a list of the letters at the lowest level of the object.
+        '''
+        if isinstance(self, Letter):
+            return [self]
+        return util.flatten([obj.letters() for obj in self.objects])
+
+    def is_leftmost_in_string(self):
+        return self.left_string_position == 0
+
+    def is_rightmost_in_string(self):
+        right_position = len(self.string.letters()) - 1
+        return self.right_string_position == right_position
+
+    def is_middle_in_string(self):
+        left_neighbor = self.ungrouped_left_neighbor()
+        right_neighbor = self.ungrouped_right_neighbor()
+        return left_neighbor and right_neighbor and \
+                left_neighbor.is_leftmost_in_string() and \
+                right_neighbor.is_rightmost_in_string()
+
+    def spans_whole_string(self):
+        '''
+        Return True if the object is the single letter in its string or a
+        group that spans the string.
+        '''
+        return self.letter_span() == self.string.length()
+
+    def is_string_spanning_group(self):
+        return isinstance(self, Group) and self.spans_whole_string()
+
+    def ungrouped_left_neighbor(self):
+        '''
+        Return the left neighbor of the group that either isn't in a group
+        or is in the same group as the given object.
+        '''
+        if not self.is_leftmost_in_string():
+            for left_neighbor in self.all_left_neighbors():
+                group = left_neighbor.group
+                if not group or self.is_recursive_group_member(group):
+                    return left_neighbor
+
+    def ungrouped_right_neighbor(self):
+        '''
+        Return the right neighbor of the group that either isn't in a group
+        or is in the same group as the given object.
+        '''
+        if not self.is_rightmost_in_string():
+            for right_neighbor in self.all_right_neighbors():
+                group = right_neighbor.group
+                if not group or self.is_recursive_group_member(group):
+                    return right_neighbor
+
+    def all_left_neighbors(self):
+        '''
+        Return a list of all the object's immediate left neighbors, both
+        letters and groups.
+        '''
+        if not self.is_leftmost_in_string():
+            objects = []
+            position = self.leftmost_string_position - 1
+            for obj in self.string.object_positions[position]:
+                if not (isinstance(object, Group) and \
+                        self.is_recursive_group_member(obj)):
+                    objects.append(obj)
+            return objects
+
+    def all_right_neighbors(self):
+        '''
+        Return a list of all the objects's left neighbors.
+        '''
+        if not self.is_rightmost_in_string():
+            objects = []
+            position = self.right_string_position + 1
+            for obj in self.string.object_positions[position]:
+                if not (isinstance(obj, Group) and \
+                        self.is_recursive_group_member(obj)):
+                    objects.append(obj)
+            return objects
+
+    def all_neighbors(self):
+        '''
+        Return a list of all the immediate neighbors of the objects.
+        '''
+        return self.all_left_neighbors() + self.all_right_neighbors()
+
+    def random_left_neighbor(self):
+        '''
+        Return a randomly selected left neighbor.
+        '''
+        return random.choose(self.all_left_neighbors())
+
+    def random_right_neighbor(self):
+        '''
+        Return a randomly selected right neighbor.
+        '''
+        return random.choose(self.all_right_neighbors())
+
+    def random_neighbor(self):
+        '''
+        Return a randomly selected neighbor.
+        '''
+        return random.choose(self.all_neighbors())
+
+    def choose_left_neighbor(self):
+        '''
+        Choose a left neighbor probabilistically based on intra string
+        salience.
+        '''
+        values = [o.intra_string_salience for o in self.all_left_neighbors()]
+        return util.weighted_select(values)
+
+    def choose_right_neighbor(self):
+        '''
+        Choose a right neighbor probabilistically based on intra string
+        salience.
+        '''
+        values = [o.intra_string_salience for o in self.all_right_neighbors()]
+        return util.weighted_select(values)
+
+    def choose_neighbor(self):
+        '''
+        Choose a neighbor probabilistically based on intra string salience.
+        '''
+        values = [o.intra_string_salience for o in self.all_neighbors()]
+        return util.weighted_select(values)
+
+    def all_bonds(self):
+        '''
+        Return all bonds connected to this ojbect, either incoming or
+        outgoing.
+        '''
+        return self.incoming_bonds + self.outgoing_bonds
+
+    def add_description(self, description):
+        '''
+        Add the given description to the object's description list.
+        '''
+        description.descriptor_number = len(self.descriptions)
+        self.descriptions.append(description)
+
+    def add_extrinsic_description(self, description):
+        self.extrinsic_descriptions.append(description)
+
+    def get_descriptor(self, description_type):
+        '''
+        Return the descriptor of the object corresponding to the given
+        desicription type.
+        '''
+        for description in self.descriptions:
+            if description.description_type == description_type:
+                return description.descriptor
+
 
 class Structure(object):
     def __init__(self):
