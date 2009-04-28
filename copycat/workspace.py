@@ -213,6 +213,156 @@ class Object(object):
             if description.description_type == description_type:
                 return description.descriptor
 
+    def relevant_descriptions(self):
+        '''
+        Return a list of the object's relevant desriptions; those whose
+        description type is fully active.
+        '''
+        return [d for d in self.descriptions if d.description_type.is_active()]
+
+    def distinguishing_descriptions(self):
+        '''
+        Return a list of the object's distinguishing descriptions; those which
+        distinguish it in a string.
+        '''
+        f = self.is_distinguishing_descriptor
+        return [d for d in self.descriptions if f(d.descriptor)]
+
+    def non_distinguishing_descriptions(self):
+        '''
+        Return a list of the object's non distinguishing descriptions.
+        '''
+        f = self.is_distinguishing_descriptor
+        return [d for d in self.descriptions if not f(d.descriptor)]
+
+    def is_distinguishing_descriptor(self, descriptor):
+        '''
+        Return True if no other object of the same type has the same descriptor.
+        Object category and length descriptions are not distinguishing.
+        '''
+        if descriptor == self.state.slipnet.plato_letter or \
+           descriptor == self.state.slipnet.plato_group or \
+           descriptor in self.state.slipnet.slipnet_numbers:
+            return
+        else:
+            if isinstance(self, Letter):
+                other_objects = self.string.letters[:]
+                other_objects.remove(self)
+            else:
+                other_objects = self.string.groups[:]
+                other_objects.remove(self)
+                if self.group:
+                    other_objects.remove(self.group)
+                for obj in self.objects:
+                    if isinstance(obj, Group):
+                        other_objects.remove(obj)
+            descriptions = util.flatten([o.descriptions for o in other_objects])
+            other_descriptors = [d.descriptor for d in descriptions]
+            return not descriptor in other_descriptors
+
+    def relevant_distinguishing_descriptions(self):
+        descriptions = self.distinguishing_descriptions()
+        [d for d in descriptions if d.description_type.is_active()]
+
+    def relevant_non_distinguishing_descriptions(self):
+        descriptions = self.non_distinguishing_descriptions()
+        [d for d in descriptions if d.description_type.is_active()]
+
+    def choose_relevant_description_by_activation(self):
+        '''
+        Choose a relevant description probabilistically based on the
+        descriptor's activation.
+        '''
+        relevant_descriptions = self.relevant_descriptions()
+        if relevant_descriptions:
+            descriptors = [d.descriptor for d in relevant_descriptions]
+            activations = [d.activation for d in descriptors]
+            return util.weighted_select(activations, relevant_descriptions)
+
+    def choose_relevant_distinguishing_description_by_conceptual_depth(self):
+        '''
+        Chooses a relevant, distinguishing description probabilistically based
+        on the descriptor's conceptual depth.
+        '''
+        relevant_descriptions = self.relevant_distinguishing_descriptions()
+        if relevant_descriptions:
+            depths = [d.conceptual_depth for d in relevant_descriptions]
+            return util.weighted_select(depths, relevant_descriptions)
+
+    def is_description_present(self, description):
+        '''
+        Return True if this object already has this description.
+        '''
+        for d in self.descriptions:
+            if d.description_type == description.description_type and \
+               d.descriptor == description.descriptor:
+                return True
+
+    def rule_initial_string_descriptions(self):
+        '''
+        Return all the descriptions that can be used in making the initial
+        string part of the rule, with this object as the changed object in the
+        initial string.
+        '''
+        descriptions = []
+        for d in self.descriptions:
+            if d.description_Type.is_active() and \
+               self.is_distinguishing_descriptor(d.descriptor) and \
+               not d.descriptor == self.state.slipnet.plato_object_category:
+                descriptions.append(d)
+        return descriptions
+
+    def rule_modified_string_descriptions(self):
+        '''
+        Return all the non extrinsic descriptions that can be used in make the
+        modified string part of the rule with this object as the object in the
+        modified string corresponding to the initial string changed object.
+        '''
+        descriptions = []
+        categories = [self.state.slipnet.plato_string_position_category,
+                      self.state.slipnet.plato_object_category]
+        for d in self.descriptions:
+            if d.description_type.is_active() and \
+               self.is_distinguishing_descriptor(d.descriptor) and \
+               d.description_type not in categories:
+                descriptions.append(d)
+        return descriptions
+
+    def add_incoming_bond(self, bond):
+        '''
+        Add a new incoming bond to the object.
+        '''
+        self.incoming_bonds.append(bond)
+
+    def add_outgoing_bond(self, bond):
+        '''
+        Add a new outgoing bond to the object.
+        '''
+        self.outgoing_bonds.append(bond)
+
+    def structures(self):
+        '''
+        Return a list of the structures attached to the object.
+        '''
+        return self.descriptions + [self.left_bond, self.right_bond,
+                                    self.group, self.correspondence]
+
+    def is_descriptor_present(self, descriptor):
+        '''
+        Return True if this object has a description with this descriptor.
+        '''
+        for d in self.descriptions:
+            if d.descriptor == descriptor:
+                return True
+
+    def is_description_type_present(self, description_type):
+        '''
+        Return True if this object has a description with the given
+        description type.
+        '''
+        for d in self.descriptions:
+            if d.description_type == description_type:
+                return True
 
 class Structure(object):
     def __init__(self):
