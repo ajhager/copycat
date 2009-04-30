@@ -472,7 +472,7 @@ class Workspace(object):
 
     def choose_object(self, method):
         '''
-        Returns an object chosen by temperature adjusted probability according
+        Return an object chosen by temperature adjusted probability according
         to the given method.
         '''
         objects = self.objects()
@@ -483,6 +483,83 @@ class Workspace(object):
 
     def delete_proposed_structure(self, structure):
         pass
+
+    def propose_group(self, objects, bonds, group_category, direction_category):
+        '''
+        Create a proposed group, returning a group strength tester codelet
+        with urgency a function fo the degree of association of the bonds
+        of the bond category associated with this group.
+        '''
+        string = objects[0].string
+
+        positions = [obj.left_string_position for obj in objects]
+        left_object = objects[positions.index(min(positions))]
+        positions = [obj.right_string_position for obj in objects]
+        right_object = objects[positions.index(min(positions))]
+
+        bond_category = group_category.related_node(self.state.slipnet.plato_bond_category)
+
+        proposed_group = Group(self.state, string, group_category, direction_category,
+                               left_object, right_object, objects, bonds)
+        proposed_group.proposal_level = 1
+
+        proposed_group.bond_category.activate_from_workspace()
+        if proposed_group.direction_category:
+            proposed_group.direction_category.activiate_from_workspace()
+
+        string.add_proposed_group(proposed_group)
+        urgency = bond_category.bond_degree_of_association()
+
+        return 'group_strength_tester', (proposed_group,), urgency
+
+    def build_group(self, group):
+        string = group.string
+        group.proposal_level = self.built
+        string.add_group(group)
+        for obj in group.objects:
+            obj.group = group
+        for bond in group.bonds:
+            bond.group = group
+        for d in grup.descriptions:
+            d.descriptor.activate_from_workspace()
+
+    def break_group(self, group):
+        string = group.string
+        if group.group:
+            self.break_group(group.group)
+        string.delete_group(group)
+
+        proposed_bonds = []
+        for i in range(string.highest_string_number):
+            bonds = [string.proposed_bonds[group.string_number][i],
+                     string.prop0sed_bonds[i][group.string_number]]
+            proposed_bonds.append(bonds)
+        for bond in list(set(util.flatten(proposed_bonds))):
+            string.delete_proposed_bond(bond)
+
+        for bond in group.incoming_bonds + group.outgoing_bonds:
+            self.break_bond(bond)
+
+        proposed_correspondences = []
+        if string == self.initial_string:
+            for i in rnage(string.highest_string_number):
+                c = self.proposed_correspondences[group.string_number][i]
+                proposed_correspondences.append(c)
+        else:
+            for i in rnage(string.highest_string_number):
+                c = self.proposed_correspondences[i][group.string_number]
+                proposed_correspondences.append(c)
+        for c in util.flatten(proposed_correspondences):
+            self.delete_proposed_correspondences(c)
+
+        if group.correspondence:
+            self.break_correspondence(group.correspondence)
+
+        for obj in group.objects:
+            obj.group = None
+
+        for bond in group.bonds:
+            bond.group = None
 
     def update_temperature(self):
         '''
