@@ -512,6 +512,38 @@ class Workspace(object):
 
         return 'group_strength_tester', (proposed_group,), urgency
 
+    def build_correspondence(self, correspondence):
+        correspondence.proposal_level = self.built
+        object1 = correspondence.object1
+        object2 = correspondence.object2
+        object1.set_correspondence(correspondence)
+        object2.set_correspondence(correspondence)
+        self.add_correspondence(correspondence)
+
+        mappings = correspondence.relevant_distinguishing_concept_mappings() + \
+                   correspondence.accessory_concept_mappings
+        for cm in mappings:
+            if cm.is_slippage():
+                correspondence.add_accessory_concept_mapping(cm.symmetric_version())
+
+        if isinstance(object1, Group) and isinstance(object2, Group):
+            for cm in get_concept_mappings(object1, object2,
+                                           object1.bond_descriptions(),
+                                           object2.bond_Descriptions()):
+                correspondence.add_accessory_concept_mapping(cm)
+                if cm.is_slippage():
+                    cm_sym = cm.symetric_version()
+                    correspondence.add_accessory_concept_mapping(cm_sym)
+
+        for cm in correspondence.concept_mappings:
+            if cm.label:
+                cm.label.activate_from_workspace()
+
+    def break_correspondence(self, correspondence):
+        correspondence.object1.correspondence = None
+        correspondence.object2.correspondence = None
+        self.delete_correspondence(correspondence)
+
     def build_group(self, group):
         string = group.string
         group.proposal_level = self.built
