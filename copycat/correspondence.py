@@ -120,6 +120,53 @@ class Correspondence(Structure):
            self.object2.is_string_spanning_group() and \
            direction_category_cm:
             incomp.extend(leftmost_and_rightmost_incompatible_correspondences(
-                self.object1, self.object2, direction_category_cm)
+                self.object1, self.object2, direction_category_cm))
 
         return list(set(incomp))
+
+    def incompatible_bond(self):
+        '''
+        Return the bond that is incompatible with this correspondence.
+        '''
+        if self.object1.is_leftmost_in_string():
+            bond1 = self.object1.right_bond
+        else:
+            bond1 = self.object1.left_bond
+
+        if self.object2.is_leftmost_in_string():
+            bond2 = self.object2.right_bond
+        else:
+            bond2 = self.object2.left_bond
+
+        if bond1 and bond2 and \
+           bond1.direction_cateogry and bond2.direction_category:
+            plato_direction_category = self.slipnet.plato_direction_category
+            bond_concept_mappings = [ConceptMapping(plato_direction_category,
+                                                    plato_direction_category,
+                                                    bond1.direction_category,
+                                                    bond2.direction_category,
+                                                    None, None)]
+            if are_incompatible_concept_mapping_lists(bond_concept_mappings,
+                                                      self.concept_mappings):
+                return bond2
+
+    def is_incompatible_rule(self):
+        '''
+        A rule is incompatible with this correspondence if object1 is the
+        changed object and object2 doesn't have the rule's descriptor1 in
+        its relevant_descriptions.
+        '''
+        rule = self.workspace.rule
+        descriptor1 = rule.descriptor1
+        descriptors = [cm.descriptor1 for cm in self.concept_mappings]
+        slippages = self.workspace.slippages
+        relevant_descriptors = [d.descriptor for d in self.object2.relevant_descriptions]
+        slipped = [d.apply_slippages() for d in relevant_descriptors]
+        return self.object1.is_changed() and rule and \
+                descritpr1 not in descriptors and \
+                descriptor1 not in slipped + slippages
+
+    def is_proposed(self):
+        return self.proposal_level < self.workspace.built
+
+                
