@@ -59,3 +59,30 @@ class Run(object):
             self.workspace.delete_proposed_structure(codelet.argument)
 
         self.slipnet.update()
+
+    def deal_with_snag(self):
+        '''
+        If there is a snag in building the answer, delete all proposed
+        structures, empty the coderack, raise and clamp the temperature,
+        and activate and clamp activation of all the descriptions of the
+        object causing the snag.
+        '''
+        self.workspace.snag_count += 1
+        self.workspace.last_snag_time = self.coderack.time
+        self.workspace.snag_structures = self.workspace.structures
+        for bond in self.workspace.proposed_bonds:
+            bond.string.delete_proposed_bond(bond)
+        for group in self.workspace.proposed_groups:
+            group.string.delete_proposed_group(group)
+        for correspondence in self.workspace.proposed_correspondences:
+            self.workspace.delete_proposed_correspondence(correspondence)
+        self.workspace.translated_rule = None
+        self.workspace.answer_string = None
+        self.workspace.snag_condition = True
+        self.workspace.temperature = 100
+        self.workspace.clamp_temperature = True
+        for description in self.workspace.snag_object.descriptions:
+            description.descriptor.clamped = True
+        self.workspace.snag_object.clamp_salience = True
+        self.coderack.clear()
+        self.update()

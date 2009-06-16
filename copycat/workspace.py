@@ -417,6 +417,9 @@ class Workspace(object):
 
         self.snag_object = None
         self.snag_condition = None
+        self.snag_count = 0
+        self.last_snag_time = 0
+        self.snag_structures = []
 
     def update(self):
         '''

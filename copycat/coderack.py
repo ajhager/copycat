@@ -30,6 +30,9 @@ class Coderack:
     def urgency(self, urgency_bin):
         return round(urgency_bin ** self.modifier)
 
+    def clear(self):
+        self.codeletes = []
+
     def is_empty(self):
         return self.codelets == []
 
