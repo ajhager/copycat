@@ -448,6 +448,8 @@ class Workspace(object):
         number_needed = len(self.objects()) * 2
         return initial_codelets * number_needed
 
+    
+
     def test_snag_condition(self):
         '''
         If the program is dealing with a snag, then see if any new structures
@@ -884,6 +886,66 @@ class Workspace(object):
                                                competition, other_weight):
                 return False
         return True
+
+    def build_rule(self, rule):
+        self.rule = rule
+        self.activate_from_workspace_rule_descriptions(rule)
+
+    def build_translated_rule(self, translated_rule):
+        self.translated_rule = translated_rule
+
+    def break_rule(self, rule):
+        '''
+        Break the rule. The only reason this function has an argument is so
+        that it matchs the form of the other "break" functions and thus the
+        break codelets that call it.
+        '''
+        self.rule = None
+
+    def propose_rule(i_object, i_description, m_object, m_description):
+        '''
+        Create a proposed rule and post a rule strength tester codelet with
+        urgency a function of the degree of conceptual depth of the
+        descriptions in the rule.
+        '''
+        if not i_object:
+            proposed_rule = Rule(None, None, None, None, None)
+        else:
+            obj_category = self.slipnet.plato_object_category
+            if isinstance(m_description, ExtrinsicDescription):
+                proposed_rule = Rule(i_object.get_descriptor(obj_category),
+                                     i_description.description_type,
+                                     i_description.descriptor,
+                                     m_object.get_descriptor(obj_category),
+                                     m_description.description_type_related,
+                                     m_description.relation)
+            else:
+                proposed_rule = Rule(i_object.get_descriptor(obj_category),
+                                     i_description.description_type,
+                                     i_description.descriptor,
+                                     m_object.get_descriptor(obj_category),
+                                     m_description.description_type,
+                                     m_description.descriptor)
+
+        if not i_description:
+            urgnecy = 100
+        else:
+            a = util.average([i_description.conceptual_depth(),
+                              m_description.conceptual_depth()])
+            b = a / 100.0
+            urgnecy = math.sqrt(b) * 100
+
+        return Codelet('rule_strength_tester', (proposed_rule, urgency))
+
+    def activate_from_workspace_rule_descriptions(self, rule):
+        if rule.descriptor1:
+            rule.descriptor1.activate_from_workspace()
+        if rule.expresses_relation():
+            rule.relation.activate_from_workspace()
+        else:
+            if rule.descriptor2:
+                rule.descriptor2.activate_from_workspace()
+
 
     # Codelet methods.
     def answer_builder(self):
