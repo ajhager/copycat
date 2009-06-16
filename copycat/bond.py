@@ -125,3 +125,11 @@ class Bond(Structure):
 
     def salience(self):
         return round(util.average(self.importance(), self.unhappiness()))
+
+    def choose_left_neighbor(self):
+        '''
+        Return one of the left neighbors of the bond, chosen probabilistically
+        by salience.
+        '''
+        if self.is_leftmost_in_string():
+            return
