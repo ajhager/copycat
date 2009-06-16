@@ -611,6 +611,63 @@ class Workspace(object):
                     (self.total_unhappiness(), 8),
                     (rule_weakness, 2))
 
+    def answer_temperature_threshold_distribution(self):
+        if self.initial_string.length == 1 and \
+           self.target_string.length == 1:
+            bond_density = 1
+        else:
+            a = len(self.initial_string.bonds + \
+                    self.target_string.bonds)
+            b = (1 - self.initial_string.length) + \
+                    (1 - self.target_string.length)
+            bond_density = a / float(b)
+
+        # FIXME: Return actual distributions.
+        if bond_density >= .8:
+            return 'very_low_answer_temperature_threshold_distribution'
+        elif bond_density >= .6:
+            return 'low_answer_temperature_threshold_distribution'
+        elif bond_density >= .4:
+            return 'medium_answer_temperature_threshold_distribution'
+        elif bond_density >= .2:
+            return 'high_answer_temperature_threshold_distribution'
+        else:
+            return 'very_high_answer_temperature_threshold_distribution'
+
+    def temperature_adjusted_probability(self, probability):
+        if probability == 0:
+            return 0
+        elif probability <= .5:
+            value = int(abs(math.log(probability, 10)))
+            low_probability_factor = max(1, value)
+            a = 10 - math.sqrt(100 - self.temperature)
+            b = a / 100.0
+            c = 10 ^ abs(1 - low_probability_factor)
+            d = c - probability
+            return min(.5, d)
+        elif probability == .5:
+            return .5
+        elif probability > .5:
+            a = 10 - math.sqrt(100 - self.temperature)
+            b = a / 100.0
+            c = 1 - (1 - probability)
+            d = b * c
+            e = (1 - probability) + d
+            max(.5, e)
+
+    def temperature_adjusted_values(values):
+        '''
+        Return a list with values that are exponential functins of the original
+        values, with the exponent being a funtion of the temperature. The
+        higher the temperature, the bigger the difference between unequal
+        values.
+        '''
+        exponent = ((100 - self.temperature) / 30.0) + .5
+        new_values = []
+        for value in values:
+            new_values += round(value ^ exponent)
+        return values
+
     def post_codelet_probability(self, category):
         '''
         Return a probability to use when deciding to post codelets searching
