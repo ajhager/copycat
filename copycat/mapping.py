@@ -1,0 +1,108 @@
+# Copyright (c) 2007-2009 Joseph Hager.
+#
+# Copycat is free software; you can redistribute it and/or modify
+# it under the terms of version 2 of the GNU General Public License,
+# as published by the Free Software Foundation.
+# 
+# Copycat is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with Copycat; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+class Mapping(object):
+    def __init__(self, description_type1, description_type2,
+                 descriptor1, descriptor2, object1, object1):
+        self.description_bype1 = descripttion_type1
+        self.description_bype2 = descripttion_type2
+        self.descriptor1 = descriptor1
+        self.descriptor2 = descriptor2
+        self.label = self.slipnet.get_label_node(descriptor1, descriptor2)
+        self.object1 = object1
+        self.object2 = object2
+
+    def is_slippage(self):
+        '''
+        Return True if the concept mapping is not an identity.
+        '''
+        return self.label != self.slipnet.plato_identity
+
+    def degree_of_association(self):
+        '''
+        This method assumes the two descriptors in the concept mapping are
+        connected in the slipnet by at most one slip link. It should be
+        generalized eventually.
+        '''
+        if self.descriptor1 == self.descriptor2:
+            return 100
+        else:
+            for link in self.descriptor1.lateral_slip_links():
+                if link.to_node == self.descriptor2:
+                    return link.degree_of_association()
+
+    def conceptual_depth(self):
+        return util.average(self.descriptor1.conceptual_depth(),
+                            self.descriptor2.conceptual_depth())
+
+    def is_relevant(self):
+        return self.description_type1.is_active() and \
+                self.description_type2.is_active()
+
+    def is_distinguishing(self):
+        '''
+        For now, the concept mapping "whole -> whole" is not considered
+        distinguishing.  That is, a correspondence cannot be build on it
+        alone.  This should eventually be generalized or changed.
+        '''
+        if self.descriptor1 == self.slipnet.plato_whole and \
+           self.descriptor2 == self.slipnet.plato_whole:
+            return
+        else:
+            return self.object1.is_distinguishing_descriptor() and \
+                    self.object2.is_distinguishing_descriptor()
+
+    def label_relevance(self):
+        if not self.label:
+            return 50
+        elif self.label.is_active():
+            return 100
+        else:
+            return 0
+
+    def symmetric_version(self):
+        '''
+        E.g., if the concept mapping is "rightmost -> leftmost", return
+        "leftmost -> rightmost".
+        '''
+        if self.label == self.slipnet.plato_identity:
+            return self
+        elif self.slipnet.get_label_node(self.descriptor2, self.descriptor1) !=\
+                self.label:
+            return None
+        else:
+            return Mapping(self.description_type2, self.description_type1,
+                           self.descriptor2, self.descriptor1,
+                           self.object2, self.object1)
+
+    def are_contraditory_concept_mappings(self, other):
+        '''
+        Return True if the two concept mappings contradict each other.
+        '''
+        return (self.descriptor1 == other.descriptor1 and \
+                self.descriptor2 != other.descriptor2) or \
+               (self.descriptor2 == other.descriptor2 and \
+                self.descriptor1 != other.descriptor1)
+
+def are_all_opposite_concept_mappings(concept_mappings):
+    '''
+    Return True if all the concept mappings in the list have the label
+    "opposite".
+    '''
+    for mapping in concept_mappings:
+        if mapping.label != self.slipnet.plato_opposite:
+            return False
+    return True
