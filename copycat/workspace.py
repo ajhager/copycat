@@ -517,6 +517,25 @@ class Workspace(object):
 
         return 'group_strength_tester', (proposed_group,), urgency
 
+    def build_description(self, description):
+        if description.is_bond_description():
+            description.object.add_bond_description(description)
+        else:
+            description.object.add_description(description)
+        description.description_type.activate_from_workspace()
+        description.descriptor.activate_from_workspace()
+
+    def propose_description(self, object1, description_type, descriptor):
+        '''
+        Create a proposed description and post a description strength tester
+        codelet with urgency a function of the activation of the
+        description's descriptor.
+        '''
+        description = Description(object1, description_type, descriptor)
+        description.descriptor.activate_from_workspace()
+        urgency = description_type.activation
+        return Codelet('description_strength_tester', (description, urgency))
+
     def build_correspondence(self, correspondence):
         correspondence.proposal_level = self.built
         object1 = correspondence.object1
