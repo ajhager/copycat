@@ -803,6 +803,31 @@ class Workspace(object):
         # TODO: implement.
         return 30
 
+    def structure_vs_structure(self, structure1, weight1, structure2, weight2):
+        '''
+        Choose probabilistically between the two structures based on strengths
+        and the given weights.  Return True if structure1 wins and False if
+        structure2 wins.
+        '''
+        structure1.update_strength_values()
+        structure2.update_strength_values()
+        strengths = [structure1.total_strength() * weight1,
+                     structure2.total_strength() * weight2]
+        adjusted_strengths = self.temperature_adjusted_values(strengths)
+        return [True, False][util.weighted_index(adjusted_strengths)]
+
+    def fight_it_out(self, structure, structure_weight, others, others_weight):
+        '''
+        Choose probabilistically between the structure and the other structures
+        using the method structure_vs_structure.  Return True if the structure
+        wins.
+        '''
+        for competition in others:
+            if not self.structure_vs_structure(structure, structure_weight,
+                                               competition, other_weight):
+                return False
+        return True
+
     # Codelet methods.
     def answer_builder(self):
         # Runs the translated rule on the target string to build the answer.
