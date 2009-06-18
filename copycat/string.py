@@ -21,18 +21,18 @@ import util
 class String(object):
     def __init__(self, state, string):
         self.state = state
-        self.highest_string_number = 0
+        self.highest_string_number = -1
         self.letters = []
         self.proposed_bonds = []
         self.left_right_bonds = []
         self.from_to_bonds = []
         self.proposed_groups = []
         self.built_groups = []
-        self.length = 0
+        self.length = len(string)
         self.name = string
-        self.object_spaces = 0
-        self.number_of_bonds_to_scan_distribution = []
+        self.object_spaces = self.length
         self.intra_string_unhappiness = 0
+        self.number_of_bonds_to_scan_distribution = range(self.length)
 
     def __repr__(self):
         return 'String(%s)' % self.name

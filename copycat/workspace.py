@@ -421,6 +421,57 @@ class Workspace(object):
         self.last_snag_time = 0
         self.snag_structures = []
 
+        # Activate plato object category if a string has length 1.
+        if self.initial_string.length == 1 or self.target_string == 1:
+            self.slipnet.plato_object_category.activate_from_workspace()
+
+        # Make letters for each sting.
+        for string in [self.initial_string, self.modified_string, self.target_string]:
+            count = 0
+            for character in string.name:
+                letter_category = self.slipnet.get_plato_letter(character)
+                letter = Letter(string, letter_category, count)
+                string.add_letter(letter)
+                count += 1
+
+        # Add initial descriptions to the letters in the strings.
+        for string in [self.initial_string, self.modified_string, self.target_string]:
+            for letter in string.letters:
+                letter.add_description(Description(letter,
+                                                   self.slipnet.plato_object_category,
+                                                   self.slipnet.plato_letter))
+                letter.add_Description(Description(letter,
+                                                   self.slipnet.plato_letter_category,
+                                                   self.slipnet.get_plato_letter(letter.name)))
+
+            leftmost_letter = string.letters[0]
+            if string.length > 1:
+                rightmost_letter = string.letters[-1]
+                leftmost_letter.add_description(Description(leftmost_letter,
+                                                            self.slipnet.plato_string_position_category,
+                                                            self.slipnet.plato_leftmost))
+                rightmost_letter.add_Description(Description(rightmost_letter,
+                                                             self.slipnet.plato_string_position_category,
+                                                             self.slipnet.plato_rightmost))
+            else:
+                leftmost_letter.add_description(Description(leftmost_letter,
+                                                            self.slipnet.plato_string_position_category,
+                                                            self.slipnet.plato_single))
+
+            if string.length == 3:
+                middle_letter = string.letters[1]
+                middle_letter.add_description(Description(middle_letter,
+                                                          self.slipnet.plato_string_position_category,
+                                                          self.slipnet.plato_middle))
+
+        for obj in self.objects:
+            for description in obj.descriptions:
+                for descriptor in description:
+                    descriptor.activate_from_workspace()
+
+
+
+
     def update(self):
         '''
         Update various values of the structures, objects, and strings in the
