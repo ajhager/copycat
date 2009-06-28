@@ -27,8 +27,6 @@ class Bond(Structure):
         self.direction_category = None
         if bond_category.name != 'sameness':
             if from_object.left_string_position < to_object.left_string_position:
-                # FIXME: Need access to the actual slipnodes.
-                # FIXME: Possibly move this calculation outside and pass in.
                 self.direction_category = 'left'
             else:
                 self.direction_category = 'right'
@@ -82,10 +80,115 @@ class Bond(Structure):
         return flipped
 
     def choose_left_neighbor(self):
-        pass
+        '''
+        Return one of the left neighbors of the bond probabilistically by
+        salience.
+        '''
+        if self.is_leftmost_in_string():
+            return
+        left_neighbors = []
+        for obj in self.left_object.all_left_neighbors():
+            possible_neighbor = self.string.left_right_bonds[obj.string_number][self.left_object.string_number]
+            if possible_neighbor:
+                left_neighbors.append(possible_neighbor)
+        saliences = [obj.salience for obj in left_neighbors]
+        return util.weight_select(saliences, left_neighbors)
 
     def choose_right_neighbor(self):
-        pass
+        '''
+        Return one of the right neighbors of the bond probabilistically by
+        salience.
+        '''
+        if self.is_rightmost_in_string():
+            return
+        right_neighbors = []
+        for obj in self.right_object.all_right_neighbors():
+            possible_neighbor = self.string.left_right_bonds[self.right_object.string_number][obj.string_number]
+            if possible_neighbor:
+                right_neighbors.append(possible_neighbor)
+        saliences = [obj.salience for obj in right_neighbors]
+        return util.weight_select(saliences, right_neighbors)
+
+    def get_incompatible_bonds(self):
+        '''
+        Return the bonds that are incompatible with the give bond, i.e. any
+        bonds involving one or both of the same two objects bonded by this
+        bond.
+        '''
+        return list(set(util.flatten([self.left_object.right_bond,
+                                      self.right_object.left_bond])))
+
+    def get_incompatible_correspondences(self):
+        '''
+        Return the correspondences that are incompatible with this bond. This
+        only applies to the directed bonds and to correspondences between
+        objects at the edges of strings. E.g., in "abc -> abd, pqrs -> ?, if
+        there is a correspondence between the "a" and the "p" (with concept
+        mapping "leftmost -> leftmost"), and a right going succesor bond from
+        the "a" to the "b" in "abc", then the correspondence will be
+        incompatible with a left going predecessor bond from the "q" to the
+        "p" in "pqrs", because the correspondence would then imply both
+        "leftmost -> leftmost" (the letters) and "right -> left (the bonds.)
+        '''
+        incompatible_correspondences = []
+
+        if self.is_leftmost_in_string():
+            correspondence = self.left_object.correspondence
+            if not correspondence:
+                return
+            for cm in correspondence.concept_mappings:
+                if cm.description_type1 == self.slipnet.plato_string_position_category:
+                    string_position_category_concept_mapping =  cm
+            if not string_position_cateogry_conept_mapping:
+                return
+            other_object = correspondence.other_object(self.left_object)
+            if other_object.is_leftmost_in_string():
+                other_bond = other_object.right_bond
+            elif other_object.is_rightmost_in_string():
+                other_bond = other_object.left_bond
+            else:
+                return
+            if not other_bond:
+                return
+            if not other_bond.direction_category:
+                return
+            bond_concept_mapping = Mapping(self.slipnet.plato_direction_category,
+                                           self.slipnet.plato_direction_category,
+                                           self.direction_category,
+                                           other_bond.direction_category,
+                                           None, None)
+            if bond_concept_mapping.is_incompatible_concept_mapping(string_position_category_concept_mapping):
+                incompatible_correspondences.append(correspondence)
+
+        if self.is_rightmost_in_string():
+            correspondence = self.right_object.correspondence
+            if not correspondence:
+                return
+            for cm in correspondence.concept_mappings:
+                if cm.description_type1 == self.slipnet.plato_string_position_category:
+                    string_position_category_concept_mapping =  cm
+            if not string_position_cateogry_conept_mapping:
+                return
+            other_object = correspondence.other_object(self.right_object)
+            if other_object.is_leftmost_in_string():
+                other_bond = other_object.right_bond
+            elif other_object.is_rightmost_in_string():
+                other_bond = other_object.left_bond
+            else:
+                return
+            if not other_bond:
+                return
+            if not other_bond.direction_category:
+                return
+            bond_concept_mapping = Mapping(self.slipnet.plato_direction_category,
+                                           self.slipnet.plato_direction_category,
+                                           self.direction_category,
+                                           other_bond.direction_category,
+                                           None, None)
+            if bond_concept_mapping.is_incompatible_concept_mapping(string_position_category_concept_mapping):
+                incompatible_correspondences.append(correspondence)
+
+        return incompatible_correspondences
 
     def update_internal_strength(self):
         if type(self.from_object) == type(self.to_object):

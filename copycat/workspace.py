@@ -587,6 +587,60 @@ class Workspace(object):
         urgency = description_type.activation
         return Codelet('description_strength_tester', (description, urgency))
 
+    def build_bond(self, bond):
+        bond.proposal_level = self.built
+        bond.string.add_bond(bond)
+        bond.from_object.add_outgoing_bond(bond)
+        bond.to_object.add_incoming_bond(bond)
+
+        if bond.bond_category == self.slipnet.plato_sameness:
+            bond.to_object.add_outgoing_bond(bond)
+            bond.from_object.add_incoming_bond(bond)
+
+        bond.left_object.set_right_bond(bond)
+        bond.right_object.set_left_bond(bond)
+
+        bond.bond_category.activiate_from_workspace()
+        if bond.direction_category:
+            bond.direction_category.activate_from_workspace()
+
+    def break_bond(self, bond):
+        bond.string.delete_bond(bond)
+        bond.from_object.remove_outgoing_bond(bond)
+        bond.to_object.remove_incoming_bond(bond)
+
+        if bond.bond_category == self.slipnet.plato_sameness:
+            bond.to_object.remove_outgoing_bond(bond)
+            bond.from_object.remove_incoming_bond(bond)
+
+        bond.left_object.set_right_bond(None)
+        bond.right_object.set_left_bond(None)
+
+    def choose_bond_facet(self, object1, object2):
+        object1_bond_facets = []
+        for description_type in [d.description_type for d in object1.descriptions]:
+            if desription_type.category == self.slipnet.plato_bond:
+                object1_bond_facets.append(description_type)
+        object2_bond_facets = []
+        for description_type in [d.description_type for d in object2.descriptions]:
+            if desription_type.category == self.slipnet.plato_bond:
+                object2_bond_facets.append(description_type)
+        items = set(object1_bond_facets).intersection(set(object2_bond_facets))
+        items = [facet.total_description_type_support(object1.string) for facet in items]
+        return util.select_item(items)
+
+    def propose_bond(self, from_object, to_object, bond_category,
+                     bond_facet, from_object_descriptor, to_object_descriptor):
+        from_object_descriptor.activate_from_workspace()
+        to_object_desriptor.activate_from_workspace()
+        bond_facet.activate_from_workspace()
+        proposed_bond = Bond(from_object, to_object, bond_category, bond_facet,
+                             from_object_descriptor, to_bond_descriptor)
+        proposed_bond.proposal_level = 1
+        from_object.string.add_proposed_bond(poposed_bond)
+        urgency = bond_category.bond_degree_of_association(proposed_bond)
+        return Codelet('bond_strength_tester', (proposed_bond, urgency))
+
     def build_correspondence(self, correspondence):
         correspondence.proposal_level = self.built
         object1 = correspondence.object1
