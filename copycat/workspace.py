@@ -469,9 +469,6 @@ class Workspace(object):
                 for descriptor in description:
                     descriptor.activate_from_workspace()
 
-
-
-
     def update(self):
         '''
         Update various values of the structures, objects, and strings in the
@@ -499,8 +496,6 @@ class Workspace(object):
         number_needed = len(self.objects()) * 2
         return initial_codelets * number_needed
 
-    
-
     def test_snag_condition(self):
         '''
         If the program is dealing with a snag, then see if any new structures
@@ -525,6 +520,137 @@ class Workspace(object):
                 for description in self.snag_object.descriptions:
                     description.set_clamp(False)
                 self.snag_object.set_clamp_salience(False)
+
+    def get_unmodified_letters_for_answer(self, objects_to_change):
+        '''
+        Return the letters from the targe string that do not need to be
+        changed for the answer.
+        '''
+        letters = []
+        for letter in self.target_string.letters:
+            for obj in objects_to_change:
+                if letter not in obj.letters:
+                    letters.append(Letter(self.answer_string,
+                                          letter.get_desscriptor(self.slipnet.plato_letter_category),
+                                          letter.left_string_position))
+        return letters
+
+    def get_modified_letters_for_answer(self, object1, description_type):
+        '''
+        Return a list of letters modified as directed by the translated rule.
+        '''
+        modified_letters = []
+
+        if isinstance(object1, Letter):
+            new_descriptor = self.get_new_descriptor_for_answer(object1, description_type)
+            if not new_descriptor:
+                self.snag_object = object1
+                return
+            if description_type == self.slipnet.plato_letter_category:
+                new_letter = Letter(self.answer_string, new_descriptor,
+                                    object1.let_stringposition)
+                modified_letters.append(new_letter)
+            else:
+                self.snag_object = object1
+        else:
+            if description_type == self.slipnet.plato_letter_category:
+                for letter in object1.letters:
+                    new_descriptor = self.get_new_descriptor_for_answer(letter, description_type)
+                    if not new_descriptor:
+                        self.snag_object = letter
+                        return
+                    new_letter = Letter(self.answer_string, new_descriptor,
+                                        letter.left_string_position)
+                    modified_letters.append(new_letter)
+            else:
+                self.changed_length_group = object1
+                new_descriptor = self.get_new_descriptor_for_answer(object1, description_type)
+                if new_descriptor not in self.slipnet.plato_numbers:
+                    self.snag_object = object1
+                    return
+                for group_member in object1.objects:
+                    if isinstance(group_member, Group):
+                        self.snag_object = object1
+                        return
+                group_direction = object1.direction_category
+                a = self.slipnet.node_to_number(new_descriptor)
+                b = self.slipnet.node_to_number(object1.get_descriptor(self.slipnet.plato_length))
+                self.amount_length_changed = a - b
+                if not group_direction or \
+                   group_direction == self.slipnet.plato_right:
+                    first_letter = object1.string.get_letter(object1.left_object_position)
+                    new_string_position = first_letter.left_string_position
+                else:
+                    first_letter = object1.string.get_letter(object1.right_object_position)
+                    new_string_position = first_letter.left_string_position + \
+                            self.amount_length_changed
+                new_letter = Letter(self.answer_string,
+                                    first_letter.get_desscriptor(self.slipnet.plato_letter_category),
+                                    new_string_position)
+                modified_letters.append(new_letter)
+                new_string_position = new_letter.left_string_position
+                for i in range(self.slipnet.node_to_number(new_descriptor) - 1):
+                    if not new_letter:
+                        break
+                    if not group_direction or \
+                       group_direction == self.slipnet.plato_right:
+                        new_string_position = new_string_position + 1
+                    else:
+                        new_string_position = new_string_position - 1
+                    new_letter_cateogry = object1.group_category.iterate_group(self.slipnet.get_plato_letter(new_letter.name))
+                    if not new_letter_category:
+                        self.snag_object = new_letter
+                        return
+                    new_letter = Letter(self.answer_string, new_letter_category,
+                                        new_string_position)
+                    modified_letters.append(new_letter)
+        self.modified_letters = modified_letters
+        return modified_letters
+
+    def get_objects_to_change_for_answer(self):
+        objects_to_change = []
+
+        for obj in self.target_string.objects:
+            if obj.get_descriptor(self.slipnet.plato_object_category) == \
+               self.translated_rule.object_category1:
+                if obj.get_descriptor(self.translated_rule.descriptor1_facet) == \
+                   self.translated_rule.descriptor1:
+                    objects_to_change.append(obj)
+            else:
+                if self.translated_rule.descriptor1.description_tester and \
+                   self.translated_rule.descriptor1.description_tester(obj):
+                    obj.add_description(Description(obj,
+                                                    self.translated_rule.descriptor1_facet,
+                                                    self.translated_rule.descriptor1))
+                    objects_to_change.append(obj)
+
+        if self.translated_rule.descriptor1_facet == self.slipnet.plato_string_position_category and \
+           len(objects_to_change) > 1:
+            for obj in self.initial_string.objects:
+                if obj.is_changed():
+                    changed_object_correspondence = obj.correspondence
+            obj2 = changed_object_correspondence.object2
+            if changed_object_correspondence and obj2 in objects_to_change:
+               return [obj2]
+            else:
+                for obj in objects_to_change:
+                    if not obj.group or obj.group.get_descriptor(self.slipnet.plato_string_position_category) != self.translated_rule.descriptor1:
+                        return [obj]
+        else:
+            return objects_to_changed
+
+    def get_new_descriptor_for_answer(self, object1, descriptor_type):
+        '''
+        Return the new descriptor that should be applied to the given object
+        for the answer.
+        '''
+        old_descriptor = object1.get_descriptor(description_type)
+        if not old_descriptor:
+            return
+        if self.translated_rule.is_relation():
+            return old_descriptor.get_related_node(self.translated_rule.relation)
+        else:
+            return self.translated_rule.descriptor2
 
     def choose_object(self, method):
         '''
