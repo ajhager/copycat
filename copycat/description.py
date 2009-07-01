@@ -28,6 +28,42 @@ class Description(Structure):
         return self.description_type == other.description_type and \
                 self.descriptor == other.descriptor
 
+    def calculate_internal_strength(self):
+        return self.descriptor.conceptual_depth
+
+    def calculate_external_strength(self):
+        return util.average([self.local_support(),
+                             self.description_type.activation])
+
+    def local_support(self):
+        '''
+        Return the support for this description in its string. This is a rough
+        (not perfect) version.  Look at all the objects in the string, getting
+        support from objects with a description of the given object facet.
+        This does not take into account distance; all qualifying objects in
+        the string give the same amount of support.
+        '''
+        number_of_supporting_objects = 0
+        objects = string.objects
+        other_objects = objects.remove(self.object)
+        for other_object in other_objects:
+            if (not (self.workspace.is_recursive_group_member(other_object,
+                                                             self.object) or \
+                     self.workspace.is_recurisve_group_member(self.object,
+                                                              other_object))) and \
+               self.description_type in [obj.description_type for onb in other_object.descriptions]:
+                number_of_supporting_objects += 1
+        if number_of_supporting_objects == 0:
+            return 0
+        elif number_of_supporting_objects == 1:
+            return 20
+        elif number_of_supporting_objects == 2:
+            return 60
+        elif number_of_supporting_objects == 3:
+            return 90
+        else:
+            return 100
+
     def is_relevant(self):
         '''
         Return True if the description type being described is active.
