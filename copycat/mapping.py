@@ -25,6 +25,49 @@ class Mapping(object):
         self.object1 = object1
         self.object2 = object2
 
+    def slippability(self):
+        '''
+        Return a value representing the ease with which this slippage can be
+        made.  Conceptual depth gives a resistance to slippage.
+        '''
+        degree_of_association = self.degree_of_association()
+        if degree_of_association == 100:
+            return 100
+        else:
+            return degree_of_association * (1 - ((self.conceptual_depth) / 100.0) ** 2)
+
+    def strength(self):
+        '''
+        Return a value representing the strength of the conceptual mapping.
+        The closer and more general the nodes, the stronger it will be.
+        '''
+        degree_of_association = self.degree_of_association()
+        if degree_of_association == 100:
+            return 100
+        else:
+            return degree_of_association * (1 + ((self.conceptual_depth) / 100.0) ** 2)
+
+    def is_incompatible_concept_mapping(self, other):
+        if not (self.descriptor1.is_related(other.descriptor1) or \
+                self.descriptor2.is_related(other.descriptor2)):
+            return
+        if not self.label or not other.label:
+            return
+        if self.label != other.label:
+            return True
+
+    def is_supporting_concept_mapping(self, other):
+        if self.descriptor1 == other.descriptor1 and \
+           self.descriptor2 == other.descriptor2:
+            return True
+        elif not (self.descriptor1.is_related(other.descriptor1) or\
+                  self.descriptor2.is_related(other.descriptor2)):
+            return
+        elif not self.label or not other.label:
+            return
+        elif self.label == other.label:
+            return True
+
     def is_slippage(self):
         '''
         Return True if the concept mapping is not an identity.
