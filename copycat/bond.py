@@ -51,6 +51,122 @@ class Bond(Structure):
                self.bond_category == other.bond_category and \
                self.direction_category == other.direction_category
 
+    def calculate_internal_strength(self):
+        '''
+        Bonds between objects of the same type are stronger than bonds between
+        different types.
+        '''
+        if self.from_object.flavor_type == self.to_object.flavor_type:
+            member_compatibility_factor = 1
+        else:
+            member_compatibility_factor = .7
+
+        if self.bond_facet == self.slipnet.plato_letter_category:
+            bond_facet_factor = 1
+        else:
+            bond_facet_factor = .7
+
+        degree_of_associtation = self.bond_category.bond_degree_of_association()
+
+        return min(100, round(member_compaitibility_factor * \
+                              bond_facet_factor * \
+                              degree_of_association))
+
+    def calculate_external_strength(self):
+        return self.local_support()
+
+    def importance(self):
+        '''
+        Sameness bonds are more important than other bonds of other categories.
+        '''
+        if self.bond_category == self.slipnet.plato_sameness:
+            return 100
+        else:
+            return 50
+
+    def happiness(self):
+        if self.group:
+            return self.goup.total_strength()
+        else:
+            return 0
+
+    def unhappiness(self):
+        return round(util.average([self.importance(), self.happiness()]))
+
+    def salience(self):
+        return round(util.average([self.importance(), self.unhappiness()]))
+
+    def number_of_local_supporting_bonds(self):
+        '''
+        Return the number of supporting bonds in the given bond's string.
+        Looks at all the other bonds in the string, counting bonds of the same
+        bond category and direction category.  Does not take distance into
+        account; all qualifying bonds in the string are counted the same.
+        '''
+        number_of_supporting_bonds = 0
+        bonds = self.string.bonds
+        other_bonds = bonds.remove(self)
+        for other_bond in other_bonds:
+            if self.workspace.letter_distance(self.left_object,
+                                              other_bond.left_object) != 0 and \
+               self.workspace.letter_distance(right_object,
+                                              other_bond.right_object) != 0 and \
+               other_bond.bond_category == self.bond_category and \
+               other_bond.direction_category == self.direction_category:
+                number_of_supporting_bonds += 1
+        return number_of_supporting_bonds
+
+    def local_density(self):
+        '''
+        Return a rough measure of the density in the string of bonds of the
+        same bond category and direction category as the given bond. This
+        method is used in calculating the external strength of a bond.
+        '''
+        slot_sum = 0
+        support_sum = 0
+
+        last_object = self.left_object
+        next_object = self.left_object.choose_left_neighbor()
+        while next_object != None:
+            slot_sum += 1
+            x = next_object.string_number
+            y = last_object.string_number
+            next_bond = self.string.left_right_bonds[x][y]
+            if next_bond:
+                if next_bond.bond_category == self.bond_category and \
+                   next_bond.direction_category == self.direction_category:
+                    suppport_sum += 1
+            last_object = next_object
+            next_object = next_object.choose_left_neighbor()
+
+        last_object = self.right_object
+        next_object = right_object.choose_right_neighbor()
+        while next_object != None:
+            slot_sum += 1
+            x = next_object.string_number
+            y = last_object.string_number
+            next_bond = self.string.left_right_bonds[x][y]
+            if next_bond:
+                if next_bond.bond_category == self.bond_category and \
+                   next_bond.direction_category == self.direction_category:
+                    support_sum += 1
+            last_object = next_object
+            next_object = next_object.choose_right_neighbor()
+
+        if slot_sum == 0:
+            return 100
+        else:
+            return round(100 * (support_sum / float(slot_sum)))
+
+    def local_support(self):
+        number = self.number_of_local_supporting_bonds()
+        if number == 0:
+            return 0
+        density = self.local_density()
+        adjusted_density = 100 * (math.sqrt(density / 100.0))
+        number_factor = min(1, .6**(1 / number**3))
+        return round(adjusted_density * number_factor)
+
     def is_proposed(self):
         return self.proposal_level < 3
 
