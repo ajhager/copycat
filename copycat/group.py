@@ -102,6 +102,20 @@ class Group(Object, Structure):
                 self.right_object_position == other.right_object_position and \
                 self.group_category == other.group_category
 
+    def is_recursive_member(self, object):
+        '''
+        Return True if the object is a member of the gruop or is a member of a
+        member, etc.
+        '''
+        if isinstance(self, Letter):
+            return False
+        elif object in self.objects:
+            return True
+        else:
+            for g in self.objects:
+                if g.is_recursive_member(object):
+                    return True
+
     def calculate_internal_strength(self):
         '''
         For now, groups based on letter category are stronger than groups based

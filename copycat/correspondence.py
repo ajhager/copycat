@@ -25,6 +25,34 @@ class Correspondence(Structure):
         self.accessory_concept_mappings= []
         self.structure_category = Correspondence
 
+    def is_supporting_correspondence(self, other):
+        '''
+        Return True if this correspondence supports the given correspondence.
+        '''
+        if self.object1 == other.object1 or \
+           self.object2 == other.object2 or \
+           self.is_incompatible_correspondence(other):
+            return
+        else:
+            for cm1 in self.distinguishing_concept_mappings():
+                for cm2 in other.distinguishing_concept_mappings():
+                    if cm1.is_supporting_concept_mapping(cm2):
+                        return True
+
+    def is_incompatible_correspondence(self, other):
+        '''
+        Return True if this correspondence is incompatible with the given
+        correspondence.
+        '''
+        if self.object1 == other.object1 or \
+           self.object2 == other.object2:
+            return True
+        else:
+            for cm1 in self.concept_mappings():
+                for cm2 in other.concept_mappings():
+                    if cm1.is_incompatible_concept_mapping(cm2):
+                        return True
+
     def support(self):
         '''
         For now there are three levels of compatibility:
