@@ -40,6 +40,49 @@ class Slipnode(object):
         self.description_tester = None
         self.iterate_group = None
 
+    def are_related(self, other_node):
+        '''
+        Return True if the two nodes are equal or are linked in the slipnet.
+        '''
+        return self == other_node or self.are_linked(other_node)
+
+    def are_linked(self, other_node):
+        '''
+        Return True if the two nodes are linked in the slipnet.
+        '''
+        return other_node in [ol.to_node for ol in self.outgoing_links]
+
+    def are_slip_linked(self, other_node):
+        '''
+        Return True if the two nodes are linked by a slip link in the slipnet.
+        '''
+        return other_node in [lsl.to_node for lsl in self.later_slip_links]
+
+    def local_descriptor_support(self, string, object_category):
+        if object_category == self.slipnet.plato_letter:
+            objects = string.letters
+        else:
+            objects = string.groups
+        
+        if not objects:
+            return 0
+        
+        descriptor_count = 0
+        for obj in objects:
+            if obj.is_descriptor_present(self):
+                descriptor_count += 1
+
+        return round(100 * (descriptor_count / float(len(objects))))
+
+    def local_description_type_support(self, string):
+        description_type_count = 0
+        for ojb in string.objects:
+            if obj.has_description_type_present(self):
+                description_type_count += 1
+
+        return round(100 * (description_type_count / float(len(string.objects))))
+
+
     def outgoing_links(self):
         return self.has_property_links + \
                self.lateral_slip_links + \
