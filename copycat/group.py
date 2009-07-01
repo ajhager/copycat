@@ -102,6 +102,117 @@ class Group(Object, Structure):
                 self.right_object_position == other.right_object_position and \
                 self.group_category == other.group_category
 
+    def calculate_internal_strength(self):
+        '''
+        For now, groups based on letter category are stronger than groups based
+        on other facets. This should be fixed; a more general mechanism is
+        needed.
+        '''
+        if self.bond_facet == self.slipnet.plato_letter_category:
+            bond_facet_factor = 1
+        else:
+            bond_facet_factor = .5
+
+        bond_component = self.group_categgory.get_related_node(self.slipnet.plato_bond_category).degree_of_association() * \
+                bond_facet_factor
+
+        if self.length() == 1:
+            length_component = 5
+        elif self.length() == 2:
+            length_component = 20
+        elif self.length() == 3:
+            length_component = 60
+        else:
+            length_component = 90
+
+        bond_component_weight = bond_component ** .98
+        length_component_weight = 100 - bond_component_weight
+        return util.weighted_average([(bond_component, bond_component_weight),
+                                      (length_compoent, length_component_weight)])
+
+    def calculate_external_strength(self):
+        if self.spans_whole_string():
+            return 100
+        else:
+            return self.local_support()
+
+    def number_of_local_supporting_groups(self):
+        '''
+        Return the number of supporting groups in the given gruop's string.
+        Looks at all the other groups in the string, counting groups of the
+        same group category and direction category.  Does not take distance
+        into acount; all qualifying groups in the string are counted the same.
+        '''
+        number_of_supporting_group = 0
+        groups = self.string.groups
+        other_groups = groups.remove(self)
+        for other_group in other_groups:
+           if (not (self.is_subgroup(other_group) or \
+                    other_group.is_subgroup(self) or \
+                    self.groups_overlap(other_group))) and \
+              other_group.group_category == self.group_category and \
+              other_group.direction_category == self.direction_category:
+               number_of_supporting_gruops += 1
+        return number_of_supporting_groups
+
+    def local_density(self):
+        '''
+        Return the rough measure of the density in the string of groups of the
+        same group category and directin category as the given group. This
+        method is used in calculating the external strength of a group.
+        '''
+        if self.string_spanning_group():
+            return 100
+
+        slot_sum = 0
+        support_sum = 0
+
+        next_object self.left_object.choose_left_neighbor()
+        if isinstance(next_object, Letter) and next_object.group:
+            next_object = next_object.group
+        while next_object:
+            if isinstance(next_object, Letter):
+                next_group = None
+            else:
+                next_group = next_object
+            slot_sum += 1
+            if next_group and not self.groups_overlap(next_group) and \
+               next_group.group_category == self.group_category and \
+               next_group.direction_category == self.direction_category:
+                support_sum += 1
+            next_object = next_object.choose_left_neighbor()
+
+        next_object self.right_object.choose_right_neighbor()
+        if isinstance(next_object, Letter) and next_object.group:
+            next_object = next_object.group
+        while next_object:
+            if isinstance(next_object, Letter):
+                next_group = None
+            else:
+                next_group = next_object
+            slot_sum += 1
+            if next_group and not self.groups_overlap(next_group) and \
+               next_group.group_category == self.group_category and \
+               next_group.direction_category == self.direction_category:
+                support_sum += 1
+                nexst_object = next_object.choose_right_neighbor()
+
+        if slot_sum == 0:
+            return 100
+        else:
+            return round(100 * (support_sum / float(slot_sum)))
+
+    def local_support(self):
+        number = self.number_of_local_supporting_groups()
+        if number == 0:
+            return 0
+        else:
+            density = self.local_density()
+            adjusted_density = 100 * (math.sqrt(density / 100.0))
+            number_facet = min(1, .6 ** (1 / number ** 3))
+            return round(adjusted_density * number_factor)
+            
+
     def sharing_group(self, other):
         return self.group == other.group
 
