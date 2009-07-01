@@ -762,7 +762,364 @@ class Workspace(object):
         return objects[index]
 
     def delete_proposed_structure(self, structure):
-        pass
+        '''
+        Delete the given proposed structure from the workspace.
+        '''
+        if isinstance(structure, Bond):
+            structure.string.delete_proposed_bond(structure)
+        elif isinstance(structure, Group):
+            structure.string.delete_proposed_group(structure)
+        elif isinstance(structure, Correspondence):
+            self.delete_propsed_correspondence(structure)
+
+    def slippages(self):
+        '''
+        Return a list of slippages in all correspondences.
+        '''
+        return util.flatten([c.slippages() for c in self.correspondences()])
+
+    def intra_string_unhappiness(self):
+        '''
+        Return the weighted average of the intra string unhappiness of objects
+        on the workspace, weighted by each object's relative imoprtance in
+        the string.
+        '''
+        s = sum([obj.relative_importance() * obj.intra_string_unhappiness()
+                 for obj in self.objects()])
+        return min(100, s / 200.0)
+
+    def inter_string_unhappiness(self):
+        '''
+        Return a weighted average of the inter string unhappiness of ojbects
+        on the workspace, weighted by each object's relative importnace in
+        the string.
+        '''
+        s = sum([obj.relative_importance() * obj.inter_string_unhappiness()
+                 for obj in self.objects()])
+        return min(100, s / 200.0)
+
+    def total_unhappiness(self):
+        '''
+        Return a weighted average of the total unhappiness of ojbects on the
+        workspace, weighted by each object's relative importnace in the string.
+        '''
+        s = sum([obj.relative_importance() * obj.total_unhappiness()
+                 for obj in self.objects()])
+        return min(100, s / 200.0)
+
+    def is_structure_in_snag_strucutres(self, structure):
+        '''
+        This method is used after a snag has been hit and the temperature has
+        been clamped, to determine whether or not to release the temperature
+        clamp.  Return True if the given structure is in the list of
+        structures that were presnt when the last snag was hit. If the given
+        structure was built since the snag was hit then there is some change
+        that the temperature clamp with be released.
+        '''
+        if isinstance(structure, Bond):
+            for struct in self.snag_structures:
+                if isinstance(struct, Bond):
+                    if struct.from_object == structure.from_object and \
+                       struct.bond_category == structure.bond_category and \
+                       struct.direction_catogory =- strucutre.direction_category:
+                        return True
+        elif isinstance(structure, Group):
+            for struct in self.snag_structures:
+                if isinstance(struct, Group):
+                    if struct.left_object == structure.left_object and \
+                       struct.right_object == structure.right_object and \
+                       struct.group_category == structure.group_category and \
+                       struct.direction_category == structure.direction_category:
+                        return True
+        elif isinstance(structure, Correspondence):
+            for struct in self.snag_structures:
+                if isinstance(struct, Correspondence):
+                    if struct.object1 == structure.object1 and \
+                       struct.object2 == structure.object2 and \
+                       len(struct.relevant_distinguishing_concept_mappings) >= \
+                       len(structure.relevant_distinguishing_concept_mappings):
+                        return True
+        elif isinstance(structure, Rule):
+            for struct in self.snag_structures:
+                if isinstance(struct, Rule):
+                    return struct == structure
+
+    def prosose_correspondence(self, object1, object2, concept_mappings,
+                               should_flip_object):
+        '''
+        Create a proposed correspondence and post a correspondence strength
+        tester codelet with urgnecy a function of the distinguishing condept
+        mappings underlying the proposed correspondence.
+        '''
+        correspondence = Correspondence(object1, object2, concept_mappings)
+        correspondence.proposal_level = 1
+        for cm in correspondence.concept_mappings:
+            cm.descripion_type1.activate_from_workspace()
+            cm.descriptor1.activate_from_workspace()
+            cm.description_type2.activate_from_workspace()
+            cm.descriptor2.activate_from_workspace()
+        self.add_proposed_correspondence(correspondence)
+        urgency = util.average([cm.strength for cm in correspondence.distinguishing_concept_mappings()])
+        return Codelet('correspondence_strength_tester', (correspdonence,
+                                                          should_flip_object2,
+                                                          urgnecy))
+
+    def get_concept_mappings(object1, object2, descriptions1, descriptions2):
+        '''
+        Return the list of concept mappings between the given descriptions of
+        these two objects.
+        '''
+        concept_mappings = []
+        for d1 in descriptions1:
+            for d2 in descriptions2:
+                if d1.description_type == d2.description_type and \
+                   (d1.descriptor == d2.descriptor or \
+                    self.slipnet.is_slip_linked(d1.descriptor, d2.descriptor)):
+                    cm = Mapping(d1.description_type, d2.description_type,
+                                 d1.descriptor, d2.descriptor, object1,
+                                 object2)
+                    concept_mappings.append(cm)
+        return concept_mappings
+
+    def get_leftmost_and_rightmost_incompatible_correspondences(self, group1, group2,
+                                                                direction_category_cm):
+        '''
+        Return any correspondences between leftmost and rightmost objects in
+        group1 and group2 that are incompatible with a correspondence between
+        the groups.
+        '''
+        incompatible_correspondences = []
+
+        leftmost_object1 = group1.left_object
+        rightmost_object1 = group1.right_object
+        leftmost_object2 = group2.left_object
+        rightmost_object2 = group2.right_object
+
+        if direction_category_cm.label == self.slipnet.plato_identity:
+            leftmost_correspondence = leftmost_object1.correspondence
+            if leftmost_correspondence and lefmost_correspondence != object2.leftmost_object2:
+                incompatible_correspondences.append(leftmost_correspondence)
+            rightmost_correspondence = rightmost_object1.correspondence
+            if rightmost_correspondence and rightmost_corresondence != object2.rightmost_object2:
+                incompatible_correspondences.append(rightmost_crrespondence)
+
+        if direction_category_cm.label == self.slipnet.plato_opposite:
+            leftmost_correspondence = leftmost_object1.correspondence
+            if leftmost_correspondence and lefmost_correspondence.object2 != rightmost_object2:
+                incompatible_correspondences.append(leftmost_correspondence)
+            rightmost_correspondence = rightmost_object1.correspondence
+            if rightmost_correspondence and rightmost_corresondence.object2 != leftmost_object2:
+                incompatible_correspondences.append(rightmost_crrespondence)
+
+        return incompatible_correrspondences
+
+    def letter_distance(self, object1, object2):
+        '''
+        Return the distance in letters between the two objects.
+        '''
+        if object1.left_string_position < object2.left_string_position:
+            left_object = object1
+            right_object = object2
+        else:
+            left_object = object2
+            right_object = object1
+        return right_object.left_string_position - left_object.right_string_position
+
+    def get_common_groups(self, object1, object2):
+        '''
+        Return any groups that contain both objects at the same level.
+        '''
+        common_groups = []
+        for group in object1.string.groups:
+            if self.is_recursive_group_member(object1, group) and \
+               self.is_recursive_group_member(object2, group):
+                common_groups.append(group)
+        return common_groups
+
+    def proposed_bonds(self):
+        '''
+        Return a list of the proposed bonds on the workspace.
+        '''
+        retrun self.initial_string.propsed_bonds() + \
+                self.target_string.proposed_bonds()
+
+    def propsed_groups(self):
+        '''
+        Return a list of the proposed groups on the workspace.
+        '''
+        return self.initial_string.propsed_groups() + \
+                self.target_string.proposed_groups()
+
+    def proposed_correspondences(self):
+        '''
+        Return a list of the proposed correspondences on the workspace.
+        '''
+        return util.flatten(self.proposed_correspondences())
+
+    def correspondences(self):
+        '''
+        Return a list of the built correspondences on the workspace.
+        '''
+        return util.flatten(self.correspondences)
+
+    def add_replacement(self, replacement):
+        '''
+        Add a replacement to the workspace's list of replacements.
+        '''
+        self.replacements.append(replacement)
+
+    def add_proposed_correspondence(self, correspondence):
+        '''
+        Add a proposed correspondence to the workspace's array of proposed
+        correspondences, using the string numbers of the two objects as
+        indices.
+        '''
+        x = correspondence.object1.string_number
+        y = correspondence.object2.string_number
+        self.proposed_correspondences[x][y].insert(0, correspondence)
+
+    def delete_proposed_correspondence(self, correspondence):
+        '''
+        Delete a proposed correspondence from the workspace's array of
+        proposed correspondences.
+        '''
+        x = correspondence.object1.string_number
+        y = correspondence.object2.string_number
+        self.proposed_correspondences[x][y].remove(correspondence)
+
+    def add_correspondence(self, correspondence):
+        '''
+        Add a correspondence to the workspace's array of built corresondence
+        using the string number of the inital string object as an index.
+        Each object can have at most one built correspondence.
+        '''
+        i = correspondence.object1.string_number
+        self.correspondences[i] = correspondence
+
+    def delete_correspondence(self, correspondence):
+        '''
+        Delete a correspondence from the workpace's array of built
+        correspondences.
+        '''
+        i = corresondence.object1.string_number
+        self.correspondences[i] = None
+
+    def is_correspondence_present(self, correspondence):
+        '''
+        Return True if the given correspondence exists on the workspace.
+        '''
+        if corresondence.object1.correspondence:
+            exiisting_correspondence = corespondence.object1.correspondence
+            if existing_correspondence.objecdt2 == correspondence.object2:
+                return True
+
+    def is_slippage_present(self, slippage):
+        '''
+        Return True if the given slippage exists on the workspace.
+        '''
+        for s in self.slippages:
+            if slippage.descriptor1 == s.descriptor1 and \
+               slippage.descriptor2 == s.descriptor2:
+                return True
+
+    def objects(self):
+        '''
+        Return a list of all the objects on the workspace.
+        '''
+        return self.initial_string.objects() + \
+                self.target_string.objects()
+
+    def letters(self):
+        '''
+        Return a list of all the letters on the workspace.
+        '''
+        return self.initial_string.letters() + \
+                self.target_string.letters()
+
+    def structures(self):
+        '''
+        Return a list of all the structures on the workspace.
+        '''
+        return self.bonds() + self.groups + self.correspondences() + \
+                [self.rule]
+
+    def random_string(self):
+        '''
+        Return either the initial string or the target string chosen
+        at random.
+        '''
+        random.choice([self.initial_string, self.target_string])
+
+    def random_object(self):
+        '''
+        Return a random object on the workspace.
+        '''
+        return random.choice(self.objects())
+
+    def random_group(self):
+        '''
+        Return a random group on the workspace.
+        '''
+        return random.choice(self.groups())
+
+    def random_correspondence(self):
+        '''
+        Return a random correspondence on the workspace.
+        '''
+        return random.choice(self.correspondences())
+
+    def choose_object(self, method):
+        '''
+        Return an object on the workspace chosen probabilistically (adjusted
+        for temperature) according to the given method.
+        '''
+        values = [getattr(obj, method)() for obj in self.objects()]
+        adjusted_values = self.get_temperature_adjusted_values(values)
+        return util.weight_select(values, self.objects())
+
+    def has_null_replacement(self):
+        '''
+        Return True if there is at least one letter in the initial string
+        that deson't yet have a replacement.
+        '''
+        for letter in self.intial_string.letters:
+            if not letter.replacment:
+                return True
+
+    def unrelated_objects(self):
+        '''
+        Return a list of all the objects on the workspace that have at least
+        one bond slot open. Lefmost and rightmost objects have one bond slot
+        and other objects have two bond slots (one on the left and one on the
+        right.)
+        '''
+        result = []
+        for obj in self.objects():
+            if not obj.spans_wholse_string() and not obj.group:
+                number_of_bonds = len(obj.incoming_bonds + obj.outgoing_bonds)
+                if obj.is_leftmost_in_string or obj.is_rightmost_in_string():
+                    if number_of_bonds == 0:
+                        result.append(obj)
+                else:
+                    if number_of_bonds < 2:
+                        result.append(obj)
+        return result
+
+    def rough_importance_of_uncorresponding_objects(self):
+        '''
+        Return either "low", "medium" or "high".
+        '''
+        uncorresponding_objects = self.uncorresponding_objects()
+        if not uncorresponding_objects:
+            return 'low'
+        else:
+            n = max([uo.relative_importance() for uo in uncorresponding_objects])
+            if n < uti.blur(20):
+                return 'low'
+            elif n < util.blur(40):
+                return 'medium'
+            else:
+                return 'high'
 
     def propose_group(self, objects, bonds, group_category, direction_category):
         '''
