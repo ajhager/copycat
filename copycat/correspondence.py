@@ -25,6 +25,68 @@ class Correspondence(Structure):
         self.accessory_concept_mappings= []
         self.structure_category = Correspondence
 
+    def support(self):
+        '''
+        For now there are three levels of compatibility:
+            1. Supporting
+            2. Not incompatible but not supporting
+            3. Incompatible
+        Returns the sum of the strengths of other correspondences that
+        support this one. If one of the objects is the single letter in
+        its string, then the support is 100.
+        '''
+        if (isinstance(self.object1, Letter) and self.object1.spans_whole_string()) or \
+           (isinstance(self.object2, Letter) and self.object2.spans_whole_string()):
+            return 100
+        else:
+            support_sum = 0
+            other_correspondences = self.workspace.correspondences.remove(self)
+            for c in other_correspondences:
+                if self.is_supporting_correspondence(c):
+                    support_sum += c.total_strength()
+            return min(100, support_sum)
+
+    def calculate_external_strength(self):
+        return self.support()
+
+    def calculate_internal_strength(self):
+        '''
+        A function of how many concept mappings there are, how strong they
+        are and how much internal coherence there is among concept mappings.
+        '''
+        relevant_distinguishing_cms = self.relevant_distinguishing_cms()
+        if not relevant_distinguishing_cms:
+            return 0
+        average_strength = util.average([cm.strength() for cm in relevant_distinguishing_cms])
+        number_of_cms = len(relevant_distinguishing_cms)
+        if number_of_cms == 1:
+            number_of_cms_factor = .8
+        elif number_of_cms == 2:
+            number_of_cms_factor = 1.2
+        else:
+            number_of_cms_factor = 1.6
+
+        if self.is_internally_coherent():
+            internal_coherence_factor = 2.5
+        else:
+            internal_coherence_factor = 1
+
+        return min(100, round(average_strength * internal_coherence_facotr * \
+                              number_of_cms_factor))
+
+    def is_internally_coherent(self):
+        '''
+        Returns True if there is any pair of relevant distinguishing
+        concept mappings that support each other.
+        '''
+        cms = self.relevant_distinguishing_cms()
+        if len(cms) > 1:
+            for cm in cms:
+                for other_cm in cms:
+                    if other_cm != cm:
+                        if cm.is_supporting_concept_mapping(other_cm):
+                            return True
+
     def other_object(self, obj):
         '''
         Return the object that the given object corresponds to.
