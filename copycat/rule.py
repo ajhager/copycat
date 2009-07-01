@@ -42,3 +42,49 @@ class Rule(Structure):
     def is_no_change_made(self):
         return not self.descriptor1
 
+    def calculate_internal_strength(self):
+        if self.has_no_change():
+            return 100
+
+        conceptual_depth1 = self.description1.conceptual_depth()
+        if self.relation:
+            conceptual_depth2 = self.relation.conceptual_depth()
+        else:
+            conceptual_depth2 = self.description2.conceptual_depth()
+
+        conceptual_difference = abs(conceptual_depth1 - conceptual_depth2)
+
+        for obj in self.workspace.initial_string.objects:
+            if obj.has_changed():
+                i_object = obj
+                break
+
+        if i_object.correspondence:
+            i_object_corresponding_object = i_object.correspondence.object2
+        else:
+            i_object_corresponding_object = None
+
+        if not i_object_corresponding_object:
+            shared_descriptor_term = 0
+        else:
+            slipped_descriptors = []
+            for d in i_object_corresponding_object.relevant_descriptions():
+                ds = d.apply_slippages(i_object_corresponding_object,
+                                       self.workspace.slippages)
+                slipped_descriptors.append(ds.descriptor)
+            if self.descriptor1 in slipped_descriptors:
+                shared_descriptor_term = 100
+            else:
+                return 0
+
+        shared_descriptor_weight = round(((100 - self.descriptor1.conceptual_depth()) / \
+                                         10) ** 1.4)
+
+        rule_strength = round(util.weighted_average([(util.average([conceptual_depth1, conceptual_depth2]), 10)
+                                                     (100 - conceptual_depth_difference, 12),
+                                                     (shared_descriptor_term, shared_descriptor_weight)]))
+
+        return min(rule_strength, 100)
+
+    def calculate_external_strength(self):
+        return self.internal_strength()
