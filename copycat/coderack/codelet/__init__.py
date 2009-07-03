@@ -15,3 +15,4 @@
 # 02110-1301, USA.
 
 from copycat.coderack.codelet.answer import AnswerBuilder
+from copycat.coderack.codelet.bond import BondBottomUpScout

@@ -14,10 +14,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from workspace import Object
+from copycat.workspace import Object
 
 class Letter(Object):
-    def __init__(self, string, string_position):
+    def __init__(self, string, category, string_position):
         self.string = string
         self.left_string_position = string_position
         self.right_string_position = string_position

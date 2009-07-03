@@ -33,6 +33,7 @@ class String(object):
         self.object_spaces = self.length
         self.intra_string_unhappiness = 0
         self.number_of_bonds_to_scan_distribution = range(self.length)
+        self.object_positions = []
 
     def __repr__(self):
         return 'String(%s)' % self.name

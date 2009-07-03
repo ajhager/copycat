@@ -19,6 +19,9 @@ import string
 from slipnode import Slipnode
 from sliplink import Sliplink
 
+def get_plato_letter(character):
+    return None
+
 class Slipnet(object):
     def __init__(self):
         self.slipnodes = []

@@ -22,6 +22,7 @@ from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
 from copycat.workspace.mapping import Mapping
 from copycat.workspace.string import String
+from copycat.workspace.letter import Letter
 import copycat.slipnet as slipnet
 
 class Workspace(object):
@@ -1274,43 +1275,6 @@ class Workspace(object):
 
         return [Codelet('bond_builder', (bond,), strength)]
         
-    def bottom_up_bond_scout(self):
-        '''
-        Chooses an object and a neighbor of that object probabilistically by
-        intra string salience. Chooses a bond facet probabilistically by
-        relevance in the string. Checks if there is a bond between the two
-        descriptors of this facet, posting a bond strength tester codelet
-        with urgency a function of the degree of association of bonds of the
-        bond category.
-        '''
-        # Choose an object.
-        from_object = self.choose_object('instra_string_salience')
-
-        # Choose neighbor.
-        to_object = from_object.choose_neighbor()
-        if not to_object:
-            return
-
-        # Choose bond facet.
-        facet = from_object.choose_bond_facet(to_object)
-        if not facet:
-            return
-
-        # Get the two descriptors of the facet if they exist.
-        from_descriptor = from_object.descriptor(facet)
-        to_descriptor = to_object.descriptor(facet)
-        if (not from_descriptor) or (not to_descriptor):
-            return
-
-        # Check for possible bond.
-        category = from_description.bond_category(to_descriptor)
-        if not category:
-            return
-
-        # Propose the bond.
-        return self.propose_bond(from_object, to_object, facet,
-                                 from_descriptor, to_descriptor)
-
     def bottom_up_correspondence_scout(self):
         '''
         Chooses two objects, one from the initial string and one from the
