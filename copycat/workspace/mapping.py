@@ -16,7 +16,7 @@
 
 class Mapping(object):
     def __init__(self, description_type1, description_type2,
-                 descriptor1, descriptor2, object1, object1):
+                 descriptor1, descriptor2, object1, object2):
         self.description_bype1 = descripttion_type1
         self.description_bype2 = descripttion_type2
         self.descriptor1 = descriptor1

@@ -14,10 +14,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import util
+import copycat.toolbox as toolbox
 
 class Coderack:
-    def __init__(self, max_codelets, max_bins):
+    def __init__(self, max_codelets=100, max_bins=7):
         self.max_codelets = max_codelets
         self.max_bins = max_bins
         self.codelets = []

@@ -16,11 +16,11 @@
 
 import math
 
-import workspace
-import slipnet
-import toolbox
+import copycat.toolbox as toolbox
+from copycat.workspace import Structure, Mapping
+import copycat.slipnet as slipnet
 
-class Bond(workspace.Structure):
+class Bond(Structure):
     def __init__(self, workspace, from_object, to_object, bond_category,
                  bond_facet, from_object_descriptor, to_object_descriptor):
         self.workspace = workspace
@@ -185,11 +185,11 @@ class Bond(workspace.Structure):
         else:
             return []
 
-        mapping = workspace.Mapping(slipnet.plato_direction_category,
-                                    slipnet.plato_direction_category,
-                                    self.direction_category,
-                                    other_bond.direction_category,
-                                    None, None)
+        mapping = Mapping(slipnet.plato_direction_category,
+                          slipnet.plato_direction_category,
+                          self.direction_category,
+                          other_bond.direction_category,
+                          None, None)
         if mapping.is_incompatible_with(string_position_category_mapping):
             incompatible_correspondences.append(correspondence)
 

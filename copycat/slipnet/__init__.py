@@ -14,8 +14,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from node import Node
-from link import Link
+import string
+
+from slipnode import Slipnode
+from sliplink import Sliplink
 
 class Slipnet(object):
     def __init__(self):

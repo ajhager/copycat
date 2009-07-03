@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-class Node(object):
+class Slipnode(object):
     def __init__(self, name, depth):
         self.name = name
         self.conceptual_depth = depth

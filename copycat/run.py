@@ -16,10 +16,10 @@
 
 import random
 
-from coderack import Coderack
-from slipnet import Slipnet
-from workspace import Workspace
-from answer import AnswerBuilder
+from copycat.coderack import Coderack
+from copycat.slipnet import Slipnet
+from copycat.workspace import Workspace
+from copycat.coderack.codelet import AnswerBuilder
 
 class Run(object):
     def __init__(self, initial, modified, target, seed):

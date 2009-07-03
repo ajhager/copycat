@@ -16,7 +16,7 @@
 
 import random
 
-import util
+import copycat.toolbox as toolbox
 
 class String(object):
     def __init__(self, state, string):
@@ -208,6 +208,7 @@ class String(object):
 
     def make_room_for_new_object(self):
         # TODO: Move the arrays to dicts (sparse matrices).
+        pass
 
     def get_letter(self, position):
         '''

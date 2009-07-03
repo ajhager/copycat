@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-class Link(object):
+class Sliplink(object):
     def __init__(self, from_node, to_node, label, fixed_length):
         self.from_node = from_node
         self.to_node = to_node
