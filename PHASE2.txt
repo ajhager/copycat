@@ -1,0 +1,47 @@
+An * indicates completed Phase 2 cleanups.
+
+copycat
+    toolbox
+    workspace
+      * Bond
+        Correspondence
+        Description
+        Group
+        Letter
+        Mapping
+        Object
+        Replacement
+        Rule
+        String
+        Structure
+        Workspace
+    slipnet
+        Sliplink
+        Slipnode
+    coderack
+        codelet
+            AnswerBuilder
+            BondBottomUpScout
+            BondBuilder
+            BondStrengthTester
+            BondTopDownCategoryScout
+            BondTopDownDirectionScout
+            Breaker
+            CorrespondenceBottomUpScout
+            CorrespondenceBuilder
+            CorrespondenceImportantObjectScout
+            CorrespondenceStrengthTester
+            DescriptionBottomUpScout
+            DescriptionBuilder
+            DescriptionStrengthRester
+            DescriptionTopDownScout
+            GroupBuilder
+            GroupStrengthRester
+            GroupWholeStringScout
+            GroupTopDownCategoryScout
+            GroupTopDownDirectionScout
+            ReplacementFinder
+            RuleBuilder
+            RuleScout
+            RuleStrengthTester
+            RuleTranslator

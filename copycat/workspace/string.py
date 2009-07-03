@@ -17,26 +17,29 @@
 import random
 
 import copycat.toolbox as toolbox
+import copycat.slipnet as slipnet
+
+def array(width, height=0):
+    if height == 0:
+        return [None for i in range(width)]
+    return [[None for i in range(width)] for j in range(height)]
 
 class String(object):
-    def __init__(self, state, string):
-        self.state = state
+    def __init__(self, workspace, string):
+        self.workspace = workspace
         self.highest_string_number = -1
-        self.letters = []
-        self.proposed_bonds = []
-        self.left_right_bonds = []
-        self.from_to_bonds = []
-        self.proposed_groups = []
-        self.built_groups = []
-        self.length = len(string)
         self.name = string
+        self.length = len(string)
         self.object_spaces = self.length
-        self.intra_string_unhappiness = 0
+        self.letters = array(self.length)
+        self.groups = array(self.length)
+        self.object_positions = array(self.length)
+        self.proposed_bonds = array(self.length, self.length)
+        self.left_right_bonds = array(self.length, self.length)
+        self.from_to_bonds = array(self.length, self.length)
+        self.proposed_groups = array(self.length, self.length)
         self.number_of_bonds_to_scan_distribution = range(self.length)
-        self.object_positions = []
-
-    def __repr__(self):
-        return 'String(%s)' % self.name
+        self.intra_string_unhappiness = 0
 
     def random_object(self):
         '''
@@ -58,7 +61,7 @@ class String(object):
         objects = self.letters + self.groups
         values = map(method, objects)
         values = self.state.workspace.temperature_adjusted_values(values)
-        return objects[util.weighted_index(values)]
+        return objects[toolbox.weighted_index(values)]
 
     def choose_leftmost_object(self):
         '''
@@ -74,7 +77,7 @@ class String(object):
                 leftmost_objects.append(workspace_object)
         if leftmost_objects:
             values = [obj.relative_importance() for obj in leftmost_objects]
-            return util.weighted_select(values, leftmost_objects)
+            return toolbox.weighted_select(values, leftmost_objects)
 
     def proposed_bonds(self):
         '''

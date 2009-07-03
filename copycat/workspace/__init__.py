@@ -23,6 +23,7 @@ from copycat.workspace.wobject import Object
 from copycat.workspace.mapping import Mapping
 from copycat.workspace.string import String
 from copycat.workspace.letter import Letter
+from copycat.workspace.description import Description
 import copycat.slipnet as slipnet
 
 class Workspace(object):
@@ -65,12 +66,14 @@ class Workspace(object):
         # Add initial descriptions to the letters in the strings.
         for string in [self.initial_string, self.modified_string, self.target_string]:
             for letter in string.letters:
-                letter.add_description(Description(letter,
-                                                   self.slipnet.plato_object_category,
-                                                   self.slipnet.plato_letter))
-                letter.add_Description(Description(letter,
-                                                   self.slipnet.plato_letter_category,
-                                                   self.slipnet.get_plato_letter(letter.name)))
+                description = Description(letter,
+                                          slipnet.plato_object_category,
+                                          self.slipnet.plato_letter)
+                letter.add_description(description)
+                description = Description(letter,
+                                          slipnet.plato_letter_category,
+                                          slipnet.get_plato_letter(letter.name))
+                letter.add_description(description)
 
             leftmost_letter = string.letters[0]
             if string.length > 1:
