@@ -16,9 +16,8 @@
 
 import math
 
-import workspace.Structure
-import workspace.Mapping
-import slipnet.nodes
+import workspace
+import slipnet
 import toolbox
 
 class Bond(workspace.Structure):
@@ -27,14 +26,14 @@ class Bond(workspace.Structure):
         self.workspace = workspace
 
         if from_object.left_string_position < to_object.left_string_postion:
-            self.direction_category = slipnet.nodes.plato_right
+            self.direction_category = slipnet.plato_right
             self.left_object = from_object
             self.right_object = to_object
         else:
-            self.direction_category = slipnet.nodes.plato_left
+            self.direction_category = slipnet.plato_left
             self.left_object = to_object
             self.right_object = from_object
-        if bond_category == slipnet.nodes.plato_sameness:
+        if bond_category == slipnet.plato_sameness:
             self.direction_category = None
 
         self.left_string_position = min(from_object.left_string_position,
@@ -76,7 +75,7 @@ class Bond(workspace.Structure):
         else:
             member_compatibility_factor = .7
 
-        if self.bond_facet == slipnet.nodes.plato_letter_category:
+        if self.bond_facet == slipnet.plato_letter_category:
             bond_facet_factor = 1
         else:
             bond_facet_factor = .7
@@ -135,7 +134,7 @@ class Bond(workspace.Structure):
         '''
         Sameness bonds are more important than other bonds of other categories.
         '''
-        if self.bond_category == slipnet.nodes.plato_sameness:
+        if self.bond_category == slipnet.plato_sameness:
             return 100
         else:
             return 50
@@ -171,10 +170,10 @@ class Bond(workspace.Structure):
         else:
             return []
 
-        string_position_category = slipnet.nodes.plato_string_position_category
+        plato_string_position_category = slipnet.plato_string_position_category
         string_position_category_mapping = None
         for mapping in correspondence.concept_mappings:
-            if mapping.description_type1 == string_position_category:
+            if mapping.description_type1 == plato_string_position_category:
                 string_position_category_mapping = mapping
         if string_position_category_mapping == None:
             return []
@@ -186,8 +185,8 @@ class Bond(workspace.Structure):
         else:
             return []
 
-        mapping = workspace.Mapping(slipnet.nodes.plato_direction_category,
-                                    slipnet.nodes.plato_direction_category,
+        mapping = workspace.Mapping(slipnet.plato_direction_category,
+                                    slipnet.plato_direction_category,
                                     self.direction_category,
                                     other_bond.direction_category,
                                     None, None)
@@ -228,7 +227,7 @@ class Bond(workspace.Structure):
         successor bond going to the right, returns a predecessor bond going
         to the left using the same two objects.
         '''
-        category = self.bond_category.related_node(slipnet.nodes.plato_opposite)
+        category = self.bond_category.related_node(slipnet.plato_opposite)
         flipped_bond = Bond(self.workspace, self.to_object, self.from_object,
                             category, self.bond_facet,self.to_object_descriptor,
                             self.from_object_descriptor)
