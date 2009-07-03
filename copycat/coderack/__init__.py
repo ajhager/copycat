@@ -15,14 +15,27 @@
 # 02110-1301, USA.
 
 import copycat.toolbox as toolbox
+from copycat.coderack.codelet import Codelet
 
-class Coderack:
-    def __init__(self, max_codelets=100, max_bins=7):
-        self.max_codelets = max_codelets
-        self.max_bins = max_bins
-        self.codelets = []
+class Bin(object):
+    def __init__(self, urgency_code, name):
+        pass
+
+class Coderack(object):
+    def __init__(self):
+        self.max_codelets = 100
         self.modifier = 0
         self.time = 0
+        self.extremely_low_bin = Bin(0, 'extremely_low_bin')
+        self.very_low_bin = Bin(1, 'very_low_bin')
+        self.low_bin = Bin(2, 'low_bin')
+        self.medium_bin = Bin(3, 'medium_bin')
+        self.high_bin = Bin(4, 'high_bin')
+        self.very_high_bin = Bin(5, 'very_high_bin')
+        self.extremely_high_bin = Bin(6, 'extremely_high_bin')
+        self.bins = [self.extremely_low_bin, self.very_low_bin,
+                     self.low_bin, self.medium_bin, self.high_bin,
+                     self.very_high_bin, self.extremely_high_bin]
 
     def update(self, temperature):
         self.modifier = (110.0 - temperature) / 15.0

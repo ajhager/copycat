@@ -14,5 +14,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from copycat.coderack.codelet.answer import AnswerBuilder
-from copycat.coderack.codelet.bond import BondBottomUpScout
+class Codelet(object):
+    def __init__(self, arguments, urgency, structure_category=None):
+        self.arguments = arguments
+        self.urgency = urgency
+        self.structure_category = structure_category
+        self.timestamp = None
+
+    def run(self, coderack, slipnet, workspace):
+        pass

@@ -14,7 +14,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-class AnswerBuilder(object):
+from copycat.coderack import Codelet
+
+class AnswerBuilder(Codelet):
     def run(self):
         # Runs the translated rule on the target string to build the answer.
         self.answer_string = String('')

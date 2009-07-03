@@ -19,7 +19,7 @@ import random
 from copycat.coderack import Coderack
 from copycat.slipnet import Slipnet
 from copycat.workspace import Workspace
-from copycat.coderack.codelet import AnswerBuilder
+from copycat.coderack.codelets import AnswerBuilder
 
 class Run(object):
     def __init__(self, initial, modified, target, seed):
