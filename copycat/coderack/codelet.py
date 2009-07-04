@@ -15,11 +15,11 @@
 # 02110-1301, USA.
 
 class Codelet(object):
-    def __init__(self, arguments, urgency, structure_category=None):
+    def __init__(self, arguments):
         self.arguments = arguments
-        self.urgency = urgency
-        self.structure_category = structure_category
         self.timestamp = None
+        self.bin = None
 
     def run(self, coderack, slipnet, workspace):
         pass
+
