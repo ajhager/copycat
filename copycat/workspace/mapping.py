@@ -14,14 +14,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import copycat.toolbox as toolbox
+import copycat.slipnet as slipnet
+
 class Mapping(object):
     def __init__(self, description_type1, description_type2,
                  descriptor1, descriptor2, object1, object2):
-        self.description_bype1 = descripttion_type1
-        self.description_bype2 = descripttion_type2
+        self.description_type1 = description_type1
+        self.description_type2 = description_type2
         self.descriptor1 = descriptor1
         self.descriptor2 = descriptor2
-        self.label = self.slipnet.get_label_node(descriptor1, descriptor2)
+        self.label = descriptor1.get_label_node(descriptor2)
         self.object1 = object1
         self.object2 = object2
 
@@ -34,7 +37,7 @@ class Mapping(object):
         if degree_of_association == 100:
             return 100
         else:
-            return degree_of_association * (1 - ((self.conceptual_depth) / 100.0) ** 2)
+            return degree_of_association * (1 - (self.conceptual_depth() / 100.0) ** 2)
 
     def strength(self):
         '''
@@ -83,13 +86,13 @@ class Mapping(object):
         if self.descriptor1 == self.descriptor2:
             return 100
         else:
-            for link in self.descriptor1.lateral_slip_links():
+            for link in self.descriptor1.lateral_slip_links:
                 if link.to_node == self.descriptor2:
                     return link.degree_of_association()
 
     def conceptual_depth(self):
-        return util.average(self.descriptor1.conceptual_depth(),
-                            self.descriptor2.conceptual_depth())
+        return toolbox.average(self.descriptor1.conceptual_depth,
+                               self.descriptor2.conceptual_depth)
 
     def is_relevant(self):
         return self.description_type1.is_active() and \
@@ -101,12 +104,12 @@ class Mapping(object):
         distinguishing.  That is, a correspondence cannot be build on it
         alone.  This should eventually be generalized or changed.
         '''
-        if self.descriptor1 == self.slipnet.plato_whole and \
-           self.descriptor2 == self.slipnet.plato_whole:
+        if self.descriptor1 == slipnet.plato_whole and \
+           self.descriptor2 == slipnet.plato_whole:
             return
         else:
-            return self.object1.is_distinguishing_descriptor() and \
-                    self.object2.is_distinguishing_descriptor()
+            return self.object1.is_distinguishing_descriptor(self.descriptor1) and \
+                    self.object2.is_distinguishing_descriptor(self.descriptor2)
 
     def label_relevance(self):
         if not self.label:
@@ -139,13 +142,3 @@ class Mapping(object):
                 self.descriptor2 != other.descriptor2) or \
                (self.descriptor2 == other.descriptor2 and \
                 self.descriptor1 != other.descriptor1)
-
-def are_all_opposite_concept_mappings(concept_mappings):
-    '''
-    Return True if all the concept mappings in the list have the label
-    "opposite".
-    '''
-    for mapping in concept_mappings:
-        if mapping.label != self.slipnet.plato_opposite:
-            return False
-    return True

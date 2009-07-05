@@ -20,321 +20,288 @@ import copycat.toolbox as toolbox
 from slipnode import Slipnode
 from sliplink import Sliplink
 
+slipnodes = []
+def add_node(depth, codelets=[], intrinsic_link_length=None,
+             initially_clamped=False, directed=False):
+    slipnode = Slipnode(depth, codelets, intrinsic_link_length,
+                        initially_clamped, directed)
+    slipnodes.append(slipnode)
+    return slipnode
+
+sliplinks = []
+def add_link(kind, from_node, to_node, label, fixed_length):
+    sliplink = Sliplink(from_node, to_node, label, fixed_length)
+    sliplinks.append(sliplink)
+    to_node.incoming_links.append(sliplink)
+    if kind == 'slip':
+        from_node.lateral_slip_links.append(sliplink)
+    elif kind == 'nonslip':
+        from_node.lateral_nonslip_links.append(sliplink)
+    elif kind == 'property':
+        from_node.has_property_links.append(sliplink)
+    elif kind == 'instance':
+        from_node.instance_links.append(sliplink)
+    elif kind == 'category':
+        from_node.category_links.append(sliplink)
+
+# Letter nodes
+slipnet_letters = []
+for letter in string.ascii_lowercase:
+    slipnet_letters.append(add_node(10))
+
+# Number nodes
+slipnet_numbers = []
+for number in range(1, 6):
+    slipnet_numbers.append(add_node(30))
+
+# String position nodes.
+plato_leftmost = add_node(40)
+plato_rightmost = add_node(40)
+plato_middle = add_node(40)
+plato_single = add_node(40)
+plato_whole = add_node(40)
+
+
+# Alphabetic position nodes
+plato_first = add_node(60)
+plato_last = add_node(60)
+
+# Direction nodes
+plato_left = add_node(40, ['BondTopDownDirectionScout',
+                           'GroupTopDownDirectionScout'])
+plato_right = add_node(40, ['BondTopDownDirectionScout',
+                            'GroupTopDownDirectoinScout'])
+
+# Bond nodes
+plato_predecessor = add_node(50, ['BondTopDownCategoryScout'],
+                             60, directed=True)
+plato_successor = add_node(50, ['BondTopDownCategoryScout'],
+                           60, directed=True)
+plato_sameness = add_node(80, ['BondTopDownCategoryScout'], 0)
+
+# Group nodes
+plato_predecessor_group = add_node(50, ['GroupTopDownCategoryScout'],
+                                  directed=True)
+plato_successor_group = add_node(50, ['GroupTopDownCategoryScout'],
+                                directed=True)
+plato_sameness_group = add_node(80, ['GroupTopDownCategoryScout'])
+
+# Other relation nodes
+plato_identity = add_node(90, [], 0)
+plato_opposite = add_node(90, [], 80)
+
+# Object nodes
+plato_letter = add_node(20)
+plato_group = add_node(80)
+
+# Category nodes
+plato_letter_category = add_node(30, initially_clamped=True)
+plato_string_position_category = add_node(70, ['DescriptionTopDownScout'],
+                                         initially_clamped=True)
+plato_alphabetic_position_category = add_node(80, ['DescriptionTopDownScout'])
+plato_direction_category = add_node(70)
+plato_bond_category = add_node(80)
+plato_group_category = add_node(80)
+plato_length = add_node(60)
+plato_object_category = add_node(90)
+plato_bond_facet = add_node(90)
+
+# Letter links
+for i in range(25):
+    before = slipnet_letters[i]
+    after = slipnet_letters[i + 1]
+    add_link('nonslip', before, after, plato_successor, None)
+    add_link('nonslip', after, before, plato_predecessor, None)
+
+# Number links
+for i in range(4):
+    before = slipnet_numbers[i]
+    after = slipnet_numbers[i + 1]
+    add_link('nonslip', before, after, plato_successor, None)
+    add_link('nonslip', after, before, plato_predecessor, None)
+
+# Letter category links
+for i in range(26):
+    l = slipnet_letters[i]
+    fixed_length = plato_letter_category.conceptual_depth - l.conceptual_depth
+    add_link('category', l, plato_letter_category, None, fixed_length)
+    add_link('instance', plato_letter_category, l, None, 97)
+add_link('category', plato_sameness_group, plato_letter_category, None, 50)
+
+# Length links
+for i in range(5):
+    n = slipnet_numbers[i]
+    fixed_length = plato_length.conceptual_depth - n.conceptual_depth
+    add_link('category', n, plato_length, None, fixed_length)
+    add_link('instance', plato_length, n, None, 100)
+add_link('nonslip', plato_predecessor_group, plato_length, None, 95)
+add_link('nonslip', plato_successor_group, plato_length, None, 95)
+add_link('nonslip', plato_sameness_group, plato_length, None, 95)
+
+# Opposite links
+add_link('slip', plato_first, plato_last, plato_opposite, None)
+add_link('slip', plato_last, plato_first, plato_opposite, None)
+add_link('slip', plato_leftmost, plato_rightmost, plato_opposite, None)
+add_link('slip', plato_rightmost, plato_leftmost, plato_opposite, None)
+add_link('slip', plato_left, plato_right, plato_opposite, None)
+add_link('slip', plato_right, plato_left, plato_opposite, None)
+add_link('slip', plato_successor, plato_predecessor, plato_opposite, None)
+add_link('slip', plato_predecessor, plato_successor, plato_opposite, None)
+add_link('slip', plato_successor_group, plato_predecessor_group,
+                  plato_opposite, None)
+add_link('slip', plato_predecessor_group, plato_successor_group,
+                  plato_opposite, None)
+
+# Has property links
+add_link('property', slipnet_letters[0], plato_first, None,  75)
+add_link('property', slipnet_letters[25], plato_last, None, 75)
+
+# Object category links
+add_link('category', plato_letter, plato_object_category, None,
+           plato_object_category.conceptual_depth - plato_letter.conceptual_depth)
+add_link('instance', plato_object_category, plato_letter, None, 100)
+add_link('category', plato_group, plato_object_category, None,
+           plato_object_category.conceptual_depth - plato_group.conceptual_depth)
+add_link('instance', plato_object_category, plato_group, None, 100)
+
+# String position inks
+add_link('category', plato_leftmost, plato_string_position_category, None,
+  plato_string_position_category.conceptual_depth - plato_leftmost.conceptual_depth)
+add_link('instance', plato_string_position_category, plato_leftmost,
+                  None, 100)
+add_link('category', plato_rightmost, plato_string_position_category, None,
+  plato_string_position_category.conceptual_depth - plato_rightmost.conceptual_depth)
+add_link('instance', plato_string_position_category, plato_rightmost,
+                  None,  100)
+add_link('category', plato_middle, plato_string_position_category, None,
+  plato_string_position_category.conceptual_depth - plato_middle.conceptual_depth)
+add_link('instance', plato_string_position_category, plato_middle,
+                  None, 100)
+add_link('category', plato_single, plato_string_position_category, None,
+  plato_string_position_category.conceptual_depth - plato_single.conceptual_depth)
+add_link('instance', plato_string_position_category, plato_single,
+                  None, 100)
+add_link('category', plato_whole, plato_string_position_category, None,
+  plato_string_position_category.conceptual_depth - plato_whole.conceptual_depth)
+add_link('instance', plato_string_position_category, plato_whole,
+                  None, 100)
+
+# Alphabetic position category links
+add_link('category', plato_first, plato_alphabetic_position_category, None,
+  plato_alphabetic_position_category.conceptual_depth - plato_first.conceptual_depth)
+add_link('instance', plato_alphabetic_position_category, plato_first,
+                  None, 100)
+add_link('category', plato_last, plato_alphabetic_position_category, None,
+  plato_alphabetic_position_category.conceptual_depth - plato_last.conceptual_depth)
+add_link('instance', plato_alphabetic_position_category, plato_last,
+                  None, 100)
+
+# Direction category links
+add_link('category', plato_left, plato_direction_category, None,
+  plato_direction_category.conceptual_depth - plato_left.conceptual_depth)
+add_link('instance', plato_direction_category, plato_left, None,  100)
+add_link('category', plato_right, plato_direction_category, None,
+  plato_direction_category.conceptual_depth - plato_right.conceptual_depth)
+add_link('instance', plato_direction_category, plato_right, None, 100)
+
+# Bond category links
+add_link('category', plato_predecessor, plato_bond_category, None,
+  plato_bond_category.conceptual_depth - plato_predecessor.conceptual_depth)
+add_link('instance', plato_bond_category, plato_predecessor, None, 100)
+add_link('category', plato_successor, plato_bond_category, None,
+  plato_bond_category.conceptual_depth - plato_successor.conceptual_depth)
+add_link('instance', plato_bond_category, plato_successor, None, 100)
+add_link('category', plato_sameness, plato_bond_category, None,
+  plato_bond_category.conceptual_depth - plato_sameness.conceptual_depth)
+add_link('instance', plato_bond_category, plato_sameness, None, 100)
+
+# Group category links
+add_link('category', plato_predecessor_group, plato_group_category, None,
+  plato_group_category.conceptual_depth - plato_predecessor_group.conceptual_depth)
+add_link('instance', plato_group_category, plato_predecessor_group,
+                  None, 100)
+add_link('category', plato_successor_group, plato_group_category, None,
+  plato_group_category.conceptual_depth - plato_successor_group.conceptual_depth)
+add_link('instance', plato_group_category, plato_successor_group,
+                  None, 100)
+add_link('category', plato_sameness_group, plato_group_category, None,
+  plato_group_category.conceptual_depth - plato_sameness_group.conceptual_depth)
+add_link('instance', plato_group_category, plato_sameness_group,
+                  None, 100)
+
+# Associated group links
+add_link('nonslip', plato_sameness, plato_sameness_group,
+                  plato_group_category, 30)
+add_link('nonslip', plato_successor, plato_successor_group,
+                  plato_group_category, 60)
+add_link('nonslip', plato_predecessor, plato_predecessor_group,
+                  plato_group_category, 60)
+
+# Associated bond links
+add_link('nonslip', plato_sameness_group, plato_sameness,
+                  plato_bond_category, 90)
+add_link('nonslip', plato_successor_group, plato_successor,
+                  plato_bond_category, 90)
+add_link('nonslip', plato_predecessor_group, plato_predecessor,
+                  plato_bond_category, 90)
+
+# Bond facet links
+add_link('category', plato_letter_category, plato_bond_facet, None,
+  plato_bond_facet.conceptual_depth - plato_letter_category.conceptual_depth)
+add_link('instance', plato_bond_facet, plato_letter_category, None, 100)
+add_link('category', plato_length, plato_bond_facet, None,
+  plato_bond_facet.conceptual_depth - plato_length.conceptual_depth)
+add_link('instance', plato_bond_facet, plato_length, None, 100)
+
+# Letter category links
+add_link('slip', plato_letter_category, plato_length, None, 95)
+add_link('slip', plato_length, plato_letter_category, None, 95)
+
+# Letter group links
+add_link('slip', plato_letter, plato_group, None, 90)
+add_link('slip', plato_group, plato_letter, None, 90)
+
+# Direction position, direction neighbor, position neighbor links
+add_link('nonslip', plato_left, plato_leftmost, None, 90)
+add_link('nonslip', plato_leftmost, plato_left, None, 90)
+add_link('nonslip', plato_right, plato_leftmost, None, 100)
+add_link('nonslip', plato_leftmost, plato_right, None, 100)
+add_link('nonslip', plato_right, plato_rightmost, None, 90)
+add_link('nonslip', plato_rightmost, plato_right, None, 90)
+add_link('nonslip', plato_left, plato_rightmost, None, 100)
+add_link('nonslip', plato_rightmost, plato_left, None, 100)
+add_link('nonslip', plato_leftmost, plato_first, None, 100)
+add_link('nonslip', plato_first, plato_leftmost, None, 100)
+add_link('nonslip', plato_rightmost, plato_first, None, 100)
+add_link('nonslip', plato_first, plato_rightmost, None, 100)
+add_link('nonslip', plato_leftmost, plato_last, None, 100)
+add_link('nonslip', plato_last, plato_leftmost, None, 100)
+add_link('nonslip', plato_rightmost, plato_last, None, 100)
+add_link('nonslip', plato_last, plato_rightmost, None, 100)
+
+# Other links
+add_link('slip', plato_single, plato_whole, None, 90)
+add_link('slip', plato_whole, plato_single, None, 90)
+
 def get_plato_letter(character):
     index = string.ascii_lowercase.find(str(character))
     return slipnet_letters[index]
 
-def make_slipnode(name, conceptual_depth, intrinsic_link_length=None):
-    slipnode = Slipnode(name, conceptual_depth)
-    if intrinsic_link_length != None:
-        slipnode.intrinsic_link_length = intrinsic_link_length
-        slipnode.shrunk_link_length = round(intrinsic_link_length * .4)
-    return slipnode
-
-slipnet_letters = []
-for letter in string.ascii_lowercase:
-    slipnet_letters.append(make_slipnode('plato_%s' % letter, 10))
-
-slipnet_numbers = []
-for number in range(1, 6):
-    slipnet_numbers.append(make_slipnode(str(number), 30))
-
-plato_object_category = make_slipnode('plato object category', 90)
-plato_letter = make_slipnode('plato letter', 20)
-plato_letter_category = make_slipnode('plato letter category', 30)
-
-plato_string_position_category = make_slipnode('string position category', 70)
-plato_string_position_category.initially_clamped = True
-plato_string_position_category.codelets.append('top_down_description_scout')
-
-plato_leftmost = make_slipnode('leftmost', 40)
-plato_rightmost = make_slipnode('rightmost', 40)
-plato_middle = make_slipnode('middle', 40)
-plato_single = make_slipnode('single', 40)
-plato_whole = make_slipnode('whole', 40)
-
-plato_bond_facet = make_slipnode('bond facet', 90)
-
-plato_letter = make_slipnode('letter', 20)
-plato_group = make_slipnode('group', 80)
+def are_all_opposite_concept_mappings(concept_mappings):
+    '''
+    Return True if all the concept mappings in the list have the label
+    "opposite".
+    '''
+    for mapping in concept_mappings:
+        if mapping.label != plato_opposite:
+            return False
+    return True
 
 class Slipnet(object):
     def __init__(self):
-        self.slipnodes = []
-        self.sliplinks = []
+        self.slipnodes = slipnodes
+        self.sliplinks = sliplinks
         self.clamp_time = 50
-
-        # Letter nodes
-        slipnet_letters = []
-        for letter in string.ascii_lowercase:
-            slipnet_letters.append(self.add_slipnode(letter, 10))
-
-        # Number nodes
-        slipnet_numbers = []
-        for number in range(1, 6):
-            slipnet_numbers.append(self.add_slipnode(str(number), 30))
-
-        # String position nodes
-        leftmost = self.add_slipnode('leftmost', 40)
-        rightmost = self.add_slipnode('rightmost', 40)
-        middle = self.add_slipnode('middle', 40)
-        single = self.add_slipnode('single', 40)
-        whole = self.add_slipnode('whole', 40)
-
-        # Alphabetic position nodes
-        first = self.add_slipnode('first', 60)
-        last = self.add_slipnode('last', 60)
-
-        # Direction nodes
-        left = self.add_slipnode('left', 40)
-        left.codelets.append('top_down_bond_scout__direction')
-        left.codelets.append('top_down_group_scout__direction')
-        right = self.add_slipnode('right', 40)
-        right.codelets.append('top_down_bond_scout__direction')
-        right.codelets.append('top_down_group_scout__direction')
-
-        # Bond nodes
-        predecessor = self.add_slipnode('predecessor', 50, 60)
-        predecessor.directed = True
-        predecessor.codelets.append('top_down_bond_scout__category')
-        successor = self.add_slipnode('successor', 50, 60)
-        successor.directed = True
-        successor.codelets.append('top_down_bond_scout__category')
-        sameness = self.add_slipnode('sameness', 80, 0)
-        sameness.codelets.append('top_down_bond_scout_category')
-
-        # Group nodes
-        predecessor_group = self.add_slipnode('predecessor group', 50)
-        predecessor_group.directed = True
-        predecessor_group.codelets.append('top_down_group_scout__category')
-        successor_group = self.add_slipnode('successor group', 50)
-        successor_group.directed = True
-        successor_group.codelets.append('top_down_group_scout__category')
-        sameness_group = self.add_slipnode('sameness group', 80)
-        sameness_group.codelets.append('top_down_group_scout__category')
-
-        # Other relation nodes
-        identity = self.add_slipnode('identity', 90, 0)
-        opposite = self.add_slipnode('opposite', 90, 80)
-
-        # Object nodes
-        letter = self.add_slipnode('letter', 20)
-        group = self.add_slipnode('group', 80)
-
-        # Category nodes
-        letter_category = self.add_slipnode('letter category', 30)
-        letter_category.initially_clamped = True
-        string_position_category = self.add_slipnode('string position category', 70)
-        string_position_category.initially_clamped = True
-        string_position_category.codelets.append('top_down_description_scout')
-        alphabetic_position_category = self.add_slipnode('alphabetic position category', 80)
-        alphabetic_position_category.codelets.append('top_down_description_scout')
-        direction_category = self.add_slipnode('direction category', 70)
-        bond_category = self.add_slipnode('bond category', 80)
-        group_category = self.add_slipnode('group category', 80)
-        length = self.add_slipnode('length', 60)
-        object_category = self.add_slipnode('object category', 90)
-        bond_facet = self.add_slipnode('bond facet', 90)
-
-        # Letter links
-        for i in range(25):
-            before = slipnet_letters[i]
-            after = slipnet_letters[i + 1]
-            self.add_sliplink('nonslip', before, after, successor, None)
-            self.add_sliplink('nonslip', after, before, predecessor, None)
-
-        # Number links
-        for i in range(4):
-            before = slipnet_numbers[i]
-            after = slipnet_numbers[i + 1]
-            self.add_sliplink('nonslip', before, after, successor, None)
-            self.add_sliplink('nonslip', after, before, predecessor, None)
-
-        # Letter category links
-        for i in range(26):
-            l = slipnet_letters[i]
-            fixed_length = letter_category.conceptual_depth - l.conceptual_depth
-            self.add_sliplink('category', l, letter_category, None, fixed_length)
-            self.add_sliplink('instance', letter_category, l, None, 97)
-        self.add_sliplink('category', sameness_group, letter_category, None, 50)
-
-        # Length links
-        for i in range(5):
-            n = slipnet_numbers[i]
-            fixed_length = length.conceptual_depth - n.conceptual_depth
-            self.add_sliplink('category', n, length, None, fixed_length)
-            self.add_sliplink('instance', length, n, None, 100)
-        self.add_sliplink('nonslip', predecessor_group, length, None, 95)
-        self.add_sliplink('nonslip', successor_group, length, None, 95)
-        self.add_sliplink('nonslip', sameness_group, length, None, 95)
-
-        # Opposite links
-        self.add_sliplink('slip', first, last, opposite, None)
-        self.add_sliplink('slip', last, first, opposite, None)
-        self.add_sliplink('slip', leftmost, rightmost, opposite, None)
-        self.add_sliplink('slip', rightmost, leftmost, opposite, None)
-        self.add_sliplink('slip', left, right, opposite, None)
-        self.add_sliplink('slip', right, left, opposite, None)
-        self.add_sliplink('slip', successor, predecessor, opposite, None)
-        self.add_sliplink('slip', predecessor, successor, opposite, None)
-        self.add_sliplink('slip', successor_group, predecessor_group,
-                          opposite, None)
-        self.add_sliplink('slip', predecessor_group, successor_group,
-                          opposite, None)
-
-        # Has property links
-        self.add_sliplink('property', slipnet_letters[0], first, None,  75)
-        self.add_sliplink('property', slipnet_letters[25], last, None, 75)
-
-        # Object category links
-        self.add_sliplink('category', letter, object_category, None,
-                   object_category.conceptual_depth - letter.conceptual_depth)
-        self.add_sliplink('instance', object_category, letter, None, 100)
-        self.add_sliplink('category', group, object_category, None,
-                   object_category.conceptual_depth - group.conceptual_depth)
-        self.add_sliplink('instance', object_category, group, None, 100)
-
-        # String position inks
-        self.add_sliplink('category', leftmost, string_position_category, None,
-          string_position_category.conceptual_depth - leftmost.conceptual_depth)
-        self.add_sliplink('instance', string_position_category, leftmost,
-                          None, 100)
-        self.add_sliplink('category', rightmost, string_position_category, None,
-          string_position_category.conceptual_depth - rightmost.conceptual_depth)
-        self.add_sliplink('instance', string_position_category, rightmost,
-                          None,  100)
-        self.add_sliplink('category', middle, string_position_category, None,
-          string_position_category.conceptual_depth - middle.conceptual_depth)
-        self.add_sliplink('instance', string_position_category, middle,
-                          None, 100)
-        self.add_sliplink('category', single, string_position_category, None,
-          string_position_category.conceptual_depth - single.conceptual_depth)
-        self.add_sliplink('instance', string_position_category, single,
-                          None, 100)
-        self.add_sliplink('category', whole, string_position_category, None,
-          string_position_category.conceptual_depth - whole.conceptual_depth)
-        self.add_sliplink('instance', string_position_category, whole,
-                          None, 100)
-
-        # Alphabetic position category links
-        self.add_sliplink('category', first, alphabetic_position_category, None,
-          alphabetic_position_category.conceptual_depth - first.conceptual_depth)
-        self.add_sliplink('instance', alphabetic_position_category, first,
-                          None, 100)
-        self.add_sliplink('category', last, alphabetic_position_category, None,
-          alphabetic_position_category.conceptual_depth - last.conceptual_depth)
-        self.add_sliplink('instance', alphabetic_position_category, last,
-                          None, 100)
-
-        # Direction category links
-        self.add_sliplink('category', left, direction_category, None,
-          direction_category.conceptual_depth - left.conceptual_depth)
-        self.add_sliplink('instance', direction_category, left, None,  100)
-        self.add_sliplink('category', right, direction_category, None,
-          direction_category.conceptual_depth - right.conceptual_depth)
-        self.add_sliplink('instance', direction_category, right, None, 100)
-
-        # Bond category links
-        self.add_sliplink('category', predecessor, bond_category, None,
-          bond_category.conceptual_depth - predecessor.conceptual_depth)
-        self.add_sliplink('instance', bond_category, predecessor, None, 100)
-        self.add_sliplink('category', successor, bond_category, None,
-          bond_category.conceptual_depth - successor.conceptual_depth)
-        self.add_sliplink('instance', bond_category, successor, None, 100)
-        self.add_sliplink('category', sameness, bond_category, None,
-          bond_category.conceptual_depth - sameness.conceptual_depth)
-        self.add_sliplink('instance', bond_category, sameness, None, 100)
-
-        # Group category links
-        self.add_sliplink('category', predecessor_group, group_category, None,
-          group_category.conceptual_depth - predecessor_group.conceptual_depth)
-        self.add_sliplink('instance', group_category, predecessor_group,
-                          None, 100)
-        self.add_sliplink('category', successor_group, group_category, None,
-          group_category.conceptual_depth - successor_group.conceptual_depth)
-        self.add_sliplink('instance', group_category, successor_group,
-                          None, 100)
-        self.add_sliplink('category', sameness_group, group_category, None,
-          group_category.conceptual_depth - sameness_group.conceptual_depth)
-        self.add_sliplink('instance', group_category, sameness_group,
-                          None, 100)
-
-        # Associated group links
-        self.add_sliplink('nonslip', sameness, sameness_group,
-                          group_category, 30)
-        self.add_sliplink('nonslip', successor, successor_group,
-                          group_category, 60)
-        self.add_sliplink('nonslip', predecessor, predecessor_group,
-                          group_category, 60)
-
-        # Associated bond links
-        self.add_sliplink('nonslip', sameness_group, sameness,
-                          bond_category, 90)
-        self.add_sliplink('nonslip', successor_group, successor,
-                          bond_category, 90)
-        self.add_sliplink('nonslip', predecessor_group, predecessor,
-                          bond_category, 90)
-
-        # Bond facet links
-        self.add_sliplink('category', letter_category, bond_facet, None,
-          bond_facet.conceptual_depth - letter_category.conceptual_depth)
-        self.add_sliplink('instance', bond_facet, letter_category, None, 100)
-        self.add_sliplink('category', length, bond_facet, None,
-          bond_facet.conceptual_depth - length.conceptual_depth)
-        self.add_sliplink('instance', bond_facet, length, None, 100)
-
-        # Letter category links
-        self.add_sliplink('slip', letter_category, length, None, 95)
-        self.add_sliplink('slip', length, letter_category, None, 95)
-
-        # Letter group links
-        self.add_sliplink('slip', letter, group, None, 90)
-        self.add_sliplink('slip', group, letter, None, 90)
-
-        # Direction position, direction neighbor, position neighbor links
-        self.add_sliplink('nonslip', left, leftmost, None, 90)
-        self.add_sliplink('nonslip', leftmost, left, None, 90)
-        self.add_sliplink('nonslip', right, leftmost, None, 100)
-        self.add_sliplink('nonslip', leftmost, right, None, 100)
-        self.add_sliplink('nonslip', right, rightmost, None, 90)
-        self.add_sliplink('nonslip', rightmost, right, None, 90)
-        self.add_sliplink('nonslip', left, rightmost, None, 100)
-        self.add_sliplink('nonslip', rightmost, left, None, 100)
-        self.add_sliplink('nonslip', leftmost, first, None, 100)
-        self.add_sliplink('nonslip', first, leftmost, None, 100)
-        self.add_sliplink('nonslip', rightmost, first, None, 100)
-        self.add_sliplink('nonslip', first, rightmost, None, 100)
-        self.add_sliplink('nonslip', leftmost, last, None, 100)
-        self.add_sliplink('nonslip', last, leftmost, None, 100)
-        self.add_sliplink('nonslip', rightmost, last, None, 100)
-        self.add_sliplink('nonslip', last, rightmost, None, 100)
-
-        # Other links
-        self.add_sliplink('slip', single, whole, None, 90)
-        self.add_sliplink('slip', whole, single, None, 90)
-
-    def add_sliplink(self, kind, from_node, to_node, label, fixed_length):
-        sliplink = Sliplink(from_node, to_node, label, fixed_length)
-        self.sliplinks.append(sliplink)
-        to_node.incoming_links.append(sliplink)
-        if kind == 'slip':
-            from_node.lateral_slip_links.append(sliplink)
-        elif kind == 'nonslip':
-            from_node.lateral_nonslip_links.append(sliplink)
-        elif kind == 'property':
-            from_node.has_property_links.append(sliplink)
-        elif kind == 'instance':
-            from_node.instance_links.append(sliplink)
-        elif kind == 'category':
-            from_node.category_links.append(sliplink)
-
-    def add_slipnode(self, name, conceptual_depth, intrinsic_link_length=None):
-        slipnode = Slipnode(name, conceptual_depth)
-        if intrinsic_link_length != None:
-            slipnode.intrinsic_link_length = intrinsic_link_length
-            slipnode.shrunk_link_length = round(intrinsic_link_length * .4)
-        self.slipnodes.append(slipnode)
-        return slipnode
 
     def get_label_node(self, from_node, to_node):
         if from_node == to_node:
@@ -399,6 +366,7 @@ class Slipnet(object):
         for node in self.slipnodes:
             if node.activation >= 50:
                 for codelet in node.codelets:
-                    codelets.extend((codelet.structure_category,
-                                     codelet, node.conceptual_depth / 100.0))
+                    codelets.append((codelet, node.conceptual_depth / 100.))
+                    #codelets.extend((codelet.structure_category,
+                    #                 codelet, node.conceptual_depth / 100.0))
         return codelets

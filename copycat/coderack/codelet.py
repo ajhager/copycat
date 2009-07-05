@@ -22,4 +22,3 @@ class Codelet(object):
 
     def run(self, coderack, slipnet, workspace):
         pass
-

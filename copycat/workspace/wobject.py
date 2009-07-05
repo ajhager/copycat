@@ -127,9 +127,10 @@ class Object(object):
         if self.clamp_salience:
             return 100
         else:
-            return round(toolbox.weighted_average([8, 2],
-                                                  [self.relative_importance,
-                                                   self.inter_string_unhappiness]))
+            a = round(toolbox.weighted_average([8, 2],
+                                               [self.relative_importance,
+                                               self.inter_string_unhappiness]))
+            return a
 
     def calculate_total_salience(self):
         return round(toolbox.average(self.intra_string_salience,
@@ -185,7 +186,7 @@ class Object(object):
         return self.letter_span() == self.string.length
 
     def is_string_spanning_group(self):
-        return isinstance(self, Group) and self.spans_whole_string()
+        return self.type_name == 'group'  and self.spans_whole_string()
 
     def ungrouped_left_neighbor(self):
         '''

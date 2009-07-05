@@ -22,6 +22,7 @@ import copycat.toolbox as toolbox
 from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
 from copycat.workspace.description import Description
+from copycat.workspace.description import ExtrinsicDescription
 from copycat.workspace.group import Group
 from copycat.workspace.letter import Letter
 from copycat.workspace.mapping import Mapping
@@ -417,7 +418,7 @@ class Workspace(object):
             for d2 in descriptions2:
                 if d1.description_type == d2.description_type and \
                    (d1.descriptor == d2.descriptor or \
-                    self.slipnet.is_slip_linked(d1.descriptor, d2.descriptor)):
+                    d1.descriptor.is_slip_linked_with(d2.descriptor)):
                     cm = Mapping(d1.description_type, d2.description_type,
                                  d1.descriptor, d2.descriptor, object1,
                                  object2)
@@ -665,6 +666,9 @@ class Workspace(object):
             else:
                 return 'high'
 
+    def propose_correspondence(self, object1, object2, mappings, blah):
+        pass
+
     def propose_group(self, objects, bonds, group_category, direction_category):
         '''
         Create a proposed group, returning a group strength tester codelet
@@ -901,10 +905,10 @@ class Workspace(object):
         elif probability > .5:
             a = 10 - math.sqrt(100 - self.temperature)
             b = a / 100.0
-            c = 1 - (1 - probability)
+            c = (probability - 1) - 1
             d = b * c
-            e = (1 - probability) + d
-            max(.5, e)
+            e = (probability - 1) + d
+            return max(.5, e)
 
     def temperature_adjusted_values(self, values):
         '''

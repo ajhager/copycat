@@ -312,17 +312,14 @@ class String(object):
         Update the relative, normalized importances of all the objects in
         the string.
         '''
-        raw_importances = 0
-        for obj in self.objects():
-            if obj:
-                raw_importances += obj.raw_importance
+        raw_importance = sum([obj.raw_importance for obj in self.objects() if obj])
         for obj in self.objects():
             if not obj:
                 continue
-            if obj.raw_importance == 0:
+            if raw_importance == 0:
                 importance = 0
             else:
-                importance = round(100 * (obj.raw_importance / raw_importance))
+                importance = round(100 * (obj.raw_importance / float(raw_importance)))
             obj.relative_importance = importance
 
     def update_intra_string_unhappiness(self):

@@ -26,6 +26,7 @@ class DescriptionBottomUpScout(Codelet):
     property and posts a description strength tester codelet with urgency
     a function of the activation of the property.
     '''
+    structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         # Choose an object.
         object = self.workspace.choose_object('total_salience')
@@ -56,6 +57,7 @@ class DescriptionBuilder(Codelet):
     Attempts to build the proposed description. If it already exists, its
     activations are boosted.
     '''
+    structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         # Make sure the object still exists.
         if description.object not in self.objects():
@@ -76,6 +78,7 @@ class DescriptionStrengthTester(Codelet):
     decides whether or not to post a description builder codelet with
     urgency as a function of the strength.
     '''
+    structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         # Activate the descriptor.
         description.descriptor.buffer += self.activation
@@ -100,6 +103,7 @@ class DescriptionTopDownScout(Codelet):
     description strength tester codelet with urgency a funtion of the
     activation of the proposed descriptor.
     '''
+    structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         # Choose an object.
         object = self.choose_object('total_salience')

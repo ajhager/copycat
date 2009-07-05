@@ -19,6 +19,7 @@ import random
 from copycat.coderack import Coderack
 from copycat.slipnet import Slipnet
 from copycat.workspace import Workspace
+import copycat.coderack.codelets
 from copycat.coderack.codelets import AnswerBuilder
 
 class Run(object):
@@ -62,8 +63,10 @@ class Run(object):
         self.coderack.update(self.workspace.temperature)
         codelets = self.workspace.bottom_up_codelets()
         top_down_codelet_types = self.slipnet.top_down_codelets()
-        for category, codelet, urgency in top_down_codelet_types:
-            codelets.extend(workspace.get_codelets(category, codelet, urgency))
+        for codelet_name, urgency in top_down_codelet_types:
+            codelet = getattr(copycat.coderack.codelets, codelet_name)
+            category = codelet.structure_category
+            codelets.extend(self.workspace.get_codelets(category, codelet, urgency))
         for codelet, urgency in codelets:
             deleted = self.coderack.post(codelet, urgency)
             if deleted != None:

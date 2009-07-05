@@ -15,18 +15,21 @@
 # 02110-1301, USA.
 
 class Slipnode(object):
-    def __init__(self, name, depth):
-        self.name = name
+    def __init__(self, depth, codelets=[], intrinsic_link_length=None,
+                 initially_clamped=False, directed=False):
         self.conceptual_depth = depth
+        self.initially_clamped = initially_clamped
+        self.directed = directed
+        self.codelets = codelets
+        self.clamp = False
+        self.intrinsic_link_length = intrinsic_link_length
+        if intrinsic_link_length:
+            self.shrunk_link_length = round(intrinsic_link_length * .4)
+        else:
+            self.shrunk_link_length = None
+        
         self.activation = 0
         self.activation_buffer = 0
-        self.initially_clamped = False
-        self.clamp = False
-        self.directed = False
-        self.codelets = []
-
-        self.intrinsic_link_length = None
-        self.shrunk_link_length = None
 
         self.category_links = []
         self.instance_links = []
@@ -50,11 +53,11 @@ class Slipnode(object):
         '''
         return other_node in [ol.to_node for ol in self.outgoing_links]
 
-    def are_slip_linked(self, other_node):
+    def is_slip_linked_with(self, other_node):
         '''
         Return True if the two nodes are linked by a slip link in the slipnet.
         '''
-        return other_node in [lsl.to_node for lsl in self.later_slip_links]
+        return other_node in [lsl.to_node for lsl in self.lateral_slip_links]
 
     def local_descriptor_support(self, string, object_category):
         if object_category == self.slipnet.plato_letter:
@@ -150,8 +153,8 @@ class Slipnode(object):
         return self
 
     def decay(self):
-        amount = int(((100 - self.conceptual_depth) / 100.0) * self.activation)
-        self.activation_buffer -= amount
+        amount = round(((100 - self.conceptual_depth) / 100.0) * self.activation)
+        self.activation_buffer = max(0, self.activation_buffer - amount)
 
     def get_label_node(self, to_node):
         if self == to_node:

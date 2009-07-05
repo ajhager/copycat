@@ -14,7 +14,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
+import copycat.slipnet as nodes
 
 class CorrespondenceBottomUpScout(Codelet):
     '''
@@ -46,32 +48,32 @@ class CorrespondenceBottomUpScout(Codelet):
         # Decide whether or not to continue based on slippability.
         possible = False
         for mapping in mappings:
-            probability = mapping.slippablity() / 100.0
-            probability = self.temperature_adjusted_probability(probability)
-            if util.flip_coin(probability):
+            probability = mapping.slippability() / 100.0
+            probability = workspace.temperature_adjusted_probability(probability)
+            if toolbox.flip_coin(probability):
                 possible = True
         if not possible:
             return
 
         # Check if there are any distinguishing mappings.
-        distinguished_mappings = [m.distinguishing() for m in mappings]
+        distinguished_mappings = [m for m in mappings if m.is_distinguishing()]
         if not distinguished_mappings:
             return
 
         # If both objects span the strings, check if description needs flipped.
         possible_opposite_mappings = []
-        for mapping in distinguishing_mappings:
+        for mapping in distinguished_mappings:
             description_type = mapping.description_type1
             if description_type != 'plato_string_position_category' and \
                description_type != 'plato_bond_facet':
                    possible_opposite_mappings.append(mapping)
 
         opposite_descriptions = [m.description_type1 for m in mappings]
-        if all([object1.string_spanning_group(),
-                object2.string_spanning_group(),
-                # FIXME: not plato_opposite.is_active(),
-                self.all_opposite_concept_mappings(possible_opposite_mappings),
-                'plato_direction_category' in opposite_descriptions]):
+        if all([object1.is_string_spanning_group(),
+                object2.is_string_spanning_group(),
+                not nodes.plato_opposite.is_active(),
+                nodes.are_all_opposite_concept_mappings(possible_opposite_mappings),
+                nodes.plato_direction_category in opposite_descriptions]):
             old_object2_string_number = object2.string_number
             object2 = object2.flipped_version()
             object2.string_number = old_object2_string_number
@@ -79,7 +81,7 @@ class CorrespondenceBottomUpScout(Codelet):
                                              object1.relevant_descriptions(),
                                              object2.relevant_descriptions())
 
-        return self.propose_correspondence(object1, object2, mappings, True)
+        return workspace.propose_correspondence(object1, object2, mappings, True)
 
 class CorrespondenceBuilder(Codelet):
     '''

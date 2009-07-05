@@ -17,6 +17,7 @@
 from copycat.coderack import Codelet
 import copycat.slipnet as nodes
 from copycat.workspace import Replacement
+from copycat.workspace import ExtrinsicDescription
 
 class ReplacementFinder(Codelet):
     '''
