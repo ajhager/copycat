@@ -49,6 +49,8 @@ plato_middle = make_slipnode('middle', 40)
 plato_single = make_slipnode('single', 40)
 plato_whole = make_slipnode('whole', 40)
 
+plato_bond_facet = make_slipnode('bond facet', 90)
+
 class Slipnet(object):
     def __init__(self):
         self.slipnodes = []
@@ -326,6 +328,13 @@ class Slipnet(object):
             slipnode.shrunk_link_length = round(intrinsic_link_length * .4)
         self.slipnodes.append(slipnode)
         return slipnode
+
+    def get_label_node(self, from_node, to_node):
+        if from_node == to_node:
+            return plato_identity
+        for link in from_node.outgoing_links():
+            if link.to_node == to_node:
+                return link.label
 
     def update(self):
         '''

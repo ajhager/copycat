@@ -51,7 +51,7 @@ class String(object):
         '''
         Return a random letter in the string.
         '''
-        return random.choose(self.letters)
+        return random.choice(self.letters)
     
     def objects(self):
         return self.letters + self.groups
@@ -61,9 +61,9 @@ class String(object):
         Return an object in the string chosen probabilistically,
         adjusted for temperature, according to the given method.
         '''
-        objects = self.letters + self.groups
-        values = map(method, objects)
-        values = self.state.workspace.temperature_adjusted_values(values)
+        objects = [obj for obj in self.objects() if obj]
+        values = [getattr(obj, method) for obj in objects]
+        values = self.workspace.temperature_adjusted_values(values)
         return objects[toolbox.weighted_index(values)]
 
     def choose_leftmost_object(self):

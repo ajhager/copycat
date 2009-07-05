@@ -29,17 +29,17 @@ class CorrespondenceBottomUpScout(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Choose two objects.
-        object1 = self.initial_string.choose_object('inter_string_salience')
-        object2 = self.target_string.choose_object('inter_string_salience')
+        object1 = workspace.initial_string.choose_object('inter_string_salience')
+        object2 = workspace.target_string.choose_object('inter_string_salience')
 
         # If one object spans the whole string and the other does not, fizzle.
         if object1.spans_whole_string() != object2.spans_whole_string():
             return
 
         # Get the possible concept mappings.
-        mappings = self.concept_mappings(object1, object2,
-                                         object1.relevant_descriptions(),
-                                         object2.relevant_descriptions())
+        mappings = workspace.get_concept_mappings(object1, object2,
+                                                  object1.relevant_descriptions(),
+                                                  object2.relevant_descriptions())
         if not mappings:
             return
 

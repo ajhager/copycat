@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from workspace import Structure
+from copycat.workspace import Structure
 
 class Replacement(Structure):
     def __init__(self, object1, object2):

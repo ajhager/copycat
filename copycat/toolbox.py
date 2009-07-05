@@ -45,7 +45,8 @@ def weighted_select(weights, items):
     '''
     Returns one of the items probabilistically by weight.
     '''
-    return items[weighted_index(weights)]
+    if items:
+        return items[weighted_index(weights)]
 
 def select_assoc(assoc_list):
     '''

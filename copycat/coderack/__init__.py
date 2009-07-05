@@ -94,7 +94,7 @@ class Coderack(object):
         '''
         if self.is_empty():
             return None
-        urgencies = [bin.urgency_sum() for bin in self.bins]
+        urgencies = [bin.urgency_sum(self.temperature) for bin in self.bins]
         bin = toolbox.weighted_select(urgencies, self.bins)
         return bin.choose()
 
@@ -138,7 +138,7 @@ class Coderack(object):
         if urgency >= 100:
             bin = self.extremely_high_bin
         else:
-            index = (len(self.bins) * value) / 100
+            index = (len(self.bins) * urgency) / 100
             bin = self.bins[index]
         bin.add(codelet)
         codelet.timestamp = self.time

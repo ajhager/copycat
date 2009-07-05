@@ -26,12 +26,12 @@ class BondBottomUpScout(Codelet):
     category.
     '''
     def run(self, coderack, slipnet, workspace):
-        from_object = workspace.choose_object('instra_string_salience')
+        from_object = workspace.choose_object('intra_string_salience')
         to_object = from_object.choose_neighbor()
         if to_object == None:
             return
 
-        facet = from_object.choose_bond_facet(to_object)
+        facet = workspace.choose_bond_facet(from_object, to_object)
         if facet == None:
             return
 
@@ -167,31 +167,31 @@ class BondTopDownCategoryScout(Codelet):
         string = [initial_string, target_string][index]
 
         # Choose an object and neighbor.
-        object = string.choose_object('intra_string_salience')
-        neighbor = object.choose_neighbor()
+        obj = string.choose_object('intra_string_salience')
+        neighbor = obj.choose_neighbor()
         if not neighbor:
             return
 
         # Choose bond facet.
-        facet = object.choose_bond_facet(neighbor)
+        facet = workspace.choose_bond_facet(obj, neighbor)
         if not facet:
             return
 
         # Get the descriptors of the facet if they exist.
-        object_descriptor = object.descriptor(facet)
+        object_descriptor = obj.descriptor(facet)
         neighbor_descriptor = neighbor.descriptor(facet)
         if (not object_descriptor) or (not neighbor_descriptor):
             return
 
         # Check for a possible bond.
         if object_descriptor.bond_category(neighbor_descriptor) == category:
-            from_object = object
+            from_object = obj
             to_object = neighbor
             from_descriptor = object_descriptor
             to_descriptor = neighbor_descriptor
         elif neighbor_descriptor.bond_category(object_descriptor) == category:
             from_object = neighbor
-            to_object = object
+            to_object = obj
             from_descriptor = neighbor_descriptor
             to_descriptor = object_descriptor
         else:

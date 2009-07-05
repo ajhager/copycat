@@ -15,6 +15,8 @@
 # 02110-1301, USA.
 
 from copycat.coderack import Codelet
+import copycat.slipnet as nodes
+from copycat.workspace import Replacement
 
 class ReplacementFinder(Codelet):
     '''
@@ -25,26 +27,26 @@ class ReplacementFinder(Codelet):
     vice versa.
     '''
     def run(self, coderack, slipnet, workspace):
-        i_letter = self.initial_string.random_letter()
+        i_letter = workspace.initial_string.random_letter()
         if i_letter.replacement:
             return
 
-        m_letter = self.modified_string.letter(i_letter.left_string_position)
+        index = i_letter.left_string_position
+        m_letter = workspace.modified_string.letters[index]
 
         # Check if m_letter's letter_category is different form i_letter's.
-        i_letter_category = i_letter.get_descriptor(plato_letter_category)
-        m_letter_category = m_letter.get_descriptor(plato_letter_category)
+        i_letter_category = i_letter.get_descriptor(nodes.plato_letter_category)
+        m_letter_category = m_letter.get_descriptor(nodes.plato_letter_category)
         if i_letter_category != m_letter_category:
             i_letter.changed = True
-            # FIXME: Another example of needing slipnet information.
-            change_relation = slipnet.label_node(i_letter_category,
-                                                 m_letter_category)
+            change_relation = slipnet.get_label_node(i_letter_category,
+                                                     m_letter_category)
             if change_relation:
                 description = ExtrinsicDescription(change_relation,
-                                                   plato_letter_category,
+                                                   nodes.plato_letter_category,
                                                    i_letter)
                 m_letter.add_extrinsic_description(description)
 
         replacement = Replacement(i_letter, m_letter)
-        self.add_replacement(replacement)
+        workspace.add_replacement(replacement)
         i_letter.replacement = replacement

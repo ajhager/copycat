@@ -14,15 +14,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import util
-from workspace import Object, Structure
-from description import Description
+import copycat.toolbox as toolbox
+from copycat.workspace import Object, Structure, Description
 
 class Group(Object, Structure):
-    def __init__(self, state, string, group_category, direction_category,
+    def __init__(self, workspace, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):
         super(Group, self).__init__()
-        self.state = state
+        self.workspace = workspace
+        self.type_name = 'group'
         self.string = string
         self.structure_category = Group
         self.group_category = group_category
@@ -182,7 +182,7 @@ class Group(Object, Structure):
         slot_sum = 0
         support_sum = 0
 
-        next_object self.left_object.choose_left_neighbor()
+        next_object = self.left_object.choose_left_neighbor()
         if isinstance(next_object, Letter) and next_object.group:
             next_object = next_object.group
         while next_object:
@@ -197,7 +197,7 @@ class Group(Object, Structure):
                 support_sum += 1
             next_object = next_object.choose_left_neighbor()
 
-        next_object self.right_object.choose_right_neighbor()
+        next_object = self.right_object.choose_right_neighbor()
         if isinstance(next_object, Letter) and next_object.group:
             next_object = next_object.group
         while next_object:
@@ -261,7 +261,7 @@ class Group(Object, Structure):
     def is_incompatible_correspondence(self, correspondence, obj):
         category = self.state.slipnet.plato_string_position_category
         for cm in correspondence.concept_mappings:
-            if cm.description_type1 == category::
+            if cm.description_type1 == category:
                 concept_mapping = cm
                 break
 
@@ -398,7 +398,7 @@ class Group(Object, Structure):
         bonds_to_be_flipped = []
         for b in self.bonds:
             to_be_flipped = self.string.get_bond(b.to_object, b.from_object)
-            if b = to_be_flipped.flipped_version():
+            if b == to_be_flipped.flipped_version():
                 bonds_to_be_flipped.append(to_be_flipped)
         return bonds_to_be_flipped
 

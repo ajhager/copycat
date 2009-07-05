@@ -18,12 +18,20 @@ import math
 import random
 
 import copycat.toolbox as toolbox
+
 from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
-from copycat.workspace.mapping import Mapping
-from copycat.workspace.string import String
-from copycat.workspace.letter import Letter
 from copycat.workspace.description import Description
+from copycat.workspace.group import Group
+from copycat.workspace.letter import Letter
+from copycat.workspace.mapping import Mapping
+from copycat.workspace.replacement import Replacement
+from copycat.workspace.string import String
+
+from copycat.coderack.codelets import BondBottomUpScout
+from copycat.coderack.codelets import ReplacementFinder
+from copycat.coderack.codelets import CorrespondenceBottomUpScout
+
 import copycat.slipnet as slipnet
 
 class Workspace(object):
@@ -37,7 +45,7 @@ class Workspace(object):
         self.temperature = 0
         self.clamp_temperature = False
 
-        self._replacements = []
+        self.replacements = []
         self._correspondences = []
         self._proposed_correspondences = []
 
@@ -124,12 +132,11 @@ class Workspace(object):
         self.update_temperature()
 
     def initial_codelets(self):
-        return []
-        codelets = [Codelet('bottom_up_bond_scout'),
-                    Codelet('replacement_finder'),
-                    Codelet('bottom_up_correspondence_scout')]
+        codelets = [(BondBottomUpScout(), 0),
+                    (ReplacementFinder(), 0),
+                    (CorrespondenceBottomUpScout(), 0)]
         number_needed = len(self.objects()) * 2
-        return initial_codelets * number_needed
+        return codelets * number_needed
 
     def test_snag_condition(self):
         '''
@@ -401,7 +408,7 @@ class Workspace(object):
                                                           should_flip_object2,
                                                           urgnecy))
 
-    def get_concept_mappings(object1, object2, descriptions1, descriptions2):
+    def get_concept_mappings(self, object1, object2, descriptions1, descriptions2):
         '''
         Return the list of concept mappings between the given descriptions of
         these two objects.
@@ -610,9 +617,10 @@ class Workspace(object):
         Return an object on the workspace chosen probabilistically (adjusted
         for temperature) according to the given method.
         '''
-        values = [getattr(obj, method)() for obj in self.objects()]
-        adjusted_values = self.get_temperature_adjusted_values(values)
-        return util.weight_select(values, self.objects())
+        objects = [obj for obj in self.objects() if obj]
+        values = [getattr(obj, method) for obj in objects]
+        adjusted_values = self.temperature_adjusted_values(values)
+        return toolbox.weighted_select(values, objects)
 
     def has_null_replacement(self):
         '''
@@ -737,15 +745,15 @@ class Workspace(object):
     def choose_bond_facet(self, object1, object2):
         object1_bond_facets = []
         for description_type in [d.description_type for d in object1.descriptions]:
-            if desription_type.category == self.slipnet.plato_bond:
+            if description_type.category == slipnet.plato_bond_facet:
                 object1_bond_facets.append(description_type)
         object2_bond_facets = []
         for description_type in [d.description_type for d in object2.descriptions]:
-            if desription_type.category == self.slipnet.plato_bond:
+            if description_type.category == slipnet.plato_bond_facet:
                 object2_bond_facets.append(description_type)
         items = set(object1_bond_facets).intersection(set(object2_bond_facets))
-        items = [facet.total_description_type_support(object1.string) for facet in items]
-        return util.select_item(items)
+        support = [facet.total_description_type_support(object1.string) for facet in items]
+        return toolbox.weighted_select(support, items)
 
     def propose_bond(self, from_object, to_object, bond_category,
                      bond_facet, from_object_descriptor, to_object_descriptor):
@@ -899,7 +907,7 @@ class Workspace(object):
             e = (1 - probability) + d
             max(.5, e)
 
-    def temperature_adjusted_values(values):
+    def temperature_adjusted_values(self, values):
         '''
         Return a list with values that are exponential functins of the original
         values, with the exponent being a funtion of the temperature. The
@@ -909,8 +917,8 @@ class Workspace(object):
         exponent = ((100 - self.temperature) / 30.0) + .5
         new_values = []
         for value in values:
-            new_values += round(value ^ exponent)
-        return values
+            new_values.append(round(value ** exponent))
+        return new_values
 
     def post_codelet_probability(self, category):
         '''

@@ -213,27 +213,31 @@ class Object(object):
         Return a list of all the object's immediate left neighbors, both
         letters and groups.
         '''
+        objects = []
         if not self.is_leftmost_in_string():
-            objects = []
-            position = self.leftmost_string_position - 1
+            position = self.left_string_position - 1
             for obj in self.string.object_positions[position]:
-                if not (isinstance(object, Group) and \
+                if not obj:
+                    continue
+                if not (obj.type_name == 'group' and \
                         self.is_recursive_group_member(obj)):
                     objects.append(obj)
-            return objects
+        return objects
 
     def all_right_neighbors(self):
         '''
         Return a list of all the objects's left neighbors.
         '''
+        objects = []
         if not self.is_rightmost_in_string():
-            objects = []
             position = self.right_string_position + 1
             for obj in self.string.object_positions[position]:
-                if not (isinstance(obj, Group) and \
+                if not obj:
+                    continue
+                if not (obj.type_name == 'group' and \
                         self.is_recursive_group_member(obj)):
                     objects.append(obj)
-            return objects
+        return objects
 
     def all_neighbors(self):
         '''
@@ -273,14 +277,15 @@ class Object(object):
         salience.
         '''
         values = [o.intra_string_salience for o in self.all_right_neighbors()]
-        return util.weighted_select(values)
+        return toolbox.weighted_select(values)
 
     def choose_neighbor(self):
         '''
         Choose a neighbor probabilistically based on intra string salience.
         '''
-        values = [o.intra_string_salience for o in self.all_neighbors()]
-        return util.weighted_select(values)
+        neighbors = self.all_neighbors()
+        saliences = [o.intra_string_salience for o in neighbors]
+        return toolbox.weighted_select(saliences, neighbors)
 
     def all_bonds(self):
         '''

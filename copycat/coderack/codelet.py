@@ -15,7 +15,7 @@
 # 02110-1301, USA.
 
 class Codelet(object):
-    def __init__(self, arguments):
+    def __init__(self, arguments=()):
         self.arguments = arguments
         self.timestamp = None
         self.bin = None
