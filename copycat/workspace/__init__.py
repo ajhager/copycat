@@ -26,11 +26,10 @@ from copycat.workspace.group import Group
 from copycat.workspace.letter import Letter
 from copycat.workspace.mapping import Mapping
 from copycat.workspace.replacement import Replacement
+from copycat.workspace.rule import Rule
 from copycat.workspace.string import String
 
-from copycat.coderack.codelets import BondBottomUpScout
-from copycat.coderack.codelets import ReplacementFinder
-from copycat.coderack.codelets import CorrespondenceBottomUpScout
+from copycat.coderack.codelets import *
 
 import copycat.slipnet as slipnet
 
@@ -117,7 +116,7 @@ class Workspace(object):
         '''
         for structure in self.structures():
             if structure:
-                structure.update_strength_values()
+                structure.update_strengths()
         for object_ in self.objects():
             if object_:
                 object_.update_object_values()
@@ -156,7 +155,7 @@ class Workspace(object):
                 unclamp_probability = max([structure.total_strength() \
                     for structure in new_structures]) / 100.
 
-            if util.flip_coin(unclamp_probability):
+            if toolbox.flip_coin(unclamp_probability):
                 self.snag_condition = None
                 self.clamp_temperature = False
                 for description in self.snag_object.descriptions:
@@ -302,7 +301,7 @@ class Workspace(object):
         objects = self.objects()
         values = [getattr(object, method)() for object in objects]
         values = self.temperature_adjusted_values(values)
-        index = util.select_list_position(values)
+        index = toolbox.select_list_position(values)
         return objects[index]
 
     def delete_proposed_structure(self, structure):
@@ -320,7 +319,7 @@ class Workspace(object):
         '''
         Return a list of slippages in all correspondences.
         '''
-        return util.flatten([c.slippages() for c in self.correspondences()])
+        return toolbox.flatten([c.slippages() for c in self.correspondences()])
 
     def intra_string_unhappiness(self):
         '''
@@ -592,7 +591,7 @@ class Workspace(object):
         Return either the initial string or the target string chosen
         at random.
         '''
-        random.choice([self.initial_string, self.target_string])
+        return random.choice([self.initial_string, self.target_string])
 
     def random_object(self):
         '''
@@ -627,8 +626,8 @@ class Workspace(object):
         Return True if there is at least one letter in the initial string
         that deson't yet have a replacement.
         '''
-        for letter in self.intial_string.letters:
-            if not letter.replacment:
+        for letter in self.initial_string.letters:
+            if not letter.replacement:
                 return True
 
     def unrelated_objects(self):
@@ -857,7 +856,7 @@ class Workspace(object):
         if not self.clamp_temperature:
             rule_weakness = 100
             if self.rule:
-                rule_weakness = 100 - self.rule.total_strength()
+                rule_weakness = 100 - self.rule.total_strength
 
             self.temperature = toolbox.weighted_average([8, 2],
                                                         [self.total_unhappiness(),
@@ -972,7 +971,6 @@ class Workspace(object):
         Returns various bottom up codelets, with urgency and number based on
         how many of each type of codelet is needed.
         '''
-        return []
         def test(category, codelet, urgency):
             '''
             Based on the category sent in, test for the probability for the
@@ -989,16 +987,16 @@ class Workspace(object):
             return codelets
 
         return \
-        test('description', 'bottom_up_description_scout', 30) +\
-        test('bond', 'bottom_up_bond_scout', 30) +\
-        test('group', 'group_scout__whole_string', 30) +\
-        test('replacement', 'replacement_finder', 30) +\
-        test('correspondence', 'bottom_up_correspondence_scout', 30) +\
-        test('correspondence', 'important_object_correspondence_scout', 30) +\
-        test('rule', 'rule_scout', 30) +\
-        test('translator_rule', 'rule_translator',
-                30 if self.temperature > 25 else 60) +\
-        [codeletsCodelet('breaker', urgency=0)]
+        test('description', DescriptionBottomUpScout, 30) + \
+        test('bond', BondBottomUpScout, 30) + \
+        test('group', GroupWholeStringScout, 30) + \
+        test('replacement', ReplacementFinder, 30) + \
+        test('correspondence', CorrespondenceBottomUpScout, 30) + \
+        test('correspondence', CorrespondenceImportantObjectScout, 30) + \
+        test('rule', RuleScout, 30) + \
+        test('translator_rule', RuleTranslator,
+                                    30 if self.temperature > 25 else 60) + \
+        [(Breaker(), 0)]
 
     def objects(self):
         return self.initial_string.objects() + self.target_string.objects()
@@ -1064,9 +1062,11 @@ class Workspace(object):
 
     def uncorresponding_objects(self):
         uncorresponding_objects = []
-        for object in self.objects():
-            if object.correspondence == None:
-                uncorresponding_objects.append(object)
+        for obj in self.objects():
+            if not obj:
+                continue
+            if obj.correspondence == None:
+                uncorresponding_objects.append(obj)
         return uncorresponding_objects
 
     def rough_number_of_unrelated_objects(self):
@@ -1089,18 +1089,18 @@ class Workspace(object):
 
     def rough_number_of_unreplaced_objects(self):
         number_of_unreplaced_objects = len(self.unreplaced_objects())
-        if number_of_unreplaced_objects < util.blur(2):
+        if number_of_unreplaced_objects < toolbox.blur(2):
             return 'few'
-        elif number_of_unreplaced_objects < until.blur(4):
+        elif number_of_unreplaced_objects < toolbox.blur(4):
             return 'medium'
         else:
             return 'many'
 
     def rough_number_of_uncorresponding_objects(self):
         number_of_uncorresponding_objects = len(self.uncorresponding_objects())
-        if number_of_uncorresponding_objects < util.blur(2):
+        if number_of_uncorresponding_objects < toolbox.blur(2):
             return 'few'
-        elif number_of_uncorresponding_objects < until.blur(4):
+        elif number_of_uncorresponding_objects < toolbox.blur(4):
             return 'medium'
         else:
             return 'many'
@@ -1128,7 +1128,7 @@ class Workspace(object):
         strengths = [structure1.total_strength() * weight1,
                      structure2.total_strength() * weight2]
         adjusted_strengths = self.temperature_adjusted_values(strengths)
-        return [True, False][util.weighted_index(adjusted_strengths)]
+        return [True, False][toolbox.weighted_index(adjusted_strengths)]
 
     def fight_it_out(self, structure, structure_weight, others, others_weight):
         '''
@@ -1157,7 +1157,7 @@ class Workspace(object):
         '''
         self.rule = None
 
-    def propose_rule(i_object, i_description, m_object, m_description):
+    def propose_rule(self, i_object, i_description, m_object, m_description):
         '''
         Create a proposed rule and post a rule strength tester codelet with
         urgency a function of the degree of conceptual depth of the
@@ -1183,14 +1183,14 @@ class Workspace(object):
                                      m_description.descriptor)
 
         if not i_description:
-            urgnecy = 100
+            urgency = 100
         else:
-            a = util.average([i_description.conceptual_depth(),
-                              m_description.conceptual_depth()])
+            a = toolbox.average([i_description.conceptual_depth(),
+                                 m_description.conceptual_depth()])
             b = a / 100.0
             urgnecy = math.sqrt(b) * 100
 
-        return Codelet('rule_strength_tester', (proposed_rule, urgency))
+        return [(RuleStrengthTester([proposed_rule]), urgency)]
 
     def activate_from_workspace_rule_descriptions(self, rule):
         if rule.descriptor1:

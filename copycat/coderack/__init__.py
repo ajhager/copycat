@@ -96,6 +96,7 @@ class Coderack(object):
             return None
         urgencies = [bin.urgency_sum(self.temperature) for bin in self.bins]
         bin = toolbox.weighted_select(urgencies, self.bins)
+        self.time += 1
         return bin.choose()
 
     def clear(self):

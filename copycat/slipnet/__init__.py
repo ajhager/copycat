@@ -35,6 +35,10 @@ slipnet_letters = []
 for letter in string.ascii_lowercase:
     slipnet_letters.append(make_slipnode('plato_%s' % letter, 10))
 
+slipnet_numbers = []
+for number in range(1, 6):
+    slipnet_numbers.append(make_slipnode(str(number), 30))
+
 plato_object_category = make_slipnode('plato object category', 90)
 plato_letter = make_slipnode('plato letter', 20)
 plato_letter_category = make_slipnode('plato letter category', 30)
@@ -50,6 +54,9 @@ plato_single = make_slipnode('single', 40)
 plato_whole = make_slipnode('whole', 40)
 
 plato_bond_facet = make_slipnode('bond facet', 90)
+
+plato_letter = make_slipnode('letter', 20)
+plato_group = make_slipnode('group', 80)
 
 class Slipnet(object):
     def __init__(self):

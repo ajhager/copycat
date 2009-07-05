@@ -15,6 +15,7 @@
 # 02110-1301, USA.
 
 from copycat import toolbox as toolbox
+from copycat import slipnet as slipnet
 
 class Object(object):
     def __init__(self):
@@ -340,12 +341,12 @@ class Object(object):
         Return True if no other object of the same type has the same descriptor.
         Object category and length descriptions are not distinguishing.
         '''
-        if descriptor == self.state.slipnet.plato_letter or \
-           descriptor == self.state.slipnet.plato_group or \
-           descriptor in self.state.slipnet.slipnet_numbers:
+        if descriptor == slipnet.plato_letter or \
+           descriptor == slipnet.plato_group or \
+           descriptor in slipnet.slipnet_numbers:
             return
         else:
-            if isinstance(self, Letter):
+            if self.type_name == 'letter':
                 other_objects = self.string.letters[:]
                 other_objects.remove(self)
             else:
@@ -356,7 +357,7 @@ class Object(object):
                 for obj in self.objects:
                     if isinstance(obj, Group):
                         other_objects.remove(obj)
-            descriptions = util.flatten([o.descriptions for o in other_objects])
+            descriptions = toolbox.flatten([o.descriptions for o in other_objects])
             other_descriptors = [d.descriptor for d in descriptions]
             return not descriptor in other_descriptors
 

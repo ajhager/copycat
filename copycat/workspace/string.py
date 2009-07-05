@@ -73,13 +73,15 @@ class String(object):
         lefmost objects in the string.
         '''
         leftmost_objects = []
-        category = self.state.slipnet.plato_string_position_category
-        for workspace_object in self.objects:
-            descriptor = workspace_object.descriptor(category)
-            if descriptor == self.state.slipnet.plato_leftmost:
+        category = slipnet.plato_string_position_category
+        for workspace_object in self.objects():
+            if not workspace_object:
+                continue
+            descriptor = workspace_object.get_descriptor(category)
+            if descriptor == slipnet.plato_leftmost:
                 leftmost_objects.append(workspace_object)
         if leftmost_objects:
-            values = [obj.relative_importance() for obj in leftmost_objects]
+            values = [obj.relative_importance for obj in leftmost_objects]
             return toolbox.weighted_select(values, leftmost_objects)
 
     def proposed_bonds(self):
@@ -92,7 +94,7 @@ class String(object):
         '''
         Return a list of all bonds in the string.
         '''
-        bs = [b for b in toolbox.flatten(self.from_to_bonds)]
+        bs = [b for b in toolbox.flatten(self.from_to_bonds) if b]
         return list(set(bs))
 
     def proposed_groups(self):

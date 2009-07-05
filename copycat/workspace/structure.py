@@ -27,7 +27,7 @@ class Structure(object):
         self.proposal_level = None
 
     def update_strengths(self):
-        self.update_interal_strength()
+        self.update_internal_strength()
         self.update_external_strength()
         self.update_total_strength()
 

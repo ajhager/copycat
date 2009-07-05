@@ -196,10 +196,10 @@ class CorrespondenceImportantObjectScout(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Choose an object.
-        object1 = self.initial_string.choose_object('relative_importance')
+        object1 = workspace.initial_string.choose_object('relative_importance')
 
         # Choose a description by conceptual depth.
-        object1_description = object1.choose_relative_distinguishing_description_by_conceptual_depth()
+        object1_description = object1.choose_relevant_distinguishing_description_by_conceptual_depth()
         if not object1_description:
             return
         object1_descriptor = object1_description.descriptor

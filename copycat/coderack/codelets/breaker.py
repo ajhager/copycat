@@ -14,6 +14,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import random
+
+import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 
 class Breaker(Codelet):
@@ -23,11 +26,11 @@ class Breaker(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Probabilistically fizzle based on temperature.
-        if util.flip_coin((100.0 - self.temperature) / 100.0):
+        if toolbox.flip_coin((100.0 - workspace.temperature) / 100.0):
             return
 
         # Choose a structure at random.
-        structure = random.choice(self.structures())
+        structure = random.choice(workspace.structures())
         if not structure:
             return
 
@@ -41,7 +44,7 @@ class Breaker(Codelet):
         for structure in structures:
             probability = structure.total_weakness() / 100.0
             probability = self.temperature_adjusted_probability(probability)
-            if not util.flip_coin(probability):
+            if not toolbox.flip_coin(probability):
                 return
 
         # Break the structures.

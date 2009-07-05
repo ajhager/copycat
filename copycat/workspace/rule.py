@@ -14,15 +14,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from workspace import Structure
+from copycat.workspace import Structure
 
 class Rule(Structure):
     def __init__(self, object_category1, descriptor1_facet, descriptor1,
                  object_category2, replaced_description_type, relation=None):
-        super(Rule, self).__init__.py
+        super(Rule, self).__init__()
         self.object_category1 = object_category1
         self.descriptor1_facet = descriptor1_facet
         self.descriptor1 = descriptor1
+        self.descriptor2 = None
         self.object_category2 = object_category2
         self.replaced_description_type = replaced_description_type
         self.relation = relation

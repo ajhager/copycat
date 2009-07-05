@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 
 class RuleBuilder(Codelet):
@@ -22,20 +23,23 @@ class RuleBuilder(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Make sure this rule doesn't already exist.
-        if self.rule == rule:
-            rule.activate_descriptions_from_workspace(rule, self.activation)
-            return
+        rule = self.arguments[0]
+        workspace_rule = workspace.rule
+        if workspace_rule:
+            if workspace_rule == rule:
+                workspace.activate_from_workspace_rule_descriptions(rule)
+                return
 
         # Fight an existing rule.
-        if self.rule:
-            result = self.fight_it_out(rule, 1, self.rule, 1)
+        if workspace_rule:
+            result = workspace.fight_it_out(rule, 1, workspace_rule, 1)
             if not result:
                 return
 
         # Build the rule.
-        if self.rule:
-            self.break_rule(self.rule)
-        self.build_rule(rule)
+        if workspace_rule:
+            workspace.break_rule(workspace_rule)
+        workspace.build_rule(rule)
 
 class RuleScout(Codelet):
     '''
@@ -48,14 +52,16 @@ class RuleScout(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # If not all replacements have been found, then fizzle.
-        if self.null_replacement():
+        if workspace.has_null_replacement():
             return
 
         # Find changed object.
         changed_objects = []
-        for object in self.initial_string.objects():
-            if object.changed():
-                changed_objects.append(object)
+        for obj in workspace.initial_string.objects():
+            if not obj:
+                continue
+            if obj.is_changed:
+                changed_objects.append(obj)
 
         # If there is more than one changed object signal an error and quit.
         if len(changed_objects) > 1:
@@ -64,7 +70,11 @@ class RuleScout(Codelet):
 
         # If not changed object, propose rule specifying no changes.
         if not changed_objects:
-            self.propose_rule(None, None, None, None)
+            codelets = workspace.propose_rule(None, None, None, None)
+            for codelet, urgency in codelets:
+                deleted_codelet = coderack.post(codelet, urgency)
+                if deleted_codelet:
+                    workspace.delete_proposed_structure(deleted.arguments)
             return
 
         i_object = changed_objects[0]
@@ -123,16 +133,17 @@ class RuleStrengthTester(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Calculate strength.
-        rule.update_strength_values()
-        strength = rule.total_strength()
+        rule = self.arguments[0]
+        rule.update_strengths()
+        strength = rule.total_strength
 
         # Decide whether or not to post a rule builder codelet.
         probability = strength / 100.0
-        probability = self.temperature_adjusted_probability(probability)
-        if not util.flip_coin(probability):
+        probability = workspace.temperature_adjusted_probability(probability)
+        if not toolbox.flip_coin(probability):
             return
 
-        return Codelet('rule_builder', (rule,), strength)
+        return [(RuleBuilder([rule]), strength)]
 
 class RuleTranslator(Codelet):
     '''
@@ -141,23 +152,26 @@ class RuleTranslator(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Make sure there is a rule.
-        if not self.rule:
+        workspace_rule = workspace.rule
+        if not workspace_rule:
             return
-        if self.rule.no_change:
-            self.translated_rule = NonRelationRule(None, None, None,
-                                                   None, None, None)
+        if workspace_rule.no_change:
+            workspace.translated_rule = NonRelationRule(None, None, None,
+                                                        None, None, None)
             return
 
         # If the temperature is too high, fizzle.
-        threshold = self.answer_temperature_threshold_distribution.choose()
-        if self.temperature > threshold:
+        threshold = workspace.answer_temperature_threshold_distribution.choose()
+        if workspace.temperature > threshold:
             return
 
         # Build the translation of the rule.
         changed_object = None
-        for object in self.initial_string.objects():
-            if object.changed:
-                changed_object = object
+        for obj in self.initial_string.objects():
+            if not obj:
+                continue
+            if obj.changed:
+                changed_object = obj
                 break
         if not changed_object:
             return
@@ -167,12 +181,12 @@ class RuleTranslator(Codelet):
         # Get the slippages to use.
         slippages = self.slippages
         if changed_object_correspondence:
-            for slippage in self.slippages:
+            for slippage in workspace.slippages:
                 for mapping in changed_object_correspondence.concept_mapptings:
                     if self.contradictory_concept_mappings(mapping, slippage):
                         slippages.remove(slippage)
 
-        rule = self.rule
+        rule = workspace_rule
         if rule.relation():
             args = []
             for arg in [rule.object_category1, rule.descriptor1_face,

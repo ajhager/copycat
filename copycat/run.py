@@ -42,8 +42,12 @@ class Run(object):
                     self.workspace.delete_proposed_structure(deleted.arguments)
 
         codelet = self.coderack.choose()
-        if codelet:
-            codelet.run(self.coderack, self.slipnet, self.workspace)
+        codelets = codelet.run(self.coderack, self.slipnet, self.workspace)
+        if codelets:
+            for codelet, urgency in codelets:
+                deleted_codelet = self.coderack.post(codelet, urgency)
+                if deleted_codelet:
+                    self.workspace.delete_proposed_structure(deleted.arguments)
 
         if self.workspace.translated_rule:
             AnswerBuilder.run(self.coderack, self.slipnet, self.workspace)
@@ -60,7 +64,8 @@ class Run(object):
                    self.slipnet.top_down_codelets()
         for codelet, urgency in codelets:
             deleted = self.coderack.post(codelet, urgency)
-            self.workspace.delete_proposed_structure(deleted.arguments)
+            if deleted != None:
+                self.workspace.delete_proposed_structure(deleted.arguments)
 
         self.slipnet.update()
 
