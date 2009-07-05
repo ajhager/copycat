@@ -60,8 +60,10 @@ class Run(object):
             self.slipnet.unclamp_initial_nodes()
 
         self.coderack.update(self.workspace.temperature)
-        codelets = self.workspace.bottom_up_codelets() + \
-                   self.slipnet.top_down_codelets()
+        codelets = self.workspace.bottom_up_codelets()
+        top_down_codelet_types = self.slipnet.top_down_codelets()
+        for category, codelet, urgency in top_down_codelet_types:
+            codelets.extend(workspace.get_codelets(category, codelet, urgency))
         for codelet, urgency in codelets:
             deleted = self.coderack.post(codelet, urgency)
             if deleted != None:

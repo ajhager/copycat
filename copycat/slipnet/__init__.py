@@ -395,10 +395,10 @@ class Slipnet(object):
         Ask each node at or above the activation threshold for any codelets
         attached to them and return them all.
         '''
-        return []
         codelets = []
         for node in self.slipnodes:
             if node.activation >= 50:
-                for codelet in node.codelets():
-                    codelets.append(codelet)
+                for codelet in node.codelets:
+                    codelets.extend((codelet.structure_category,
+                                     codelet, node.conceptual_depth / 100.0))
         return codelets

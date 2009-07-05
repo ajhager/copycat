@@ -966,12 +966,7 @@ class Workspace(object):
         
         return number
 
-    def bottom_up_codelets(self):
-        '''
-        Returns various bottom up codelets, with urgency and number based on
-        how many of each type of codelet is needed.
-        '''
-        def test(category, codelet, urgency):
+    def get_codelets(self, category, codelet, urgency):
             '''
             Based on the category sent in, test for the probability for the
             codelet related to that category to be posted.  If the test does
@@ -986,17 +981,24 @@ class Workspace(object):
                     codelets.append((codelet(), urgency))
             return codelets
 
-        return \
-        test('description', DescriptionBottomUpScout, 30) + \
-        test('bond', BondBottomUpScout, 30) + \
-        test('group', GroupWholeStringScout, 30) + \
-        test('replacement', ReplacementFinder, 30) + \
-        test('correspondence', CorrespondenceBottomUpScout, 30) + \
-        test('correspondence', CorrespondenceImportantObjectScout, 30) + \
-        test('rule', RuleScout, 30) + \
-        test('translator_rule', RuleTranslator,
-                                    30 if self.temperature > 25 else 60) + \
-        [(Breaker(), 0)]
+    def bottom_up_codelets(self):
+        '''
+        Returns various bottom up codelets, with urgency and number based on
+        how many of each type of codelet is needed.
+        '''
+        types = [('description', DescriptionBottomUpScout, 30),
+                 ('bond', BondBottomUpScout, 30),
+                 ('group', GroupWholeStringScout, 30),
+                 ('replacement', ReplacementFinder, 30),
+                 ('correspondence', CorrespondenceBottomUpScout, 30),
+                 ('correspondence', CorrespondenceImportantObjectScout, 30),
+                 ('rule', RuleScout, 30),
+                 ('translator_rule', RuleTranslator, 30 if self.temperature > 25 else 60)]
+
+        codelets = [(Breaker(), 0)]
+        for category, codelet, urgency in types:
+            codelets.extend(self.get_codelets(category, codelet, urgency))
+        return codelets
 
     def objects(self):
         return self.initial_string.objects() + self.target_string.objects()
