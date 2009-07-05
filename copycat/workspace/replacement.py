@@ -18,5 +18,6 @@ from workspace import Structure
 
 class Replacement(Structure):
     def __init__(self, object1, object2):
+        super(Replacement, self).__init__()
         self.object1 = object1
         self.object2 = object2

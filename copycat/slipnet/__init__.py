@@ -16,11 +16,38 @@
 
 import string
 
+import copycat.toolbox as toolbox
 from slipnode import Slipnode
 from sliplink import Sliplink
 
 def get_plato_letter(character):
-    return None
+    index = string.ascii_lowercase.find(str(character))
+    return slipnet_letters[index]
+
+def make_slipnode(name, conceptual_depth, intrinsic_link_length=None):
+    slipnode = Slipnode(name, conceptual_depth)
+    if intrinsic_link_length != None:
+        slipnode.intrinsic_link_length = intrinsic_link_length
+        slipnode.shrunk_link_length = round(intrinsic_link_length * .4)
+    return slipnode
+
+slipnet_letters = []
+for letter in string.ascii_lowercase:
+    slipnet_letters.append(make_slipnode('plato_%s' % letter, 10))
+
+plato_object_category = make_slipnode('plato object category', 90)
+plato_letter = make_slipnode('plato letter', 20)
+plato_letter_category = make_slipnode('plato letter category', 30)
+
+plato_string_position_category = make_slipnode('string position category', 70)
+plato_string_position_category.initially_clamped = True
+plato_string_position_category.codelets.append('top_down_description_scout')
+
+plato_leftmost = make_slipnode('leftmost', 40)
+plato_rightmost = make_slipnode('rightmost', 40)
+plato_middle = make_slipnode('middle', 40)
+plato_single = make_slipnode('single', 40)
+plato_whole = make_slipnode('whole', 40)
 
 class Slipnet(object):
     def __init__(self):
@@ -310,16 +337,16 @@ class Slipnet(object):
                 for link in node.outgoing_links():
                     amount_to_spread = int(node.activation * \
                             (link.intrinsic_degree_of_association() / 100.0))
-                    link.to_node.buffer += amount_to_spread
+                    link.to_node.activation_buffer += amount_to_spread
             
         for node in self.slipnodes:
-            node.activation = min(100, node.activation + node.buffer)
+            node.activation = min(100, node.activation + node.activation_buffer)
             if node.clamp:
                 node.activation = 100
             else:
                 if node.activation >= 50:
                     full_activation_probability = (node.activation / 100.0) ** 3
-                    if util.flip_coin(full_activation_probability):
+                    if toolbox.flip_coin(full_activation_probability):
                         node.activation = 100
             node.buffer = 0
 
@@ -352,6 +379,7 @@ class Slipnet(object):
         Ask each node at or above the activation threshold for any codelets
         attached to them and return them all.
         '''
+        return []
         codelets = []
         for node in self.slipnodes:
             if node.activation >= 50:

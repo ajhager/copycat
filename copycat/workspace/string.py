@@ -52,6 +52,9 @@ class String(object):
         Return a random letter in the string.
         '''
         return random.choose(self.letters)
+    
+    def objects(self):
+        return self.letters + self.groups
 
     def choose_object(self, method):
         '''
@@ -89,7 +92,8 @@ class String(object):
         '''
         Return a list of all bonds in the string.
         '''
-        return list(set(self.from_to_bonds))
+        bs = [b for b in toolbox.flatten(self.from_to_bonds)]
+        return list(set(bs))
 
     def proposed_groups(self):
         pass
@@ -111,9 +115,9 @@ class String(object):
         self.highest_string_number += 1
         letter.string_number = self.highest_string_number
         position = letter.left_string_position
-        self.letters.insert(position, letter)
+        self.letters[position] = letter
         right_object = self.object_positions[position]
-        self.object_positions.insert(position, [letter, right_object])
+        self.object_positions[position] = [letter, right_object]
 
     def objects_by_category(self, category):
         '''
@@ -306,9 +310,14 @@ class String(object):
         Update the relative, normalized importances of all the objects in
         the string.
         '''
-        raw_importance = sum([obj.raw_importance for obj in self.objects])
-        for obj in self.objects:
-            if raw_importance == 0:
+        raw_importances = 0
+        for obj in self.objects():
+            if obj:
+                raw_importances += obj.raw_importance
+        for obj in self.objects():
+            if not obj:
+                continue
+            if obj.raw_importance == 0:
                 importance = 0
             else:
                 importance = round(100 * (obj.raw_importance / raw_importance))
@@ -319,6 +328,6 @@ class String(object):
         Calculate the average of the intra-string unhappiness of all the
         objects in the string.
         '''
-        unhappiness = [obj.intra_string_unhappiness() for obj in self.objects]
+        unhappiness = [obj.intra_string_unhappiness for obj in self.objects() if obj]
         length = len(unhappiness)
         self.intra_string_unhappiness = sum(unhappiness) / length

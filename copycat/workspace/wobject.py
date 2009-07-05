@@ -14,6 +14,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+from copycat import toolbox as toolbox
+
 class Object(object):
     def __init__(self):
         self.string = None
@@ -21,6 +23,7 @@ class Object(object):
         self.left_string_position = None
         self.right_string_position = None
         self.raw_importance = 0
+        self.relative_importance = 0
         self.intra_string_happiness = 0
         self.intra_string_unhappiness = 0
         self.inter_string_happiness = 0
@@ -30,15 +33,15 @@ class Object(object):
         self.intra_string_salience = 0
         self.inter_string_salience = 0
         self.total_salience = 0
-        self.descriptions = None
-        self.extrinsic_descriptions = None
-        self.outgoing_bonds = None
-        self.incoming_bonds = None
+        self.descriptions = []
+        self.extrinsic_descriptions = []
+        self.outgoing_bonds = []
+        self.incoming_bonds = []
         self.left_bond = None
         self.right_bond = None
         self.group = None
         self.replacement = None
-        self.corresonpondence = None
+        self.correspondence = None
         self.is_changed = False
         self.is_new_answer_letter = False
         self.clamp_salience = False
@@ -51,8 +54,8 @@ class Object(object):
         importance of objects in groups is dimished. Sum the activation of
         the descriptors of relevant descriptions up to 300.
         '''
-        result = [rd.descriptor.activation for rd in self.relevant_descriptions]
-        if self.is_changed():
+        result = sum([rd.descriptor.activation for rd in self.relevant_descriptions()])
+        if self.is_changed:
             result *= 2
         if self.group:
             result *= 2/3.0
@@ -80,7 +83,7 @@ class Object(object):
         return result
 
     def calculate_intra_string_unhappiness(self):
-        return 100 - self.intra_string_happiness()
+        return 100 - self.intra_string_happiness
 
     def calculate_inter_string_happiness(self):
         '''
@@ -94,58 +97,60 @@ class Object(object):
             return 0
 
     def calculate_inter_string_unhappiness(self):
-        return 100 - self.inter_string_happiness()
+        return 100 - self.inter_string_happiness
 
     def calculate_total_happiness(self):
-        return round(util.average([self.intra_string_happiness(),
-                                   self.inter_string_happiness()]))
+        return round(toolbox.average(self.intra_string_happiness,
+                                      self.inter_string_happiness))
 
     def calculate_total_unhappiness(self):
-        return 100 - self.total_happiness()
+        return 100 - self.total_happiness
 
     def calculate_intra_string_salience(self):
         '''
         This value represents how much the object is crying out for attention
         from codelets that build structures inside a single string.
         '''
-        if self.should_clamp_salience():
+        if self.clamp_salience:
             return 100
         else:
-            return round(util.weight_average([(self.relative_importance(), 2)
-                                              (self.intra_string_unhappiness(), 8)]))
+            return round(toolbox.weighted_average([2, 8],
+                                                  [self.relative_importance,
+                                                   self.intra_string_unhappiness]))
 
     def calculate_inter_string_salience(self):
         '''
         This value represents how much the object is crying out for attention
         from codelets that build structures between strings.
         '''
-        if self.should_clamp_salience():
+        if self.clamp_salience:
             return 100
         else:
-            return round(util.weighted_average([(self.relative_importance(), 8),
-                                                (self.inter_string_unhappiness(), 2)]))
+            return round(toolbox.weighted_average([8, 2],
+                                                  [self.relative_importance,
+                                                   self.inter_string_unhappiness]))
 
     def calculate_total_salience(self):
-        return round(util.average([self.intra_string_salience(),
-                                   self.inter_string_salience()]))
+        return round(toolbox.average(self.intra_string_salience,
+                                     self.inter_string_salience))
 
     def update_object_values(self):
-        self.set_raw_importance(self.calculate_raw_importance())
-        self.set_intra_sring_happiness(self.calculate_intra_string_happiness())
-        self.set_intra_string_unhappiness(self.calculate_intra_string_unhappiness())
-        self.set_inter_string_happiness(self.calculate_inter_string_happiness())
-        self.set_inter_string_unhappiness(self.calculate_inter_string_unhappiness())
-        self.set_total_happiness(self.calculate_total_happiness())
-        self.set_total_unhappiness(self.calculate_total_unhappiness())
-        self.set_intra_string_salience(self.calculate_intra_string_salience())
-        self.set_inter_string_salience(self.calculate_inter_string_salience())
-        self.set_total_string_salience(self.calculate_total_salience())
+        self.raw_importance = self.calculate_raw_importance()
+        self.intra_sring_happiness = self.calculate_intra_string_happiness()
+        self.intra_string_unhappiness = self.calculate_intra_string_unhappiness()
+        self.inter_string_happiness = self.calculate_inter_string_happiness()
+        self.inter_string_unhappiness = self.calculate_inter_string_unhappiness()
+        self.total_happiness = self.calculate_total_happiness()
+        self.total_unhappiness = self.calculate_total_unhappiness()
+        self.intra_string_salience = self.calculate_intra_string_salience()
+        self.inter_string_salience = self.calculate_inter_string_salience()
+        self.total_string_salience = self.calculate_total_salience()
 
     def letter_span(self):
         '''
         Return the number of letters spanned by the object.
         '''
-        if isinstance(self, Letter):
+        if self.groups == None:
             return 1
         return sum([obj.letter_span() for obj in self.objects])
 
@@ -155,13 +160,13 @@ class Object(object):
         '''
         if isinstance(self, Letter):
             return [self]
-        return util.flatten([obj.letters() for obj in self.objects])
+        return toolbox.flatten([obj.letters() for obj in self.objects])
 
     def is_leftmost_in_string(self):
         return self.left_string_position == 0
 
     def is_rightmost_in_string(self):
-        right_position = len(self.string.letters()) - 1
+        right_position = len(self.string.letters) - 1
         return self.right_string_position == right_position
 
     def is_middle_in_string(self):
@@ -176,7 +181,7 @@ class Object(object):
         Return True if the object is the single letter in its string or a
         group that spans the string.
         '''
-        return self.letter_span() == self.string.length()
+        return self.letter_span() == self.string.length
 
     def is_string_spanning_group(self):
         return isinstance(self, Group) and self.spans_whole_string()
@@ -260,7 +265,7 @@ class Object(object):
         salience.
         '''
         values = [o.intra_string_salience for o in self.all_left_neighbors()]
-        return util.weighted_select(values)
+        return toolbox.weighted_select(values)
 
     def choose_right_neighbor(self):
         '''

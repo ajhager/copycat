@@ -36,11 +36,13 @@ class Run(object):
         if self.coderack.is_empty():
             self.slipnet.clamp_initial_nodes()
             codelets = self.workspace.initial_codelets()
-            for codelet in self.coderack.post(codelets):
-                self.workspace.delete_proposed_structure(codelet.argument)
+            for codelet, urgency in codelets:
+                deleted = self.coderack.post(codelet, urgency)
+                self.workspace.delete_proposed_structure(deleted.arguments)
 
         codelet = self.coderack.choose()
-        codelet.run(self.coderack, self.slipnet, self.workspace)
+        if codelet:
+            codelet.run(self.coderack, self.slipnet, self.workspace)
 
         if self.workspace.translated_rule:
             AnswerBuilder.run(self.coderack, self.slipnet, self.workspace)
@@ -55,8 +57,9 @@ class Run(object):
         self.coderack.update(self.workspace.temperature)
         codelets = self.workspace.bottom_up_codelets() + \
                    self.slipnet.top_down_codelets()
-        for codelet in self.coderack.post(codelets):
-            self.workspace.delete_proposed_structure(codelet.argument)
+        for codelet, urgency in codelets:
+            deleted = self.coderack.post(codelet, urgency)
+            self.workspace.delete_proposed_structure(deleted.arguments)
 
         self.slipnet.update()
 

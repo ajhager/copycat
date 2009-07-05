@@ -23,6 +23,7 @@ import copycat.slipnet as slipnet
 class Bond(Structure):
     def __init__(self, workspace, from_object, to_object, bond_category,
                  bond_facet, from_object_descriptor, to_object_descriptor):
+        super(Bond, self).__init__()
         self.workspace = workspace
 
         if from_object.left_string_position < to_object.left_string_postion:

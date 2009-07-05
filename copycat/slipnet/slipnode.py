@@ -19,7 +19,7 @@ class Slipnode(object):
         self.name = name
         self.conceptual_depth = depth
         self.activation = 0
-        self.buffer = 0
+        self.activation_buffer = 0
         self.initially_clamped = False
         self.clamp = False
         self.directed = False
@@ -151,7 +151,7 @@ class Slipnode(object):
 
     def decay(self):
         amount = int(((100 - self.conceptual_depth) / 100.0) * self.activation)
-        self.buffer -= amount
+        self.activation_buffer -= amount
 
     def get_label_node(self, to_node):
         if self == to_node:

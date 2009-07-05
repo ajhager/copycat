@@ -18,6 +18,7 @@ from copycat.workspace import Structure
 
 class Description(Structure):
     def __init__(self, object1, description_type, descriptor):
+        super(Description, self).__init__()
         self.object = object1
         self.string = object1.string
         self.description_type = description_type

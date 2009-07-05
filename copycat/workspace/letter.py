@@ -17,7 +17,11 @@
 from copycat.workspace import Object
 
 class Letter(Object):
-    def __init__(self, string, category, string_position):
+    def __init__(self, name, string, category, string_position):
+        super(Letter, self).__init__()
+        self.groups = None
+        self.bonds = None
+        self.name = name
         self.string = string
         self.left_string_position = string_position
         self.right_string_position = string_position

@@ -59,7 +59,7 @@ class Workspace(object):
             count = 0
             for character in string.name:
                 letter_category = slipnet.get_plato_letter(character)
-                letter = Letter(string, letter_category, count)
+                letter = Letter(character, string, letter_category, count)
                 string.add_letter(letter)
                 count += 1
 
@@ -68,7 +68,7 @@ class Workspace(object):
             for letter in string.letters:
                 description = Description(letter,
                                           slipnet.plato_object_category,
-                                          self.slipnet.plato_letter)
+                                          slipnet.plato_letter)
                 letter.add_description(description)
                 description = Description(letter,
                                           slipnet.plato_letter_category,
@@ -79,11 +79,11 @@ class Workspace(object):
             if string.length > 1:
                 rightmost_letter = string.letters[-1]
                 leftmost_letter.add_description(Description(leftmost_letter,
-                                                            self.slipnet.plato_string_position_category,
-                                                            self.slipnet.plato_leftmost))
-                rightmost_letter.add_Description(Description(rightmost_letter,
-                                                             self.slipnet.plato_string_position_category,
-                                                             self.slipnet.plato_rightmost))
+                                                            slipnet.plato_string_position_category,
+                                                            slipnet.plato_leftmost))
+                rightmost_letter.add_description(Description(rightmost_letter,
+                                                             slipnet.plato_string_position_category,
+                                                             slipnet.plato_rightmost))
             else:
                 leftmost_letter.add_description(Description(leftmost_letter,
                                                             slipnet.plato_string_position_category,
@@ -92,13 +92,14 @@ class Workspace(object):
             if string.length == 3:
                 middle_letter = string.letters[1]
                 middle_letter.add_description(Description(middle_letter,
-                                                          self.slipnet.plato_string_position_category,
-                                                          self.slipnet.plato_middle))
+                                                          slipnet.plato_string_position_category,
+                                                          slipnet.plato_middle))
 
-        for obj in self.objects:
+        for obj in self.objects():
+            if not obj:
+                continue
             for description in obj.descriptions:
-                for descriptor in description:
-                    descriptor.activate_from_workspace()
+                description.descriptor.activation_buffer += self.activation
 
     def update(self):
         '''
@@ -107,9 +108,11 @@ class Workspace(object):
         everything can go back to normal.  Finally, update the temperature.
         '''
         for structure in self.structures():
-            structure.update_strength_values()
+            if structure:
+                structure.update_strength_values()
         for object_ in self.objects():
-            object_.update_object_values()
+            if object_:
+                object_.update_object_values()
 
         self.initial_string.update_relative_importances()
         self.target_string.update_relative_importances()
@@ -121,6 +124,7 @@ class Workspace(object):
         self.update_temperature()
 
     def initial_codelets(self):
+        return []
         codelets = [Codelet('bottom_up_bond_scout'),
                     Codelet('replacement_finder'),
                     Codelet('bottom_up_correspondence_scout')]
@@ -847,9 +851,9 @@ class Workspace(object):
             if self.rule:
                 rule_weakness = 100 - self.rule.total_strength()
 
-            self.temperature = util.weighted_average(
-                    (self.total_unhappiness(), 8),
-                    (rule_weakness, 2))
+            self.temperature = toolbox.weighted_average([8, 2],
+                                                        [self.total_unhappiness(),
+                                                         rule_weakness])
 
     def answer_temperature_threshold_distribution(self):
         if self.initial_string.length == 1 and \
@@ -960,7 +964,8 @@ class Workspace(object):
         Returns various bottom up codelets, with urgency and number based on
         how many of each type of codelet is needed.
         '''
-        def test(category, name, urgency):
+        return []
+        def test(category, codelet, urgency):
             '''
             Based on the category sent in, test for the probability for the
             codelet related to that category to be posted.  If the test does
@@ -970,9 +975,9 @@ class Workspace(object):
             codelets = []
             probability = self.post_codelet_probability(category)
             number = self.post_codelet_number(category)
-            if util.flip_coin(probability):
+            if toolbox.flip_coin(probability):
                 for i in range(number):
-                    codelets.append(Codelet(name, urgency=urgency))
+                    codelets.append((codelet(), urgency))
             return codelets
 
         return \
@@ -985,7 +990,7 @@ class Workspace(object):
         test('rule', 'rule_scout', 30) +\
         test('translator_rule', 'rule_translator',
                 30 if self.temperature > 25 else 60) +\
-        [Codelet('breaker', urgency=0)]
+        [codeletsCodelet('breaker', urgency=0)]
 
     def objects(self):
         return self.initial_string.objects() + self.target_string.objects()
@@ -1008,27 +1013,31 @@ class Workspace(object):
         return self.initial_string.bonds() + self.target_string.bonds()
 
     def groups(self):
-        return self.initial_string.groups() + self.target_string.groups()
+        return self.initial_string.groups + self.target_string.groups
 
     def correspondences(self):
-        return util.flatten(self._correspondences)
+        return toolbox.flatten(self._correspondences)
 
     def unrelated_objects(self):
         unrelated_objects = []
-        for object in self.objects():
-            if not object.spans_whole_string() and object.group == None:
-                number_of_bonds = len(object.incoming_bonds) + len(object.outgoing_bonds)
-                if object.is_leftmost_in_string() or object.is_rightmost_in_string():
-                    if number_of_bonds == 0: unrelated_objects.append(object)
+        for obj in self.objects():
+            if not obj:
+                continue
+            if not obj.spans_whole_string() and obj.group == None:
+                number_of_bonds = len(obj.incoming_bonds) + len(obj.outgoing_bonds)
+                if obj.is_leftmost_in_string() or obj.is_rightmost_in_string():
+                    if number_of_bonds == 0: unrelated_objects.append(obj)
                 else:
                     if number_of_bonds < 2: unrelated_objects.append(object)
         return unrelated_objects
 
     def ungrouped_objects(self):
         ungrouped_objects = []
-        for object in self.objects():
-            if not object.spans_whole_string() and object.group == None:
-                ungrouped_objects.append(object)
+        for obj in self.objects():
+            if not obj:
+                continue
+            if not obj.spans_whole_string() and obj.group == None:
+                ungrouped_objects.append(obj)
         return ungrouped_objects
 
     def ungrouped_bonds(self):
@@ -1054,18 +1063,18 @@ class Workspace(object):
 
     def rough_number_of_unrelated_objects(self):
         number_of_unrelated_objects = len(self.unrelated_objects())
-        if number_of_unrelated_objects < util.blur(2):
+        if number_of_unrelated_objects < toolbox.blur(2):
             return 'few'
-        elif number_of_unrelated_objects < until.blur(4):
+        elif number_of_unrelated_objects < toolbox.blur(4):
             return 'medium'
         else:
             return 'many'
 
     def rough_number_of_ungrouped_objects(self):
         number_of_ungrouped_objects = len(self.ungrouped_objects())
-        if number_of_ungrouped_objects < util.blur(2):
+        if number_of_ungrouped_objects < toolbox.blur(2):
             return 'few'
-        elif number_of_ungrouped_objects < until.blur(4):
+        elif number_of_ungrouped_objects < toolbox.blur(4):
             return 'medium'
         else:
             return 'many'

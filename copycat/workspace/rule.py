@@ -19,6 +19,7 @@ from workspace import Structure
 class Rule(Structure):
     def __init__(self, object_category1, descriptor1_facet, descriptor1,
                  object_category2, replaced_description_type, relation=None):
+        super(Rule, self).__init__.py
         self.object_category1 = object_category1
         self.descriptor1_facet = descriptor1_facet
         self.descriptor1 = descriptor1

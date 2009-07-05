@@ -19,6 +19,7 @@ from workspace import Structure
 
 class Correspondence(Structure):
     def __init__(self, object1, object2, concept_mappings):
+        super(Correrspondence, self).__init__()
         self.object1 = object1
         self.object2 = object2
         self.concept_mappings = concept_mappings

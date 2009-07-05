@@ -21,6 +21,7 @@ from description import Description
 class Group(Object, Structure):
     def __init__(self, state, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):
+        super(Group, self).__init__()
         self.state = state
         self.string = string
         self.structure_category = Group
