@@ -15,4 +15,34 @@
 # 02110-1301, USA.
 
 from copycat.coderack.codelets.answer import AnswerBuilder
+
 from copycat.coderack.codelets.bond import BondBottomUpScout
+from copycat.coderack.codelets.bond import BondBuilder
+from copycat.coderack.codelets.bond import BondStrengthTester
+from copycat.coderack.codelets.bond import BondTopDownCategoryScout
+from copycat.coderack.codelets.bond import BondTopDownDirectionScout
+
+from copycat.coderack.codelets.breaker import Breaker
+
+from copycat.coderack.codelets.correspondence import CorrespondenceBottomUpScout
+from copycat.coderack.codelets.correspondence import CorrespondenceBuilder
+from copycat.coderack.codelets.correspondence import CorrespondenceImportantObjectScout
+from copycat.coderack.codelets.correspondence import CorrespondenceStrengthTester
+
+from copycat.coderack.codelets.description import DescriptionBottomUpScout
+from copycat.coderack.codelets.description import DescriptionBuilder
+from copycat.coderack.codelets.description import DescriptionStrengthTester
+from copycat.coderack.codelets.description import DescriptionTopDownScout
+
+from copycat.coderack.codelets.group import GroupBuilder
+from copycat.coderack.codelets.group import GroupStrengthTester
+from copycat.coderack.codelets.group import GroupTopDownCategoryScout
+from copycat.coderack.codelets.group import GroupTopDownDirectionScout
+from copycat.coderack.codelets.group import GroupWholeStringScout
+
+from copycat.coderack.codelets.replacement import ReplacementFinder
+
+from copycat.coderack.codelets.rule import RuleBuilder
+from copycat.coderack.codelets.rule import RuleScout
+from copycat.coderack.codelets.rule import RuleStrengthTester
+from copycat.coderack.codelets.rule import RuleTranslator

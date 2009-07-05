@@ -36,10 +36,10 @@ copycat
             DescriptionStrengthRester
             DescriptionTopDownScout
             GroupBuilder
-            GroupStrengthRester
-            GroupWholeStringScout
+            GroupStrengthTester
             GroupTopDownCategoryScout
             GroupTopDownDirectionScout
+            GroupWholeStringScout
             ReplacementFinder
             RuleBuilder
             RuleScout
