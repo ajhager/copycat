@@ -89,10 +89,14 @@ class CorrespondenceBuilder(Codelet):
     competitors if necessary.
     '''
     def run(self, coderack, slipnet, workspace):
+        correspondence = self.arguments[0]
+        flip_obj2 = self.arguments[1]
+
         object1 = correspondence.object1
         object2 = correspondence.object2
+
         flipped = object2.flipped_version()
-        existing_object2_group = self.target_string.group_present(flipped)
+        existing_object2_group = workspace.target_string.is_group_present(flipped)
 
         # If the objects do not exist anymore, then fizzle.
         objects = self.objects()
@@ -221,7 +225,7 @@ class CorrespondenceImportantObjectScout(Codelet):
         if not object2_candidates:
             return
         values = [obj.inter_string_salience() for obj in object2_candidates]
-        index = util.select_list_position(values)
+        index = toolbox.select_list_position(values)
         object2 = object2_candidates[index]
 
         # If one object spans the whole string and the other does not, fizzle.
@@ -240,7 +244,7 @@ class CorrespondenceImportantObjectScout(Codelet):
         for mapping in mappings:
             probability = mapping.slippablity() / 100.0
             probability = self.temperature_adjusted_probability(probability)
-            if util.flip_coin(probability):
+            if toolbox.flip_coin(probability):
                 possible = True
         if not possible:
             return
@@ -280,26 +284,29 @@ class CorrespondenceStrengthTester(Codelet):
     urgency a function of the strength.
     '''
     def run(self, coderack, slipnet, workspace):
+        correspondence = self.arguments[0]
+        flip_object2 = self.arguments[1]
+
         object1 = correspondence.object1
         object2 = correspondence.object2
         flipped = object2.flipped_version()
 
         # If the objects do not exist anymore, then fizzle.
-        objects = self.objects()
+        objects = workspace.objects()
         if (object1 not in objects) or \
             ((object2 not in objects) and \
             (not (flip_object2 and self.target_string.group_present(flipped)))):
             return
 
         # Calculate the proposed correspondence's strength.
-        correspondence.update_strength_values()
-        stength = correspondence.total_strength()
+        correspondence.update_strengths()
+        strength = correspondence.total_strength
 
         # Decide whether to post a corresondpondence builder codelet or not.
         probability = strength / 100.0
-        probability = self.temperature_adjusted_probability(probability)
-        if not util.flip_coin(probability):
-            self.delete_proposed_correspondenc(correspondence)
+        probability = workspace.temperature_adjusted_probability(probability)
+        if not toolbox.flip_coin(probability):
+            workspace.delete_proposed_correspondence(correspondence)
             return
 
         # Add some activation to some descriptions.

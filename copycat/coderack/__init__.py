@@ -139,7 +139,7 @@ class Coderack(object):
         if urgency >= 100:
             bin = self.extremely_high_bin
         else:
-            index = (len(self.bins) * urgency) / 100
+            index = int((len(self.bins) * urgency) / 100.0)
             bin = self.bins[index]
         bin.add(codelet)
         codelet.timestamp = self.time

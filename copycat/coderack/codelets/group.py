@@ -14,12 +14,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
+import copycat.slipnet as nodes
 
 class GroupBuilder(Codelet):
     '''
     Tries to build the proposed group, fighting with any competitors.
     '''
+    structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         string = group.string
 
@@ -27,7 +30,7 @@ class GroupBuilder(Codelet):
         existing_group = string.group_present(group)
         if existing_group:
             for description in existing_group.descriptions:
-                description.desriptor.buffer += self.activation
+                description.desriptor.activation_buffer += workspace.activation
             for description in group.descriptions:
                 if not existing_group.description_present(description):
                     new_description = Description(existing_group,
@@ -117,6 +120,7 @@ class GroupStrengthTester(Codelet):
     whether or not to post a group builder codelet with urgency a function
     of the strength.
     '''
+    structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         # Calculate the group's stength.
         group.update_strength_values()
@@ -125,7 +129,7 @@ class GroupStrengthTester(Codelet):
         # Decide whether or not to post the group builder codelet.
         probability = strength / 100.0
         probability = self.temperature_adjusted_probability(probability)
-        if not util.flip_coin(probability):
+        if not toolbox.flip_coin(probability):
             group.string.delete_proposed_group(group)
             return
 
@@ -152,20 +156,21 @@ class GroupTopDownCategoryScout(Codelet):
     a function of the degree of association of bonds of the given bond
     category.
     '''
+    structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         bond_category = category.related_node('plato_bond_category')
 
         # Choose a string based on local bond category relevance.
-        i_string = self.initial_string
+        i_string = workspace.initial_string
         i_relevance = i_string.local_bond_category_relevance(bond_category)
         i_unhappiness = i_string.intra_string_unhappiness()
         t_string = self.target_string
         t_relevance = t_string.local_bond_category_relevance(bond_category)
         t_unhappiness = t_string.intra_string_unhappiness()
         choices = [i_string, t_string]
-        weights = [round(util.average(i_relevance, i_unhappiness)),
-                   round(util.average(t_relevance, t_unhappniess))]
-        string = choices[util.select_list_position(weights)]
+        weights = [round(toolbox.average(i_relevance, i_unhappiness)),
+                   round(toolbox.average(t_relevance, t_unhappniess))]
+        string = choices[toolbox.select_list_position(weights)]
 
         # Choose an object by intra string salience.
         object = string.choose_object('intra_string_salience')
@@ -180,11 +185,11 @@ class GroupTopDownCategoryScout(Codelet):
             direction = plato_left
         else:
             activations = [plato_left.activation, plato_right.activation]
-            index = util.select_list_position(activations)
+            index = toolbox.select_list_position(activations)
             direction = [plato_left, plato_right][index]
 
         # Choose the number of bonds to scan.
-        number = util.select_list_position(string.bonds_to_scan_distribution())
+        number = toolbox.select_list_position(string.bonds_to_scan_distribution())
 
         # Get the first bond in that direction.
         if direction == plato_left:
@@ -203,7 +208,7 @@ class GroupTopDownCategoryScout(Codelet):
                 choices = [plato_left, plato_right]
                 weights = [node.local_descriptor_support(string, plato_group) \
                             for node in choices]
-                index = util.select_list_position(weights)
+                index = toolbox.select_list_position(weights)
                 possible_single_letter_group_direction = choices[index]
 
             possible_single_letter_group = Group(category,
@@ -211,7 +216,7 @@ class GroupTopDownCategoryScout(Codelet):
                                                  object, object, objects, bonds)
 
             probility = possible_possible_single_letter_group.single_letter_group_probability()
-            if util.flip_coin(probability):
+            if toolbox.flip_coin(probability):
                 return self.propose_group(objects, bonds, category,
                                           possible_single_letter_group_direction)
         
@@ -271,45 +276,47 @@ class GroupTopDownDirectionScout(Codelet):
     posts a group strength tester codelet with urgency a function of the
     degree of association of bonds of the given bond category.
     '''
+    structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
+        category = self.arguments[0]
         # Choose a string based on local direction category relevance.
-        i_string = self.initial_string
+        i_string = workspace.initial_string
         i_relevance = i_string.local_direction_category_relevance(category)
-        i_unhappiness = i_string.intra_string_unhappiness()
-        t_string = self.target_string
+        i_unhappiness = i_string.intra_string_unhappiness
+        t_string = workspace.target_string
         t_relevance = t_string.local_direction_category_relevance(category)
-        t_unhappiness = t_string.intra_string_unhappiness()
+        t_unhappiness = t_string.intra_string_unhappiness
         choices = [i_string, t_string]
-        weights = [round(util.average(i_relevance, i_unhappiness)),
-                   round(util.average(t_relevance, t_unhappniess))]
-        string = choices[util.select_list_position(weights)]
+        weights = [round(toolbox.average(i_relevance, i_unhappiness)),
+                   round(toolbox.average(t_relevance, t_unhappiness))]
+        string = toolbox.weighted_select(weights, choices)
 
         # Choose an object by intra string salience.
-        object = string.choose_object('intra_string_salience')
-        if object.spans_whole_string():
+        obj = string.choose_object('intra_string_salience')
+        if obj.spans_whole_string():
             return
 
         # Choose a direction in which to scan.
-        # FIXME: no access to slipnodes.
-        if object.leftmost_in_string():
-            direction = plato_right
-        elif object.rightmost_in_string():
-            direction = plato_left
+        if obj.is_leftmost_in_string():
+            direction = nodes.plato_right
+        elif obj.is_rightmost_in_string():
+            direction = nodes.plato_left
         else:
-            activations = [plato_left.activation, plato_right.activation]
-            index = util.select_list_position(activations)
-            direction = [plato_left, plato_right][index]
+            activations = [nodes.plato_left.activation,
+                           nodes.plato_right.activation]
+            direction = toolbox.weighted_select(activations, [nodes.plato_left,
+                                                              nodes.plato_right])
 
         # Choose the number of bonds to scan.
-        number = util.select_list_position(string.bonds_to_scan_distribution())
+        number = toolbox.weighted_index(string.number_of_bonds_to_scan_distribution)
 
         # Get the first bond in that direction.
-        if direction == plato_left:
-            bond = object.left_bond
+        if direction == nodes.plato_left:
+            bond = obj.left_bond
         else:
-            bond = object.right_bond
+            bond = obj.right_bond
 
-        if (not bond) or (bond.direction_category != category):
+        if not bond or bond.direction_category != category:
             return
 
         bond_category = bond.bond_category
@@ -357,7 +364,7 @@ class GroupTopDownDirectionScout(Codelet):
 
         group_category = bond_category.get_related_node(plato_group_category)
 
-        return self.propose_group(objects, bonds, group_category, category)
+        return workspace.propose_group(objects, bonds, group_category, category)
 
 class GroupWholeStringScout(Codelet):
     '''
@@ -366,6 +373,7 @@ class GroupWholeStringScout(Codelet):
     codelet with urgency a function of the degree of association of bonds
     of the given bond category.
     '''
+    structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         string = workspace.random_string()
 

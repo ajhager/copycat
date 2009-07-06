@@ -21,6 +21,7 @@ import copycat.toolbox as toolbox
 
 from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
+from copycat.workspace.correspondence import Correspondence
 from copycat.workspace.description import Description
 from copycat.workspace.description import ExtrinsicDescription
 from copycat.workspace.group import Group
@@ -520,7 +521,7 @@ class Workspace(object):
         '''
         x = correspondence.object1.string_number
         y = correspondence.object2.string_number
-        self.proposed_correspondences[x][y].insert(0, correspondence)
+        self._proposed_correspondences[x][y].insert(0, correspondence)
 
     def delete_proposed_correspondence(self, correspondence):
         '''
@@ -529,7 +530,7 @@ class Workspace(object):
         '''
         x = correspondence.object1.string_number
         y = correspondence.object2.string_number
-        self.proposed_correspondences[x][y].remove(correspondence)
+        self._proposed_correspondences[x][y].remove(correspondence)
 
     def add_correspondence(self, correspondence):
         '''
@@ -666,8 +667,15 @@ class Workspace(object):
             else:
                 return 'high'
 
-    def propose_correspondence(self, object1, object2, mappings, blah):
-        pass
+    def propose_correspondence(self, object1, object2, mappings, flip_obj2):
+        '''
+        Create a proposed correspondence and pots a correspondece strength
+        tester codelet with urgency a function of the strength of the
+        distinguishing concept mappings underlying the correspondence.
+        '''
+        # FIXME: Real implementation
+        correspondence = Correspondence(object1, object2, mappings)
+        return [(CorrespondenceStrengthTester([correspondence, False]), 80)]
 
     def propose_group(self, objects, bonds, group_category, direction_category):
         '''
@@ -970,7 +978,7 @@ class Workspace(object):
         
         return number
 
-    def get_codelets(self, category, codelet, urgency):
+    def get_codelets(self, category, codelet, urgency, args=[]):
             '''
             Based on the category sent in, test for the probability for the
             codelet related to that category to be posted.  If the test does
@@ -982,7 +990,7 @@ class Workspace(object):
             number = self.post_codelet_number(category)
             if toolbox.flip_coin(probability):
                 for i in range(number):
-                    codelets.append((codelet(), urgency))
+                    codelets.append((codelet(args), urgency))
             return codelets
 
     def bottom_up_codelets(self):

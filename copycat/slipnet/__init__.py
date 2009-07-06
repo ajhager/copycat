@@ -70,7 +70,7 @@ plato_last = add_node(60)
 plato_left = add_node(40, ['BondTopDownDirectionScout',
                            'GroupTopDownDirectionScout'])
 plato_right = add_node(40, ['BondTopDownDirectionScout',
-                            'GroupTopDownDirectoinScout'])
+                            'GroupTopDownDirectionScout'])
 
 # Bond nodes
 plato_predecessor = add_node(50, ['BondTopDownCategoryScout'],
@@ -366,7 +366,5 @@ class Slipnet(object):
         for node in self.slipnodes:
             if node.activation >= 50:
                 for codelet in node.codelets:
-                    codelets.append((codelet, node.conceptual_depth / 100.))
-                    #codelets.extend((codelet.structure_category,
-                    #                 codelet, node.conceptual_depth / 100.0))
+                    codelets.append((codelet, [node], node.conceptual_depth / 100.))
         return codelets

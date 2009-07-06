@@ -14,12 +14,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import util
-from workspace import Structure
+import copycat.toolbox as toolbox
+from copycat.workspace import Structure
 
 class Correspondence(Structure):
     def __init__(self, object1, object2, concept_mappings):
-        super(Correrspondence, self).__init__()
+        super(Correspondence, self).__init__()
         self.object1 = object1
         self.object2 = object2
         self.concept_mappings = concept_mappings
@@ -86,7 +86,7 @@ class Correspondence(Structure):
         relevant_distinguishing_cms = self.relevant_distinguishing_cms()
         if not relevant_distinguishing_cms:
             return 0
-        average_strength = util.average([cm.strength() for cm in relevant_distinguishing_cms])
+        average_strength = toolbox.average([cm.strength() for cm in relevant_distinguishing_cms])
         number_of_cms = len(relevant_distinguishing_cms)
         if number_of_cms == 1:
             number_of_cms_factor = .8

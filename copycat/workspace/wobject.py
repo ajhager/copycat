@@ -47,6 +47,9 @@ class Object(object):
         self.is_new_answer_letter = False
         self.clamp_salience = False
 
+    def flipped_version(self):
+        return self
+
     def calculate_raw_importance(self):
         '''
         Return the raw importance of the object. This is a function of the
@@ -270,16 +273,18 @@ class Object(object):
         Choose a left neighbor probabilistically based on intra string
         salience.
         '''
-        values = [o.intra_string_salience for o in self.all_left_neighbors()]
-        return toolbox.weighted_select(values)
+        neighbors = self.all_left_neighbors()
+        values = [obj.intra_string_salience for obj in neighbors]
+        return toolbox.weighted_select(values, neighbors)
 
     def choose_right_neighbor(self):
         '''
         Choose a right neighbor probabilistically based on intra string
         salience.
         '''
-        values = [o.intra_string_salience for o in self.all_right_neighbors()]
-        return toolbox.weighted_select(values)
+        neighbors = self.all_right_neighbors()
+        values = [obj.intra_string_salience for obj in neighbors]
+        return toolbox.weighted_select(values, neighbors)
 
     def choose_neighbor(self):
         '''

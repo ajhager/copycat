@@ -105,7 +105,9 @@ class String(object):
         Return a list of all non string spanning objects in the string.
         '''
         non_string_spanning = []
-        for workspace_object in self.objects:
+        for workspace_object in self.objects():
+            if not workspace_object:
+                continue
             if workspace_object.spans_whole_string():
                 non_string_spanning.append(workspace_object)
         return non_string_spanning

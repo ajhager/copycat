@@ -14,7 +14,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
+import copycat.slipnet as nodes
 
 class BondBottomUpScout(Codelet):
     '''
@@ -25,6 +27,7 @@ class BondBottomUpScout(Codelet):
     urgency a function of the degree of association of bonds of the bond
     category.
     '''
+    structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         from_object = workspace.choose_object('intra_string_salience')
         to_object = from_object.choose_neighbor()
@@ -44,14 +47,15 @@ class BondBottomUpScout(Codelet):
         if category == None:
             return
 
-        workspace.propose_bond(from_object, to_object, facet,
-                               from_descriptor, to_descriptor)
+        return workspace.propose_bond(from_object, to_object, facet,
+                                      from_descriptor, to_descriptor)
 
 class BondBuilder(Codelet):
     '''
     Attempts to build the proposed bond, fighting with competitiors if
     necessary.
     '''
+    structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         string = bond.string
         from_object = bond.from_object
@@ -120,6 +124,7 @@ class BondStrengthTester(Codelet):
     wheither or not to post a bond builder codelet with urgency as a
     function of the strength.
     '''
+    structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         # Update the strength values for the bond.
         bond.update_strength_values()
@@ -128,7 +133,7 @@ class BondStrengthTester(Codelet):
         # Decide whether or not to post the bond builder codelet.
         probability = strength / 100.0
         probability = self.temperature_adjusted_probability(probability)
-        if not util.flip_coin(probability):
+        if not toolbox.flip_coin(probability):
             bond.string.delete_proposed_bond(bond)
             return
 
@@ -153,6 +158,7 @@ class BondTopDownCategoryScout(Codelet):
     with urgency a function of the degree of association of bonds of the
     category.
     '''
+    structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         # Choose a string.
         initial_string = self.initial_string
@@ -161,10 +167,9 @@ class BondTopDownCategoryScout(Codelet):
         t_relevance = target_string.local_bond_category_relevance(category)
         i_unhappiness = initial_string.intra_string_unhappiness()
         t_unhappiness = target_string.intra_string_unhappiness()
-        values = [round(util.average(i_relevance, i_unhappiness)),
-                  round(util.average(t_relevance, t_unhappiness))]
-        index = util.select_list_position(values)
-        string = [initial_string, target_string][index]
+        values = [round(toolbox.average(i_relevance, i_unhappiness)),
+                  round(toolbox.average(t_relevance, t_unhappiness))]
+        string = toolbox.weighted_select(values, [initial_string, target_string])
 
         # Choose an object and neighbor.
         obj = string.choose_object('intra_string_salience')
@@ -212,30 +217,31 @@ class BondTopDownDirectionScout(Codelet):
     posting a bond strength tester codelet with urgency a function of the
     degree of association of bonds of the bond category.
     '''
+    structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
+        category = self.arguments[0]
         # Choose a string.
-        initial_string = self.initial_string
-        target_string = self.target_string
+        initial_string = workspace.initial_string
+        target_string = workspace.target_string
         i_relevance = initial_string.local_direction_category_relevance(category)
         t_relevance = target_string.local_direction_category_relevance(category)
-        i_unhappiness = initial_string.intra_string_unhappiness()
-        t_unhappiness = target_string.intra_string_unhappiness()
-        values = [round(util.average(i_relevance, i_unhappiness)),
-                  round(util.average(t_relevance, t_unhappiness))]
-        index = util.select_list_position(values)
-        string = [initial_string, target_string][index]
+        i_unhappiness = initial_string.intra_string_unhappiness
+        t_unhappiness = target_string.intra_string_unhappiness
+        values = [round(toolbox.average(i_relevance, i_unhappiness)),
+                  round(toolbox.average(t_relevance, t_unhappiness))]
+        string = toolbox.weighted_select(values, [initial_string, target_string])
 
         # Choose an object and neighbor.
-        object = string.choose_object('intra_string_salience')
-        if category.name == 'plato_left':
-            neighbor = object.choose_left_neighbor()
-        elif category.name == 'plato_right':
-            neighbor = object.choose_right_neighbor()
+        obj = string.choose_object('intra_string_salience')
+        if category == nodes.plato_left:
+            neighbor = obj.choose_left_neighbor()
+        elif category == nodes.plato_right:
+            neighbor = obj.choose_right_neighbor()
         if not neighbor:
             return
 
         # Choose bond facet.
-        facet = object.choose_bond_facet(neighbor)
+        facet = workspace.choose_bond_facet(obj, neighbor)
         if not facet:
             return
         
@@ -251,5 +257,6 @@ class BondTopDownDirectionScout(Codelet):
             return
 
         # Propose the bond.
-        return self.propose_bond(from_object, to_object, bond_category, facet,
+        return workspace.propose_bond(from_object, to_object,
+                                      bond_category, facet,
                                  from_descriptor, to_descriptor)
