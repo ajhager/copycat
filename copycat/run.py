@@ -42,17 +42,20 @@ class Run(object):
                 if deleted_codelet:
                     self.workspace.delete_proposed_structure(deleted.arguments)
 
-        codelet = self.coderack.choose()
-        codelets = codelet.run(self.coderack, self.slipnet, self.workspace)
-        if codelets:
-            for codelet, urgency in codelets:
-                deleted_codelet = self.coderack.post(codelet, urgency)
-                if deleted_codelet:
-                    self.workspace.delete_proposed_structure(deleted.arguments)
+        self.run_codelet(self.coderack.choose())
 
         if self.workspace.translated_rule:
-            AnswerBuilder.run(self.coderack, self.slipnet, self.workspace)
+            self.run_codelet(AnswerBuilder)
             self.update()
+
+    def run_codelet(self, codelet):
+        codelets = codelet.run(self.coderack, self.slipnet, self.workspace)
+        if not codelets:
+            return
+        for codelet, urgency in codelets:
+            deleted_codelet = self.coderack.post(codelet, urgency)
+            if deleted_codelet:
+                self.workspace.delete_proposed_structure(deleted.arguments)
 
     def update(self):
         self.workspace.update()

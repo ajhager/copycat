@@ -47,7 +47,7 @@ class BondBottomUpScout(Codelet):
         if category == None:
             return
 
-        return workspace.propose_bond(from_object, to_object, facet,
+        return workspace.propose_bond(from_object, to_object, category, facet,
                                       from_descriptor, to_descriptor)
 
 class BondBuilder(Codelet):
@@ -57,41 +57,37 @@ class BondBuilder(Codelet):
     '''
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
+        bond = self.args[0]
         string = bond.string
         from_object = bond.from_object
         to_object = bond.to_object
 
-        # Make sure these objects still exist.
-        objects = self.objects()
+        objects = workspace.objects()
         if (from_object not in objects) or (to_object not in objects):
             return
 
-        # Make sure the bond does not exist.
         existing_bond = string.is_bond_present(bond)
         if existing_bond:
-            existing_bond.bond_category.buffer += self.activation
-            if existing_bond.direction_category:
-                existing_bond.direction_category.buffer += self.activation
+            existing_bond.bond_category.activation_buffer += self.activation
+            direction_category = existing_bond.direction_category
+            if direction_category:
+                direction_category.activation_buffer += workspace.activation
             string.delete_proposed_bond(bond)
             return
 
-        # Remove the proposed bond from the list of proposed bonds.
         string.delete_proposed_bond(bond)
 
-        # Fight any incompatible bonds.
         incompatible_bonds = bond.incompatible_bonds()
         if incompatible_bonds:
             if not self.fight_it_out(bond, 1, incompatible_bonds, 1):
                 return
 
-        # Try to break any groups shared by from_object and to_object.
         incompatible_groups = from_object.common_groups(to_object)
         if incompatible_groups:
             if  not self.fight_it_out(bond, 1, incompatible_groups,
                 max([group.letter_span() for group in incompatible_groups])):
                 return
 
-        # Try to break any incompatible correspondences.
         if bond.direction_category and (bond.is_leftmost_in_string() or \
                                         bond.is_rightmost_in_string()):
             incompatible_correspondences = bond.incompatible_correspondences()
@@ -100,23 +96,19 @@ class BondBuilder(Codelet):
                                          incompatible_correspondences, 3):
                     return
 
-        # Break incompatible bonds, if any.
         if incompatible_bonds:
             for bond in incompatible_bonds:
                 self.break_bond(bond)
 
-        # Break incompatible groups, if any.
         if incompatible_groups:
             for group in incompatible_groups:
                 self.break_group(group)
 
-        # Break incompatible correspondences, if any.
         if incompatible_correspondences:
             for correrspondence in incompatible_correspondences:
                 self.break_correspondence(correspondence)
 
-        # Build the new bond.
-        self.build_bond(bond)
+        return workspace.build_bond(bond)
 
 class BondStrengthTester(Codelet):
     '''
