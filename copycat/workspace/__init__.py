@@ -48,7 +48,7 @@ class Workspace(object):
 
         self.replacements = []
         self._correspondences = []
-        self._proposed_correspondences = []
+        self._proposed_correspondences = {}
 
         self.rule = None
         self.translated_rule = None
@@ -499,7 +499,7 @@ class Workspace(object):
         '''
         Return a list of the proposed correspondences on the workspace.
         '''
-        return util.flatten(self.proposed_correspondences())
+        return self._proposed_correspondences.items()
 
     def correspondences(self):
         '''
@@ -521,7 +521,10 @@ class Workspace(object):
         '''
         x = correspondence.object1.string_number
         y = correspondence.object2.string_number
-        self._proposed_correspondences[x][y].insert(0, correspondence)
+        if (x, y) in self._proposed_correspondences:
+            self._proposed_correspondences[(x, y)].insert(0, correspondence)
+        else:
+            self._proposed_correspondences[(x, y)] = [correspondence]
 
     def delete_proposed_correspondence(self, correspondence):
         '''
@@ -530,7 +533,8 @@ class Workspace(object):
         '''
         x = correspondence.object1.string_number
         y = correspondence.object2.string_number
-        self._proposed_correspondences[x][y].remove(correspondence)
+        if (x, y) in self._proposed_correspondences:
+            self._proposed_correspondences[(x, y)].remove(correspondence)
 
     def add_correspondence(self, correspondence):
         '''
