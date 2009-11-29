@@ -11,7 +11,6 @@
   :settable-instance-variables
   :initable-instance-variables)
 
-
 ;---------------------------------------------
 ; codelet.print-to-output-file | REMOVED
 ;---------------------------------------------
@@ -50,13 +49,9 @@
 ; coderack.total-num-of-codelets | REMOVED
 ;---------------------------------------------
 
-(defflavor coderack-bin
-  (vector urgency-code relative-urgency-sum 
-   codelet-in-bin-probability pname)	  
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
+;---------------------------------------------
+; defflavor coderack-bin | Bin.__init__
+;---------------------------------------------
 
 ;---------------------------------------------
 ; coderack.spy | REMOVED

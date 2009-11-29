@@ -21,7 +21,18 @@ from copycat.coderack.codelet import Codelet
 
 
 class Bin(object):
+    """Bin is a bucket for holding codelets of a certain urgency.
+
+    Bins are used, and only ever used, by Coderack for managing codelets in a
+    certain urgency range.
+
+    Attributes:
+        urgency_code: An integer indicating the level of urgency of the bin.
+        codelets: A list of the codelets in the bin.
+    """
+
     def __init__(self, urgency_code):
+        """Initialize Bin."""
         self.urgency_code = urgency_code
         self.codelets = []
 
