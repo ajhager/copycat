@@ -162,11 +162,8 @@
   (aref %urgency-value-array% urgency-code *temperature*))
 
 ;---------------------------------------------
-
-(defmethod (coderack :codelet-list) ()
-; Returns a list of all the codelets in the coderack.
-  (flatten (loop for bin in *coderack-bins* 
-		 collect (vector-to-list (send bin :vector)))))
+; coderack.codelet-list | Coderack.codelets
+;---------------------------------------------
 
 ;---------------------------------------------
 ; coderack.empty | Coderack.clear
@@ -174,6 +171,7 @@
 
 ;---------------------------------------------
 ; make-coderack | Coderack.__init__
+; init-coderack
 ;---------------------------------------------
 
 (defmethod (coderack :total-urgency-sum) ()
@@ -402,12 +400,6 @@
 	*codelets-to-post*))
 
 ;---------------------------------------------
-
-(defun init-coderack ()
-; Makes a coderack called *coderack*.
-  (setq *coderack* (make-coderack))
-  (setq *codelet-list* nil)
-  (setq *coderack-initialized* t))
 
 ;---------------------------------------------
 
