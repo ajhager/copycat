@@ -65,10 +65,11 @@ class Bin(object):
             self.codelets.remove(codelet)
 
     def urgency(self, temperature):
-        '''
-        Return the value associated with this bin; a function of its urgency
-        code and the temperature.
-        '''
+        """Return this bin's urgency.
+
+        The urgency value is a function of the bin's urgency code and the current
+        temperature.
+        """
         return round((self.urgency_code + 1) ** ((110 - temperature) / 15))
 
     def urgency_sum(self, temperature):

@@ -73,9 +73,11 @@
 ; coderack-bin.urgency-sum | Bin.urgency_sum
 ;---------------------------------------------
 
+;---------------------------------------------
+; coderack-bin.urgency-value | Bin.urgency
+;---------------------------------------------
+
 (defmethod (coderack-bin :urgency-value) ()
-; Returns the value associated with this bin (a function of which bin this is 
-; and the temperature).
   (aref %urgency-value-array% urgency-code *temperature*))
 
 ;---------------------------------------------

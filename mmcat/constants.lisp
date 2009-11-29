@@ -122,27 +122,15 @@
                     ; that it has been built.
 
 ;---------------------------------------------
+; %max-coderack-size% | Coderack.max_codelets
+;---------------------------------------------
 
-; CONSTANTS FOR CODERACK
+;---------------------------------------------
+; %num-of-urgency-bins% | len(Coderack.bins)
+;---------------------------------------------
 
-  (setq %max-coderack-size% 100)  ; The maximum number of codelets on the 
-                                       ; coderack.
-
-  (setq %num-of-urgency-bins% 7) ; The number of different urgency bins.
-
-  ; The URGENCY-VALUE-ARRAY is a table containing the value of an urgency 
-  ; bin as a function of temperature.
-  (setq %urgency-value-array% 
-	(make-array (list %num-of-urgency-bins% 101) :initial-element nil))
-
-  ; Set up URGENCY-VALUE-ARRAY.
-  (loop for bin-number from 0 to (1- %num-of-urgency-bins%) do
-	(loop for temperature from 0 to 100 do
-	      (aset %urgency-value-array% bin-number temperature 
-		    (round (expt (1+ bin-number) 
-			          (/ (+ (fake-reciprocal temperature) 10)
-				     15.0))))))
-
+;---------------------------------------------
+; %urgency-value-array% | Bin.urgency
 ;---------------------------------------------
 
 ; CONSTANTS FOR SLIPNET
