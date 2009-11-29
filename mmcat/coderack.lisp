@@ -24,16 +24,7 @@
   (apply codelet-type arguments))
 
 ;---------------------------------------------
-
-(defmethod (codelet :remove-probability) ()
-; Returns the probability of removing this codelet from the coderack
-; (a function of the codelet's urgency and age).
-; The 1+ allows some probability for codelets with the highest urgency
-; to be removed.
-  (* (- *codelet-count* time-stamp) 
-     (1+ (- (send *extremely-high-bin* :urgency-value)
-	    (send urgency-bin :urgency-value)))))
-
+; codelet.remove-probability | Coderack.remove_probability
 ;---------------------------------------------
 
 (defun make-codelet (codelet-type arguments urgency-bin-name 
@@ -105,6 +96,18 @@
 ; coderakc.post-codelet-list
 ;---------------------------------------------
 
+;---------------------------------------------
+; coderack.display | REMOVED
+;---------------------------------------------
+
+;---------------------------------------------
+; get-urgency-bin | MERGED Coderack.post
+;---------------------------------------------
+
+;---------------------------------------------
+; get-coderack-bin | MERGED Coderack.post
+;---------------------------------------------
+
 (defmethod (coderack :choose) (&aux chosen-bin chosen-index codelet)
 ; Chooses a codelet from the coderack.
 (block nil
@@ -133,8 +136,6 @@
   (setq *codelet-list* (remove codelet *codelet-list*))
   (send *coderack* :delete-codelet-from-graphics codelet)
   codelet))
-
-;---------------------------------------------
 
 (defmethod (coderack :remove-codelets) 
            (num-to-remove &aux remove-probability-list codelet argument bin 
@@ -185,24 +186,6 @@
   (if* (send self :empty?)
    then (format t "Can't remove any codelets: coderack is empty.~&"))))
     
-;---------------------------------------------
-; coderack.display | REMOVED
-;---------------------------------------------
-
-(defun get-urgency-bin (value)
-; Returns the urgency bin corresponding to a given number.
-  (if* (>= value 100) 
-   then '*extremely-high-bin*
-   else (nth (truncate (/ (* value %num-of-urgency-bins%) 100)) 
-	     *urgency-list*)))
-  
-;---------------------------------------------
-
-(defun get-coderack-bin (bin-number)
-  (nth bin-number *coderack-bins*))
-
-;---------------------------------------------
-
 (defun get-bottom-up-codelets ()
 ; Adds various bottom-up codelets to *codelets-to-post*, deciding on how
 ; many to add and urgency, as a function of how much each type of codelet 
@@ -265,8 +248,6 @@
   ; Add bottom-up breaker codelets.
   (push (make-codelet 'breaker nil '*extremely-low-bin*) 
 	*codelets-to-post*))
-
-;---------------------------------------------
 
 (defun post-initial-codelets ()
 ; Post the initial codelets the program starts out with.

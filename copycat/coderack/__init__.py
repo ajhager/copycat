@@ -150,13 +150,14 @@ class Coderack(object):
         return removed_codelet
 
     def remove_probability(self, codelet):
-        '''
-        Return the probability of removing this codelet from the coderack,
-        which is a function of the codelet's urgency and age.  Even codelets
-        with the highest urgency and lowest age have a chance to be removed.
-        '''
+        """Return the probability of removing the given codelet.
+
+        Removal is a function of the codelet's bin urgency, biased toward
+        deleting low urgency, older codelets. The '1 +' allows for some
+        possibility of the highest urgency being removed.
+        """
         codelet_age = self.time - codelet.timestamp
-        codelet_bin_urgney.bin.urgency(self.temperature)
+        codelet_bin_urgency = codelet.bin.urgency(self.temperature)
         highest_bin_urgency = self.extremely_high_bin.urgency(self.temperature)
         return codelet_age * (1 + codelet_bin_urgency - highest_bin_urgency)
 
