@@ -13,21 +13,11 @@
 
 
 ;---------------------------------------------
-
-(defmethod (codelet :print-to-output-file) (output-file)
-  (with-open-file 
-      (ostream output-file :direction :output 
-	  :if-exists :append :if-does-not-exist :create)    
-  (format ostream "codelet-type: ~a~&" codelet-type)))
-
+; codelet.print-to-output-file | REMOVED
 ;---------------------------------------------
 
-(defmethod (codelet :print) ()
-  (format t "codelet-type: ~a, arguments: ~a" codelet-type arguments)
-  (format t " urgency-bin ~a, time-stamp ~a,~&" 
-	  (send urgency-bin :pname) time-stamp)
-  (format t "~%"))
-
+;---------------------------------------------
+; codelet.print | REMOVED
 ;---------------------------------------------
 
 (defmethod (codelet :run) ()
@@ -69,54 +59,16 @@
   :initable-instance-variables)
 
 ;---------------------------------------------
-
-(defmethod (coderack :spy) (&aux codelet codelet-type codelet-type-vector
-   				      codelet-number num-of-codelets 
-				      urgency-sum-vector
-				      urgency-sum total-sum
-				      relative-sum (total-relative-sum 0))
-; Prints out some info about the current state of the coderack.
-  (setq codelet-type-vector 
-	(make-vector (length %codelet-types%) :initial-element 0))
-				
-  (setq urgency-sum-vector 
-	(make-vector (length %codelet-types%) :initial-element 0))
-
-  (loop for bin in *coderack-bins* do
-	(loop for i from 0 to (1- (send bin :fill-pointer)) do
-              (setq codelet (vref (send bin :vector) i))
-	      (setq codelet-number 
-		    (get-codelet-number (send codelet :codelet-type)))
-	      (vset codelet-type-vector codelet-number
-		    (1+ (vref codelet-type-vector codelet-number)))
-	      (vset urgency-sum-vector codelet-number
-		    (+ (send bin :urgency-value)
-		       (vref urgency-sum-vector codelet-number)))))
-  (setq total-sum (reduce #'+ urgency-sum-vector))
-  (loop for i from 0 to (1- (vsize codelet-type-vector)) do
-	(setq codelet-type (get-codelet-name i))
-        (setq num-of-codelets (vref codelet-type-vector i))
-        (setq urgency-sum (vref urgency-sum-vector i))
-        (setq relative-sum (round (* 100 (/ urgency-sum total-sum))))
-	(setq total-relative-sum (+ relative-sum total-relative-sum))
-	(if* (> num-of-codelets 0)
-	 then (format t 
-		      "~a:~% ~a codelets; eff-urg-sum: ~a; rel-sum: ~a ~&" 
-		      codelet-type num-of-codelets urgency-sum
-		      relative-sum)))
-		      
-  (format t "Total sum: ~a~&" total-sum)
-  (format t "Total relative sum: ~a~&" total-relative-sum))
-
+; coderack.spy | REMOVED
 ;---------------------------------------------
 
-(defmethod (coderack-bin :fill-pointer) ()
-  (fill-pointer vector))
-
+;---------------------------------------------
+; coderack-bin.fill-pointer | REMOVED
 ;---------------------------------------------
 
-(defmethod (coderack-bin :set-fill-pointer) (value)
-  (setf (fill-pointer vector) value))
+;---------------------------------------------
+; coderack-bin.set-fill-pointer | REMOVED
+;---------------------------------------------
 
 ;---------------------------------------------
 ; coderack-bin.num-of-codelets-in-bin | REMOVED
@@ -279,20 +231,7 @@
    then (format t "Can't remove any codelets: coderack is empty.~&"))))
     
 ;---------------------------------------------
-
-(defmethod (coderack :display) ()
-; Displays the contents of the coderack (text, not graphics).
-  (loop for bin in *coderack-bins* do
-        (format t "~a: value: ~a; effective-sum: ~a~&" 
-            (send bin :pname)
-	    (send bin :urgency-value)
-            (send bin :urgency-sum))
-        (format t "------------~&")
-        (loop for i from 0 to (1- (send bin :fill-pointer)) do
-	      (send (vref (send bin :vector) i) :print))
-  
-        (format t "~%")))
-
+; coderack.display | REMOVED
 ;---------------------------------------------
 
 (defun get-urgency-bin (value)
@@ -374,8 +313,6 @@
 
 ;---------------------------------------------
 
-;---------------------------------------------
-
 (defun post-initial-codelets ()
 ; Post the initial codelets the program starts out with.
   (loop for i from 1 to (* 2 (length (send *workspace* :object-list))) do
@@ -389,5 +326,3 @@
 
   (send *coderack* :post-codelet-list *codelets-to-post*)
   (setq *codelets-to-post* nil))
-  
-;---------------------------------------------
