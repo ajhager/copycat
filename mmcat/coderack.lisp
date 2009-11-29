@@ -77,9 +77,6 @@
 ; coderack-bin.urgency-value | Bin.urgency
 ;---------------------------------------------
 
-(defmethod (coderack-bin :urgency-value) ()
-  (aref %urgency-value-array% urgency-code *temperature*))
-
 ;---------------------------------------------
 ; coderack.codelet-list | Coderack.codelets
 ;---------------------------------------------

@@ -37,9 +37,7 @@ class Bin(object):
         self.codelets = []
 
     def add(self, codelet):
-        '''
-        Add a codelet to the bin.
-        '''
+        """Add a codelet to the bin."""
         self.codelets.append(codelet)
         codelet.bin = self
 
@@ -52,15 +50,11 @@ class Bin(object):
         return codelet
 
     def clear(self):
-        '''
-        Clear the bin of all its codelets.
-        '''
+        """Clear the bin of all its codelets."""
         self.codelets = []
 
     def remove(self, codelet):
-        '''
-        Remove a codelet from the bin.
-        '''
+        """Remove a codelet from the bin."""
         if codelet in self.codelets:
             self.codelets.remove(codelet)
 
@@ -165,6 +159,7 @@ class Coderack(object):
         return codelet_age * (1 + codelet_bin_urgency - highest_bin_urgency)
 
     def update(self, temperature):
+        """Store the current temperature for urgency calculations."""
         self.temperature = temperature
 
     def urgency_sum(self):

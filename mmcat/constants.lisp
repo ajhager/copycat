@@ -1,14 +1,4 @@
-;---------------------------------------------
-; CONSTANTS: This file contains constants for Copycat.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defun init-constants ()
-; This function initializes all the constants.
-  
 ; CONSTANTS FOR GRAPHICS
 
   (setq %verbose% nil) ; T turns on verbose trace of codelet runs.
@@ -29,45 +19,8 @@
   (setq %graphics-rate% 'fast) ; There are three settings: 'fast, 'medium, and
                                ; 'slow.
 
-  ; Set up the fonts.
-  (if* %demo-graphics% 
-   then (setq %slipnet-font% "/usr/lib/fonts/fixedwidthfonts/cour.r.10")
-   else (setq %slipnet-font% "/usr/lib/fonts/fixedwidthfonts/screen.r.7"))
-  (setq %slipnet-activation-font% "/usr/lib/fonts/fixedwidthfonts/cour.r.10")
-
-  (if* %demo-graphics% 
-   then (setq %slipnet-letter-font% "/usr/lib/fonts/fixedwidthfonts/cour.r.14")
-   else (setq %slipnet-letter-font%
-	      "/usr/lib/fonts/fixedwidthfonts/cour.r.10"))
-
-  (setq %workspace-font% "/usr/lib/fonts/fixedwidthfonts/cour.b.24")
-  (setq %group-font% "/usr/lib/fonts/fixedwidthfonts/cour.b.24")
-  (setq %relevant-length-font% "/usr/lib/fonts/fixedwidthfonts/cour.b.18")
-  (setq %irrelevant-length-font% "/usr/lib/fonts/fixedwidthfonts/cour.r.18")
-  (setq %rule-font% "/usr/lib/fonts/fixedwidthfonts/cour.b.12")
-  (setq %relevant-concept-mapping-font% 
-	"/usr/lib/fonts/fixedwidthfonts/cour.b.12")
-  (setq %irrelevant-concept-mapping-font% 
-        "/usr/lib/fonts/fixedwidthfonts/cour.r.12")
-  (setq %relevant-description-font% 
-	"/usr/lib/fonts/fixedwidthfonts/cour.b.12")
-  (setq %irrelevant-description-font% 
-	"/usr/lib/fonts/fixedwidthfonts/cour.r.12")
-  (setq %temperature-font% 
-	"/usr/lib/fonts/fixedwidthfonts/cour.r.10")
-
-  (setq %coderack-font% "/usr/lib/fonts/fixedwidthfonts/cour.r.10")
-  (setq %minimal-coderack-font% "/usr/lib/fonts/fixedwidthfonts/cour.b.12")
-  (setq %codelet-name-font% "/usr/lib/fonts/fixedwidthfonts/cour.r.10")
-  (setq %codelet-group-font% "/usr/lib/fonts/fixedwidthfonts/cour.b.14")
-
-  ; Set up values for the font-heights.
-  (setq %codelet-name-font-height% 11) 
-  (setq %group-font-height% 10)
-  (setq %slipnet-font-height% 10)
-  (setq %slipnet-activation-font-height% 5)
-  (setq %relevant-concept-mapping-font-height% 10)
-
+;---------------------------------------------
+; FONT CONSTANTS | REMOVED
 ;---------------------------------------------
 
 ; CONSTANTS FOR CODELETS
@@ -246,6 +199,3 @@
   (send %very-high-answer-temperature-threshold-distribution% :update)
 
 )
-
-;---------------------------------------------
-
