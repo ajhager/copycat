@@ -72,9 +72,7 @@ class Bin(object):
         return round((self.urgency_code + 1) ** ((110 - temperature) / 15))
 
     def urgency_sum(self, temperature):
-        '''
-        Return the sum of urgencies in this bin.
-        '''
+        """Return the sum of urgencies in this bin."""
         return len(self.codelets) * self.urgency(temperature)
 
 

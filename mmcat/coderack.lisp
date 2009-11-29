@@ -69,10 +69,8 @@
 ; coderack-bin.num-of-codelets-in-bin | REMOVED
 ;---------------------------------------------
 
-(defmethod (coderack-bin :urgency-sum) ()
-; Returns the sum of the urgencies in this bin.
-  (* (send self :num-of-codelets-in-bin) (send self :urgency-value)))
-
+;---------------------------------------------
+; coderack-bin.urgency-sum | Bin.urgency_sum
 ;---------------------------------------------
 
 (defmethod (coderack-bin :urgency-value) ()
