@@ -126,14 +126,16 @@ class Coderack(object):
         return self.urgency_sum() == 0
 
     def post(self, codelet, urgency):
-        '''
-        Post a codelet to the coderack.  If the coderack is already at its max
-        size, remove a codelet to make room for the new one.
-        '''
+        """Post a codelet to the coderack.
+
+        If the coderack is already at its maximum size, remove a codelet to make
+        room for the new one. The bin to post to is a function of the numver of
+        bins and the urgency of the codelet passed in.
+        """
         removed_codelet = None
-        if len(self.codelets()) == self.max_codelets:
-            codelets = self.codelets()
-            probabilities = [self.remove_probability(cl) for cl in codelets]
+        codelets = self.codelets()
+        if len(codelets) == self.max_codelets:
+            probabilities = [self.remove_probability(c) for c in codelets]
             removed_codelet = toolbox.weighted_select(probabilities, codelets)
             removed_codelet.bin.remove(removed_codelet)
 

@@ -99,48 +99,10 @@
 ; coderack.empty? | Coderack.is_empty
 ;---------------------------------------------
 
-(defmethod (coderack :post) (codelet &aux bin)
-; Posts a codelet to the coderack.  If the coderack has 
-; %max-coderack-size% codelets, remove a codelet to make room for the new
-; one.
-
-  (if* (= (send self :total-num-of-codelets) %max-coderack-size%)
-   then (send self :remove-codelets 1)) ; Remove a codelet from the 
-                                        ; coderack.
-  (setq bin (send codelet :urgency-bin))
-  (vset (send bin :vector) (send bin :fill-pointer) codelet)
-  (send codelet :set-index-in-bin (send bin :fill-pointer))
-  (send codelet :set-time-stamp *codelet-count*)
-  (send bin :set-fill-pointer (1+ (send bin :fill-pointer)))
-  (push codelet *codelet-list*)
-  (send self :add-codelet-to-graphics codelet))
-
 ;---------------------------------------------
-
-(defmethod (coderack :post-without-removing) (codelet &aux bin)
-; Posts a codelet to the coderack.  
-  (setq bin (send codelet :urgency-bin))
-  (vset (send bin :vector) (send bin :fill-pointer) codelet)
-  (send codelet :set-index-in-bin (send bin :fill-pointer))
-  (send codelet :set-time-stamp *codelet-count*)
-  (send bin :set-fill-pointer (1+ (send bin :fill-pointer)))
-  (push codelet *codelet-list*)
-  (send self :add-codelet-to-graphics codelet))
-
-;---------------------------------------------
-
-(defmethod (coderack :post-codelet-list) (codelet-list &aux num-to-remove)
-; See how many codelets have to be removed.  Remove them, and then
-; post the codelets on this list.
-  (setq num-to-remove 
-	(- (+ (send *coderack* :total-num-of-codelets)
-	      (length codelet-list))
-	   %max-coderack-size%))
-  (if* (> num-to-remove 0)
-   then (send *coderack* :remove-codelets num-to-remove))
-  (loop for codelet in codelet-list do
-	(send *coderack* :post-without-removing codelet)))
-
+; coderack.post | Coderack.post
+; coderack.post-without-removing
+; coderakc.post-codelet-list
 ;---------------------------------------------
 
 (defmethod (coderack :choose) (&aux chosen-bin chosen-index codelet)
