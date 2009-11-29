@@ -169,14 +169,8 @@
 		 collect (vector-to-list (send bin :vector)))))
 
 ;---------------------------------------------
-
-(defmethod (coderack :empty) ()
-; Empty out the coderack.
-  (loop for codelet in (send *coderack* :codelet-list) do
-	(send self :delete-codelet-from-graphics codelet))
-  (loop for bin in *coderack-bins* do
-        (send bin :set-fill-pointer 0))
-  (setq *codelet-list* nil))
+; coderack.empty | Coderack.clear
+;---------------------------------------------
 
 ;---------------------------------------------
 ; make-coderack | Coderack.__init__

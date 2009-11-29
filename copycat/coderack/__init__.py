@@ -87,7 +87,7 @@ class Coderack(object):
     """
 
     def __init__(self):
-        """Initializes Coderack."""
+        """Initialize Coderack."""
         self.max_codelets = 100
         self.temperature = 0
         self.time = 0
@@ -115,9 +115,7 @@ class Coderack(object):
         return bin.choose()
 
     def clear(self):
-        '''
-        Clear the coderack of all codelets.
-        '''
+        """Empty the coderack of all codelets."""
         for bin in self.bins:
             bin.clear()
 
