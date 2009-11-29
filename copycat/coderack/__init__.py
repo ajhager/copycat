@@ -42,9 +42,7 @@ class Bin(object):
         codelet.bin = self
 
     def choose(self):
-        '''
-        Choose and remove a random codelet from the bin.
-        '''
+        """Choose and remove a random codelet from the bin."""
         codelet = random.choice(self.codelets)
         self.remove(codelet)
         return codelet
@@ -102,9 +100,7 @@ class Coderack(object):
                      self.very_high_bin, self.extremely_high_bin]
 
     def choose(self):
-        '''
-        Choose a codelet from the coderack.
-        '''
+        """Choose a codelet from the coderack."""
         if self.is_empty():
             return None
         urgencies = [bin.urgency_sum(self.temperature) for bin in self.bins]

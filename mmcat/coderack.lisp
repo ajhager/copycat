@@ -108,34 +108,9 @@
 ; get-coderack-bin | MERGED Coderack.post
 ;---------------------------------------------
 
-(defmethod (coderack :choose) (&aux chosen-bin chosen-index codelet)
-; Chooses a codelet from the coderack.
-(block nil
-  (if* (send self :empty?) 
-   then (format t "Can't choose: coderack is empty.~&") 
-        (return))     
-
-  ; Choose a bin probabilistically according to the urgency sum.
-  (setq chosen-bin 
-	(select-list-item-by-method *coderack-bins* ':urgency-sum))
-
-  ; Choose a random codelet in this bin.
-  (setq chosen-index (random (send chosen-bin :num-of-codelets-in-bin)))
-  (setq codelet (vref (send chosen-bin :vector) chosen-index))
-
-  ; If this codelet left a hole in the vector, fill it in with the last 
-  ; codelet in the bin.  Adjust the fill-pointer.
-  (if* (< chosen-index (1- (send chosen-bin :fill-pointer)))
-   then (vset (send chosen-bin :vector) chosen-index 
-	      (vref (send chosen-bin :vector) 
-		    (1- (send chosen-bin :fill-pointer))))
-        ; Give the codelet that moved its new bin index.
-        (send (vref (send chosen-bin :vector) chosen-index) 
-	      :set-index-in-bin chosen-index))
-  (send chosen-bin :set-fill-pointer (1- (send chosen-bin :fill-pointer)))
-  (setq *codelet-list* (remove codelet *codelet-list*))
-  (send *coderack* :delete-codelet-from-graphics codelet)
-  codelet))
+;---------------------------------------------
+; coderack.choose | Coderack.choose & Bin.choose
+;---------------------------------------------
 
 (defmethod (coderack :remove-codelets) 
            (num-to-remove &aux remove-probability-list codelet argument bin 
