@@ -126,9 +126,7 @@ class Coderack(object):
         return toolbox.flatten([bin.codelets for bin in self.bins])
 
     def is_empty(self):
-        '''
-        Return True if the coderack is empty.
-        '''
+        """Retrun True if the coderack is empty."""
         return self.urgency_sum() == 0
 
     def number_of_codelets(self):

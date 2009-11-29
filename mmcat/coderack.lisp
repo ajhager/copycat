@@ -180,11 +180,7 @@
   (list-sum (send-method-to-list *coderack-bins* :urgency-sum)))
 
 ;---------------------------------------------
-
-(defmethod (coderack :empty?) ()
-; Returns t if the coderack is empty, nil otherwise.
-  (= 0 (send self :total-urgency-sum)))
-
+; coderack.empty? | Coderack.is_empty
 ;---------------------------------------------
 
 (defmethod (coderack :post) (codelet &aux bin)
