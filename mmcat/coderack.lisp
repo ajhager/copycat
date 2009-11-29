@@ -94,8 +94,9 @@
 ; defflavor coderack
 ;---------------------------------------------
 
-(defmethod (coderack :total-urgency-sum) ()
-  (list-sum (send-method-to-list *coderack-bins* :urgency-sum)))
+;---------------------------------------------
+; coderack.total-urgency-sum | Coderack.urgency_sum
+;---------------------------------------------
 
 ;---------------------------------------------
 ; coderack.empty? | Coderack.is_empty

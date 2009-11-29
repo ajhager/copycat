@@ -169,7 +169,5 @@ class Coderack(object):
         self.temperature = temperature
 
     def urgency_sum(self):
-        '''
-        Return the total amount of urgency in the coderack.
-        '''
+        """Return the sum of urgency of all bins in the coderack."""
         return sum([bin.urgency_sum(self.temperature) for bin in self.bins])
