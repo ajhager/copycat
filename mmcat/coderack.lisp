@@ -1,12 +1,3 @@
-;---------------------------------------------
-; CODERACK:  This file contains flavors, methods, and functions for the 
-;                 coderack.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defflavor codelet
   (codelet-type ; E.g., bottom-up-bond-scout.
    arguments 
@@ -66,23 +57,7 @@
       :structure-category structure-category))
       
 ;---------------------------------------------
-
-(defflavor coderack 
-  (bin-list ; The list of coderack bins, each corresponding to an urgency
-            ; level.
-   codelet-urgency-array) ; This is used in the graphics routines for
-                          ; displaying the coderack.
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
-
-;---------------------------------------------
-
-(defmethod (coderack :total-num-of-codelets) ()
-; Returns the total number of codelets currently in the coderack.
-  (list-sum (send-method-to-list *coderack-bins* :num-of-codelets-in-bin)))
-  
+; coderack.total-num-of-codelets | REMOVED
 ;---------------------------------------------
 
 (defflavor coderack-bin
@@ -144,10 +119,7 @@
   (setf (fill-pointer vector) value))
 
 ;---------------------------------------------
-
-(defmethod (coderack-bin :num-of-codelets-in-bin) ()
-  (fill-pointer vector))
-
+; coderack-bin.num-of-codelets-in-bin | REMOVED
 ;---------------------------------------------
 
 (defmethod (coderack-bin :urgency-sum) ()
@@ -172,6 +144,7 @@
 ;---------------------------------------------
 ; make-coderack | Coderack.__init__
 ; init-coderack
+; defflavor coderack
 ;---------------------------------------------
 
 (defmethod (coderack :total-urgency-sum) ()

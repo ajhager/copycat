@@ -46,12 +46,6 @@ class Bin(object):
         '''
         self.codelets = []
 
-    def number_of_codelets(self):
-        '''
-        Return the total number of codelets currently in the bin.
-        '''
-        return len(self.codelets)
-
     def remove(self, codelet):
         '''
         Remove a codelet from the bin.
@@ -70,7 +64,7 @@ class Bin(object):
         '''
         Return the sum of urgencies in this bin.
         '''
-        return self.number_of_codelets() * self.urgency(temperature)
+        return len(self.codelets) * self.urgency(temperature)
 
 
 class Coderack(object):
@@ -127,19 +121,13 @@ class Coderack(object):
         """Return True if the coderack is empty."""
         return self.urgency_sum() == 0
 
-    def number_of_codelets(self):
-        '''
-        Return the total number of codelets currently in the coderack.
-        '''
-        return sum([bin.number_of_codelets() for bin in self.bins])
-
     def post(self, codelet, urgency):
         '''
         Post a codelet to the coderack.  If the coderack is already at its max
         size, remove a codelet to make room for the new one.
         '''
         removed_codelet = None
-        if self.number_of_codelets == self.max_codelets:
+        if len(self.codelets()) == self.max_codelets:
             codelets = self.codelets()
             probabilities = [self.remove_probability(cl) for cl in codelets]
             removed_codelet = toolbox.weighted_select(probabilities, codelets)
