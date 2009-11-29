@@ -19,6 +19,7 @@ import random
 import copycat.toolbox as toolbox
 from copycat.coderack.codelet import Codelet
 
+
 class Bin(object):
     def __init__(self, urgency_code):
         self.urgency_code = urgency_code
@@ -71,8 +72,22 @@ class Bin(object):
         '''
         return self.number_of_codelets() * self.urgency(temperature)
 
+
 class Coderack(object):
+    """Coderack holds codelets waiting to be run.
+
+    The coderack is split up into seven bins based on urgency. Codelets can be
+    added to and chosen from the coderack.
+
+    Attributes:
+        max_codelets: The maximum size of the coderack.
+        temperature: The value indicating how random a codelet choice is.
+        time: The number of codelets that have been chosen so far.
+        bins: A list of urgency bins in the coderack.
+    """
+
     def __init__(self):
+        """Initializes Coderack."""
         self.max_codelets = 100
         self.temperature = 0
         self.time = 0

@@ -179,60 +179,7 @@
   (setq *codelet-list* nil))
 
 ;---------------------------------------------
-
-(defun make-coderack (&aux new-coderack)
-; Returns a new coderack.
-  (setq *extremely-low-bin* 
-	(make-instance 'coderack-bin 
-	    :vector (make-bin-vector %max-coderack-size%) 
-            :urgency-code 0 :pname "extremely-low-bin"))
-
-  (setq *very-low-bin* 
-	(make-instance 'coderack-bin 
-	    :vector (make-bin-vector %max-coderack-size%) 
-            :urgency-code 1 :pname "very-low-bin"))
-
-  (setq *low-bin* 
-	(make-instance 'coderack-bin 
-	    :vector (make-bin-vector %max-coderack-size%) 
-            :urgency-code 2 :pname "low-bin"))
-
-  (setq *medium-bin* 
-	(make-instance 'coderack-bin 
-	  :vector (make-bin-vector %max-coderack-size%) 
-          :urgency-code 3 :pname "medium-bin"))
-
-  (setq *high-bin* 
-	(make-instance 'coderack-bin 
-	    :vector (make-bin-vector %max-coderack-size%) 
-            :urgency-code 4 :pname "high-bin"))
-
-  (setq *very-high-bin*
-	(make-instance 'coderack-bin 
-	    :vector (make-bin-vector %max-coderack-size%) 
-            :urgency-code 5 :pname "very-high-bin"))
-
-  (setq *extremely-high-bin*
-	(make-instance 'coderack-bin 
-	    :vector (make-bin-vector %max-coderack-size%) 
-            :urgency-code 6 :pname "extremely-high-bin"))
-
-  (setq *coderack-bins* 
-	(list *extremely-low-bin* *very-low-bin* *low-bin* 
-	      *medium-bin* *high-bin* *very-high-bin* *extremely-high-bin*))
-
-  (setq *urgency-list* 
-	'(*extremely-low-bin* *very-low-bin* *low-bin* 
-	  *medium-bin* *high-bin* *very-high-bin* *extremely-high-bin*))
-	  
-  (setq new-coderack
-       (make-instance 'coderack
-	 :bin-list *coderack-bins*
-         :codelet-urgency-array 
-         (make-array (list (length %codelet-types%) %num-of-urgency-bins%)
-	             :initial-element 0)))
-  new-coderack)
-  
+; make-coderack | Coderack.__init__
 ;---------------------------------------------
 
 (defmethod (coderack :total-urgency-sum) ()

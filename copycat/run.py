@@ -53,8 +53,8 @@ class Run(object):
         if not codelets:
             return
         for codelet, urgency in codelets:
-            deleted_codelet = self.coderack.post(codelet, urgency)
-            if deleted_codelet:
+            deleted = self.coderack.post(codelet, urgency)
+            if deleted:
                 self.workspace.delete_proposed_structure(deleted.arguments)
 
     def update(self):
