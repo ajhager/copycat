@@ -129,6 +129,7 @@ class Slipnode(object):
         return min(100, round(11 * self.degree_of_association()))
 
     def is_active(self):
+        """Return True if the nodes activation is the max value (100)."""
         return self.activation == 100
 
     def get_possible_descriptors(self, obj):

@@ -42,11 +42,9 @@
 
 ;---------------------------------------------
 ; slipnode.outgoing-links | Slipnode.outgoing_links
+
 ;---------------------------------------------
-
-(defmethod (slipnode :active?) ()
-  (= activation 100))
-
+; slipnode.active? | Slipnode.is_active
 ;---------------------------------------------
 
 (defmethod (slipnode :directed?) ()
