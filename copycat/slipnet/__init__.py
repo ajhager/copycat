@@ -299,7 +299,19 @@ def are_all_opposite_concept_mappings(concept_mappings):
     return True
 
 class Slipnet(object):
+    """Slipnet contains nodes and the links between them.
+    
+    The Slipnet manages the activation and decay of nodes and the conceptual
+    distance between them.
+
+    Attributes:
+        slipnodes: The nodes in the slipnet.
+        sliplinks: The links between the nodes.
+        clamp_time: The amount of steps to clamp activation in the slipnet.
+    """
+
     def __init__(self):
+        """Initializes Slipnet."""
         self.slipnodes = slipnodes
         self.sliplinks = sliplinks
         self.clamp_time = 50

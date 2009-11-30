@@ -3,15 +3,6 @@ truncated at the end of the first Run.step()
 Using this to decide what next to check for accuracy.
 
 
-#### INIT SLIPNET
-
-
-copycat.run:28:         self.slipnet = Slipnet()
-copycat.slipnet:303:         self.slipnodes = slipnodes
-copycat.slipnet:304:         self.sliplinks = sliplinks
-copycat.slipnet:305:         self.clamp_time = 50
-
-
 #### INIT WORKSPACE
 
 
