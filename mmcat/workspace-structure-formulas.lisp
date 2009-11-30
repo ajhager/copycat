@@ -403,16 +403,7 @@
 					       (length object-list))))))))
   
 ;---------------------------------------------
-
-(defmethod (slipnode :local-description-type-support) (string)
-; The percentage of objects in the string that have descriptions with this 
-; description-type.
-  (loop for obj in (send string :object-list)
-        when (send obj :description-type-present? self)
-        count t into description-type-count
-	finally (return (round (* 100 (/ description-type-count 
-				      (length (send string :object-list))))))))
-  
+; slipnode.local-description-type-support | Slipnode.local_description_type_support
 ;---------------------------------------------
 
 (defmethod (slipnode :total-description-type-support) (string)
