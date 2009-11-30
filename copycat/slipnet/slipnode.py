@@ -107,6 +107,11 @@ class Slipnode(object):
                self.instance_links
 
     def category(self):
+        """Returns the category this node belongs to.
+
+        For example, 'leftmost' belongs to 'string_position_category'. This code
+        assumes that each node belongs to at most one category.
+        """
         if self.category_links:
             return self.category_links[0].to_node()
         else:

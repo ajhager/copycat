@@ -53,15 +53,7 @@
       (eq self plato-predgrp) (eq self plato-succgrp)))
 
 ;---------------------------------------------
-
-(defmethod (slipnode :category) ()
-; Returns the category that this node belongs to (e.g., "leftmost"
-; belongs to "string-position-category").  For now this assumes that
-; each node belongs to at most one cateogry.  
-; For the time being this doesn't affect anything, but it eventually should be
-; fixed.
-  (if* category-links then (send (car category-links) :to-node) else nil))
-
+; slipnode.category | Slipnode.category
 ;---------------------------------------------
 
 (defflavor slipnet-link 
@@ -80,11 +72,6 @@
 
 ;---------------------------------------------
 ; slipnode.intrinsic-degree-of-association | Slipnode.intrinsic_degree_of_association
-;---------------------------------------------
-
-(defmethod (slipnode :intrinsic-degree-of-association) ()
-  (fake-reciprocal intrinsic-link-length))
-
 ;---------------------------------------------
 
 (defmethod (slipnet-link :degree-of-association) ()
