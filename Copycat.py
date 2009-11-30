@@ -21,11 +21,41 @@ import optparse
 from copycat.run import Run
 from clients import CursesClient, OpenglClient
 
+# TRACE: http://www.dalkescientific.com/
+import sys
+import linecache
+import inspect
+
+def traceit(frame, event, arg):
+    if event == 'line':
+        lineno = frame.f_lineno
+        if '__file__' in frame.f_globals:
+            filename = frame.f_globals['__file__']
+            if (filename.endswith('.pyc') or
+                filename.endswith('.pyo')):
+                filename = filename[:-1]
+            name = frame.f_globals['__name__']
+            line = linecache.getline(filename, lineno)
+        else:
+            name = '[unknown]'
+            try:
+                src = inspect.getsourcelines(frame)
+                line = src[lineno]
+            except IOError:
+                line = 'Unknown code named [%s].  VM instruction #%d' % \
+                    (frame.f_code.co_name, frame.f_lasti)
+        print '%s:%s: %s' % (name, lineno, line.rstrip())
+    return traceit
+# TRACE END
+
 usage = '%prog [OPTIONS] [INITIAL MODIFIED TARGET SEED]'
 version = '%prog 0.1 - (c) 2007-2009 Joseph Hager.\nReleased under the GPLv2'
 parser = optparse.OptionParser(usage=usage, version=version)
 parser.add_option('-m', '--mode', dest='mode', default='headless',
                   help='interaction mode: curses, opengl')
+parser.add_option("-t", "--trace",
+                  action="store_true", dest="trace", default=False,
+                  help="generate a execution trace")
 (options, args) = parser.parse_args()
 
 if len(args) == 0:
@@ -40,6 +70,9 @@ elif len(args) == 4:
     seed = int(args[3])
 else:
     parser.error('must supply all three strings and a seed')
+
+if options.trace:
+    sys.settrace(traceit)
 
 if options.mode == 'headless':
     if not initial:

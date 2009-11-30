@@ -119,7 +119,7 @@ class Coderack(object):
 
     def is_empty(self):
         """Return True if the coderack is empty."""
-        return self.urgency_sum() == 0
+        return len(self.codelets()) == 0
 
     def post(self, codelet, urgency):
         """Post a codelet to the coderack.
