@@ -1,9 +1,3 @@
-;--------------------------------------------- 
-; SLIPNET-FUNCTIONS: This file contains functions for the Slipnet.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defmethod (slipnode :activate-from-workspace) ()
   (incf activation-buffer %workspace-activation%))
 
@@ -17,6 +11,8 @@
 (defmethod (slipnode :subtract-activation-from-buffer) (activation-to-subtract)
   (decf activation-buffer activation-to-subtract))
 
+;---------------------------------------------
+; slipnode.decay | Slipnode.decay
 ;---------------------------------------------
 
 (defmethod (slipnode :decay) ()
