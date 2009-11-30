@@ -40,11 +40,8 @@
 ; slipnode.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (slipnode :outgoing-links) ()
-; Returns a list of the links emanating from this node.
-  (append category-links instance-links has-property-links lateral-slip-links 
-	  lateral-nonslip-links))
-
+;---------------------------------------------
+; slipnode.outgoing-links | Slipnode.outgoing_links
 ;---------------------------------------------
 
 (defmethod (slipnode :active?) ()

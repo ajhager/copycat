@@ -92,6 +92,7 @@ class Slipnode(object):
 
 
     def outgoing_links(self):
+        """Return a list of the links emanating from this node."""
         return self.has_property_links + \
                self.lateral_slip_links + \
                self.lateral_nonslip_links + \
