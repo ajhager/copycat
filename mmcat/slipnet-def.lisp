@@ -100,311 +100,140 @@
   ; LETTERS
    
   (setq plato-a 
-	(make-instance 'slipnode  
-          :conceptual-depth 10
-          :pname "A"
-          :symbol-name 'a
-          :short-name '("A")
-	  :cm-name "A"
           :incoming-links '(b-a-link letter-category-a-link)
 	  :category-links '(a-letter-category-link)
           :has-property-links '(a-first-link)
 	  :lateral-nonslip-links '(a-b-link)))
 
   (setq plato-b 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "B"
-          :symbol-name 'b
-          :short-name '("B")
-	  :cm-name "B"
           :incoming-links '(a-b-link c-b-link letter-category-b-link)
 	  :category-links '(b-letter-category-link)
           :lateral-nonslip-links '(b-a-link b-c-link)))
 
   (setq plato-c 
-	(make-instance 'slipnode 
-          :conceptual-depth 10
-          :pname "C"
-          :symbol-name 'c
-          :short-name '("C")
-	  :cm-name "C"
           :incoming-links '(b-c-link d-c-link letter-category-c-link)
 	  :category-links '(c-letter-category-link)
           :lateral-nonslip-links '(c-b-link c-d-link)))
 
   (setq plato-d 
-	(make-instance 'slipnode 
-          :conceptual-depth 10
-    	  :pname "D"
-          :symbol-name 'd
-          :short-name '("D")
-	  :cm-name "D"
           :incoming-links '(c-d-link e-d-link letter-category-d-link)
 	  :category-links '(d-letter-category-link)
 	  :lateral-nonslip-links '(d-c-link d-e-link)))
 
   (setq plato-e 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "E"
-          :symbol-name 'e
-          :short-name '("E")
-	  :cm-name "E"
           :incoming-links '(d-e-link f-e-link letter-category-e-link)
 	  :category-links '(e-letter-category-link)
           :lateral-nonslip-links '(e-d-link e-f-link)))
  
   (setq plato-f 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "F"
-          :symbol-name 'f
-          :short-name '("F")
-	  :cm-name "F"
           :incoming-links '(e-f-link g-f-link letter-category-f-link)
 	  :category-links '(f-letter-category-link)
 	  :lateral-nonslip-links '(f-e-link f-g-link)))
 
   (setq plato-g 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "G"
-          :symbol-name 'g
-          :short-name '("G")
-	  :cm-name "G"
           :incoming-links '(f-g-link h-g-link letter-category-g-link)
 	  :category-links '(g-letter-category-link)
           :lateral-nonslip-links '(g-f-link g-h-link)))
 
   (setq plato-h 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "H"
-          :symbol-name 'h
-          :short-name '("H")
-	  :cm-name "H"
           :incoming-links '(g-h-link i-h-link letter-category-h-link)
 	  :category-links '(h-letter-category-link)
 	  :lateral-nonslip-links '(h-g-link h-i-link)))
 
   (setq plato-i 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "I"
-          :symbol-name 'i
-          :short-name '("I")
-	  :cm-name "I"
           :incoming-links '(h-i-link j-i-link letter-category-i-link)
 	  :category-links '(i-letter-category-link)
 	  :lateral-nonslip-links '(i-h-link i-j-link)))
 
   (setq plato-j 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "J"
-          :symbol-name 'j
-          :short-name '("J")
-	  :cm-name "J"
           :incoming-links '(i-j-link k-j-link letter-category-j-link)
 	  :category-links '(j-letter-category-link)
 	  :lateral-nonslip-links '(j-i-link j-k-link)))
 
   (setq plato-k 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "K"
-          :symbol-name 'k
-          :short-name '("K")
-	  :cm-name "K"
           :incoming-links '(j-k-link l-k-link letter-category-k-link)
 	  :category-links '(k-letter-category-link)
           :lateral-nonslip-links '(k-j-link k-l-link)))
 
   (setq plato-l 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "L"
-          :symbol-name 'l
-          :short-name '("L")
-	  :cm-name "L"
           :incoming-links '(k-l-link m-l-link letter-category-l-link)
 	  :category-links '(l-letter-category-link)
           :lateral-nonslip-links '(l-k-link l-m-link)))
 			           
   (setq plato-m 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "M"
-          :symbol-name 'm
-          :short-name '("M")
-	  :cm-name "M"
           :incoming-links '(l-m-link n-m-link letter-category-m-link)
 	  :category-links '(m-letter-category-link)
           :lateral-nonslip-links '(m-l-link m-n-link)))
 
   (setq plato-n 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "N"
-          :symbol-name 'n
-          :short-name '("N")
-	  :cm-name "N"
           :incoming-links '(m-n-link o-n-link letter-category-n-link)
 	  :category-links '(n-letter-category-link)
 	  :lateral-nonslip-links '(n-m-link n-o-link)))
 
   (setq plato-o 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "O"
-          :symbol-name 'o
-          :short-name '("O")
-	  :cm-name "O"
           :incoming-links '(n-o-link p-o-link letter-category-o-link)
 	  :category-links '(o-letter-category-link)
 	  :lateral-nonslip-links '(o-n-link o-p-link)))
 
   (setq plato-p 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "P"
-          :symbol-name 'p
-          :short-name '("P")
-	  :cm-name "P"
           :incoming-links '(o-p-link q-p-link letter-category-p-link)
 	  :category-links '(p-letter-category-link)
 	  :lateral-nonslip-links '(p-o-link p-q-link)))
 
   (setq plato-q 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "Q"
-          :symbol-name 'q
-          :short-name '("Q")
-	  :cm-name "Q"
           :incoming-links '(p-q-link r-q-link letter-category-q-link)
 	  :category-links '(q-letter-category-link)
 	  :lateral-nonslip-links '(q-p-link q-r-link)))
 
   (setq plato-r 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "R"
-          :symbol-name 'r
-          :short-name '("R")
-	  :cm-name "R"
           :incoming-links '(q-r-link s-r-link letter-category-r-link)
 	  :category-links '(r-letter-category-link)
 	  :lateral-nonslip-links '(r-q-link r-s-link)))
 
   (setq plato-s 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "S"
-          :symbol-name 's
-          :short-name '("S")
-	  :cm-name "S"
           :incoming-links '(r-s-link t-s-link letter-category-s-link)
 	  :category-links '(s-letter-category-link)
 	  :lateral-nonslip-links '(s-r-link s-t-link)))
 
   (setq plato-t 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "T"
-          :symbol-name 't
-          :short-name '("T")
-	  :cm-name "T"
           :incoming-links '(s-t-link u-t-link letter-category-t-link)
 	  :category-links '(t-letter-category-link)
 	  :lateral-nonslip-links '(t-s-link t-u-link)))
 
   (setq plato-u 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "U"
-          :symbol-name 'u
-          :short-name '("U")
-	  :cm-name "U"
           :incoming-links '(t-u-link v-u-link letter-category-u-link)
 	  :category-links '(u-letter-category-link)
 	  :lateral-nonslip-links '(u-t-link u-v-link)))
 
   (setq plato-v 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "V"
-          :symbol-name 'v
-          :short-name '("V")
-	  :cm-name "V"
           :incoming-links '(u-v-link w-v-link letter-category-v-link)
 	  :category-links '(v-letter-category-link)
 	  :lateral-nonslip-links '(v-u-link v-w-link)))
 			        
   (setq plato-w 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "W"
-          :symbol-name 'w
-          :short-name '("W")
-	  :cm-name "W"
           :incoming-links '(v-w-link x-w-link letter-category-w-link)
 	  :category-links '(w-letter-category-link)
 	  :lateral-nonslip-links '(w-v-link w-x-link)))
 			        
   (setq plato-x 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "X"
-          :symbol-name 'x
-          :short-name '("X")
-	  :cm-name "X"
           :incoming-links '(w-x-link y-x-link letter-category-x-link)
 	  :category-links '(x-letter-category-link)
 	  :lateral-nonslip-links '(x-w-link x-y-link)))
 
   (setq plato-y 
-	(make-instance 'slipnode 
-    	  :conceptual-depth 10
-    	  :pname "Y"
-          :symbol-name 'y
-          :short-name '("Y")
-	  :cm-name "Y"
           :incoming-links '(x-y-link z-y-link letter-category-y-link)
 	  :category-links '(y-letter-category-link)
 	  :lateral-nonslip-links '(y-x-link y-z-link)))
 		    
   (setq plato-z 
-	(make-instance 'slipnode 
-	  :conceptual-depth 10
-    	  :pname "Z"
-          :symbol-name 'z
-          :short-name '("Z")
-	  :cm-name "Z"
           :incoming-links '(y-z-link letter-category-z-link)
 	  :category-links '(z-letter-category-link)
 	  :has-property-links '(z-last-link)
 	  :lateral-nonslip-links '(z-y-link)))
 
-  (setq *slipnet-letters*
-	(list plato-a plato-b plato-c plato-d
-              plato-e plato-f plato-g plato-h
-              plato-i plato-j plato-k plato-l 
-              plato-m plato-n plato-o plato-p
-              plato-q plato-r plato-s plato-t
-              plato-u plato-v plato-w plato-x 
-              plato-y plato-z))
-
-
   ; NUMBERS
 
   (setq plato-one 
-	(make-instance 'slipnode  
-	  :conceptual-depth 30
-          :pname "1"
-          :short-name '("1")
-	  :cm-name "1"
           :incoming-links '(length-1-link 2-1-link)
 	  :category-links '(1-length-link)
 	  :lateral-nonslip-links '(1-2-link)
@@ -414,11 +243,6 @@
   	          (= (send  object :length) 1)))))
    
   (setq plato-two 
-	(make-instance 'slipnode 
-	  :conceptual-depth 30
-    	  :pname "2"
-          :short-name '("2")
-	  :cm-name "2"
           :incoming-links '(length-2-link 1-2-link)
 	  :category-links '(2-length-link)
           :lateral-nonslip-links '(2-3-link 2-1-link)
@@ -428,11 +252,6 @@
   	          (= (send object :length) 2)))))
    
   (setq plato-three
-	(make-instance 'slipnode 
-	  :conceptual-depth 30
-    	  :pname "3"
-          :short-name '("3")
-	  :cm-name "3"
           :incoming-links '(length-3-link 2-3-link 4-3-link)
 	  :category-links '(3-length-link)
           :lateral-nonslip-links '(3-4-link 3-2-link)
@@ -442,11 +261,6 @@
   	          (= (send object :length) 3)))))
    
   (setq plato-four
-	(make-instance 'slipnode 
-	  :conceptual-depth 30
-    	  :pname "4"
-          :short-name '("4")
-	  :cm-name "4"
           :incoming-links '(length-4-link 3-4-link 5-4-link)
 	  :category-links '(4-length-link)
           :lateral-nonslip-links '(4-5-link 4-3-link)
@@ -456,11 +270,6 @@
   	          (= (send object :length) 4)))))
    
   (setq plato-five
-	(make-instance 'slipnode 
-	  :conceptual-depth 30
-    	  :pname "5"
-          :short-name '("5")
-	  :cm-name "5"
           :incoming-links '(length-5-link 4-5-link)
 	  :category-links '(5-length-link)
           :lateral-nonslip-links '(5-4-link)
@@ -469,20 +278,9 @@
              (and (typep object 'group) 
   	          (= (send object :length) 5)))))
    
-  (setq *slipnet-numbers* 
-	(list plato-one plato-two plato-three plato-four plato-five))
-
   ; STRING-POSITIONS
 
   (setq plato-leftmost 
-	(make-instance 'slipnode 
-	  :conceptual-depth 40
-    	  :pname "lmost"
-          :short-name (case %slipnet-display-level%
-			    (low '("leftmost"))
-			    (medium '("lmost"))
-			    (high '("lmost")))
-	  :cm-name "lmost"
           :incoming-links '(string-position-category-leftmost-link 
 			    rightmost-leftmost-link 
 			    left-leftmost-link 
@@ -500,14 +298,6 @@
 	      then t else nil))))
 			 
   (setq plato-rightmost 
-        (make-instance 'slipnode 
-	  :conceptual-depth 40
-    	  :pname "rmost"
-          :short-name (case %slipnet-display-level%
-			    (low '("rightmost"))
-			    (medium '("rmost"))
-			    (high '("rmost")))
-	  :cm-name "rmost"
           :incoming-links '(string-position-category-rightmost-link 
 			    leftmost-rightmost-link 
 			    right-rightmost-link 
@@ -524,11 +314,6 @@
               then t else nil))))
 								    
   (setq plato-middle 
-        (make-instance 'slipnode 
-	  :conceptual-depth 40
-    	  :pname "middle"
-          :short-name '("middle")
-	  :cm-name "mid"
           :incoming-links '(string-position-category-middle-link)
           :category-links '(middle-string-position-category-link)
 	  :description-tester 
@@ -542,11 +327,6 @@
 		    (send right-neighbor :rightmost-in-string?))))))
 
   (setq plato-single 
-        (make-instance 'slipnode 
-	  :conceptual-depth 40
-    	  :pname "single"
-          :short-name '("single")
-	  :cm-name "single"
           :incoming-links '(string-position-category-single-link
 			    whole-single-link)
           :category-links '(single-string-position-category-link)
@@ -557,11 +337,6 @@
 			(send object :spans-whole-string?)))))
 
   (setq plato-whole 
-        (make-instance 'slipnode 
-	  :conceptual-depth 40
-    	  :pname "whole"
-          :short-name '("whole")
-	  :cm-name "whole"
           :incoming-links '(string-position-category-whole-link
 			    single-whole-link)
           :category-links '(whole-string-position-category-link)
@@ -574,11 +349,6 @@
   ; ALPHABETIC-POSITION NODES
 
   (setq plato-first 
-	(make-instance 'slipnode  
-	  :conceptual-depth 60
-          :pname "first"
-          :short-name '("first")
-	  :cm-name "first"
           :incoming-links '(a-first-link last-first-link 
 			    alphabetic-position-category-first-link
 			    leftmost-first-link rightmost-first-link)
@@ -591,11 +361,6 @@
 			                  plato-letter-category) plato-a))))
 
   (setq plato-last
-	(make-instance 'slipnode  
-	  :conceptual-depth 60
-          :pname "last"
-          :short-name '("last")
-	  :cm-name "last"
           :incoming-links '(z-last-link first-last-link 
 			    alphabetic-position-category-last-link
 			    leftmost-last-link rightmost-last-link)
@@ -611,11 +376,6 @@
   ; DIRECTIONS
 
   (setq plato-left 
-        (make-instance 'slipnode 
-	  :conceptual-depth 40
-          :pname "left"
-          :short-name '("left")
-	  :cm-name "left"
           :incoming-links '(direction-category-left-link right-left-link 
 			    leftmost-left-link rightmost-left-link)
           :category-links '(left-direction-category-link)
@@ -623,11 +383,6 @@
 	  :lateral-nonslip-links '(left-leftmost-link left-rightmost-link)))
 
   (setq plato-right 
-	(make-instance 'slipnode 
-   	  :conceptual-depth 40
-    	  :pname "right"
-          :short-name '("right")
-	  :cm-name "right"
           :incoming-links '(direction-category-right-link left-right-link 
 			    rightmost-right-link leftmost-right-link)
           :category-links '(right-direction-category-link)
@@ -637,15 +392,6 @@
   ; BONDS
 
   (setq plato-predecessor 
-        (make-instance 'slipnode 
-	  :conceptual-depth 50
-          :intrinsic-link-length 60
-	  :pname "predecessor"
-          :short-name (case %slipnet-display-level%
-			    (low '("predecessor"))
-			    (medium '("pred"))
-			    (high '("pred")))
-	  :cm-name "pred"
           :incoming-links '(bond-category-predecessor-link 
 			    successor-predecessor-link 
 			    predgrp-predecessor-link)
@@ -654,15 +400,6 @@
           :lateral-nonslip-links '(predecessor-predgrp-link)))
                             		            
   (setq plato-successor 
-        (make-instance 'slipnode 
-	  :conceptual-depth 50
-          :intrinsic-link-length 60
-	  :pname "successor"
-          :short-name (case %slipnet-display-level%
-			    (low '("successor"))
-			    (medium '("succ"))
-			    (high '("succ")))
-	  :cm-name "succ"
           :incoming-links '(bond-category-successor-link 
 			    predecessor-successor-link 
 			    succgrp-successor-link)
@@ -671,15 +408,6 @@
           :lateral-nonslip-links '(successor-succgrp-link)))
 			   
   (setq plato-sameness      
-  ; "Sameness" refers to letter-sameness (or length sameness); it is a 
-  ; possible bond-category for a group.  "Identity" on the other hand is, 
-  ; like "opposite", a type of concept-mapping.
-	(make-instance 'slipnode 
-	  :conceptual-depth 80
-          :intrinsic-link-length 0
-    	  :pname "sameness"
-          :short-name '("same")
-	  :cm-name "same"
 	  :incoming-links '(bond-category-sameness-link 
 			    samegrp-sameness-link)
 	  :category-links '(sameness-bond-category-link)
@@ -688,14 +416,6 @@
   ; GROUPS
 
   (setq plato-predgrp
-        (make-instance 'slipnode 
-	  :conceptual-depth 50
-	  :pname "predgrp"
-          :short-name (case %slipnet-display-level%
-			    (low '("predecessor" "group"))
-			    (medium '("pred group"))
-			    (high '("predgrp")))
-	  :cm-name "predgrp"
           :incoming-links '(group-category-predgrp-link succgrp-predgrp-link 
 			    predecessor-predgrp-link)
 	  :category-links '(predgrp-group-category-link)
@@ -709,14 +429,6 @@
 
 
   (setq plato-succgrp
-        (make-instance 'slipnode 
-          :conceptual-depth 50
-          :pname "succgrp"
-          :short-name (case %slipnet-display-level%
-			    (low '("successor" "group"))
-			    (medium '("succ group"))
-			    (high '("succgrp")))
-	  :cm-name "succgrp"
           :incoming-links '(group-category-succgrp-link predgrp-succgrp-link 
 			    successor-succgrp-link)
 	  :category-links '(succgrp-group-category-link)
@@ -729,55 +441,15 @@
 			 plato-successor))))
 
   (setq plato-samegrp 
-        (make-instance 'slipnode 
-	  :conceptual-depth 80
-	  :pname "samegrp"
-          :short-name (case %slipnet-display-level%
-			    (low '("sameness" "group"))
-			    (medium '("same group"))
-			    (high '("samegrp")))
-	  :cm-name "samegrp"
 	  :incoming-links '(group-category-samegrp-link sameness-samegrp-link)
 	  :category-links '(samegrp-group-category-link)
 	  :lateral-nonslip-links '(samegrp-sameness-link samegrp-length-link)
   	  :iterate-group
 	  '(lambda (letter-category) letter-category)))
 
-
-  ; OTHER RELATIONS
-
-  (setq plato-identity 
-	(make-instance 'slipnode 
-	  :conceptual-depth 90
-          :intrinsic-link-length 0
-    	  :pname "identity"
-          :short-name (case %slipnet-display-level%
-			    (low '("identity"))
-			    (medium '("iden"))
-			    (high '("iden")))))
-
-  (setq plato-opposite 
-	(make-instance 'slipnode 
-	  :conceptual-depth 90
-          :intrinsic-link-length 80
-          :pname "opposite"
-          :short-name (case %slipnet-display-level%
-			    (low '("opposite"))
-			    (medium '("opp"))
-			    (high '("opp")))))
-
-			        
   ; OBJECTS
 
   (setq plato-letter 
-  ; This is the platonic type for the workspace structure
-  ; LETTER, not to be confused with the node plato-letter-category, which
-  ; is the category of all the nodes representing individual letters.
-        (make-instance 'slipnode 
-	  :conceptual-depth 20
-	  :pname "letter"
-          :short-name '("letter")
-	  :cm-name "let"
 	  :incoming-links '(object-category-letter-link 
 			    group-letter-link)
 	  :category-links '(letter-object-category-link)
@@ -785,12 +457,6 @@
 	  :description-tester '(lambda (object) (typep object 'letter))))
 
   (setq plato-group 
-        (make-instance 'slipnode 
-	  :conceptual-depth 80
-	  :pname "group"
-	  :symbol-name 'group
-          :short-name '("group")
-	  :cm-name "group"
           :incoming-links '(object-category-group-link 
 			    letter-group-link)
           :category-links '(group-object-category-link)
@@ -801,14 +467,6 @@
   ; CATEGORIES
 
   (setq plato-letter-category
-        (make-instance 'slipnode 
-	  :conceptual-depth 30
-	  :pname "letter-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("letter" "category"))
-			    (medium '("letter cat"))
-			    (high '("letter" "cat")))
-          :cm-name "letcat"
           :incoming-links 
 	  (append (list 'length-letter-category-link 
 			'bond-facet-letter-category-link
@@ -827,13 +485,6 @@
 
 
   (setq plato-string-position-category
-        (make-instance 'slipnode 
-	  :conceptual-depth 70
-	  :pname "string-position-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("string" "position"))
-			    (medium '("string pos"))
-			    (high '("string" "positn")))
 	  :incoming-links '(leftmost-string-position-category-link 
 			    rightmost-string-position-category-link
 			    middle-string-position-category-link
@@ -847,40 +498,18 @@
 
 
   (setq plato-alphabetic-position-category
-        (make-instance 'slipnode 
-	  :conceptual-depth 80
-	  :pname "alphabetic-position-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("alpha" "position"))
-			    (medium '("alpha pos"))
-			    (high '("alpha" "positn")))
 	  :incoming-links '(first-alphabetic-position-category-link 
 			    last-alphabetic-position-category-link)
 	  :instance-links '(alphabetic-position-category-first-link 
 				alphabetic-position-category-last-link)))
 	
-
   (setq plato-direction-category
-        (make-instance 'slipnode 
-	  :conceptual-depth 70
-	  :pname "direction-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("direction"))
-			    (medium '("direction"))
-			    (high '("directn")))
 	  :incoming-links '(left-direction-category-link 
 			    right-direction-category-link)
 	  :instance-links '(direction-category-left-link 
 				direction-category-right-link)))
 
   (setq plato-bond-category
-	(make-instance 'slipnode 
-	  :conceptual-depth 80
-    	  :pname "bond-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("bond" "category"))
-			    (medium '("bond cat"))
-			    (high '("bond" "cat")))
 	  :incoming-links
 	  '(successor-bond-category-link 
 	    predecessor-bond-category-link 
@@ -890,15 +519,7 @@
             bond-category-predecessor-link
             bond-category-sameness-link)))
 
-
   (setq plato-group-category 
-        (make-instance 'slipnode 
-	  :conceptual-depth 80
-	  :pname "group-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("group" "category"))
-			    (medium '("group cat"))
-			    (high '("group" "cat")))
 	  :incoming-links '(predgrp-group-category-link
 			    succgrp-group-category-link
 			    samegrp-group-category-link)
@@ -907,15 +528,6 @@
 				group-category-samegrp-link)))
   
   (setq plato-length
-        (make-instance 'slipnode 
-	  :conceptual-depth 60
-	  :pname "length"
-          :short-name (case %slipnet-display-level%
-			;    (low '("length"))
-			    (low '("length"))
-			    (medium '("length"))
-			    (high '("length")))
-	  :cm-name "length"
 	  :incoming-links
               (append (list 'letter-category-length-link 
 			    'bond-facet-length-link
@@ -934,62 +546,16 @@
 
 
   (setq plato-object-category   
-        (make-instance 'slipnode 
-	  :conceptual-depth 90
-	  :pname "object-category"
-          :short-name (case %slipnet-display-level%
-			    (low '("object" "category"))
-			    (medium '("object cat"))
-			    (high '("object" "cat")))
 	  :incoming-links '(letter-object-category-link 
 			    group-object-category-link)
 	  :instance-links 
 	  '(object-category-letter-link object-category-group-link)))
 	
-
   (setq plato-bond-facet
-  ; This node is the category for the different kinds of description-types
-  ; that can be related by a bond.  Right now there are only two:  
-  ; letter-category (for letters and groups) and length (for groups). 
-        (make-instance 'slipnode 
-	  :conceptual-depth 90
-	  :pname "bond-facet"
-          :short-name (case %slipnet-display-level%
-			    (low '("bond facet"))
-			    (medium '("bond facet"))
-			    (high '("bond" "facet")))
           :incoming-links '(letter-category-bond-facet-link 
 			    length-bond-facet-link)
 	  :instance-links '(bond-facet-letter-category-link 
 			       	bond-facet-length-link)))
-
-
-  (setq *slipnet* 
-        (list plato-a plato-b  plato-c plato-d
-              plato-e plato-f plato-g plato-h
-              plato-i plato-j plato-k plato-l 
-              plato-m plato-n plato-o plato-p
-              plato-q plato-r plato-s plato-t
-              plato-u plato-v plato-w plato-x 
-	      plato-y plato-z
-	      plato-one plato-two plato-three plato-four plato-five
-	      plato-leftmost plato-rightmost plato-middle 
-	      plato-single plato-whole
-	      plato-left plato-right  
-	      plato-first plato-last
-	      plato-predecessor plato-successor plato-sameness
-	      plato-predgrp plato-succgrp plato-samegrp 
-	      plato-letter plato-group 
-              plato-identity plato-opposite 
-	      plato-object-category 
-              plato-letter-category 
-              plato-length
-              plato-alphabetic-position-category
-              plato-string-position-category
-              plato-direction-category
- 	      plato-bond-category  
-	      plato-group-category 
-	      plato-bond-facet))
 
   ; Initialize all the links in the slipnet.
   (init-slipnet-links)

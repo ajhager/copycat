@@ -22,9 +22,10 @@ from sliplink import Sliplink
 
 
 slipnodes = []
-def add_node(depth, codelets=[], intrinsic_link_length=None,
+def add_node(name, depth, codelets=[], intrinsic_link_length=None,
              initially_clamped=False, directed=False):
-    slipnode = Slipnode(depth, codelets, intrinsic_link_length,
+    
+    slipnode = Slipnode(name, depth, codelets, intrinsic_link_length,
                         initially_clamped, directed)
     slipnodes.append(slipnode)
     return slipnode
@@ -48,64 +49,66 @@ def add_link(kind, from_node, to_node, label, fixed_length):
 # Letter nodes
 slipnet_letters = []
 for letter in string.ascii_lowercase:
-    slipnet_letters.append(add_node(10))
+    slipnet_letters.append(add_node(str(letter), 10))
 
 # Number nodes
 slipnet_numbers = []
 for number in range(1, 6):
-    slipnet_numbers.append(add_node(30))
+    slipnet_numbers.append(add_node(str(number), 30))
 
 # String position nodes.
-plato_leftmost = add_node(40)
-plato_rightmost = add_node(40)
-plato_middle = add_node(40)
-plato_single = add_node(40)
-plato_whole = add_node(40)
+plato_leftmost = add_node('leftmost', 40)
+plato_rightmost = add_node('rightmost', 40)
+plato_middle = add_node('middle', 40)
+plato_single = add_node('single', 40)
+plato_whole = add_node('whole', 40)
 
 
 # Alphabetic position nodes
-plato_first = add_node(60)
-plato_last = add_node(60)
+plato_first = add_node('first', 60)
+plato_last = add_node('last', 60)
 
 # Direction nodes
-plato_left = add_node(40, ['BondTopDownDirectionScout',
-                           'GroupTopDownDirectionScout'])
-plato_right = add_node(40, ['BondTopDownDirectionScout',
-                            'GroupTopDownDirectionScout'])
+plato_left = add_node('left', 40, ['BondTopDownDirectionScout',
+                                  'GroupTopDownDirectionScout'])
+plato_right = add_node('right', 40, ['BondTopDownDirectionScout',
+                                     'GroupTopDownDirectionScout'])
 
 # Bond nodes
-plato_predecessor = add_node(50, ['BondTopDownCategoryScout'],
+plato_predecessor = add_node('predecessor', 50, ['BondTopDownCategoryScout'],
                              60, directed=True)
-plato_successor = add_node(50, ['BondTopDownCategoryScout'],
+plato_successor = add_node('successor', 50, ['BondTopDownCategoryScout'],
                            60, directed=True)
-plato_sameness = add_node(80, ['BondTopDownCategoryScout'], 0)
+plato_sameness = add_node('sameness', 80, ['BondTopDownCategoryScout'], 0)
 
 # Group nodes
-plato_predecessor_group = add_node(50, ['GroupTopDownCategoryScout'],
-                                  directed=True)
-plato_successor_group = add_node(50, ['GroupTopDownCategoryScout'],
+plato_predecessor_group = add_node('predgroup', 50,
+                                   ['GroupTopDownCategoryScout'], directed=True)
+plato_successor_group = add_node('succgrp', 50, ['GroupTopDownCategoryScout'],
                                 directed=True)
-plato_sameness_group = add_node(80, ['GroupTopDownCategoryScout'])
+plato_sameness_group = add_node('samegrp', 80, ['GroupTopDownCategoryScout'])
 
 # Other relation nodes
-plato_identity = add_node(90, [], 0)
-plato_opposite = add_node(90, [], 80)
+plato_identity = add_node('identity', 90, [], 0)
+plato_opposite = add_node('opposite', 90, [], 80)
 
 # Object nodes
-plato_letter = add_node(20)
-plato_group = add_node(80)
+plato_letter = add_node('letter', 20)
+plato_group = add_node('group', 80)
 
 # Category nodes
-plato_letter_category = add_node(30, initially_clamped=True)
-plato_string_position_category = add_node(70, ['DescriptionTopDownScout'],
-                                         initially_clamped=True)
-plato_alphabetic_position_category = add_node(80, ['DescriptionTopDownScout'])
-plato_direction_category = add_node(70)
-plato_bond_category = add_node(80)
-plato_group_category = add_node(80)
-plato_length = add_node(60)
-plato_object_category = add_node(90)
-plato_bond_facet = add_node(90)
+plato_letter_category = add_node('letter-category', 30, initially_clamped=True)
+plato_string_position_category = add_node('string-position-category', 70,
+                                          ['DescriptionTopDownScout'],
+                                          initially_clamped=True)
+plato_alphabetic_position_category = add_node('alphabetic-position-category', 80,
+                                              ['DescriptionTopDownScout'])
+plato_direction_category = add_node('direction-category', 70)
+plato_bond_category = add_node('bond-category', 80)
+plato_group_category = add_node('group-category', 80)
+plato_length = add_node('length', 60)
+plato_object_category = add_node('object-category', 90)
+plato_bond_facet = add_node('bond-facet', 90)
 
 # Letter links
 for i in range(25):
@@ -285,8 +288,10 @@ add_link('slip', plato_single, plato_whole, None, 90)
 add_link('slip', plato_whole, plato_single, None, 90)
 
 def get_plato_letter(character):
-    index = string.ascii_lowercase.find(str(character))
-    return slipnet_letters[index]
+    """Given a character, return the corresponding slipnet letter node."""
+    for node in slipnet_letters:
+        if node.name == str(character):
+            return node
 
 def are_all_opposite_concept_mappings(concept_mappings):
     '''

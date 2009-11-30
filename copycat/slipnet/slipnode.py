@@ -21,9 +21,10 @@ class Slipnode(object):
         conceptual_depth:
     """
 
-    def __init__(self, depth, codelets=[], intrinsic_link_length=None,
+    def __init__(self, name, depth, codelets=[], intrinsic_link_length=None,
                  initially_clamped=False, directed=False):
         """Initialize Slipnode."""
+        self.name = name
         self.conceptual_depth = depth
         self.initially_clamped = initially_clamped
         self.directed = directed
