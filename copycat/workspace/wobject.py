@@ -155,7 +155,7 @@ class Object(object):
         '''
         Return the number of letters spanned by the object.
         '''
-        if self.groups == None:
+        if self.group == None:
             return 1
         return sum([obj.letter_span() for obj in self.objects])
 

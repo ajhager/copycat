@@ -16,6 +16,7 @@
 
 import copycat.toolbox as toolbox
 from copycat.workspace import Object, Structure, Description
+import copycat.slipnet as nodes
 
 class Group(Object, Structure):
     def __init__(self, workspace, string, group_category, direction_category,
@@ -30,16 +31,18 @@ class Group(Object, Structure):
         self.left_object = left_object
         self.right_object = right_object
         self.middle_object = None
-        category = state.slipnet.plato_string_position_category
+        category = nodes.plato_string_position_category
         for obj in objects:
-            if obj.get_descriptor(category) == state.slipnet.plato_middle:
+            if obj.get_descriptor(category) == nodes.plato_middle:
                 self.middle_object = obj
                 break
         self.left_object_position = left_object.left_string_position
-        self.right_obejct_position = right_object.right_string_position
+        self.right_object_position = right_object.right_string_position
+        self.left_string_position = self.left_object_position
+        self.right_string_position = self.right_object_position
         self.objects = objects
         self.bonds = bonds
-        category = state.slipnet.plato_bond_category
+        category = nodes.plato_bond_category
         self.bond_category = group_category.get_related_node(category)
         self.bond_facet = None
         self.bond_descriptions = []
@@ -50,55 +53,58 @@ class Group(Object, Structure):
             description = Description(self, object_category, group)
             self.add_description(description)
 
-        category = state.slipnet.plato_string_position_category
+        category = nodes.plato_string_position_category
         if self.is_leftmost_in_string() and not self.spans_whole_string():
-            leftmost = state.slipnet.plato_leftmost
+            leftmost = nodes.plato_leftmost
             description = Description(self, category, leftmost)
             self.add_description(description)
         elif self.is_middle_in_string():
-            middle = state.slipnet.plato_middle
+            middle = nodes.plato_middle
             description = Description(self, category, middle)
             self.add_description(description)
         elif self.is_rightmost_in_string() and not self.spans_whole_string():
-            rightmost = state.slipnet.plato_rightmost
+            rightmost = nodes.plato_rightmost
             description = Description(self, category, rightmost)
             self.add_description(description)
 
-        if group_category == state.slipnet.plato_samegrp and \
+        if group_category == nodes.plato_sameness_group and \
            (bonds == [] or \
-            bonds[0].bond_facet == state.slipnet.plato_letter_category):
-            category = state.slipnet.plato_letter_category
+            bonds[0].bond_facet == nodes.plato_letter_category):
+            category = nodes.plato_letter_category
             new_group_letter_category = left_object.get_descriptor(category)
-            description = Description(self, category, new_group_letter_cateogry)
+            description = Description(self, category, new_group_letter_category)
             self.add_description(description)
 
-        category = state.slipnet.plato_group_category
+        category = nodes.plato_group_category
         description = Description(self, category, group_category)
         self.add_description(description)
         if direction_category:
-            cateogry = state.slipnet.plato_direction_category
+            cateogry = nodes.plato_direction_category
             description = Description(self, category, direction_category)
             self.add_description(description)
 
         if bonds:
             new_bond_facet = bonds[0].bond_facet
             self.bond_facet = new_bond_facet
-            category = state.slipnet.plato_bond_facet
+            category = nodes.plato_bond_facet
             description = Description(self, category, new_bond_facet)
             self.add_bond_description(description)
 
-        category = state.slipnet.plato_bond_category
-        description = Description(self, category, bond_category)
+        category = nodes.plato_bond_category
+        description = Description(self, category, self.bond_category)
         self.add_bond_description(description)
 
-        length_description_probability = self.length_desciption_probability()
-        if util.flip_coin(length_description_probability):
-            category = state.slipnet.plato_length
-            plato_number = state.slipnet.get_plato_number(self.length())
+        length_description_probability = self.length_description_probability()
+        if toolbox.flip_coin(length_description_probability):
+            category = nodes.plato_length
+            plato_number = nodes.get_plato_number(self.length())
             description = Description(self, category, plato_number)
             self.add_description(description)
 
     def __eq__(self, other):
+        # HACK
+        if other == None:
+            return False
         return self.left_object_position == other.left_object_position and \
                 self.right_object_position == other.right_object_position and \
                 self.group_category == other.group_category
@@ -158,18 +164,21 @@ class Group(Object, Structure):
         same group category and direction category.  Does not take distance
         into acount; all qualifying groups in the string are counted the same.
         '''
-        number_of_supporting_group = 0
+        number_of_supporting_groups = 0
         groups = self.string.groups
-        other_groups = groups.remove(self)
-        for other_group in other_groups:
-           if (not (self.is_subgroup(other_group) or \
-                    other_group.is_subgroup(self) or \
-                    self.groups_overlap(other_group))) and \
-              other_group.group_category == self.group_category and \
-              other_group.direction_category == self.direction_category:
-               number_of_supporting_gruops += 1
+        if self in groups:
+            groups.remove(self)
+        for other_group in groups:
+            if other_group == None:
+                continue
+            if (not (self.is_subgroup(other_group) or \
+                         other_group.is_subgroup(self) or \
+                         self.groups_overlap(other_group))) and \
+                         other_group.group_category == self.group_category and \
+                         other_group.direction_category == self.direction_category:
+                number_of_supporting_gruops += 1
         return number_of_supporting_groups
-
+    
     def local_density(self):
         '''
         Return the rough measure of the density in the string of groups of the
@@ -313,7 +322,7 @@ class Group(Object, Structure):
         '''
         Return True if the group is righmost in its string.
         '''
-        return self.right_object_position == self.string.length() - 1
+        return self.right_object_position == self.string.length - 1
 
     def left_neighbor(self):
         if not self.leftmost_in_string():
@@ -403,7 +412,7 @@ class Group(Object, Structure):
         return bonds_to_be_flipped
 
     def spans_whole_string(self):
-        return self.letter_span() == self.string.length()
+        return self.letter_span() == self.string.length
 
     def is_proposed(self):
         return self.proposal_level < self.state.workspace.built
@@ -413,7 +422,7 @@ class Group(Object, Structure):
         Return the probability to be used in deciding whether or not to propose
         the single letter group.
         '''
-        n == self.number_of_local_supporting_groups()
+        n = self.number_of_local_supporting_groups()
         if n == 1:
             exponent = 4
         elif n == 2:
@@ -422,14 +431,14 @@ class Group(Object, Structure):
             exponent =  1
 
         a = self.local_support() / 100.
-        b = self.state.slipnet.plato_length.activation / 100.
+        b = nodes.plato_length.activation / 100.
         prob = (a * b) ** exponent
-        return self.state.workspace.get_temperature_adjusted_probability(prob)
+        return self.workspace.temperature_adjusted_probability(prob)
 
     def length_description_probability(self):
         if self.length() > 5:
             return 0
         a = self.length() ** 3
-        b = (100 - self.state.slipnet.plato_length.activation) / 100.
+        b = (100 - nodes.plato_length.activation) / 100.
         prob = .5 ** (a * b)
-        return self.state.workspace.get_temperature_adjusted_probability(prob)
+        return self.workspace.temperature_adjusted_probability(prob)

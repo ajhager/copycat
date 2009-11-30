@@ -40,6 +40,7 @@ class String(object):
         self.proposed_groups = array(self.length, self.length)
         self.number_of_bonds_to_scan_distribution = range(self.length)
         self.intra_string_unhappiness = 0
+        self.bonds_to_scan_distribution = range(self.length)
 
     def random_object(self):
         '''

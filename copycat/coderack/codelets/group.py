@@ -17,6 +17,7 @@
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 import copycat.slipnet as nodes
+from copycat.workspace import Group
 
 class GroupBuilder(Codelet):
     '''
@@ -158,19 +159,20 @@ class GroupTopDownCategoryScout(Codelet):
     '''
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
-        bond_category = category.related_node('plato_bond_category')
+        category = self.arguments[0]
+        bond_category = category.get_related_node(nodes.plato_bond_category)
 
         # Choose a string based on local bond category relevance.
         i_string = workspace.initial_string
         i_relevance = i_string.local_bond_category_relevance(bond_category)
-        i_unhappiness = i_string.intra_string_unhappiness()
-        t_string = self.target_string
+        i_unhappiness = i_string.intra_string_unhappiness
+        t_string = workspace.target_string
         t_relevance = t_string.local_bond_category_relevance(bond_category)
-        t_unhappiness = t_string.intra_string_unhappiness()
+        t_unhappiness = t_string.intra_string_unhappiness
         choices = [i_string, t_string]
         weights = [round(toolbox.average(i_relevance, i_unhappiness)),
-                   round(toolbox.average(t_relevance, t_unhappniess))]
-        string = choices[toolbox.select_list_position(weights)]
+                   round(toolbox.average(t_relevance, t_unhappiness))]
+        string = choices[toolbox.weighted_index(weights)]
 
         # Choose an object by intra string salience.
         object = string.choose_object('intra_string_salience')
@@ -179,46 +181,49 @@ class GroupTopDownCategoryScout(Codelet):
 
         # Choose a direction in which to scan.
         # FIXME: no access to slipnodes.
-        if object.leftmost_in_string():
-            direction = plato_right
-        elif object.rightmost_in_string():
-            direction = plato_left
+        if object.is_leftmost_in_string():
+            direction = nodes.plato_right
+        elif object.is_rightmost_in_string():
+            direction = nodes.plato_left
         else:
-            activations = [plato_left.activation, plato_right.activation]
-            index = toolbox.select_list_position(activations)
-            direction = [plato_left, plato_right][index]
+            activations = [nodes.plato_left.activation, nodes.plato_right.activation]
+            index = toolbox.weighted_index(activations)
+            direction = [nodes.plato_left, nodes.plato_right][index]
 
         # Choose the number of bonds to scan.
-        number = toolbox.select_list_position(string.bonds_to_scan_distribution())
+        number = toolbox.weighted_index(string.bonds_to_scan_distribution)
 
         # Get the first bond in that direction.
-        if direction == plato_left:
+        if direction == nodes.plato_left:
             bond = object.left_bond
         else:
             bond = object.right_bond
 
-        if (not bond) or (bond.bond_category != bond_category):
+        if bond == None or (bond.bond_category != bond_category):
             if isinstance(object, Group):
                 return
             objects = [object]
             bonds = []
-            if category == plato_samegroup:
+            if category == nodes.plato_sameness_group:
                 possible_single_letter_group_direction = None
             else:
-                choices = [plato_left, plato_right]
-                weights = [node.local_descriptor_support(string, plato_group) \
+                choices = [nodes.plato_left, nodes.plato_right]
+                weights = [node.local_descriptor_support(string, nodes.plato_group) \
                             for node in choices]
-                index = toolbox.select_list_position(weights)
+                index = toolbox.weighted_index(weights)
                 possible_single_letter_group_direction = choices[index]
 
-            possible_single_letter_group = Group(category,
-                                                 possible_single_letter_direction,
-                                                 object, object, objects, bonds)
+                possible_single_letter_group = Group(workspace, string, category,
+                                                     possible_single_letter_group_direction,
+                                                     object, object, objects, bonds)
 
-            probility = possible_possible_single_letter_group.single_letter_group_probability()
-            if toolbox.flip_coin(probability):
-                return self.propose_group(objects, bonds, category,
-                                          possible_single_letter_group_direction)
+                probability = possible_single_letter_group.single_letter_group_probability()
+                print probability
+                if toolbox.flip_coin(probability):
+                    return self.propose_group(objects, bonds, category,
+                                              possible_single_letter_group_direction)
+            return
+            
         
         direction_category = bond.direction_category
         facet = bond.bond_facet

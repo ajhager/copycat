@@ -22,7 +22,7 @@ class Sliplink(object):
         self.fixed_length = fixed_length
 
     def intrinsic_degree_of_association(self):
-        if self.fixed_length:
+        if self.fixed_length != None:
             return 100 - self.fixed_length
         else:
             return self.label.intrinsic_degree_of_association()

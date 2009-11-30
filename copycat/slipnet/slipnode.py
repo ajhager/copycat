@@ -36,7 +36,8 @@ class Slipnode(object):
         else:
             self.shrunk_link_length = None
         
-        self.activation = 0
+        # TODO: Change this back to 0. used for testing purposes only.
+        self.activation = 100
         self.activation_buffer = 0
 
         self.category_links = []
@@ -68,7 +69,7 @@ class Slipnode(object):
         return other_node in [lsl.to_node for lsl in self.lateral_slip_links]
 
     def local_descriptor_support(self, string, object_category):
-        if object_category == self.slipnet.plato_letter:
+        if object_category.name == 'letter':
             objects = string.letters
         else:
             objects = string.groups
@@ -78,6 +79,8 @@ class Slipnode(object):
         
         descriptor_count = 0
         for obj in objects:
+            if obj == None:
+                continue
             if obj.is_descriptor_present(self):
                 descriptor_count += 1
 
@@ -85,8 +88,8 @@ class Slipnode(object):
 
     def local_description_type_support(self, string):
         description_type_count = 0
-        for ojb in string.objects:
-            if obj.has_description_type_present(self):
+        for obj in string.objects():
+            if obj.is_description_present(self):
                 description_type_count += 1
 
         return round(100 * (description_type_count / float(len(string.objects))))
@@ -114,7 +117,7 @@ class Slipnode(object):
         assumes that each node belongs to at most one category.
         """
         if self.category_links:
-            return self.category_links[0].to_node()
+            return self.category_links[0].to_node
         else:
             return None
 

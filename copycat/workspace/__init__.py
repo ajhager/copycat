@@ -27,6 +27,7 @@ from copycat.workspace.description import ExtrinsicDescription
 from copycat.workspace.group import Group
 from copycat.workspace.letter import Letter
 from copycat.workspace.mapping import Mapping
+from copycat.workspace.bond import Bond
 from copycat.workspace.replacement import Replacement
 from copycat.workspace.rule import Rule
 from copycat.workspace.string import String
@@ -760,11 +761,11 @@ class Workspace(object):
     def choose_bond_facet(self, object1, object2):
         object1_bond_facets = []
         for description_type in [d.description_type for d in object1.descriptions]:
-            if description_type.category == slipnet.plato_bond_facet:
+            if description_type.category() == slipnet.plato_bond_facet:
                 object1_bond_facets.append(description_type)
         object2_bond_facets = []
         for description_type in [d.description_type for d in object2.descriptions]:
-            if description_type.category == slipnet.plato_bond_facet:
+            if description_type.category() == slipnet.plato_bond_facet:
                 object2_bond_facets.append(description_type)
         items = set(object1_bond_facets).intersection(set(object2_bond_facets))
         support = [facet.total_description_type_support(object1.string) for facet in items]

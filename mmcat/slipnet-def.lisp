@@ -65,7 +65,7 @@
 ; slipnet-link.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (slipnet-link :intrinsic-degree-of-association) ()
+(defmethod (slipnet-link :intrinsic-degreex-of-association) ()
   (if* fixed-length
    then (fake-reciprocal fixed-length)
    else (send label :intrinsic-degree-of-association)))

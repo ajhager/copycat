@@ -293,6 +293,11 @@ def get_plato_letter(character):
         if node.name == str(character):
             return node
 
+def get_plato_number(number):
+    for node in slipnet_numbers:
+        if node.name == str(number):
+            return node
+
 def are_all_opposite_concept_mappings(concept_mappings):
     '''
     Return True if all the concept mappings in the list have the label

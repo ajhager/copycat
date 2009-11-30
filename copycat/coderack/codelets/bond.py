@@ -152,13 +152,14 @@ class BondTopDownCategoryScout(Codelet):
     '''
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
+        category = self.arguments[0]
         # Choose a string.
-        initial_string = self.initial_string
-        target_string = self.target_string
+        initial_string = workspace.initial_string
+        target_string = workspace.target_string
         i_relevance = initial_string.local_bond_category_relevance(category)
         t_relevance = target_string.local_bond_category_relevance(category)
-        i_unhappiness = initial_string.intra_string_unhappiness()
-        t_unhappiness = target_string.intra_string_unhappiness()
+        i_unhappiness = initial_string.intra_string_unhappiness
+        t_unhappiness = target_string.intra_string_unhappiness
         values = [round(toolbox.average(i_relevance, i_unhappiness)),
                   round(toolbox.average(t_relevance, t_unhappiness))]
         string = toolbox.weighted_select(values, [initial_string, target_string])
