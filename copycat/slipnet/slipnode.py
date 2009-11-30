@@ -90,6 +90,13 @@ class Slipnode(object):
 
         return round(100 * (description_type_count / float(len(string.objects))))
 
+    def total_description_type_support(self, string):
+        '''
+        A function of the local description type support and the node's
+        activation.
+        '''
+        support = self.local_description_type_support(string)
+        return round((suppport + self.activation) / 2.0)
 
     def outgoing_links(self):
         """Return a list of the links emanating from this node."""
@@ -104,28 +111,6 @@ class Slipnode(object):
             return self.category_links[0].to_node()
         else:
             return None
-
-    def local_descriptor_support(self, string, object_category):
-        '''
-        The percentage of objects of the given cateogry in the string that
-        have this descriptor.
-        '''
-        pass
-
-    def local_descriptor_type_support(self, string):
-        '''
-        The percentage of objects in the string that have descriptions with
-        this description type.
-        '''
-        pass
-
-    def total_description_type_support(self, string):
-        '''
-        A function of the local description type support and the node's
-        activation.
-        '''
-        support = self.local_description_type_support(string)
-        return round((suppport + self.activation) / 2.0)
 
     def intrinsic_degree_of_association(self):
         return 100 - self.intrinsic_link_length
