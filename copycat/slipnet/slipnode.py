@@ -113,6 +113,10 @@ class Slipnode(object):
             return None
 
     def intrinsic_degree_of_association(self):
+        """Return the intrinsic degree of association.
+
+        This value is 100 minus the build in link length.
+        """
         return 100 - self.intrinsic_link_length
 
     def degree_of_association(self):

@@ -79,6 +79,8 @@
    else (send label :intrinsic-degree-of-association)))
 
 ;---------------------------------------------
+; slipnode.intrinsic-degree-of-association | Slipnode.intrinsic_degree_of_association
+;---------------------------------------------
 
 (defmethod (slipnode :intrinsic-degree-of-association) ()
   (fake-reciprocal intrinsic-link-length))
