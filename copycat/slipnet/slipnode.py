@@ -157,6 +157,7 @@ class Slipnode(object):
         return self
 
     def decay(self):
+        """Remove 100 - conceptual_depth percent of the node's activation."""
         amount = round(((100 - self.conceptual_depth) / 100.0) * self.activation)
         self.activation_buffer = max(0, self.activation_buffer - amount)
 
