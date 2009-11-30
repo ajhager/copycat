@@ -125,10 +125,11 @@ class Slipnode(object):
         return 100 - self.intrinsic_link_length
 
     def degree_of_association(self):
+        """Return the degree of association encoded in the links labeled."""
         if self.is_active():
             return 100 - self.shrunk_link_length
         else:
-            return self.intrinsic_link_length
+            return 100 - self.intrinsic_link_length
 
     def bond_degree_of_association(self):
         '''

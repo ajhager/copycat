@@ -1,3 +1,8 @@
+(defmethod (slipnode :directed?) ()
+; Returns t if the slipnode represents a directed bond or group.
+  (or (eq self plato-predecessor) (eq self plato-successor) 
+      (eq self plato-predgrp) (eq self plato-succgrp)))
+
 (defflavor slipnode 
     (activation 
      activation-buffer ; A buffer for storing activation between updates.
@@ -36,6 +41,11 @@
 					   
   ())
 
+(defflavor slipnet-link 
+    (from-node to-node (label nil) (fixed-length nil))
+    ; If a link has no label, then it is assigned a fixed length.
+    ())
+
 ;---------------------------------------------
 ; slipnode.print | REMOVED
 ;---------------------------------------------
@@ -47,19 +57,9 @@
 ; slipnode.active? | Slipnode.is_active
 ;---------------------------------------------
 
-(defmethod (slipnode :directed?) ()
-; Returns t if the slipnode represents a directed bond or group.
-  (or (eq self plato-predecessor) (eq self plato-successor) 
-      (eq self plato-predgrp) (eq self plato-succgrp)))
-
 ;---------------------------------------------
 ; slipnode.category | Slipnode.category
 ;---------------------------------------------
-
-(defflavor slipnet-link 
-    (from-node to-node (label nil) (fixed-length nil))
-    ; If a link has no label, then it is assigned a fixed length.
-    ())
 
 ;---------------------------------------------
 ; slipnet-link.print | REMOVED
@@ -80,13 +80,7 @@
    else (send label :degree-of-association)))
 
 ;---------------------------------------------
-
-(defmethod (slipnode :degree-of-association) ()
-; Returns the degree-of-association encoded in the links this node labels.
-  (if* (send self :active?) 
-   then (fake-reciprocal shrunk-link-length)
-   else (fake-reciprocal intrinsic-link-length)))
-   
+; slipnode.degree-of-association | Slipnode.degree_of_association
 ;---------------------------------------------
 
 (defmethod (slipnode :similar-has-property-links) ()
