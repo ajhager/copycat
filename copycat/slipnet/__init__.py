@@ -20,6 +20,7 @@ import copycat.toolbox as toolbox
 from slipnode import Slipnode
 from sliplink import Sliplink
 
+
 slipnodes = []
 def add_node(depth, codelets=[], intrinsic_link_length=None,
              initially_clamped=False, directed=False):

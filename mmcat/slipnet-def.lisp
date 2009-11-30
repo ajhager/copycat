@@ -1,12 +1,3 @@
-;---------------------------------------------
-; SLIPNET-DEF: This file contains definitions and methods for nodes
-;              in the Slipnet.  
-;---------------------------------------------
-
-(in-package 'user)
-	
-;---------------------------------------------
-
 (defflavor slipnode 
     (activation 
      activation-buffer ; A buffer for storing activation between updates.
@@ -43,24 +34,10 @@
      graphics-obj ; The graphics object representing this node.
     )
 					   
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
+  ())
 
 ;---------------------------------------------
-
-(defmethod (slipnode :print) ()
-  (format t "I am the node ~a~&" pname)
-  (format t "My activation is ~a~&" activation)
-  (format t "My conceptual-depth is ~a~&" conceptual-depth)
-  (format t "My incoming links are: ")
-  (send-method-to-list incoming-links :print)
-  (format t "~%")
-  (format t "My outgoing links are: ")
-  (send-method-to-list (send self :outgoing-links) :print)
-  (format t "~%"))
-
+; slipnode.print | REMOVED
 ;---------------------------------------------
 
 (defmethod (slipnode :outgoing-links) ()
@@ -95,17 +72,10 @@
 (defflavor slipnet-link 
     (from-node to-node (label nil) (fixed-length nil))
     ; If a link has no label, then it is assigned a fixed length.
-    ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
+    ())
 
 ;---------------------------------------------
-
-(defmethod (slipnet-link :print) ()
-  (format t "From ~a to ~a~&" (send from-node :pname) 
-	                      (send to-node :pname)))
-
+; slipnet-link.print | REMOVED
 ;---------------------------------------------
 
 (defmethod (slipnet-link :intrinsic-degree-of-association) ()
@@ -1178,6 +1148,3 @@
   (loop for node in *slipnet* do
 	(send node :set-activation-buffer 0)
 	(send node :set-activation 0)))
-
-;---------------------------------------------
-

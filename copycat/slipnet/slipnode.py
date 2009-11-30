@@ -15,8 +15,15 @@
 # 02110-1301, USA.
 
 class Slipnode(object):
+    """Slipnode
+
+    Attributes:
+        conceptual_depth:
+    """
+
     def __init__(self, depth, codelets=[], intrinsic_link_length=None,
                  initially_clamped=False, directed=False):
+        """Initialize Slipnode."""
         self.conceptual_depth = depth
         self.initially_clamped = initially_clamped
         self.directed = directed
