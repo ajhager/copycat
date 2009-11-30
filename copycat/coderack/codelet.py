@@ -15,10 +15,22 @@
 # 02110-1301, USA.
 
 class Codelet(object):
+    """Codelet is a small amount of code that has a chance to be run.
+
+    Attributes:
+        arguments: A tuple of arguments that the codelet can affect.
+        timestamp: The time when the codelet was created.
+        bin: The coderack bin the codelet is stored in.
+    """
     def __init__(self, arguments=()):
+        """Initialize Codelet."""
         self.arguments = arguments
         self.timestamp = None
         self.bin = None
 
     def run(self, coderack, slipnet, workspace):
+        """Run the codelet.
+
+        Each specific codelet must implement this for itself.
+        """
         pass

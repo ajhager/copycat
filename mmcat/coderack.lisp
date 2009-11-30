@@ -1,15 +1,7 @@
-(defflavor codelet
-  (codelet-type ; E.g., bottom-up-bond-scout.
-   arguments 
-   urgency-bin ; E.g., %very-high-bin%
-   (index-in-bin nil) ; This codelet's position in its urgency bin.
-   (time-stamp nil) ; The time (in codelet-steps) when this codelet was 
-                    ; posted
-   structure-category) ; E.g., 'bond.
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
+;---------------------------------------------
+; make-codelet | Codelet.__init__
+; defflavor codelet
+;---------------------------------------------
 
 ;---------------------------------------------
 ; codelet.print-to-output-file | REMOVED
@@ -19,23 +11,14 @@
 ; codelet.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (codelet :run) ()
-; This is the method that runs the codelet.    
-  (apply codelet-type arguments))
+;---------------------------------------------
+; codelet.run | Codelet.run
+;---------------------------------------------
 
 ;---------------------------------------------
 ; codelet.remove-probability | Coderack.remove_probability
 ;---------------------------------------------
 
-(defun make-codelet (codelet-type arguments urgency-bin-name 
-	             &optional structure-category)
-; Returns a new codelet.
-  (make-instance 'codelet 
-      :codelet-type codelet-type
-      :arguments arguments
-      :urgency-bin (eval urgency-bin-name)
-      :structure-category structure-category))
-      
 ;---------------------------------------------
 ; coderack.total-num-of-codelets | REMOVED
 ;---------------------------------------------
