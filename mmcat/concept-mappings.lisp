@@ -1,12 +1,3 @@
-;---------------------------------------------
-; CONCEPT-MAPPINGS: This file contains flavors and methods for 
-;                   concept-mappings.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 ; Here's an example of how a concept-mapping instance is set up:
 ; For "rightmost -> leftmost",
 ; description-type1 = plato-string-position-category,
@@ -123,12 +114,5 @@
 		    (send concept-mapping2 :descriptor1))))))
 
 ;---------------------------------------------
-
-(defun all-opposite-concept-mappings? (concept-mapping-list)
-; Returns t if all the concept-mappings in the list have label "opposite".
-  (loop for concept-mapping in concept-mapping-list 
-	when (not (eq (send concept-mapping :label) plato-opposite)) 
-	return nil
-	finally (return t)))
-
+; all-opposite-concept-mappings? | are_all_opposite_concept_mappings
 ;---------------------------------------------

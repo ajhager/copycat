@@ -287,6 +287,7 @@ add_link('nonslip', plato_last, plato_rightmost, None, 100)
 add_link('slip', plato_single, plato_whole, None, 90)
 add_link('slip', plato_whole, plato_single, None, 90)
 
+
 def get_bond_category(from_node, to_node):
     """Return the node representing the label of the link between the nodes.
 
@@ -314,19 +315,18 @@ def get_plato_letter(character):
             return node
 
 def get_plato_number(number):
+    """Given a numver, return the corresponding slipnet number node."""
     for node in slipnet_numbers:
         if node.name == str(number):
             return node
 
 def are_all_opposite_concept_mappings(concept_mappings):
-    '''
-    Return True if all the concept mappings in the list have the label
-    "opposite".
-    '''
+    """Return True if all mappings in the list have the label 'opposite'."""
     for mapping in concept_mappings:
         if mapping.label != plato_opposite:
             return False
     return True
+
 
 class Slipnet(object):
     """Slipnet contains nodes and the links between them.
@@ -374,17 +374,13 @@ class Slipnet(object):
             node.activation = 0
 
     def clamp_initial_nodes(self):
-        '''
-        Clamp those slipnodes that were marked to be initially clamped.
-        '''
+        """Clamp those slipnodes that were marked to be initially clamped."""
         for node in self.slipnodes:
             if node.initially_clamped:
                 node.clamp = True
 
     def unclamp_initial_nodes(self):
-        '''
-        Unclamp those slipnodes that were marked to be initially clamped.
-        '''
+        """Unclamp those slipnodes that were marked to be initially clamped."""
         for node in self.slipnodes:
             if node.initially_clamped:
                 node.clamp = False
