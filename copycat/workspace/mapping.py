@@ -25,7 +25,7 @@ class Mapping(object):
         self.description_type2 = description_type2
         self.descriptor1 = descriptor1
         self.descriptor2 = descriptor2
-        self.label = descriptor1.get_label_node(descriptor2)
+        self.label = slipnet.get_label_node(descriptor1, descriptor2)
         self.object1 = object1
         self.object2 = object2
 

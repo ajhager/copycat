@@ -308,6 +308,17 @@ def get_label_node(from_node, to_node):
         if link.to_node == to_node:
             return link.label
 
+def get_related_node(node, relation):
+    """Return the node related to the given node by relation.
+
+    For example, if given 'left' and 'opposite', returns 'right'.
+    """
+    if relation == plato_identity:
+        return node
+    for link in node.outgoing_links():
+        if link.label == relation:
+            return link.to_node
+
 def get_plato_letter(character):
     """Given a character, return the corresponding slipnet letter node."""
     for node in slipnet_letters:

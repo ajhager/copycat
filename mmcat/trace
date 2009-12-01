@@ -2,6 +2,9 @@ abc abd ijk 42 --trace
 truncated at the end of the first Run.step()
 Using this to decide what next to check for accuracy.
 
+Currently finishing slipnet/__init__.py:
+    all the sliplink adding
+
 
 #### INIT WORKSPACE
 
@@ -1351,21 +1354,6 @@ copycat.workspace:107:         for obj in self.objects():
 copycat.workspace:108:             if not obj:
 copycat.workspace:109:                 continue
 copycat.workspace:107:         for obj in self.objects():
-
-
-#### INIT RNG
-
-
-copycat.run:30:         random.seed(seed)
-random:106:         if a is None:
-random:113:         super(Random, self).seed(a)
-random:114:         self.gauss_next = None
-
-
-#### INIT TIMESTEP
-
-
-copycat.run:31:         self.timestep = 15
 
 
 #### UPDATE EVERYTHING
@@ -3799,16 +3787,6 @@ copycat.toolbox:49:         return items[weighted_index(weights)]
 copycat.toolbox:32:     total = sum(weights)
 copycat.toolbox:33:     if total <= 0:
 copycat.toolbox:35:     value = random.randint(0, total - 1)
-random:215:         return self.randrange(a, b+1)
-random:158:         istart = int(start)
-random:159:         if istart != start:
-random:161:         if stop is default:
-random:169:         istop = int(stop)
-random:170:         if istop != stop:
-random:172:         width = istop - istart
-random:173:         if step == 1 and width > 0:
-random:187:             if width >= maxwidth:
-random:189:             return int(istart + int(self.random()*width))
 copycat.toolbox:36:     new_total = 0
 copycat.toolbox:37:     index = 0
 copycat.toolbox:38:     for weight in weights:
@@ -3827,7 +3805,6 @@ copycat.toolbox:42:             return index - 1
 copycat.coderack:108:         self.time += 1
 copycat.coderack:109:         return bin.choose()
 copycat.coderack:46:         codelet = random.choice(self.codelets)
-random:248:         return seq[int(self.random() * len(seq))]  # raises IndexError if seq is empty
 copycat.coderack:47:         self.remove(codelet)
 copycat.coderack:56:         if codelet in self.codelets:
 copycat.coderack:57:             self.codelets.remove(codelet)
@@ -3840,7 +3817,6 @@ copycat.coderack:48:         return codelet
 copycat.run:52:         codelets = codelet.run(self.coderack, self.slipnet, self.workspace)
 copycat.coderack.codelets.group:378:         string = workspace.random_string()
 copycat.workspace:600:         return random.choice([self.initial_string, self.target_string])
-random:248:         return seq[int(self.random() * len(seq))]  # raises IndexError if seq is empty
 copycat.coderack.codelets.group:381:         if not string.bonds():
 copycat.workspace.string:97:         bs = [b for b in toolbox.flatten(self.from_to_bonds) if b]
 copycat.toolbox:77:     if isinstance(sequence, list):
@@ -3883,6 +3859,3 @@ copycat.coderack.codelets.group:382:             return
 copycat.run:53:         if not codelets:
 copycat.run:54:             return
 copycat.run:47:         if self.workspace.translated_rule:
-
-
-#### END FIRST STEP

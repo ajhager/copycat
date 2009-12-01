@@ -646,15 +646,8 @@
 ; get-label-node | get_label_node
 ;---------------------------------------------
 
-(defmethod (slipnode :get-related-node) (relation)
-; Returns the node related to the given node by the given relation
-; (e.g., if given "left" and "opposite", returns "right").
-  (if* (eq relation plato-identity)
-   then self
-   else (loop for link in (send self :outgoing-links)
-	      when (eq (send link :label) relation)
-              return (send link :to-node))))
-
+;---------------------------------------------
+; slipnode.get-related-node | get_related_node
 ;---------------------------------------------
 
 (defmethod (slipnode :apply-slippages) (slippage-list)

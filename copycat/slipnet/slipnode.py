@@ -166,21 +166,6 @@ class Slipnode(object):
         amount = round(((100 - self.conceptual_depth) / 100.0) * self.activation)
         self.activation_buffer = max(0, self.activation_buffer - amount)
 
-    def get_label_node(self, to_node):
-        if self == to_node:
-            return None
-        else:
-            for link in self.outgoing_links():
-                if link.to_node == to_node:
-                    return link.label
-
-    def get_related_node(self, relation):
-        if relation.name == 'identity':
-            return self
-        for link in self.outgoing_links():
-            if link.label == relation:
-                return link.to_node
-            
     def similar_has_property_links(self):
         similar_links = []
         for link in self.has_property_links:
