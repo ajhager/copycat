@@ -62,10 +62,8 @@ class Slipnode(object):
         """Return True if the two nodes are linked in the slipnet."""
         return other_node in [ol.to_node for ol in self.outgoing_links()]
 
-    def is_slip_linked_with(self, other_node):
-        '''
-        Return True if the two nodes are linked by a slip link in the slipnet.
-        '''
+    def are_slip_linked(self, other_node):
+        """Return True if the two nodes are linked by a slip link."""
         return other_node in [lsl.to_node for lsl in self.lateral_slip_links]
 
     def local_descriptor_support(self, string, object_category):

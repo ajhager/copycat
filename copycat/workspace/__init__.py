@@ -421,7 +421,7 @@ class Workspace(object):
             for d2 in descriptions2:
                 if d1.description_type == d2.description_type and \
                    (d1.descriptor == d2.descriptor or \
-                    d1.descriptor.is_slip_linked_with(d2.descriptor)):
+                    d1.descriptor.are_slip_linked(d2.descriptor)):
                     cm = Mapping(d1.description_type, d2.description_type,
                                  d1.descriptor, d2.descriptor, object1,
                                  object2)

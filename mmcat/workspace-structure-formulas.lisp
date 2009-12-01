@@ -337,9 +337,9 @@
 ; linked? | Slipnode.are_linked
 ;---------------------------------------------
 
-(defun slip-linked? (node1 node2)
-; Returns t if the two nodes are linked by a slip-link in the slipnet.
-  (memq node2 (send-method-to-list (send node1 :lateral-slip-links) :to-node)))
+;---------------------------------------------
+; slip-linked? | Slipnode.are_slip_linked
+;---------------------------------------------
 
 ;---------------------------------------------
 ; slipnode.bond-degree-of-association | Slipnode.bond_degree_of_association
