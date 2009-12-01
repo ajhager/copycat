@@ -397,5 +397,6 @@ class Slipnet(object):
         codelets = []
         for node in self.slipnodes:
             if node.activation >= 50:
-                codelets.extend(node.get_codelets())
+                for codelet in node.codelets:
+                    codelets.append((codelet, [node], node.conceptual_depth / 100.))
         return codelets

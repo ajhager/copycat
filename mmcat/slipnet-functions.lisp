@@ -58,19 +58,8 @@
 ; get-top-down-codelets | Slipnet.top_down_codelets
 ;---------------------------------------------
 
-(defun get-top-down-codelets ()
-; Returns a list of top-down codelets, attached to active nodes, to be posted.
-  (loop for node in *slipnet* do
-        (if* (and (>= (send node :activation) %full-activation-threshold%)
-		  (send node :codelets))
-	 then (send node :get-codelets))))
-  
-;---------------------------------------------
-
 (defmethod (slipnode :get-codelets) ()
   (loop for codelet in codelets do 
-        ; Decide whether or not to post this codelet, and if so, how many
-	; copies to post.
         (if* (eq (flip-coin (get-post-codelet-probability 
 				(send codelet :structure-category))) 'heads)
          then (loop for i from 1 to (get-num-of-codelets-to-post
@@ -82,5 +71,3 @@
 						   (/ (send self :conceptual-depth) 
 						      100))))
                            *codelets-to-post*)))))
-						   
-;---------------------------------------------
