@@ -686,9 +686,5 @@
 	collect instance))
 
 ;---------------------------------------------
-
-(defun clear-slipnet ()
-; Sets activation to 0 for each node in the slipnet.
-  (loop for node in *slipnet* do
-	(send node :set-activation-buffer 0)
-	(send node :set-activation 0)))
+; clear-slipnet | Slipnet.clear
+;---------------------------------------------

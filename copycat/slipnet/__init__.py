@@ -367,9 +367,7 @@ class Slipnet(object):
             node.activation_buffer = 0
 
     def clear(self):
-        '''
-        Zero out the acitivations of all slipnodes.
-        '''
+        """Zero out the activations of all slipnodes."""
         for node in self.slipnodes:
             node.activation_buffer = 0
             node.activation = 0
