@@ -139,8 +139,7 @@ class Slipnode(object):
 
     def bond_degree_of_association(self):
         """Return the degree of association bonds of the given cagtegory are
-        considered to have.
-        """
+        considered to have."""
         return min(100, round(11 * math.sqrt(self.degree_of_association())))
 
     def is_active(self):
@@ -149,8 +148,7 @@ class Slipnode(object):
 
     def get_possible_descriptors(self, obj):
         """Return a list of instances of the node that could be used as
-        descriptors for the given object.
-        """
+        descriptors for the given object."""
         descriptors = []
         for link in self.instance_links:
             instance = link.to_node
@@ -159,6 +157,8 @@ class Slipnode(object):
         return descriptors
 
     def apply_slippages(self, slippage_list):
+        """Return the node that is the translation of the node according to the
+        given slippages."""
         for slippage in slippage_list:
             if slippage.descriptor1 == self:
                 return slippage.descriptor2

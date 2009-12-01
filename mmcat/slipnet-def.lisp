@@ -650,13 +650,9 @@
 ; slipnode.get-related-node | get_related_node
 ;---------------------------------------------
 
-(defmethod (slipnode :apply-slippages) (slippage-list)
-; Returns the node that is the translation of the given node
-; according to the given slippage list.
-  (loop for s in slippage-list 
-	when (eq (send s :descriptor1) self)
-	return (send s :descriptor2)
-	finally (return self)))
+;---------------------------------------------
+; slipnode.applay-slippages | Slipnode.apply_slippages
+;---------------------------------------------
 
 ;---------------------------------------------
 ; slipnode.get-possible-descriptors | Slipnode.get_possible_descriptors
