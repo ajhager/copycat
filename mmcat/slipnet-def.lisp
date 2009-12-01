@@ -643,17 +643,7 @@
 )
 					  
 ;---------------------------------------------
-
-(defun get-label-node (from-node to-node)
-; Returns the node representing the label of the link from FROM-NODE to 
-; TO-NODE.  Returns nil if the link has no label. For now, I am assuming 
-; that there is only one link from the FROM-NODE to the TO-NODE.
-  (if* (eq from-node to-node)
-   then plato-identity
-   else (loop for link in (send from-node :outgoing-links)
-              when (eq (send link :to-node) to-node)
-              return (send link :label))))
-
+; get-label-node | get_label_node
 ;---------------------------------------------
 
 (defmethod (slipnode :get-related-node) (relation)

@@ -300,6 +300,7 @@ def get_bond_category(from_node, to_node):
                 return link.label
 
 def get_label_node(from_node, to_node):
+    """Return the the label of the link between from_node and to_node."""
     if from_node == to_node:
         return plato_identity
     for link in from_node.outgoing_links():
