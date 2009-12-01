@@ -1,12 +1,3 @@
-;---------------------------------------------
-; WORKSPACE-OBJECTS: This file contains flavor definitions and functions 
-;                     for workspace objects (either letters or groups).
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defflavor workspace-object 
      (string ; The string the object is in (e.g., initial-string).
 

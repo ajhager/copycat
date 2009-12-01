@@ -46,6 +46,7 @@ class Workspace(object):
         self.activation = 100
         self.temperature = 0
         self.clamp_temperature = False
+        self.built = 1
 
         self.replacements = []
         self._correspondences = []
@@ -477,8 +478,10 @@ class Workspace(object):
         '''
         common_groups = []
         for group in object1.string.groups:
-            if self.is_recursive_group_member(object1, group) and \
-               self.is_recursive_group_member(object2, group):
+            if group == None:
+                continue
+            if group.is_recurseive_member(object1) and \
+                    group.is_recursive_member(object2):
                 common_groups.append(group)
         return common_groups
 
@@ -730,6 +733,8 @@ class Workspace(object):
         return Codelet('description_strength_tester', (description, urgency))
 
     def build_bond(self, bond):
+        if bond == None:
+            return
         bond.proposal_level = self.built
         bond.string.add_bond(bond)
         bond.from_object.add_outgoing_bond(bond)
@@ -747,6 +752,8 @@ class Workspace(object):
             bond.direction_category.activate_from_workspace()
 
     def break_bond(self, bond):
+        if bond == None:
+            return
         bond.string.delete_bond(bond)
         bond.from_object.remove_outgoing_bond(bond)
         bond.to_object.remove_incoming_bond(bond)
@@ -1142,10 +1149,10 @@ class Workspace(object):
         and the given weights.  Return True if structure1 wins and False if
         structure2 wins.
         '''
-        structure1.update_strength_values()
-        structure2.update_strength_values()
-        strengths = [structure1.total_strength() * weight1,
-                     structure2.total_strength() * weight2]
+        structure1.update_strengths()
+        structure2.update_strengths()
+        strengths = [structure1.total_strength * weight1,
+                     structure2.total_strength * weight2]
         adjusted_strengths = self.temperature_adjusted_values(strengths)
         return [True, False][toolbox.weighted_index(adjusted_strengths)]
 
@@ -1156,8 +1163,10 @@ class Workspace(object):
         wins.
         '''
         for competition in others:
+            if competition == None:
+                continue
             if not self.structure_vs_structure(structure, structure_weight,
-                                               competition, other_weight):
+                                               competition, others_weight):
                 return False
         return True
 

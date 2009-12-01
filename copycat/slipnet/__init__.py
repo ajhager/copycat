@@ -366,14 +366,14 @@ class Slipnet(object):
                     full_activation_probability = (node.activation / 100.0) ** 3
                     if toolbox.flip_coin(full_activation_probability):
                         node.activation = 100
-            node.buffer = 0
+            node.activation_buffer = 0
 
     def clear(self):
         '''
         Zero out the acitivations of all slipnodes.
         '''
         for node in self.slipnodes:
-            node.buffer = 0
+            node.activation_buffer = 0
             node.activation = 0
 
     def clamp_initial_nodes(self):

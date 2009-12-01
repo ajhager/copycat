@@ -82,31 +82,32 @@ class BondBuilder(Codelet):
             if not workspace.fight_it_out(bond, 1, incompatible_bonds, 1):
                 return
 
-        incompatible_groups = from_object.common_groups(to_object)
+        incompatible_groups = workspace.get_common_groups(from_object, to_object)
         if incompatible_groups:
             if  not self.fight_it_out(bond, 1, incompatible_groups,
                 max([group.letter_span() for group in incompatible_groups])):
                 return
 
+        incompatible_correspondences = None
         if bond.direction_category and (bond.is_leftmost_in_string() or \
                                         bond.is_rightmost_in_string()):
             incompatible_correspondences = bond.incompatible_correspondences()
-            if incompatible_corresondences:
+            if incompatible_correspondences:
                 if not self.fight_it_out(bond, 2,
                                          incompatible_correspondences, 3):
                     return
 
         if incompatible_bonds:
             for bond in incompatible_bonds:
-                self.break_bond(bond)
+                workspace.break_bond(bond)
 
         if incompatible_groups:
             for group in incompatible_groups:
-                self.break_group(group)
+                workspace.break_group(group)
 
         if incompatible_correspondences:
             for correrspondence in incompatible_correspondences:
-                self.break_correspondence(correspondence)
+                workspace.break_correspondence(correspondence)
 
         return workspace.build_bond(bond)
 

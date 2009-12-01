@@ -83,10 +83,10 @@ class Correspondence(Structure):
         A function of how many concept mappings there are, how strong they
         are and how much internal coherence there is among concept mappings.
         '''
-        relevant_distinguishing_cms = self.relevant_distinguishing_cms()
+        relevant_distinguishing_cms = self.relevant_distinguishing_concept_mappings()
         if not relevant_distinguishing_cms:
             return 0
-        average_strength = toolbox.average([cm.strength() for cm in relevant_distinguishing_cms])
+        average_strength = toolbox.average(*[cm.strength() for cm in relevant_distinguishing_cms])
         number_of_cms = len(relevant_distinguishing_cms)
         if number_of_cms == 1:
             number_of_cms_factor = .8
@@ -108,7 +108,7 @@ class Correspondence(Structure):
         Returns True if there is any pair of relevant distinguishing
         concept mappings that support each other.
         '''
-        cms = self.relevant_distinguishing_cms()
+        cms = self.relevant_distinguishing_concept_mappings()
         if len(cms) > 1:
             for cm in cms:
                 for other_cm in cms:

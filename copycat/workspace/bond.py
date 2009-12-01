@@ -164,9 +164,13 @@ class Bond(Structure):
 
         if self.is_leftmost_in_string():
             correspondence = self.left_object.correspondence
+            if not correspondence:
+                return []
             other_object = correspondence.other_object(self.left_object)
         elif self.is_rightmost_in_string():
             correspondence = self.right_object.correspondence
+            if not correspondence:
+                return []
             other_object = correspondence.other_object(self.right_object)
         else:
             return []
