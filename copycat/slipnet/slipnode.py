@@ -53,9 +53,7 @@ class Slipnode(object):
         self.iterate_group = None
 
     def are_related(self, other_node):
-        '''
-        Return True if the two nodes are equal or are linked in the slipnet.
-        '''
+        """Return True if the two nodes are equal or are linked."""
         return self == other_node or self.are_linked(other_node)
 
     def are_linked(self, other_node):

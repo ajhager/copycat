@@ -328,10 +328,8 @@
   incompatible?)
 
 ;---------------------------------------------
-
-(defun related? (node1 node2)
-; Returns t if the two nodes are equal or are linked in the slipnet.
-  (if* (eq node1 node2) then t else (linked? node1 node2)))
+; related? | Slipnode.are_related
+;---------------------------------------------
 
 ;---------------------------------------------
 ; linked? | Slipnode.are_linked
