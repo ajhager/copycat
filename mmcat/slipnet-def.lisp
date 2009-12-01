@@ -1,8 +1,3 @@
-(defmethod (slipnode :directed?) ()
-; Returns t if the slipnode represents a directed bond or group.
-  (or (eq self plato-predecessor) (eq self plato-successor) 
-      (eq self plato-predgrp) (eq self plato-succgrp)))
-
 (defflavor slipnode 
     (activation 
      activation-buffer ; A buffer for storing activation between updates.
@@ -45,6 +40,10 @@
     (from-node to-node (label nil) (fixed-length nil))
     ; If a link has no label, then it is assigned a fixed length.
     ())
+
+;---------------------------------------------
+; slipnode.directed? | REMOVED
+;---------------------------------------------
 
 ;---------------------------------------------
 ; slipnode.print | REMOVED
