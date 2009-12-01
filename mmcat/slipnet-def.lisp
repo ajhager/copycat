@@ -659,14 +659,8 @@
 	finally (return self)))
 
 ;---------------------------------------------
-
-(defmethod (slipnode :get-possible-descriptors) (object &aux instance)
-; Returns a list of the instances of the given node that could be used
-; as descriptors for the given object.
-  (loop for link in instance-links do    
-	(setq instance (send link :to-node))
-	when (funcall (send instance :description-tester) object)
-	collect instance))
+; slipnode.get-possible-descriptors | Slipnode.get_possible_descriptors
+;---------------------------------------------
 
 ;---------------------------------------------
 ; clear-slipnet | Slipnet.clear

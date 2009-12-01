@@ -148,6 +148,9 @@ class Slipnode(object):
         return self.activation == 100
 
     def get_possible_descriptors(self, obj):
+        """Return a list of instances of the node that could be used as
+        descriptors for the given object.
+        """
         descriptors = []
         for link in self.instance_links:
             instance = link.to_node
