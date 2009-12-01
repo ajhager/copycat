@@ -38,12 +38,12 @@ class BondBottomUpScout(Codelet):
         if facet == None:
             return
 
-        from_descriptor = from_object.descriptor(facet)
-        to_descriptor = to_object.descriptor(facet)
+        from_descriptor = from_object.get_descriptor(facet)
+        to_descriptor = to_object.get_descriptor(facet)
         if from_descriptor == None or to_descriptor == None:
             return
 
-        category = from_descriptor.bond_category(to_descriptor)
+        category = nodes.get_bond_category(from_descriptor, to_descriptor)
         if category == None:
             return
 
@@ -176,18 +176,18 @@ class BondTopDownCategoryScout(Codelet):
             return
 
         # Get the descriptors of the facet if they exist.
-        object_descriptor = obj.descriptor(facet)
-        neighbor_descriptor = neighbor.descriptor(facet)
+        object_descriptor = obj.get_descriptor(facet)
+        neighbor_descriptor = neighbor.get_descriptor(facet)
         if (not object_descriptor) or (not neighbor_descriptor):
             return
 
         # Check for a possible bond.
-        if object_descriptor.bond_category(neighbor_descriptor) == category:
+        if nodes.get_bond_category(object_descriptor, neighbor_descriptor) == category:
             from_object = obj
             to_object = neighbor
             from_descriptor = object_descriptor
             to_descriptor = neighbor_descriptor
-        elif neighbor_descriptor.bond_category(object_descriptor) == category:
+        elif nodes.get_bond_category(neighbor_descriptor, object_descriptor) == category:
             from_object = neighbor
             to_object = obj
             from_descriptor = neighbor_descriptor
