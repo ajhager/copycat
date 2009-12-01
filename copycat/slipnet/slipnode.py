@@ -16,12 +16,28 @@
 
 import math
 
-
 class Slipnode(object):
     """Slipnode
 
     Attributes:
-        conceptual_depth:
+        name: A unique string name.
+        conceptual_depth: A built in, given value based on perceived depth.
+        initially_clamped: A boolean whether to clamp at the start of a run.
+        directed:
+        codelets: A list of codelet types attached to this node.
+        clamp: A boolean that when True, activation is clamped to 100.
+        intrinsic_link_length: The intrinsic length of links labeled by the node.
+        shrunk_link_length: .4 of the intrinsic link length.
+        activation: An integer between 0-100.
+        activation_buffer: A buffer for storing activation between updates.
+        category_links:
+        instance_links:
+        has_property_links:
+        lateral_slip_links:
+        lateral_nonslip_links:
+        incoming_links:
+        description_tester: Function testing for descriptor possibility.
+        iterate_group: Function used to iterate group nodes.
     """
 
     def __init__(self, name, depth, codelets=[], intrinsic_link_length=None,

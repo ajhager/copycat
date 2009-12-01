@@ -65,43 +65,9 @@
 ; defflavor slipnet-link | Sliplink.__init__
 ;---------------------------------------------
 
-(defflavor slipnode 
-    (activation 
-     activation-buffer ; A buffer for storing activation between updates.
-     (clamp nil) ; If this is t, then the activation of the node is clamped
-                 ; to 100.
-
-     (intrinsic-link-length nil) ; The intrinsic link-length of this links
-                                 ; labeled by this node.
-     (shrunk-link-length nil)  ; For now this is .4 of the intrinsic 
-                               ; link-length
-     conceptual-depth
-
-     pname  ; A string giving the name of this node.
-     symbol-name ; A symbol giving the name of this node.
-     short-name ; A string to use for slipnet graphics.
-     cm-name ; A string to use for concept-mapping graphics.
-
-     (category-links nil)  
-     (instance-links nil)
-     (has-property-links nil)
-     (lateral-slip-links nil)
-     (lateral-nonslip-links nil)
-     (incoming-links nil)
-
-     (codelets nil)  ; A list of codelets attached to this node.
-
-     (description-tester nil) ; A function for testing if this node
-                              ; can be used as a descriptor for some object.
-
-     (iterate-group nil) ; For nodes representing groups, a function used to 
-                         ; iterate the group (e.g., if succgrp is given "a", it
-                         ; will return "b").
-
-     graphics-obj ; The graphics object representing this node.
-    )
-					   
-  ())
+;---------------------------------------------
+; defflavor slipnode | Slipnode __init__
+;---------------------------------------------
 
 (defun init-slipnet ()
 ; This function initializes all the nodes in the slipnet.  The links are 
