@@ -185,7 +185,7 @@ class Slipnode(object):
         for link in self.outgoing_links():
             if link.label == relation:
                 return link.to_node
-
+            
     def similar_has_property_links(self):
         similar_links = []
         for link in self.has_property_links:

@@ -769,7 +769,7 @@ class Workspace(object):
                 object2_bond_facets.append(description_type)
         items = set(object1_bond_facets).intersection(set(object2_bond_facets))
         support = [facet.total_description_type_support(object1.string) for facet in items]
-        return toolbox.weighted_select(support, items)
+        return toolbox.weighted_select(support, list(items))
 
     def propose_bond(self, from_object, to_object, bond_category,
                      bond_facet, from_object_descriptor, to_object_descriptor):

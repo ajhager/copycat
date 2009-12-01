@@ -239,17 +239,17 @@ class BondTopDownDirectionScout(Codelet):
             return
         
         # Get the descriptors of the facet if they exist.
-        object_descriptor = object.descriptor(facet)
-        neighbor_descriptor = neighbor.descriptor(facet)
+        object_descriptor = obj.get_descriptor(facet)
+        neighbor_descriptor = neighbor.get_descriptor(facet)
         if (not object_descriptor) or (not neighbor_descriptor):
             return
 
         # Check for a possible bond.
-        bond_category = from_descriptor.bond_category(to_descriptor)
+        bond_category = nodes.get_bond_category(object_descriptor, neighbor_descriptor)
         if (not bond_category) or (not bond_category.directed):
             return
 
         # Propose the bond.
-        return workspace.propose_bond(from_object, to_object,
+        return workspace.propose_bond(obj, neighbor,
                                       bond_category, facet,
-                                 from_descriptor, to_descriptor)
+                                      object_descriptor, neighbor_descriptor)

@@ -287,6 +287,18 @@ add_link('nonslip', plato_last, plato_rightmost, None, 100)
 add_link('slip', plato_single, plato_whole, None, 90)
 add_link('slip', plato_whole, plato_single, None, 90)
 
+def get_bond_category(from_node, to_node):
+    """Return the node representing the label of the link between the nodes.
+
+    There is either zero or one link between the two nodes.
+    """
+    if from_node == to_node:
+        return plato_sameness
+    else:
+        for link in from_node.outgoing_links():
+            if link.to_node == to_node:
+                return link.label
+
 def get_plato_letter(character):
     """Given a character, return the corresponding slipnet letter node."""
     for node in slipnet_letters:

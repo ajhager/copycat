@@ -1,9 +1,3 @@
-;---------------------------------------------
-; BONDS: This file contains flavors, methods, and codelets for bonds.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defflavor bond
     (left-string-position  
      right-string-position
@@ -681,17 +675,7 @@
        (eq (send b1 :direction-category) (send b2 :direction-category))))
 
 ;---------------------------------------------
-
-(defun get-bond-category (from-node to-node)
-; Returns the node representing the label of the link from FROM-NODE to 
-; TO-NODE.  Returns nil if the link has no label.  For now, I am assuming 
-; that there is only one link between node1 and node2.
-  (if* (eq from-node to-node)
-   then plato-sameness
-   else (loop for link in (send from-node :outgoing-links)
-              when (eq (send link :to-node) to-node)
-              return (send link :label))))
-
+; get-bond-category | get_bond_category
 ;---------------------------------------------
 
 (defmethod (bond :get-incompatible-bonds) ()
