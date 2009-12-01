@@ -17,6 +17,7 @@
 import copycat.toolbox as toolbox
 import copycat.slipnet as slipnet
 
+
 class Mapping(object):
     def __init__(self, description_type1, description_type2,
                  descriptor1, descriptor2, object1, object2):
@@ -63,8 +64,8 @@ class Mapping(object):
         if self.descriptor1 == other.descriptor1 and \
            self.descriptor2 == other.descriptor2:
             return True
-        elif not (self.descriptor1.is_related(other.descriptor1) or\
-                  self.descriptor2.is_related(other.descriptor2)):
+        elif not (self.descriptor1.are_related(other.descriptor1) or\
+                  self.descriptor2.are_related(other.descriptor2)):
             return
         elif not self.label or not other.label:
             return

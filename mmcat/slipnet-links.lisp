@@ -1,9 +1,3 @@
-;---------------------------------------------
-; This file contains definitions for the Slipnet links.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defun init-slipnet-links (&aux dummy-list letter1 letter2 number1 number2)
 
 ; SUCCESSOR AND PREDECESSOR LINKS
