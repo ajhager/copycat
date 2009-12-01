@@ -97,10 +97,11 @@ class Slipnode(object):
         return round(100 * (description_type_count / float(len(objects))))
 
     def total_description_type_support(self, string):
-        '''
+        """Return the total description type support with string.
+
         A function of the local description type support and the node's
         activation.
-        '''
+        """
         support = self.local_description_type_support(string)
         return round((support + self.activation) / 2.0)
 

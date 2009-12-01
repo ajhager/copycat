@@ -544,7 +544,4 @@
   (setq whole-single-link
 	(make-instance 'slipnet-link 
 	    :from-node plato-whole :to-node plato-single :fixed-length 90))
-
 )			   			   			
- 			   
- 

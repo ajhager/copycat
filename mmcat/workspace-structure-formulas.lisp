@@ -386,10 +386,8 @@
 ; slipnode.local-description-type-support | Slipnode.local_description_type_support
 ;---------------------------------------------
 
-(defmethod (slipnode :total-description-type-support) (string)
-; A function of the local-description-type-support and the node's activation.
-  (round (average (send self :local-description-type-support string) activation)))
-
+;---------------------------------------------
+; slipnode.total-description-type-support | Slipnode.total_desription_type_support
 ;---------------------------------------------
 
 (defmethod (description :local-support) (&aux num-of-supporting-objects)
