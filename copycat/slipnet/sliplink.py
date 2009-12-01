@@ -15,19 +15,31 @@
 # 02110-1301, USA.
 
 class Sliplink(object):
+    """Sliplink is a link between two nodes in the slipnet.
+
+    Attributes:
+        from_node: The node this link starts at.
+        to_node: The node this link ends at.
+        label: The node that labels this link.
+        fixed_length: A static length of the link has no label.
+    """
+
     def __init__(self, from_node, to_node, label, fixed_length):
+        """Initializes Sliplink."""
         self.from_node = from_node
         self.to_node = to_node
         self.label = label
         self.fixed_length = fixed_length
 
     def intrinsic_degree_of_association(self):
-        if self.fixed_length != None:
+        """Return the intrinsic degree of association of the link."""
+        if self.fixed_length:
             return 100 - self.fixed_length
         else:
             return self.label.intrinsic_degree_of_association()
 
     def degree_of_association(self):
+        """Return the degree of association of the link."""
         if self.fixed_length:
             return 100 - self.fixed_length
         else:

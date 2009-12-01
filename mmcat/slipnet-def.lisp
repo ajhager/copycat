@@ -53,15 +53,17 @@
 ; slipnode.similar-has-property-links | Slipnode.similar_has_property_links
 ;---------------------------------------------
 
-(defmethod (slipnet-link :intrinsic-degreex-of-association) ()
-  (if* fixed-length
-   then (fake-reciprocal fixed-length)
-   else (send label :intrinsic-degree-of-association)))
+;---------------------------------------------
+; slipnet-link.intrinsic-degree-of-association | Sliplink.intrinsic-degree-of-association
+;---------------------------------------------
 
-(defmethod (slipnet-link :degree-of-association) ()
-  (if* fixed-length
-   then (fake-reciprocal fixed-length)
-   else (send label :degree-of-association)))
+;---------------------------------------------
+; slipnet-link.degree-of-association | Sliplink.degree-of-association
+;---------------------------------------------
+
+;---------------------------------------------
+; defflavor slipnet-link | Sliplink.__init__
+;---------------------------------------------
 
 (defflavor slipnode 
     (activation 
@@ -101,11 +103,6 @@
 					   
   ())
 
-(defflavor slipnet-link 
-    (from-node to-node (label nil) (fixed-length nil))
-    ; If a link has no label, then it is assigned a fixed length.
-    ())
-					  
 (defun init-slipnet ()
 ; This function initializes all the nodes in the slipnet.  The links are 
 ; defined in the file "sliplinks.l".
