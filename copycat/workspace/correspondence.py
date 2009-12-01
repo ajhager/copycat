@@ -15,7 +15,7 @@
 # 02110-1301, USA.
 
 import copycat.toolbox as toolbox
-from copycat.workspace import Structure, Letter
+from copycat.workspace import Structure, Letter, Group
 
 class Correspondence(Structure):
     def __init__(self, workspace, object1, object2, concept_mappings):
@@ -178,7 +178,7 @@ class Correspondence(Structure):
         Return a list of all the already existing correspondences that are
         incompatible with the correspondence.
         '''
-        cors = self.state.workspace.correspondences
+        cors = self.workspace.correspondences()
         incomp = [c for c in cors if are_incompatible_correspondences(self, c)]
 
         if isinstance(self.object1, Group):

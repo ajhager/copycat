@@ -16,6 +16,7 @@
 
 from copycat.workspace import Structure
 
+
 class Rule(Structure):
     def __init__(self, object_category1, descriptor1_facet, descriptor1,
                  object_category2, replaced_description_type, relation=None):
@@ -41,7 +42,7 @@ class Rule(Structure):
     def expresses_relation(self):
         return self.relation
 
-    def is_no_change_made(self):
+    def has_no_change(self):
         return not self.descriptor1
 
     def calculate_internal_strength(self):
@@ -89,4 +90,4 @@ class Rule(Structure):
         return min(rule_strength, 100)
 
     def calculate_external_strength(self):
-        return self.internal_strength()
+        return self.internal_strength

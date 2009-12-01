@@ -1,10 +1,3 @@
-;---------------------------------------------
-; CORRESPONDENCES: This file contains flavors, methods, and codelets for 
-;                  correspondences.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defflavor correspondence
     (obj1 obj2  
      (concept-mapping-list nil) ; The list of concept mappings underlying the 

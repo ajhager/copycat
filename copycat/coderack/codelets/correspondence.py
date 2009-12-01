@@ -95,18 +95,21 @@ class CorrespondenceBuilder(Codelet):
         object1 = correspondence.object1
         object2 = correspondence.object2
 
-        flipped = object2.flipped_version()
-        existing_object2_group = workspace.target_string.is_group_present(flipped)
-
         # If the objects do not exist anymore, then fizzle.
-        objects = self.objects()
-        if (object1 not in objects) or \
-            ((object2 not in objects) and \
-            (not (flip_object2 and existing_object2_group))):
+        objects = workspace.objects()
+        if object1 not in objects:
+            return
+        obj2_present = object2 in objects
+        flipped = False
+        if flip_obj2:
+            flipv = object2.flipped_version()
+            flipped = workspace.target_string.is_group_present(flipv)
+
+        if not obj2_present and not flipped:
             return
 
         # If the correspondence exists, add and activiate concept mappings.
-        existing_correspondence = self.correspondence_present(correspondence)
+        existing_correspondence = workspace.is_correspondence_present(correspondence)
         if existing_correspondence:
             self.delete_proposed_correspondence(correspondence)
             labels = [m.label for m in correspondence.concept_mappings]
@@ -121,19 +124,19 @@ class CorrespondenceBuilder(Codelet):
 
         # If any concept mappings are no longer relevant, then fizzle.
         for mapping in correspondence.concept_mappings:
-            if not mapping.relevant:
+            if not mapping.is_relevant():
                 return
 
         # Remove the proposed correpondence from proposed correspondences.
-        self.delete_proposed_correspondence(correspondence)
+        workspace.delete_proposed_correspondence(correspondence)
 
         # The proposed correspondence must win against all incompatible ones.
-        incompatible_correspondences = correspondence.incompatible_corresondences()
+        incompatible_correspondences = correspondence.incompatible_correspondences()
         for incompatible_correspondence in incompatible_correspondences:
-            if not self.fight_it_out(correspondence,
-                                     correspondence.letter_span,
-                                     [incompatible_correspondence],
-                                     incompatible_correspondence.letter_span):
+            if not workspace.fight_it_out(correspondence,
+                                          correspondence.letter_span,
+                                          [incompatible_correspondence],
+                                          incompatible_correspondence.letter_span):
                 return
 
         # The proposed correspondence must win against any incompatible bond.
@@ -311,14 +314,13 @@ class CorrespondenceStrengthTester(Codelet):
 
         # Add some activation to some descriptions.
         for mapping in correspondence.concept_mappings:
-            mapping.description_type1.buffer += self.activation
-            mapping.descriptor1.buffer += self.activation
-            mapping.description_type2.buffer += self.activation
-            mapping.descriptor2.buffer += self.activation
+            mapping.description_type1.activation_buffer += workspace.activation
+            mapping.descriptor1.activation_buffer += workspace.activation
+            mapping.description_type2.activation_buffer += workspace.activation
+            mapping.descriptor2.activation_buffer += workspace.activation
 
         # Set correspondence proposal level.
         correspondence.proposal_level = 2
 
         # Post the correspondence builder codelet.
-        return [Codelet('correspondence_buidler',
-                        (correspondence, flip_object2), strength)]
+        return [(CorrespondenceBuilder((correspondence, flip_object2)), strength)]

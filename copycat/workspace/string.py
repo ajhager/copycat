@@ -263,9 +263,7 @@ class String(object):
         return self.from_to_bonds[from_number][to_number]
 
     def is_group_present(self, group):
-        '''
-        Return the existing group if the group exists in the string.
-        '''
+        """Return the existing group if the group exists in the string."""
         existing_group = self.groups[group.left_object.string_number]
         if existing_group and \
            existing_group.length() == group.length() and \

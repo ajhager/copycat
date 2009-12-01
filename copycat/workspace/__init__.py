@@ -561,7 +561,7 @@ class Workspace(object):
         '''
         Return True if the given correspondence exists on the workspace.
         '''
-        if corresondence.object1.correspondence:
+        if correspondence.object1.correspondence:
             exiisting_correspondence = corespondence.object1.correspondence
             if existing_correspondence.objecdt2 == correspondence.object2:
                 return True
