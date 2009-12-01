@@ -8,54 +8,12 @@
 ; slipnode.decay | Slipnode.decay
 ;---------------------------------------------
 
-(defun update-slipnet (&aux amount-to-spread full-activation-probability)
-
-; Decay and spread activation (change buffers, not actual activation, until
-; all nodes have been updated).
-  (loop for node in *slipnet* do
-
-        (send node :decay)
-
-	; If node is active, spread activation to neighbors.
-        ; Note that activation spreading uses the intrinsic link-length,
-        ; not the shrunk link length.
-	(if* (= (send node :activation) %max-activation%)
-         then  ; Give each neighbor the percentage of the activation
-               ; proportional to the inverse of its distance from the 
-	       ; original node.
-	       (loop for link in (send node :outgoing-links) do
-                    (setq amount-to-spread 
-			  (round (* (/ (send link 
-					     :intrinsic-degree-of-association)
-				        100.0)
-			            (send node :activation))))
-		    (send (send link :to-node) 
-			  :add-activation-to-buffer amount-to-spread))))
-		    
-  ; Next, the actual activation of each node is updated for the next time step.
-  (loop for node in *slipnet* do
-        (send node :set-activation 
-	           (min %max-activation% 
-			(+ (send node :activation) 
-			   (send node :activation-buffer))))
-
-        ; If node is still clamped, then activate it.
-	(if* (send node :clamp)
-	 then (send node :set-activation %max-activation%)
-
-	 else ; See if node should become active.  The decision is
-	      ; is a probabilistic function of activation.
-              (if* (>= (send node :activation) %full-activation-threshold%)
-	       then (setq full-activation-probability
-			  (cube (/ (send node :activation) 100)))
-                    (if* (eq (flip-coin full-activation-probability) 'heads)
-	             then (send node :set-activation %max-activation%))))
-
-        (send node :set-activation-buffer 0)))
-
-
 ;---------------------------------------------
 ; get-top-down-codelets | Slipnet.top_down_codelets
+;---------------------------------------------
+
+;---------------------------------------------
+; update-slipnet | Slipnet.update
 ;---------------------------------------------
 
 (defmethod (slipnode :get-codelets) ()

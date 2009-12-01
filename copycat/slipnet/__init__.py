@@ -346,14 +346,12 @@ class Slipnet(object):
                 return link.label
 
     def update(self):
-        '''
-        Update activations and link lengths.
-        '''
+        """Update activations and link lenths."""
         for node in self.slipnodes:
             node.decay()
-            if node.activation == 100:
+            if node.is_active():
                 for link in node.outgoing_links():
-                    amount_to_spread = int(node.activation * \
+                    amount_to_spread = round(node.activation * \
                             (link.intrinsic_degree_of_association() / 100.0))
                     link.to_node.activation_buffer += amount_to_spread
             
