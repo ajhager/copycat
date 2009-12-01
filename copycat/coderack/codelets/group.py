@@ -218,7 +218,6 @@ class GroupTopDownCategoryScout(Codelet):
                                                      object, object, objects, bonds)
 
                 probability = possible_single_letter_group.single_letter_group_probability()
-                print probability
                 if toolbox.flip_coin(probability):
                     return self.propose_group(objects, bonds, category,
                                               possible_single_letter_group_direction)

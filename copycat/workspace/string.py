@@ -140,7 +140,12 @@ class String(object):
         from_n = bond.from_object.string_number
         to_n = bond.to_object.string_number
         old_bond = self.proposed_bonds[from_n][to_n]
-        self.propsed_bonds[from_n][to_n] = [bond, old_bond]
+        if old_bond == None:
+            new_bonds = [bond]
+        else:
+            old_bond.append(bond)
+            new_bonds = old_bond
+        self.proposed_bonds[from_n][to_n] = new_bonds
 
     def remove_proposed_bond(self, bond):
         '''

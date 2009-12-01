@@ -14,6 +14,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import math
+
+
 class Slipnode(object):
     """Slipnode
 
@@ -37,7 +40,7 @@ class Slipnode(object):
             self.shrunk_link_length = None
         
         # TODO: Change this back to 0. used for testing purposes only.
-        self.activation = 100
+        self.activation = 0
         self.activation_buffer = 0
 
         self.category_links = []
@@ -142,11 +145,10 @@ class Slipnode(object):
             return 100 - self.intrinsic_link_length
 
     def bond_degree_of_association(self):
-        '''
-        Return the degree of association bonds of the given category are
+        """Return the degree of association bonds of the given cagtegory are
         considered to have.
-        '''
-        return min(100, round(11 * self.degree_of_association()))
+        """
+        return min(100, round(11 * math.sqrt(self.degree_of_association())))
 
     def is_active(self):
         """Return True if the nodes activation is the max value (100)."""

@@ -118,15 +118,17 @@ class BondStrengthTester(Codelet):
     '''
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
+        bond = self.arguments[0]
+
         # Update the strength values for the bond.
-        bond.update_strength_values()
-        strength = description.total_strength()
+        bond.update_strengths()
+        strength = bond.total_strength
 
         # Decide whether or not to post the bond builder codelet.
         probability = strength / 100.0
-        probability = self.temperature_adjusted_probability(probability)
+        probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
-            bond.string.delete_proposed_bond(bond)
+            bond.string.remove_proposed_bond(bond)
             return
 
         # Add activation to some relevant descriptions.
@@ -137,7 +139,7 @@ class BondStrengthTester(Codelet):
         # Change bond's proposal level.
         bond.proposal_level = 2
 
-        return [Codelet('bond_builder', (bond,), strength)]
+        return [(BondBuilder((bond,)), strength)]
 
 class BondTopDownCategoryScout(Codelet):
     '''
@@ -196,8 +198,8 @@ class BondTopDownCategoryScout(Codelet):
             return
 
         # Propose the bond.
-        return self.propose_bond(from_object, to_object, category, facet,
-                                 from_descriptor, to_descriptor)
+        return workspace.propose_bond(from_object, to_object, category, facet,
+                                      from_descriptor, to_descriptor)
 
 class BondTopDownDirectionScout(Codelet):
     '''

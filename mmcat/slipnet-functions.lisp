@@ -15,14 +15,6 @@
 ; slipnode.decay | Slipnode.decay
 ;---------------------------------------------
 
-(defmethod (slipnode :decay) ()
-; A node loses (100 - conceptual-depth) percent of its activation.
-  (send self :subtract-activation-from-buffer 
-             (round (* (/ (fake-reciprocal (send self :conceptual-depth)) 100)
-		       (send self :activation)))))
-
-;---------------------------------------------
-
 (defun update-slipnet (&aux amount-to-spread full-activation-probability)
 
 ; Decay and spread activation (change buffers, not actual activation, until

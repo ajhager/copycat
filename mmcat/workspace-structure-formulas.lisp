@@ -1,12 +1,3 @@
-;---------------------------------------------
-; WORKSPACE-STRUCTURE-FORMULAS:  Formulas for workspace structures.
-
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defmethod (workspace-structure :update-strength-values) ()
 ; Updates the strength values for the structure.
   (send self :set-internal-strength (send self :calculate-internal-strength))
@@ -355,12 +346,7 @@
   (memq node2 (send-method-to-list (send node1 :lateral-slip-links) :to-node)))
 
 ;---------------------------------------------
-
-(defmethod (slipnode :bond-degree-of-association) ()
-; Returns the degree of association bonds of the given category are 
-; considered to have.
-  (min 100 (round (* 11 (sqrt (send self :degree-of-association))))))
-
+; slipnode.bond-degree-of-association | Slipnode.bond_degree_of_association
 ;---------------------------------------------
 
 (defmethod (bond :importance) ()

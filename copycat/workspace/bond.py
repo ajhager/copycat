@@ -26,7 +26,7 @@ class Bond(Structure):
         super(Bond, self).__init__()
         self.workspace = workspace
 
-        if from_object.left_string_position < to_object.left_string_postion:
+        if from_object.left_string_position < to_object.left_string_position:
             self.direction_category = slipnet.plato_right
             self.left_object = from_object
             self.right_object = to_object

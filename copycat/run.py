@@ -71,7 +71,7 @@ class Run(object):
             category = codelet.structure_category
             a = self.workspace.get_codelets(category, codelet, urgency, args)
             codelets.extend(a)
-        for codelet, urgency in codelets:
+        for (codelet, urgency) in codelets:
             deleted = self.coderack.post(codelet, urgency)
             if deleted != None:
                 self.workspace.delete_proposed_structure(deleted.arguments)

@@ -773,15 +773,15 @@ class Workspace(object):
 
     def propose_bond(self, from_object, to_object, bond_category,
                      bond_facet, from_object_descriptor, to_object_descriptor):
-        from_object_descriptor.activate_from_workspace()
-        to_object_desriptor.activate_from_workspace()
-        bond_facet.activate_from_workspace()
-        proposed_bond = Bond(from_object, to_object, bond_category, bond_facet,
-                             from_object_descriptor, to_bond_descriptor)
+        from_object_descriptor.activation_buffer += self.activation
+        to_object_descriptor.activation_buffer += self.activation
+        bond_facet.activation_buffer += self.activation
+        proposed_bond = Bond(self, from_object, to_object, bond_category, bond_facet,
+                             from_object_descriptor, to_object_descriptor)
         proposed_bond.proposal_level = 1
-        from_object.string.add_proposed_bond(poposed_bond)
-        urgency = bond_category.bond_degree_of_association(proposed_bond)
-        return Codelet('bond_strength_tester', (proposed_bond, urgency))
+        from_object.string.add_proposed_bond(proposed_bond)
+        urgency = bond_category.bond_degree_of_association()
+        return [(BondStrengthTester((proposed_bond,)), urgency)]
 
     def build_correspondence(self, correspondence):
         correspondence.proposal_level = self.built

@@ -97,7 +97,7 @@ class CursesClient(object):
         totals.sort(key=lambda x: x[1])
         total = sum(self.coderack_stats.total_seen.values())
         current = self.coderack_stats.last_step
-        total_current = self.run.coderack.number_of_codelets()
+        total_current = len(self.run.coderack.codelets())
         for (t, v) , y in zip(totals, range(len(totals))):
             now = current[t]
             self.show('%40s: %5s %5s' % (t.__name__, v, now), (y+2, 0))
@@ -105,7 +105,6 @@ class CursesClient(object):
                  self.GREEN)
         self.show('%40s: %5s' % ('Temperature', self.run.workspace.temperature),
                                  (29, 0), self.RED)
-
     def main(self, screen):
         self.init_curses(screen)
 
