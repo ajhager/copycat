@@ -1,15 +1,8 @@
-(defmethod (slipnode :activate-from-workspace) ()
-  (incf activation-buffer %workspace-activation%))
-
 ;---------------------------------------------
-
-(defmethod (slipnode :add-activation-to-buffer) (activation-to-add)
-  (incf activation-buffer activation-to-add))
-
+; slipnode.activate-from-workspace | REMOVED
+; slipnode.add-activation-to-buffer
+; slipnode.subtract-activation-from-buffer
 ;---------------------------------------------
-
-(defmethod (slipnode :subtract-activation-from-buffer) (activation-to-subtract)
-  (decf activation-buffer activation-to-subtract))
 
 ;---------------------------------------------
 ; slipnode.decay | Slipnode.decay
@@ -61,6 +54,8 @@
         (send node :set-activation-buffer 0)))
 
 
+;---------------------------------------------
+; get-top-down-codelets | Slipnet.top_down_codelets
 ;---------------------------------------------
 
 (defun get-top-down-codelets ()

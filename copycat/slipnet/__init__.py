@@ -393,13 +393,9 @@ class Slipnet(object):
                 node.clamp = False
 
     def top_down_codelets(self):
-        '''
-        Ask each node at or above the activation threshold for any codelets
-        attached to them and return them all.
-        '''
+        """Return a list of codelets attached to active nodes."""
         codelets = []
         for node in self.slipnodes:
             if node.activation >= 50:
-                for codelet in node.codelets:
-                    codelets.append((codelet, [node], node.conceptual_depth / 100.))
+                codelets.extend(node.get_codelets())
         return codelets
