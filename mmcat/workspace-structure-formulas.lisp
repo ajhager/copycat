@@ -366,21 +366,8 @@
   (round (average (send self :importance) (send self :unhappiness))))
 
 ;---------------------------------------------
-
-(defmethod (slipnode :local-descriptor-support) 
-           (string object-category &aux object-list)
-; The percentage of objects of the given category in the string that have 
-; this descriptor.
-  (if* (eq object-category plato-letter)
-   then (setq object-list (send string :letter-list))
-   else (setq object-list (send string :group-list)))
-  (if* (null object-list) 
-   then 0
-   else (loop for obj in object-list
-	      when (send obj :descriptor-present? self)
-	      count t into descriptor-count
-	      finally (return (round (* 100 (/ descriptor-count 
-					       (length object-list))))))))
+; slipnode.local-descriptor-support | Slipnode.local_descriptor_support
+;---------------------------------------------
   
 ;---------------------------------------------
 ; slipnode.local-description-type-support | Slipnode.local_description_type_support

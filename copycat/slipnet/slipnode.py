@@ -64,28 +64,29 @@ class Slipnode(object):
         """Return True if the two nodes are linked by a slip link."""
         return other_node in [lsl.to_node for lsl in self.lateral_slip_links]
 
-    def local_descriptor_support(self, string, object_category):
+    def local_descriptor_support(node, string, object_category):
+        """Return the percentage of objects of the category in the string that
+        have this descriptor."""
         if object_category.name == 'letter':
             objects = string.letters
         else:
             objects = string.groups
-        
+
+        objects = filter(lambda x: x != None, objects)
+
         if not objects:
             return 0
-        
+
         descriptor_count = 0
         for obj in objects:
-            if obj == None:
-                continue
-            if obj.is_descriptor_present(self):
+            if obj.is_descriptor_present(node):
                 descriptor_count += 1
 
         return round(100 * (descriptor_count / float(len(objects))))
 
     def local_description_type_support(self, string):
         """Return the percentge of objects in the string that have descriptions
-        with this descriptor type.
-        """
+        with this descriptor type."""
         objects = string.objects()
         description_type_count = 0
         for obj in objects:
