@@ -299,6 +299,13 @@ def get_bond_category(from_node, to_node):
             if link.to_node == to_node:
                 return link.label
 
+def get_label_node(from_node, to_node):
+    if from_node == to_node:
+        return plato_identity
+    for link in from_node.outgoing_links():
+        if link.to_node == to_node:
+            return link.label
+
 def get_plato_letter(character):
     """Given a character, return the corresponding slipnet letter node."""
     for node in slipnet_letters:
@@ -337,13 +344,6 @@ class Slipnet(object):
         self.slipnodes = slipnodes
         self.sliplinks = sliplinks
         self.clamp_time = 50
-
-    def get_label_node(self, from_node, to_node):
-        if from_node == to_node:
-            return plato_identity
-        for link in from_node.outgoing_links():
-            if link.to_node == to_node:
-                return link.label
 
     def update(self):
         """Update activations and link lenths."""

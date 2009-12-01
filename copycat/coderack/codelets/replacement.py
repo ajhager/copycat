@@ -40,8 +40,8 @@ class ReplacementFinder(Codelet):
         m_letter_category = m_letter.get_descriptor(nodes.plato_letter_category)
         if i_letter_category != m_letter_category:
             i_letter.changed = True
-            change_relation = slipnet.get_label_node(i_letter_category,
-                                                     m_letter_category)
+            change_relation = nodes.get_label_node(i_letter_category,
+                                                   m_letter_category)
             if change_relation:
                 description = ExtrinsicDescription(change_relation,
                                                    nodes.plato_letter_category,
