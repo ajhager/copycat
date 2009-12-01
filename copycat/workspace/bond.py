@@ -276,7 +276,7 @@ class Bond(Structure):
             return round(100 * (support_sum / float(slot_sum)))
 
     def local_support(self):
-        number = self.number_of_supporting_bonds()
+        number = self.number_of_local_supporting_bonds()
         if number == 0:
             return 0
         density = self.local_density()
@@ -293,7 +293,7 @@ class Bond(Structure):
         '''
         number_of_supporting_bonds = 0
         letter_distance = self.workspace.letter_distance
-        for bond in self.string.bonds:
+        for bond in self.string.bonds():
             if bond == self:
                 continue
             if all([letter_distance(self.left_object, bond.left_object) != 0,

@@ -32,10 +32,10 @@ class Structure(object):
         self.update_total_strength()
 
     def update_internal_strength(self):
-        pass
+        self.internal_strength = self.calculate_internal_strength()
 
     def update_external_strength(self):
-        pass
+        self.external_strength = self.calculate_external_strength()
 
     def update_total_strength(self):
         weights = [self.internal_strength, 100 - self.internal_strength]

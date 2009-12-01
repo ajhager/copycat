@@ -57,7 +57,7 @@ class BondBuilder(Codelet):
     '''
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
-        bond = self.args[0]
+        bond = self.arguments[0]
         string = bond.string
         from_object = bond.from_object
         to_object = bond.to_object
@@ -72,14 +72,14 @@ class BondBuilder(Codelet):
             direction_category = existing_bond.direction_category
             if direction_category:
                 direction_category.activation_buffer += workspace.activation
-            string.delete_proposed_bond(bond)
+            string.remove_proposed_bond(bond)
             return
 
-        string.delete_proposed_bond(bond)
+        string.remove_proposed_bond(bond)
 
         incompatible_bonds = bond.incompatible_bonds()
         if incompatible_bonds:
-            if not self.fight_it_out(bond, 1, incompatible_bonds, 1):
+            if not workspace.fight_it_out(bond, 1, incompatible_bonds, 1):
                 return
 
         incompatible_groups = from_object.common_groups(to_object)
@@ -132,9 +132,9 @@ class BondStrengthTester(Codelet):
             return
 
         # Add activation to some relevant descriptions.
-        bond.from_object_descriptor.buffer += self.activation
-        bond.to_object_descriptor.buffer += self.activation
-        bond.bond_facet.buffer += self.activation
+        bond.from_object_descriptor.activation_buffer += workspace.activation
+        bond.to_object_descriptor.activation_buffer += workspace.activation
+        bond.bond_facet.activation_buffer += workspace.activation
 
         # Change bond's proposal level.
         bond.proposal_level = 2

@@ -39,7 +39,6 @@ class Slipnode(object):
         else:
             self.shrunk_link_length = None
         
-        # TODO: Change this back to 0. used for testing purposes only.
         self.activation = 0
         self.activation_buffer = 0
 
