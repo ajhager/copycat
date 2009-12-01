@@ -170,9 +170,11 @@ class Slipnode(object):
         self.activation_buffer = max(0, self.activation_buffer - amount)
 
     def similar_has_property_links(self):
+        """Return a list of has property links that are similar."""
         similar_links = []
         for link in self.has_property_links:
             prob = link.degree_of_association() / 100.0
+            # FIXME: Requires access to the workspace.  Is it needed?
             #prob = get_temperature_adjusted_probability(prob)
             if util.flip_coin(prob):
                 similar_links.append(link)

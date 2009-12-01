@@ -1,3 +1,68 @@
+;---------------------------------------------
+; get-label-node | get_label_node
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.get-related-node | get_related_node
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.applay-slippages | Slipnode.apply_slippages
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.get-possible-descriptors | Slipnode.get_possible_descriptors
+;---------------------------------------------
+
+;---------------------------------------------
+; clear-slipnet | Slipnet.clear
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.directed? | REMOVED
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.print | REMOVED
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.outgoing-links | Slipnode.outgoing_links
+
+;---------------------------------------------
+; slipnode.active? | Slipnode.is_active
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.category | Slipnode.category
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnet-link.print | REMOVED
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.intrinsic-degree-of-association | Slipnode.intrinsic_degree_of_association
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.degree-of-association | Slipnode.degree_of_association
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.similar-has-property-links | Slipnode.similar_has_property_links
+;---------------------------------------------
+
+(defmethod (slipnet-link :intrinsic-degreex-of-association) ()
+  (if* fixed-length
+   then (fake-reciprocal fixed-length)
+   else (send label :intrinsic-degree-of-association)))
+
+(defmethod (slipnet-link :degree-of-association) ()
+  (if* fixed-length
+   then (fake-reciprocal fixed-length)
+   else (send label :degree-of-association)))
+
 (defflavor slipnode 
     (activation 
      activation-buffer ; A buffer for storing activation between updates.
@@ -40,58 +105,7 @@
     (from-node to-node (label nil) (fixed-length nil))
     ; If a link has no label, then it is assigned a fixed length.
     ())
-
-;---------------------------------------------
-; slipnode.directed? | REMOVED
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnode.print | REMOVED
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnode.outgoing-links | Slipnode.outgoing_links
-
-;---------------------------------------------
-; slipnode.active? | Slipnode.is_active
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnode.category | Slipnode.category
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnet-link.print | REMOVED
-;---------------------------------------------
-
-(defmethod (slipnet-link :intrinsic-degreex-of-association) ()
-  (if* fixed-length
-   then (fake-reciprocal fixed-length)
-   else (send label :intrinsic-degree-of-association)))
-
-;---------------------------------------------
-; slipnode.intrinsic-degree-of-association | Slipnode.intrinsic_degree_of_association
-;---------------------------------------------
-
-(defmethod (slipnet-link :degree-of-association) ()
-  (if* fixed-length
-   then (fake-reciprocal fixed-length)
-   else (send label :degree-of-association)))
-
-;---------------------------------------------
-; slipnode.degree-of-association | Slipnode.degree_of_association
-;---------------------------------------------
-
-(defmethod (slipnode :similar-has-property-links) ()
-  (loop for link in has-property-links 
-	when (eq (flip-coin (get-temperature-adjusted-probability
-				(/ (send link :degree-of-association) 100))) 
-		 'heads)
-	collect link))
-
-;---------------------------------------------
-
-
+					  
 (defun init-slipnet ()
 ; This function initializes all the nodes in the slipnet.  The links are 
 ; defined in the file "sliplinks.l".
@@ -640,23 +654,3 @@
   (setq *slipnet-initialized* t)
 
 )
-					  
-;---------------------------------------------
-; get-label-node | get_label_node
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnode.get-related-node | get_related_node
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnode.applay-slippages | Slipnode.apply_slippages
-;---------------------------------------------
-
-;---------------------------------------------
-; slipnode.get-possible-descriptors | Slipnode.get_possible_descriptors
-;---------------------------------------------
-
-;---------------------------------------------
-; clear-slipnet | Slipnet.clear
-;---------------------------------------------
