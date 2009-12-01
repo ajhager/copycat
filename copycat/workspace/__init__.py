@@ -21,11 +21,11 @@ import copycat.toolbox as toolbox
 
 from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
-from copycat.workspace.correspondence import Correspondence
 from copycat.workspace.description import Description
 from copycat.workspace.description import ExtrinsicDescription
 from copycat.workspace.group import Group
 from copycat.workspace.letter import Letter
+from copycat.workspace.correspondence import Correspondence
 from copycat.workspace.mapping import Mapping
 from copycat.workspace.bond import Bond
 from copycat.workspace.replacement import Replacement
@@ -682,7 +682,7 @@ class Workspace(object):
         distinguishing concept mappings underlying the correspondence.
         '''
         # FIXME: Real implementation
-        correspondence = Correspondence(object1, object2, mappings)
+        correspondence = Correspondence(self, object1, object2, mappings)
         return [(CorrespondenceStrengthTester([correspondence, False]), 80)]
 
     def propose_group(self, objects, bonds, group_category, direction_category):

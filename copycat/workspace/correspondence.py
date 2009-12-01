@@ -15,11 +15,12 @@
 # 02110-1301, USA.
 
 import copycat.toolbox as toolbox
-from copycat.workspace import Structure
+from copycat.workspace import Structure, Letter
 
 class Correspondence(Structure):
-    def __init__(self, object1, object2, concept_mappings):
+    def __init__(self, workspace, object1, object2, concept_mappings):
         super(Correspondence, self).__init__()
+        self.workspace = workspace
         self.object1 = object1
         self.object2 = object2
         self.concept_mappings = concept_mappings
@@ -55,24 +56,26 @@ class Correspondence(Structure):
                         return True
 
     def support(self):
-        '''
+        """Return the summed strength of other supporting correspondences.
+
         For now there are three levels of compatibility:
             1. Supporting
             2. Not incompatible but not supporting
             3. Incompatible
-        Returns the sum of the strengths of other correspondences that
-        support this one. If one of the objects is the single letter in
-        its string, then the support is 100.
-        '''
+        If one of the objects is the single letter in its string, then the
+        support is 100.
+        """
         if (isinstance(self.object1, Letter) and self.object1.spans_whole_string()) or \
            (isinstance(self.object2, Letter) and self.object2.spans_whole_string()):
             return 100
         else:
             support_sum = 0
-            other_correspondences = self.workspace.correspondences.remove(self)
+            other_correspondences = self.workspace.correspondences()
+            if self in other_correspondences:
+                other_correspondences.remove(self)
             for c in other_correspondences:
                 if self.is_supporting_correspondence(c):
-                    support_sum += c.total_strength()
+                    support_sum += c.total_strength
             return min(100, support_sum)
 
     def calculate_external_strength(self):
@@ -100,7 +103,7 @@ class Correspondence(Structure):
         else:
             internal_coherence_factor = 1
 
-        return min(100, round(average_strength * internal_coherence_facotr * \
+        return min(100, round(average_strength * internal_coherence_factor * \
                               number_of_cms_factor))
 
     def is_internally_coherent(self):

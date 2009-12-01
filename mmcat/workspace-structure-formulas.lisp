@@ -611,25 +611,7 @@
         (round (* adjusted-density number-factor))))
 	   
 ;---------------------------------------------
-
-(defmethod (correspondence :support) (&aux support-sum other-correspondences)
-; For now there are three levels of compatibility: 
-; supporting, not incompatible but not supporting, and incompatible.
-; This returns the sum of the strengths of other correspondences that
-; support this one (or 100, whichever is lower).  If one of the objects is the 
-; single letter in its string, then the support is 100.
-  (if* (or (and (typep obj1 'letter) (send obj1 :spans-whole-string?))
-	   (and (typep obj2 'letter) (send obj2 :spans-whole-string?)))
-   then 100 
-   else (setq support-sum 0) ; What the correspondence gets in the absence of
-                             ; compatible or incompatible correspondences.
-        (setq other-correspondences 
-	      (remove self (send *workspace* :correspondence-list)))
-        (loop for c in other-correspondences do
-              (if* (supporting-correspondences? self c)
-               then (incf support-sum (send c :total-strength))))
-        (min 100 support-sum)))
-         
+; correspondence.support | Correspondence.support
 ;---------------------------------------------
 
 (defmethod (workspace-string :local-bond-category-relevance)
