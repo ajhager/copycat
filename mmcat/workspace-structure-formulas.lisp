@@ -334,11 +334,7 @@
   (if* (eq node1 node2) then t else (linked? node1 node2)))
 
 ;---------------------------------------------
-
-(defun linked? (node1 node2)
-; Returns t if the two nodes are linked in the slipnet.
-  (memq node2 (send-method-to-list (send node1 :outgoing-links) :to-node)))
-
+; linked? | Slipnode.are_linked
 ;---------------------------------------------
 
 (defun slip-linked? (node1 node2)

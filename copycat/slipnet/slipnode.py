@@ -59,10 +59,8 @@ class Slipnode(object):
         return self == other_node or self.are_linked(other_node)
 
     def are_linked(self, other_node):
-        '''
-        Return True if the two nodes are linked in the slipnet.
-        '''
-        return other_node in [ol.to_node for ol in self.outgoing_links]
+        """Return True if the two nodes are linked in the slipnet."""
+        return other_node in [ol.to_node for ol in self.outgoing_links()]
 
     def is_slip_linked_with(self, other_node):
         '''
