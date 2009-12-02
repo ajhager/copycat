@@ -119,31 +119,33 @@ class Object(object):
         return 100 - self.total_happiness
 
     def calculate_intra_string_salience(self):
-        '''
+        """Return the intra string salience.
+        
         This value represents how much the object is crying out for attention
         from codelets that build structures inside a single string.
-        '''
+        """
         if self.clamp_salience:
             return 100
         else:
-            return round(toolbox.weighted_average([2, 8],
-                                                  [self.relative_importance,
-                                                   self.intra_string_unhappiness]))
+            weights = [2, 8]
+            values = [self.relative_importance, self.intra_string_unhappiness]
+            return round(toolbox.weighted_average(weights, values))
 
     def calculate_inter_string_salience(self):
-        '''
+        """Return the inter string salience.
+
         This value represents how much the object is crying out for attention
         from codelets that build structures between strings.
-        '''
+        """
         if self.clamp_salience:
             return 100
         else:
-            a = round(toolbox.weighted_average([8, 2],
-                                               [self.relative_importance,
-                                               self.inter_string_unhappiness]))
-            return a
+            weights = [8, 2]
+            values = [self.relative_importance, self.inter_string_unhappiness]
+            return round(toolbox.weighted_average(weights, values))
 
     def calculate_total_salience(self):
+        """Return the total salience of the object."""
         return round(toolbox.average(self.intra_string_salience,
                                      self.inter_string_salience))
 
@@ -159,14 +161,14 @@ class Object(object):
         self.intra_string_salience = self.calculate_intra_string_salience()
         self.inter_string_salience = self.calculate_inter_string_salience()
         self.total_salience = self.calculate_total_salience()
+        
+    def objects(self):
+        """Return the default of no objects."""
+        return []
 
     def letter_span(self):
-        '''
-        Return the number of letters spanned by the object.
-        '''
-        if self.group == None:
-            return 1
-        return sum([obj.letter_span() for obj in self.objects])
+        """Return the number of letters spanned by the object."""
+        return max(1, sum([obj.letter_span() for obj in self.objects()]))
 
     def letters(self):
         '''

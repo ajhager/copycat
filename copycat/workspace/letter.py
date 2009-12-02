@@ -35,3 +35,4 @@ class Letter(Object):
         self.string = string
         self.left_string_position = string_position
         self.right_string_position = string_position
+

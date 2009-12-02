@@ -62,13 +62,8 @@
      pname ; The print name of the object.
      ())
 
-(defmethod (workspace-object :letter-span) ()
-; Returns the number of letters spanned by the object.
-  (if* (typep self 'letter)
-   then 1 
-   else (list-sum (send-method-to-list 
-		      (send self :object-list) :letter-span))))
-
+;---------------------------------------------
+; workspace-object.letter-span | Object.letter-span
 ;---------------------------------------------
 
 (defmethod (workspace-object :letter-list) ()
