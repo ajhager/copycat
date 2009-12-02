@@ -877,80 +877,8 @@
   incompatible-correspondences)
 
 ;---------------------------------------------
-
-(defmethod (correspondence :get-incompatible-correspondences) 
-           (&aux incompatible-correspondences direction-category-cm 
-		 object-correspondence group-correspondence)
-; Returns a list of all the already-existing correspondences that are
-; incompatible with the given correspondence.
-  (setq incompatible-correspondences
-	(loop for c in (send *workspace* :correspondence-list) 
-              when (and c (incompatible-correspondences? self c)) collect c))
-
-  ; If obj1 is a group, add any correspondences
-  ; between objects in obj1 and objects not in obj2, if obj2 is a group,
-  ; or any other objects, if obj2 is a letter.  Then do the same thing if
-  ; obj2 is a group.
-  (if* (typep obj1 'group)
-   then (loop for obj in (send obj1 :object-list) do
-              (setq object-correspondence (send obj :correspondence))
-	      (if* (and object-correspondence
-			(or (typep obj2 'letter)
-		            (not (memq (send object-correspondence :obj2) 
-			               (send  obj2 :object-list)))))
-               then (push object-correspondence 
-			  incompatible-correspondences))))
-  (if* (typep obj2 'group)
-   then (loop for obj in (send obj2 :object-list) do
-              (setq object-correspondence (send obj :correspondence))
-	      (if* (and object-correspondence
-			(or (typep obj1 'letter)
-		            (not (memq (send object-correspondence :obj1) 
-			               (send  obj1 :object-list)))))
-               then (push object-correspondence 
-			  incompatible-correspondences))))
-
-  ; If obj1 is in a group, and if obj1's group corresponds to something,
-  ; then if obj2 is not in a group or if obj1's group corresponds to something
-  ; other than obj2's group, then add the obj1's group's correspondence.
-  ; Then do the same thing if obj2 is in a group.
-  (if* (and (send obj1 :group) 
-	    (setq group-correspondence 
-		  (send (send obj1 :group) :correspondence)))
-   then (if* (or (null (send obj2 :group))
-		 (not (eq (send obj2 :group)
-			  (send group-correspondence :obj2))))
-         then (push group-correspondence incompatible-correspondences)))
-
-  (if* (and (send obj2 :group) 
-	    (setq group-correspondence 
-		  (send (send obj2 :group) :correspondence)))
-   then (if* (or (null (send obj1 :group))
-		 (not (eq (send obj1 :group)
-			  (send group-correspondence :obj1))))
-         then (push group-correspondence incompatible-correspondences)))
-
-  ; If both objects are directed string-spanning groups and their leftmost and 
-  ; rightmost objects don't have the correct correspondeces, then add these 
-  ; to the list of incompatible correspondences.
-  (if* (and (send obj1 :string-spanning-group?) 
-	    (send obj2 :string-spanning-group?)
-  	     (setq direction-category-cm
-		 (loop for cm in (send self :concept-mapping-list)
-		       when (and (eq (send cm :description-type1) 
-				     plato-direction-category)
-				 (eq (send cm :description-type2) 
-				     plato-direction-category))
-		       return cm
-		       finally (return nil))))
-   then (setq incompatible-correspondences 
-	      (append (get-leftmost-and-rightmost-incompatible-correspondences 
-			  obj1 obj2 direction-category-cm)
-	              incompatible-correspondences)))
-
-  (remove-duplicates incompatible-correspondences))
-
-;-------------------------------------------------------
+; correspondence.get-incompatible-correspondences | ditto
+;---------------------------------------------
 
 (defmethod (correspondence :get-incompatible-bond)
            (&aux bond1 bond2 bond-concept-mapping-list 

@@ -16,6 +16,7 @@
 
 import copycat.toolbox as toolbox
 from copycat.workspace import Structure, Letter, Group
+import copycat.slipnet as slipnet
 
 class Correspondence(Structure):
     def __init__(self, workspace, object1, object2, concept_mappings):
@@ -174,41 +175,45 @@ class Correspondence(Structure):
         return [cm for cm in mps if cm.is_relevant() and cm.is_distinguishing]
 
     def incompatible_correspondences(self):
-        '''
-        Return a list of all the already existing correspondences that are
-        incompatible with the correspondence.
-        '''
+        """Return a list of all the already existing correspondences that are
+        incompatible with the correspondence"""
         cors = self.workspace.correspondences()
-        incomp = [c for c in cors if are_incompatible_correspondences(self, c)]
+        incomp = []
+        for c in self.workspace.correspondences():
+            if c and are_incompatible_correspondences(self, c):
+                incomp.append(c)
 
         if isinstance(self.object1, Group):
-            for obj in self.object1.objects:
-                if obj.correspondence and (isinstance(self.object2, Letter) or \
-                      obj.correspondence not in self.object2.objects):
+            for obj in self.object1.objects():
+                if (obj.correspondence and (isinstance(self.object2, Letter)) or \
+                      obj.correspondence not in self.object2.objects()):
                     incomp.append(obj.correspondence)
         if isinstance(self.object2, Group):
-            for obj in self.object2.objects:
-                if obj.correspondence and (isinstance(self.object1, Letter) or \
-                      obj.correspondence not in self.object1.objects):
+            for obj in self.object2.objects():
+                if (obj.correspondence and (isinstance(self.object1, Letter)) or \
+                      obj.correspondence not in self.object1.objects()):
                     incomp.append(obj.correspondence)
 
-        group_correspondence = self.object1.group.correspondence
-        if self.object1.group and group_correspondence:
-            if not self.object2.group or \
-               self.object2.group != group_correspondence.object2:
-                incomp.append(group_correspondence)
-        group_correspondence = self.object2.group.correspondence
-        if self.object2.group and group_correspondence:
-            if not self.object1.group or \
-               self.object1.group != group_correspondence.object1:
-                incomp.append(group_correspondence)
+        if self.object1.group:
+            group_correspondence = self.object1.group.correspondence
+            if group_correspondence:
+                if not self.object2.group or \
+                        self.object2.group != group_correspondence.object2:
+                    incomp.append(group_correspondence)
 
-        direction_category = self.state.slipnet.plato_direction_category
+        if self.object2.group:
+            group_correspondence = self.object2.group.correspondence
+            if group_correspondence:
+                if not self.object1.group or \
+                        self.object1.group != group_correspondence.object1:
+                    incomp.append(group_correspondence)
+
+        direction_category = slipnet.plato_direction_category
         direction_category_cm = None
         for cm in self.concept_mappings:
             if cm.description_type1 == direction_category and \
                cm.description_type2 == direction_category:
-                directin_cateogry_cm = cm
+                direction_cateogry_cm = cm
                 break
         if self.object1.is_string_spanning_group() and \
            self.object2.is_string_spanning_group() and \
