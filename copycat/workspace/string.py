@@ -55,7 +55,9 @@ class String(object):
         return random.choice(self.letters)
     
     def objects(self):
-        return self.letters + self.groups
+        letters = filter(lambda x: x != None, self.letters)
+        groups = filter(lambda x: x != None, self.groups)
+        return letters + groups
 
     def choose_object(self, method):
         '''

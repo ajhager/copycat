@@ -23,7 +23,17 @@ import copycat.coderack.codelets
 from copycat.coderack.codelets import AnswerBuilder
 
 class Run(object):
+    """Run
+    
+    Attributes:
+        coderack:
+        slipnet:
+        workspace:
+        timestep: The number of codelets to run before an update.
+    """
+
     def __init__(self, initial, modified, target, seed):
+        """Initialize Run."""
         self.coderack = Coderack()
         self.slipnet = Slipnet()
         self.workspace = Workspace(initial, modified, target)

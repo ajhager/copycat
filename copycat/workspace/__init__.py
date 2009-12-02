@@ -105,26 +105,29 @@ class Workspace(object):
             leftmost_letter = string.letters[0]
             if string.length > 1:
                 rightmost_letter = string.letters[-1]
-                leftmost_letter.add_description(Description(leftmost_letter,
-                                                            slipnet.plato_string_position_category,
-                                                            slipnet.plato_leftmost))
-                rightmost_letter.add_description(Description(rightmost_letter,
-                                                             slipnet.plato_string_position_category,
-                                                             slipnet.plato_rightmost))
+                description = Description(leftmost_letter,
+                                          slipnet.plato_string_position_category,
+                                          slipnet.plato_leftmost)
+                leftmost_letter.add_description(description)
+
+                description = Description(rightmost_letter,
+                                          slipnet.plato_string_position_category,
+                                          slipnet.plato_rightmost)
+                rightmost_letter.add_description(description)
             else:
-                leftmost_letter.add_description(Description(leftmost_letter,
-                                                            slipnet.plato_string_position_category,
-                                                            slipnet.plato_single))
+                description = Description(leftmost_letter,
+                                          slipnet.plato_string_position_category,
+                                          slipnet.plato_single)
+                leftmost_letter.add_description(description)
 
             if string.length == 3:
                 middle_letter = string.letters[1]
-                middle_letter.add_description(Description(middle_letter,
-                                                          slipnet.plato_string_position_category,
-                                                          slipnet.plato_middle))
+                description = Description(middle_letter,
+                                          slipnet.plato_string_position_category,
+                                          slipnet.plato_middle)
+                middle_letter.add_description(description)
 
         for obj in self.objects():
-            if not obj:
-                continue
             for description in obj.descriptions:
                 description.descriptor.activation_buffer += self.activation
 
