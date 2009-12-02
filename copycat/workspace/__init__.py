@@ -81,7 +81,11 @@ class Workspace(object):
         if self.initial_string.length == 1 or self.target_string.length == 1:
             slipnet.plato_object_category.activation_buffer += self.activation
 
-        # Make letters for each string.
+        self.make_letters()
+        self.add_descriptions()
+
+    def make_letters(self):
+        """Make letters for each string."""
         for string in [self.initial_string, self.modified_string, self.target_string]:
             count = 0
             for character in string.name:
@@ -90,7 +94,8 @@ class Workspace(object):
                 string.add_letter(letter)
                 count += 1
 
-        # Add initial descriptions to the letters in the strings.
+    def add_descriptions(self):
+        """Add initial descriptions to the letters in the strings."""
         for string in [self.initial_string, self.modified_string, self.target_string]:
             for letter in string.letters:
                 description = Description(letter,

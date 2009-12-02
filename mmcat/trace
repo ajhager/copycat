@@ -7,23 +7,10 @@ Using this to decide what next to check for accuracy.
 
 
 copycat.run:29:         self.workspace = Workspace(initial, modified, target)
-copycat.workspace:45:         self.activation = 100
-copycat.workspace:46:         self.temperature = 0
-copycat.workspace:47:         self.clamp_temperature = False
-copycat.workspace:53:         self.rule = None
-copycat.workspace:54:         self.translated_rule = None
-copycat.workspace:56:         self.snag_object = None
-copycat.workspace:57:         self.snag_condition = None
-copycat.workspace:58:         self.snag_count = 0
-copycat.workspace:59:         self.last_snag_time = 0
-copycat.workspace:60:         self.snag_structures = []
-copycat.workspace:63:         if self.initial_string.length == 1 or self.target_string == 1:
-copycat.workspace:67:         for string in [self.initial_string, self.modified_string, self.target_string]:
-copycat.workspace:68:             count = 0
-copycat.workspace:69:             for character in string.name:
-copycat.workspace:70:                 letter_category = slipnet.get_plato_letter(character)
-copycat.slipnet:288:     index = string.ascii_lowercase.find(str(character))
-copycat.slipnet:289:     return slipnet_letters[index]
+
+
+# MAKE LETTERS
+
 copycat.workspace:71:                 letter = Letter(character, string, letter_category, count)
 copycat.workspace.letter:21:         super(Letter, self).__init__()
 copycat.workspace.wobject:22:         self.string = None
@@ -460,6 +447,11 @@ copycat.workspace.string:124:         self.object_positions[position] = [letter,
 copycat.workspace:73:                 count += 1
 copycat.workspace:69:             for character in string.name:
 copycat.workspace:67:         for string in [self.initial_string, self.modified_string, self.target_string]:
+
+
+# ADD DESCRIPTIONS
+
+
 copycat.workspace:76:         for string in [self.initial_string, self.modified_string, self.target_string]:
 copycat.workspace:77:             for letter in string.letters:
 copycat.workspace:78:                 description = Description(letter,
