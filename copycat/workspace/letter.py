@@ -21,8 +21,6 @@ class Letter(Object):
 
     Attributes:
         type_name: Used as a hack so wobject knows which object it is.
-        groups: The groups this letter is a part of.
-        bonds: The bonds this letter is a part of.
         name: The character name of the letter.
         string: The string this letter is in.
         left_string_position: Position in the string.

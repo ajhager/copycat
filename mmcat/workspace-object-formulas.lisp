@@ -1,30 +1,5 @@
 ;---------------------------------------------
-; WORKSPACE-OBJECT-FORMULAS:  This file contains formulas for workspace
-;                              objects.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
-(defmethod (workspace-object :calculate-raw-importance) (&aux result)
-; Returns the raw (as opposed to relative) importance of the object.
-; This is a function of the number and activation of the object's
-; relevant descriptions.  In addition, the importance of the changed object 
-; is enhanced, and the importance of objects in groups is diminished.
-  ; Sum the activation of the descriptors of relevant descriptions up
-  ; to 300 (this is to limit the relative importance of groups, which have
-  ; lots of descriptions, versus letters, which usually have fewer. 
-
-  (setq result 
-	(min 300 (list-sum (send-method-to-list 
-			       (send-method-to-list 
-				   (send self :relevant-descriptions)
-				   :descriptor) :activation))))
-  (if* (send self :changed?) then (setq result (* 2 result)))
-  (if* (send self :group) then (setq result (* 2/3 result)))
-  result)
-	
+; workspace-object.calculate-raw-importance | Object.calculate_raw_importance
 ;---------------------------------------------
 
 (defmethod (workspace-object :calculate-intra-string-happiness) 

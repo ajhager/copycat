@@ -18,7 +18,14 @@ from copycat import toolbox as toolbox
 from copycat import slipnet as slipnet
 
 class Object(object):
+    """Object
+    
+    Attributes:
+        string:
+    """
+
     def __init__(self):
+        """Initializes Object."""
         self.string = None
         self.string_number = None
         self.left_string_position = None
@@ -51,14 +58,15 @@ class Object(object):
         return self
 
     def calculate_raw_importance(self):
-        '''
-        Return the raw importance of the object. This is a function of the
-        number and activation of the object's relevant descriptions.  In
-        addition, the importance of the changed object is enhanced, and the
-        importance of objects in groups is dimished. Sum the activation of
-        the descriptors of relevant descriptions up to 300.
-        '''
-        result = sum([rd.descriptor.activation for rd in self.relevant_descriptions()])
+        """Return the raw importance of the object.
+        
+        This is a function of the number and activation of the object's relevant
+        descriptions. In addition, the importance of the changed object is
+        enhanced, and the importance of objects in groups is dimished. Sum the
+        activation of the descriptors of relevant descriptions up to 300.
+        """
+        descriptions = self.relevant_descriptions()
+        result = min(300, sum([d.descriptor.activation for d in descriptions]))
         if self.is_changed:
             result *= 2
         if self.group:

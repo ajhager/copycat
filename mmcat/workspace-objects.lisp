@@ -60,13 +60,7 @@
                            ; clamp the salience of the object causing the 
                            ; snag).
      pname ; The print name of the object.
-
-     graphics-obj) ; The object used in the graphics representation of the
-                    ; object.				   
-     ()
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
+     ())
 
 (defmethod (workspace-object :letter-span) ()
 ; Returns the number of letters spanned by the object.
