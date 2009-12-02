@@ -70,24 +70,10 @@
 ; workspace-object.letter-list | Object.letters
 ;---------------------------------------------
 
-(defmethod (workspace-object :leftmost-in-string?) ()
-  (= left-string-position 0))
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :middle-in-string?) 
-           (&aux left-neighbor right-neighbor)
-  (setq left-neighbor (send self :ungrouped-left-neighbor))
-  (setq right-neighbor (send self :ungrouped-right-neighbor))
-  (and left-neighbor right-neighbor 
-       (send left-neighbor :leftmost-in-string?)
-       (send right-neighbor :rightmost-in-string?)))
-
-;---------------------------------------------
-
-(defmethod (workspace-object :rightmost-in-string?) ()
-  (= right-string-position (1- (length (send string :letter-list)))))
-
+; workspace-object.leftmost-in-string?
+; workspace-object.rightmost-in-string?
+; workspace-object.middle-in-string?
 ;---------------------------------------------
 
 (defmethod (workspace-object :spans-whole-string?) ()

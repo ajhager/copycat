@@ -175,13 +175,16 @@ class Object(object):
         return toolbox.flatten([obj.letters() for obj in self.objects()])
 
     def is_leftmost_in_string(self):
+        """Return True if object is leftmost in its string."""
         return self.left_string_position == 0
 
     def is_rightmost_in_string(self):
+        """Return True if object is rightmost in its string."""
         right_position = len(self.string.letters) - 1
         return self.right_string_position == right_position
 
     def is_middle_in_string(self):
+        """Return True if object is in the middle of its string."""
         left_neighbor = self.ungrouped_left_neighbor()
         right_neighbor = self.ungrouped_right_neighbor()
         return left_neighbor and right_neighbor and \
