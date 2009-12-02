@@ -192,13 +192,12 @@ class Object(object):
                 right_neighbor.is_rightmost_in_string()
 
     def spans_whole_string(self):
-        '''
-        Return True if the object is the single letter in its string or a
-        group that spans the string.
-        '''
+        """Return True if the object is the single letter in its string or a
+        group that spans the string."""
         return self.letter_span() == self.string.length
 
     def is_string_spanning_group(self):
+        """Return True if the object is a group that spans the string."""
         return self.type_name == 'group' and self.spans_whole_string()
 
     def ungrouped_left_neighbor(self):

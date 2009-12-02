@@ -76,18 +76,10 @@
 ; workspace-object.middle-in-string?
 ;---------------------------------------------
 
-(defmethod (workspace-object :spans-whole-string?) ()
-; Returns t if the object is the single letter in its string or a group 
-; that spans the string.
-  (= (send self :letter-span) (send string :length)))
-
-;----------------------------------------------
-
-(defmethod (workspace-object :string-spanning-group?) ()
-; Returns t if the object is a group that spans the string. 
-  (and (typep self 'group) (send self :spans-whole-string?)))
-
-;----------------------------------------------
+;---------------------------------------------
+; workspace-object.spans-whole-string? | Object.spans_whole_string
+; workspace-object.string-spanning-group? | Object.is_string_spanning_group
+;---------------------------------------------
 
 (defmethod (workspace-object :ungrouped-left-neighbor) ()
 ; Returns the left-neighbor of the group that either isn't in a group itself,
