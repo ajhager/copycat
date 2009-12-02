@@ -162,17 +162,15 @@ class Object(object):
         self.inter_string_salience = self.calculate_inter_string_salience()
         self.total_salience = self.calculate_total_salience()
         
-    def objects(self):
-        """Return the default of no objects."""
-        return []
-
     def letter_span(self):
         """Return the number of letters spanned by the object."""
-        return max(1, sum([obj.letter_span() for obj in self.objects()]))
+        if self.type_name == 'letter':
+            return 1
+        return sum([obj.letter_span() for obj in self.objects()])
 
     def letters(self):
         """Return a list of the letters at the lowest level of the object."""
-        if self.objects == []:
+        if self.type_name == 'letter':
             return [self]
         return toolbox.flatten([obj.letters() for obj in self.objects()])
 
@@ -198,7 +196,7 @@ class Object(object):
         return self.letter_span() == self.string.length
 
     def is_string_spanning_group(self):
-        return self.type_name == 'group'  and self.spans_whole_string()
+        return self.type_name == 'group' and self.spans_whole_string()
 
     def ungrouped_left_neighbor(self):
         '''
