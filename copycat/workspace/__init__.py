@@ -37,7 +37,23 @@ from copycat.coderack.codelets import *
 import copycat.slipnet as slipnet
 
 class Workspace(object):
+    """Workspace
+
+    The workspace contains a list of replacements (mappings from the 
+    initial string to the modified string, e.g., from "abc" to "abd"),
+    a vector of correspondences (mappings from the initial-string to the
+    target string, e.g., from "abc" to "pqrs"), and an array of proposed
+    correspondences.
+
+    Attributes:
+        initial_string:
+        modified_string:
+        target_string:
+        answer_string:
+    """
+
     def __init__(self, initial, modified, target):
+        """Initializes Workspace."""
         self.initial_string = String(self, initial)
         self.modified_string = String(self, modified)
         self.target_string = String(self, target)

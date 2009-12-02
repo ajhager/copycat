@@ -1,23 +1,5 @@
 ;---------------------------------------------
-; WORKSPACE: This file contains flavor definitions and methods for the 
-;            workspace.
-;---------------------------------------------
-
-(in-package 'user)
-
-(defflavor workspace
-; The workspace contains a list of replacements (mappings from the 
-; initial string to the modified string, e.g., from "abc" to "abd"),
-; a vector of correspondences (mappings from the initial-string to the
-; target string, e.g., from "abc" to "pqrs"), and an array of proposed
-; correspondences.
-    ((replacement-list nil) proposed-correspondence-array 
-     correspondence-vector)
-    ()
-    :gettable-instance-variables    
-    :settable-instance-variables            
-    :initable-instance-variables)
-
+; defflavor workspace | Workspace.__init__
 ;---------------------------------------------
 
 (defmethod (workspace :proposed-bond-list) ()
