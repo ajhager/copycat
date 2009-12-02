@@ -171,12 +171,10 @@ class Object(object):
         return max(1, sum([obj.letter_span() for obj in self.objects()]))
 
     def letters(self):
-        '''
-        Return a list of the letters at the lowest level of the object.
-        '''
-        if isinstance(self, Letter):
+        """Return a list of the letters at the lowest level of the object."""
+        if self.objects == []:
             return [self]
-        return toolbox.flatten([obj.letters() for obj in self.objects])
+        return toolbox.flatten([obj.letters() for obj in self.objects()])
 
     def is_leftmost_in_string(self):
         return self.left_string_position == 0

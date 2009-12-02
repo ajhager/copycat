@@ -63,16 +63,11 @@
      ())
 
 ;---------------------------------------------
-; workspace-object.letter-span | Object.letter-span
+; workspace-object.letter-span | Object.letter_span
 ;---------------------------------------------
 
-(defmethod (workspace-object :letter-list) ()
-; Returns a list of the letters at the lowest level of the object.
-  (if* (typep self 'letter)
-   then (list self)
-   else (flatten (loop for obj in (send self :object-list)
-		       collect (send obj :letter-list)))))
-
+;---------------------------------------------
+; workspace-object.letter-list | Object.letters
 ;---------------------------------------------
 
 (defmethod (workspace-object :leftmost-in-string?) ()
