@@ -17,11 +17,22 @@
 from copycat.workspace import Object
 
 class Letter(Object):
+    """Letter
+
+    Attributes:
+        type_name: Used as a hack so wobject knows which object it is.
+        groups: The groups this letter is a part of.
+        bonds: The bonds this letter is a part of.
+        name: The character name of the letter.
+        string: The string this letter is in.
+        left_string_position: Position in the string.
+        right_string_position: Position in the string.
+    """
+
     def __init__(self, name, string, category, string_position):
+        """Initialize Letter."""
         super(Letter, self).__init__()
         self.type_name = 'letter'
-        self.groups = None
-        self.bonds = None
         self.name = name
         self.string = string
         self.left_string_position = string_position

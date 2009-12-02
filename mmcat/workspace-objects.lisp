@@ -1,3 +1,12 @@
+;---------------------------------------------
+; defflavor letter | Letter.__init__
+; make-letter
+;---------------------------------------------
+
+;---------------------------------------------
+; workspace-object.print | REMOVED
+;---------------------------------------------
+
 (defflavor workspace-object 
      (string ; The string the object is in (e.g., initial-string).
 
@@ -58,17 +67,6 @@
     :gettable-instance-variables
     :settable-instance-variables
     :initable-instance-variables)
-
-;---------------------------------------------
-
-(defmethod (workspace-object :print) ()
-  (format t "~a ~a:~a in ~a~&"
-            (send (send self :get-descriptor plato-object-category) :pname)
- 	    pname
-	    left-string-position
-	    (send string :pname)))
-
-;---------------------------------------------
 
 (defmethod (workspace-object :letter-span) ()
 ; Returns the number of letters spanned by the object.
@@ -449,31 +447,3 @@
 	when (and (recursive-group-member? obj1 group)
 		  (recursive-group-member? obj2 group))
 	collect group))
-
-
-;---------------------------------------------
-; LETTERS
-;---------------------------------------------
-
-(defflavor letter
-    ()
-    (workspace-object)    
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
-
-;---------------------------------------------
-
-(defun make-letter (string letter-category string-position)
-; Returns a new letter.
-  (make-instance 'letter 
-	    :string string 
-    	    :left-string-position string-position
-    	    :right-string-position string-position
-	    :pname (string-downcase (send letter-category :pname))))
-  
-;----------------------------------------
-
-; The flavor definition and methods for groups are in the file groups.l.
-
-;----------------------------------------

@@ -76,7 +76,7 @@ class Object(object):
             if self.group:
                 result = self.group.total_strength()
             else:
-                if not self.bonds:
+                if not self.all_bonds():
                     result = 0
                 else:
                     if self.is_leftmost_in_string() or \
