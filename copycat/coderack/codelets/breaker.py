@@ -44,15 +44,15 @@ class Breaker(Codelet):
         # See if the structures can be broken.
         for structure in structures:
             probability = structure.total_weakness() / 100.0
-            probability = self.temperature_adjusted_probability(probability)
+            probability = workspace.temperature_adjusted_probability(probability)
             if not toolbox.flip_coin(probability):
                 return
 
         # Break the structures.
-        for structure in structues:
+        for structure in structures:
             if isinstance(structure, Bond):
-                self.break_bond(structure)
+                workspace.break_bond(structure)
             elif isinstance(structure, Group):
-                self.break_group(structure)
+                workspace.break_group(structure)
             elif isinstance(structure, Correspondence):
-                self.break_correspondence(structure)
+                workspace.break_correspondence(structure)

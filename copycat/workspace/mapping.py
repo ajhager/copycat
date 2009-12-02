@@ -52,8 +52,8 @@ class Mapping(object):
             return degree_of_association * (1 + ((self.conceptual_depth()) / 100.0) ** 2)
 
     def is_incompatible_concept_mapping(self, other):
-        if not (self.descriptor1.is_related(other.descriptor1) or \
-                self.descriptor2.is_related(other.descriptor2)):
+        if not (self.descriptor1.are_related(other.descriptor1) or \
+                self.descriptor2.are_related(other.descriptor2)):
             return
         if not self.label or not other.label:
             return
@@ -76,7 +76,7 @@ class Mapping(object):
         '''
         Return True if the concept mapping is not an identity.
         '''
-        return self.label != self.slipnet.plato_identity
+        return self.label != slipnet.plato_identity
 
     def degree_of_association(self):
         '''
@@ -125,9 +125,9 @@ class Mapping(object):
         E.g., if the concept mapping is "rightmost -> leftmost", return
         "leftmost -> rightmost".
         '''
-        if self.label == self.slipnet.plato_identity:
+        if self.label == slipnet.plato_identity:
             return self
-        elif self.slipnet.get_label_node(self.descriptor2, self.descriptor1) !=\
+        elif slipnet.get_label_node(self.descriptor2, self.descriptor1) !=\
                 self.label:
             return None
         else:

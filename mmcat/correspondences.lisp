@@ -18,7 +18,6 @@
     :settable-instance-variables
     :initable-instance-variables)
 
-;---------------------------------------------
 (defun make-correspondence (obj1 obj2 concept-mapping-list 
 		            &aux new-correspondence)
 ; Returns a new correspondence.    
@@ -32,13 +31,7 @@
   new-correspondence)
 
 ;---------------------------------------------
-
-(defmethod (correspondence :print) ()
-  (format t "~a:~a to ~a:~a; level ~a~&" 
-	  (send obj1 :pname) (send obj1 :left-string-position)
-          (send obj2 :pname) (send obj2 :left-string-position)
-	  proposal-level))
-
+; correspondence.print | REMOVED
 ;---------------------------------------------
 
 (defmethod (correspondence :other-obj) (obj)
@@ -975,6 +968,4 @@
        (make-codelet 'correspondence-strength-tester 
 	             (list proposed-correspondence flip-obj2?)
                      (get-urgency-bin urgency))))
-
-;---------------------------------------------
 

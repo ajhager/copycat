@@ -190,6 +190,11 @@ class Bond(Structure):
         else:
             return []
 
+        if other_bond == None:
+            return []
+        if other_bond.direction_category == None:
+            return []
+
         mapping = Mapping(slipnet.plato_direction_category,
                           slipnet.plato_direction_category,
                           self.direction_category,

@@ -111,13 +111,13 @@ class CorrespondenceBuilder(Codelet):
         # If the correspondence exists, add and activiate concept mappings.
         existing_correspondence = workspace.is_correspondence_present(correspondence)
         if existing_correspondence:
-            self.delete_proposed_correspondence(correspondence)
+            workspace.delete_proposed_correspondence(correspondence)
             labels = [m.label for m in correspondence.concept_mappings]
             for label in labels:
-                label.buffer += self.activation
+                label.activation_buffer += workspace.activation
             mappings_to_add = []
             for mapping in correspondence.concept_mappings:
-                if not correspondence.mapping_present(mapping):
+                if not correspondence.is_concept_mapping_present(mapping):
                     mappings_to_add.append(mapping)
             existing_correspondence.add_concept_mappings(mappings_to_add)
             return
@@ -134,14 +134,17 @@ class CorrespondenceBuilder(Codelet):
         incompatible_correspondences = correspondence.incompatible_correspondences()
         for incompatible_correspondence in incompatible_correspondences:
             if not workspace.fight_it_out(correspondence,
-                                          correspondence.letter_span,
+                                          correspondence.letter_span(),
                                           [incompatible_correspondence],
-                                          incompatible_correspondence.letter_span):
+                                          incompatible_correspondence.letter_span()):
                 return
-
+        
+        incompatible_bond = None
+        incompatible_group = None
+        
         # The proposed correspondence must win against any incompatible bond.
-        if (object1.leftmost_in_string or object1.rightmost_in_string) and \
-               (object2.leftmost_in_string or object2.rightmost_in_string):
+        if (object1.is_leftmost_in_string() or object1.is_rightmost_in_string()) and \
+               (object2.is_leftmost_in_string() or object2.is_rightmost_in_string()):
             incompatible_bond = correspondence.incompatible_bond()
             if incompatible_bond:
                 if not self.fight_it_out(correspondence, 3,
@@ -155,13 +158,13 @@ class CorrespondenceBuilder(Codelet):
                         return
 
         # If the desired object2 is flipped its existing group.
-        if flip_object2:
+        if flip_obj2:
             if not self.fight_it_out(correspondence, 1,
                                      [existing_object2_group], 1):
                 return
 
         # The proposed corresondence must win against an incompatible rule.
-        incompatible_rule = correspondence.incompatible_rule()
+        incompatible_rule = correspondence.is_incompatible_rule()
         if incompatible_rule:
             if not self.fight_it_out(correspondence, 1, [self.rule], 1):
                 return
@@ -169,14 +172,15 @@ class CorrespondenceBuilder(Codelet):
         # Break all incompatible structures.
         if incompatible_correspondences:
             for incompatible_correspondence in incompatible_correspondences:
-                self.break_correspondence(incompatible_correspondence)
+                workspace.break_correspondence(incompatible_correspondence)
 
         if incompatible_bond:
             self.break_bond(incompatible_bond)
 
         if incompatible_group:
             self.break_group(incompatible_group)
-
+        
+        existing_object2_group = flipped
         if existing_object2_group:
             self.break_group(existing_object2_group)
             for bond in existing_object2_group.bonds():
@@ -189,7 +193,7 @@ class CorrespondenceBuilder(Codelet):
             self.break_rule(self.rule)
 
         # Build the correspondence.
-        self.build_correspondence(correspondence)
+        workspace.build_correspondence(correspondence)
 
 class CorrespondenceImportantObjectScout(Codelet):
     '''

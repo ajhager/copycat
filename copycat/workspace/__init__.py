@@ -65,7 +65,7 @@ class Workspace(object):
         self.built = 3
 
         self.replacements = []
-        self._correspondences = []
+        self._correspondences = {}
         self._proposed_correspondences = {}
 
         self.rule = None
@@ -532,7 +532,7 @@ class Workspace(object):
         '''
         Return a list of the built correspondences on the workspace.
         '''
-        return util.flatten(self.correspondences)
+        return self._correspondences.values()
 
     def add_replacement(self, replacement):
         '''
@@ -570,24 +570,24 @@ class Workspace(object):
         Each object can have at most one built correspondence.
         '''
         i = correspondence.object1.string_number
-        self.correspondences[i] = correspondence
+        self._correspondences[i] = correspondence
 
     def delete_correspondence(self, correspondence):
         '''
         Delete a correspondence from the workpace's array of built
         correspondences.
         '''
-        i = corresondence.object1.string_number
-        self.correspondences[i] = None
+        i = correspondence.object1.string_number
+        del(self._correspondences[i])
 
     def is_correspondence_present(self, correspondence):
         '''
         Return True if the given correspondence exists on the workspace.
         '''
         if correspondence.object1.correspondence:
-            exiisting_correspondence = corespondence.object1.correspondence
-            if existing_correspondence.objecdt2 == correspondence.object2:
-                return True
+            existing_correspondence = correspondence.object1.correspondence
+            if existing_correspondence.object2 == correspondence.object2:
+                return existing_correspondence
 
     def is_slippage_present(self, slippage):
         '''
@@ -817,8 +817,8 @@ class Workspace(object):
         correspondence.proposal_level = self.built
         object1 = correspondence.object1
         object2 = correspondence.object2
-        object1.set_correspondence(correspondence)
-        object2.set_correspondence(correspondence)
+        object1.correspondence = correspondence
+        object2.correspondence = correspondence
         self.add_correspondence(correspondence)
 
         mappings = correspondence.relevant_distinguishing_concept_mappings() + \
@@ -838,7 +838,7 @@ class Workspace(object):
 
         for cm in correspondence.concept_mappings:
             if cm.label:
-                cm.label.activate_from_workspace()
+                cm.label.activation_buffer += self.activation
 
     def break_correspondence(self, correspondence):
         correspondence.object1.correspondence = None
@@ -1069,9 +1069,6 @@ class Workspace(object):
 
     def groups(self):
         return self.initial_string.groups + self.target_string.groups
-
-    def correspondences(self):
-        return toolbox.flatten(self._correspondences)
 
     def unrelated_objects(self):
         unrelated_objects = []

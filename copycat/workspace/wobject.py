@@ -101,7 +101,7 @@ class Object(object):
         from the initial string to the target string.
         """
         if self.correspondence:
-            return self.corresondence.total_strength()
+            return self.correspondence.total_strength
         else:
             return 0
 
