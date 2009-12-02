@@ -1,9 +1,3 @@
-;---------------------------------------------
-; FORMULAS: This file contains some general formulas used in Copycat.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defun update-temperature (&aux rule-weakness)
 ; Updates the temperature, which is a function of the average total-unhappiness
 ; of objects on the workspace (weigted by importance) and the weakness of the
@@ -210,5 +204,3 @@
         (setq number (if* (null *rule*) then 0 else 1))))
 
   number)
-
-;---------------------------------------------

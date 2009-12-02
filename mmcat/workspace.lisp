@@ -388,5 +388,3 @@
   (min 100 (/ (loop for obj in (send self :object-list)
                     sum (* (send obj :relative-importance)
 		           (send obj :total-unhappiness))) 200)))
-
-;---------------------------------------------

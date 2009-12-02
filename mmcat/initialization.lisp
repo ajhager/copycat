@@ -137,106 +137,6 @@
 ;---------------------------------------------
 
 (defun init-workspace (initial-string-input modified-string-input 
-		       target-string-input
-  		       &aux i-length m-length t-length)
-; Initializes the three strings -- that is, fills in *initial-string*, 
-; *modified-string*, and *target-string* structures with letters.
-
-  ; Set up the input for the three strings. 
-  (setq initial-string-input 
-	(mapcar 'string (coerce (symbol-name initial-string-input) 'list)))
-  (setq modified-string-input 
-	(mapcar 'string (coerce (symbol-name modified-string-input) 'list)))
-  (setq target-string-input 
-	(mapcar 'string (coerce (symbol-name target-string-input) 'list)))
-  (setq i-length (length initial-string-input))
-  (setq m-length (length modified-string-input))
-  (setq t-length (length target-string-input))
- 
-  ; Initialize the workspace.
-  (setq *workspace* 
-	(make-instance 'workspace 
-                       :proposed-correspondence-array 
-		       (make-array (list i-length t-length) 
-			           :initial-element nil :adjustable t)
-                        :correspondence-vector 
-			(make-vector i-length)))
-			
-  ; Initialize the three strings.
-  (setq *initial-string* 
-	(make-instance 'workspace-string 
-                       :highest-string-number -1
-                       :letter-vector (make-vector i-length)
-                       :proposed-bond-array 
-		       (make-array (list i-length i-length) 
-			           :initial-element nil 
-				   :adjustable t)
-                       :left-right-bond-array 
- 		       (make-array (list i-length i-length) 
-			           :initial-element nil 
-				   :adjustable t)
-                       :from-to-bond-array 
-		       (make-array (list i-length i-length) 
-			           :initial-element nil 
-				   :adjustable t)
-                       :proposed-group-array 
- 		       (make-array (list i-length i-length) 
-			           :initial-element nil 
-				   :adjustable t)	
-		       :group-vector (make-vector i-length)
-		       :object-position-vector (make-vector i-length)
-		       :length i-length
-		       :object-spaces i-length
-		       :num-of-bonds-to-scan-distribution
-  	                (loop for i from 0 to (- i-length 1) do 
-			      collect i)
-	               :pname "initial string"))
-  
-  (setq *modified-string* 
-	(make-instance 'workspace-string 
-                       :highest-string-number -1
- 		       :letter-vector (make-vector m-length)
- 		       :object-position-vector (make-vector m-length)
- 		       :length m-length
-                       :pname "modified string"))
-
-  (setq *target-string* 
-	(make-instance 'workspace-string 
-                       :highest-string-number -1
-                       :letter-vector (make-vector t-length)
-                       :proposed-bond-array 
-		       (make-array (list t-length t-length) 
- 		                   :initial-element nil 
-				   :adjustable t)
-  	               :left-right-bond-array 
- 		       (make-array (list t-length t-length) 
-			           :initial-element nil 
-				   :adjustable t)
-                       :from-to-bond-array 
-		       (make-array (list t-length t-length) 
-			           :initial-element nil 
-				   :adjustable t)	
-                       :proposed-group-array 
-  		       (make-array (list t-length t-length) 
-		                   :initial-element nil 
-				   :adjustable t)
- 		       :group-vector (make-vector t-length)
-		       :object-position-vector (make-vector t-length)
-		       :length t-length
-		       :object-spaces t-length
-		       :num-of-bonds-to-scan-distribution
-  	                (loop for i from 0 to (- t-length 1) do 
-			      collect i)
-                       :pname "target string"))
-
-  (setq *answer-string* nil)
-
-  ; Nicknames.
-  (setq *i* *initial-string*)
-  (setq *m* *modified-string*)
-  (setq *t* *target-string*)
-  (setq *a* *answer-string*)
-
   ; Initialize the letters in the three strings.
   (make-letters initial-string-input *initial-string*)
   (make-letters modified-string-input *modified-string*)
@@ -251,17 +151,6 @@
   (send *target-string* 
 	:set-letter-list (vector-to-list (send *target-string* 
 					       :letter-vector)))
-  (setq *rule* nil)
-  (setq *translated-rule* nil)
-
-
-; If one of the strings has only one letter, then activate 
-; plato-object-category so that "letter" will be relevant.
-  (if* (or (= (send *initial-string* :length) 1)
-	   (= (send *target-string* :length) 1))
-   then (send plato-object-category :activate-from-workspace))
-
-  (setq *workspace-initialized* t))
 
 ;---------------------------------------------
 

@@ -62,7 +62,7 @@ class Workspace(object):
         self.activation = 100
         self.temperature = 0
         self.clamp_temperature = False
-        self.built = 1
+        self.built = 3
 
         self.replacements = []
         self._correspondences = []
@@ -78,8 +78,8 @@ class Workspace(object):
         self.snag_structures = []
 
         # Activate plato object category if a string has length 1.
-        if self.initial_string.length == 1 or self.target_string == 1:
-            self.slipnet.plato_object_category.activate_from_workspace()
+        if self.initial_string.length == 1 or self.target_string.length == 1:
+            slipnet.plato_object_category.activation_buffer += self.activation
 
         # Make letters for each sting.
         for string in [self.initial_string, self.modified_string, self.target_string]:
