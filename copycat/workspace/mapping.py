@@ -135,7 +135,7 @@ class Mapping(object):
                            self.descriptor2, self.descriptor1,
                            self.object2, self.object1)
 
-    def are_contraditory_concept_mappings(self, other):
+    def are_contradictory_concept_mappings(self, other):
         '''
         Return True if the two concept mappings contradict each other.
         '''

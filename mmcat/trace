@@ -2,13 +2,6 @@ abc abd ijk 42 --trace
 truncated at the end of the first Run.step()
 Using this to decide what next to check for accuracy.
 
-
-#### INIT WORKSPACE
-
-
-copycat.run:29:         self.workspace = Workspace(initial, modified, target)
-
-
 # MAKE LETTERS
 
 copycat.workspace:71:                 letter = Letter(character, string, letter_category, count)

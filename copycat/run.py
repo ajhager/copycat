@@ -55,7 +55,7 @@ class Run(object):
         self.run_codelet(self.coderack.choose())
 
         if self.workspace.translated_rule:
-            self.run_codelet(AnswerBuilder)
+            self.run_codelet(AnswerBuilder())
             self.update()
 
     def run_codelet(self, codelet):

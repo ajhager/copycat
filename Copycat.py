@@ -83,7 +83,7 @@ if options.mode == 'headless':
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:
         run.step()
-    print str(run.workspace.answer_string)
+    print str(run.workspace.answer_string.name)
 elif options.mode == 'curses':
     CursesClient(initial, modified, target, seed)
 elif options.mode == 'opengl':

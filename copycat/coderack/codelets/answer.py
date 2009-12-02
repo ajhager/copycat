@@ -15,6 +15,7 @@
 # 02110-1301, USA.
 
 from copycat.coderack import Codelet
+from copycat.workspace import String
 
 class AnswerBuilder(Codelet):
     def run(self, coderack, slipnet, workspace):
@@ -31,10 +32,11 @@ class AnswerBuilder(Codelet):
 
         # Change the objects needed in the target string.
         answer_string_letters = []
-        for obj in workspace.target_string.objects():
-            if obj in objects_to_change:
-                letters = workspace.modified_letters_for_answer(obj, desc_type)
-                answer_string_letters.extend(letters)
+        if objects_to_change:
+            for obj in workspace.target_string.objects():
+                if obj in objects_to_change:
+                    letters = workspace.modified_letters_for_answer(obj, desc_type)
+                    answer_string_letters.extend(letters)
 
         if workspace.snag_object:
             workspace.snag_count += 1
@@ -61,7 +63,7 @@ class AnswerBuilder(Codelet):
 
             return workspace.initial_codelets()
 
-        letters = workspace.unmodified_letters_for_answer(objects_to_change)
+        letters = workspace.get_unmodified_letters_for_answer(objects_to_change)
         answer_string_letters.extend(letters)
         if workspace.changed_length_group:
             for letter in answer_string_letters:
@@ -75,6 +77,7 @@ class AnswerBuilder(Codelet):
                             self.amount_length_changed
 
         for letter in answer_string_letters:
-            self.answer_string.add_letter(letter)
+            workspace.answer_string.add_letter(letter)
 
         workspace.answer_found = True
+

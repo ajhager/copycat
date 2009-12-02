@@ -194,13 +194,19 @@ class Workspace(object):
         Return the letters from the targe string that do not need to be
         changed for the answer.
         '''
+        if objects_to_change == None:
+            objects_to_change = []
         letters = []
+        category = slipnet.plato_letter_category
         for letter in self.target_string.letters:
+            t = False
             for obj in objects_to_change:
-                if letter not in obj.letters:
-                    letters.append(Letter(self.answer_string,
-                                          letter.get_desscriptor(self.slipnet.plato_letter_category),
-                                          letter.left_string_position))
+                if letter in obj.letters:
+                    t = True
+            if not t:
+                letters.append(Letter(letter.name, self.answer_string,
+                                      letter.get_descriptor(category),
+                                      letter.left_string_position))
         return letters
 
     def get_modified_letters_for_answer(self, object1, description_type):
@@ -984,7 +990,7 @@ class Workspace(object):
             probability = self.rule.total_weakness()
         elif category == 'rule':
             probability = 100
-        elif category == 'translated_rule' and self.rule:
+        elif category == 'translator_rule' and self.rule:
             probability = 100
         
         return probability / 100.
@@ -1008,9 +1014,9 @@ class Workspace(object):
             number = case[self.rough_number_of_uncorresponding_objects()]
         elif category == 'rule':
             number = 2
-        elif category == 'translated_rule' and self.rule:
+        elif category == 'translator_rule' and self.rule != None:
             number = 1
-        
+
         return number
 
     def get_codelets(self, category, codelet, urgency, args=[]):

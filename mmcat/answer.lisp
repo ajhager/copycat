@@ -52,7 +52,7 @@
         (deal-with-snag) ; This function is defined in the file "run.l".
 
    else ; No snag.  Set up the answer string.
-        (setq answer-string-letter-list 
+   (setq answer-string-letter-list 
 	      (append (get-unmodified-letters-for-answer objects-to-change) 
 		      answer-string-letter-list))
 

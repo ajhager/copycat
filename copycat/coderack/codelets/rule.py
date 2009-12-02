@@ -16,6 +16,7 @@
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
+from copycat.workspace import Rule
 
 class RuleBuilder(Codelet):
     '''
@@ -142,7 +143,6 @@ class RuleStrengthTester(Codelet):
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
             return
-
         return [(RuleBuilder([rule]), strength)]
 
 class RuleTranslator(Codelet):
@@ -155,9 +155,8 @@ class RuleTranslator(Codelet):
         workspace_rule = workspace.rule
         if not workspace_rule:
             return
-        if workspace_rule.no_change:
-            workspace.translated_rule = NonRelationRule(None, None, None,
-                                                        None, None, None)
+        if workspace_rule.has_no_change:
+            workspace.translated_rule = Rule(None, None, None, None, None, None)
             return
 
         # If the temperature is too high, fizzle.
