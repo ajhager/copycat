@@ -2,70 +2,13 @@
 ; workspace-object.calculate-raw-importance | Object.calculate_raw_importance
 ;---------------------------------------------
 
-(defmethod (workspace-object :calculate-intra-string-happiness) 
-           (&aux result bonds)
-; Returns the intra-string happiness of the object.  This value represents
-; how well the object is fitting into a structuring of its string (as
-; opposed to a mapping from the initial-string to the target-string), and is 
-; a function of the strength of bonds or a group involving the object.
-; For now I'm giving bonds a third the weight of groups.  Objects
-; on the edges of the string expect one bond (outgoing or incoming),
-; and objects in the middle expect two.  Bonds are counted only
-; if the object is not in a group.  Note that this function assumes
-; that there is only one bond between a given pair of objects,
-; and that bonds are made only between adjacent pairs of objects.
-
-  (if* (send self :spans-whole-string?) ; Either this is the only letter in 
-                                        ; the string or this is a group 
-					; spanning the whole string.
-   then (setq result 100)   
-   else (if* group
-         then (setq result (send group :total-strength))
-         else (setq bonds (append incoming-bonds outgoing-bonds))
-              (if* (null bonds) 
-               then (setq result 0)
-	       else (if* (or (send self :leftmost-in-string?)
-		            (send self :rightmost-in-string?))
-                     then (setq result 
-				(round (/ (send (car bonds) 
-				  	        :total-strength) 3)))
-	             else (setq result 
-				(round (/ (list-sum 
-					      (send-method-to-list 
-						  bonds :total-strength))  
-					  6)))))))
-  result)
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :calculate-intra-string-unhappiness) ()
-  (fake-reciprocal (send self :intra-string-happiness)))
-
-;---------------------------------------------
-
-(defmethod (workspace-object :calculate-inter-string-happiness) ()
-; Returns the inter-string happiness of the object.  This value represents
-; how well the object is fitting into a mapping from the initial-string to
-; the target-string (as opposed to a structuring of its own string), and is 
-; a function of the strength of the object's correspondence, if any.
-  (if* correspondence then (send correspondence :total-strength) else 0))
-
-;---------------------------------------------
-
-(defmethod (workspace-object :calculate-inter-string-unhappiness) ()
-  (fake-reciprocal (send self :inter-string-happiness)))
-
-;---------------------------------------------
-
-(defmethod (workspace-object :calculate-total-happiness) ()
-  (round (average (send self :intra-string-happiness) 
-	          (send self :inter-string-happiness))))
-
-;---------------------------------------------
-
-(defmethod (workspace-object :calculate-total-unhappiness) ()
-  (fake-reciprocal (send self :total-happiness)))
-
+; workspace-object.calculate-intra-string-happiness
+; workspace-object.calculate-inter-string-happiness
+; workspace-object.calculate-total-happiness
+; workspace-object.calculate-intra-string-unhappiness
+; workspace-object.calculate-inter-string-unhappiness
+; workspace-object.calculate-total-unhappiness
 ;---------------------------------------------
 
 (defmethod (workspace-object :calculate-intra-string-salience) ()

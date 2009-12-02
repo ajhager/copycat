@@ -74,48 +74,48 @@ class Object(object):
         return result
 
     def calculate_intra_string_happiness(self):
-        '''
-        Return the intra string happiness of the object.  This value represents
-        how well the object is fitting into a structureing of its string.
-        '''
+        """Return the intra string happiness of the object.
+
+        This value represents how well the object is fitting into a structuring
+        of its string and is a function of the strength of bonds or a group
+        involving the object.
+        """
         if self.spans_whole_string():
-            result = 100
-        else:
-            if self.group:
-                result = self.group.total_strength()
-            else:
-                if not self.all_bonds():
-                    result = 0
-                else:
-                    if self.is_leftmost_in_string() or \
-                       self.is_rightmost_in_string():
-                        result = round(self.bonds[0].total_stength() / 3.0)
-                    else:
-                        result = round(sum([b.total_strength() for b in self.bonds]) / 6.0)
-        return result
+            return 100
+        if self.group:
+            return self.group.total_strength()
+        if not self.all_bonds():
+            return 0
+        if self.is_leftmost_in_string() or self.is_rightmost_in_string():
+            return round(self.bonds[0].total_stength() / 3.0)
+        return round(sum([b.total_strength() for b in self.bonds]) / 6.0)
 
     def calculate_intra_string_unhappiness(self):
+        """Return the intra string unhappiness."""
         return 100 - self.intra_string_happiness
 
     def calculate_inter_string_happiness(self):
-        '''
-        Return the inter string happiness of the object. This value represents
-        how well the object is fitting into a mapping from the initial string
-        to the target string.
-        '''
+        """Return the inter string happiness.
+
+        This value represents how well the object is fitting into a mapping
+        from the initial string to the target string.
+        """
         if self.correspondence:
             return self.corresondence.total_strength()
         else:
             return 0
 
     def calculate_inter_string_unhappiness(self):
+        """Return the inter string unhappiness."""
         return 100 - self.inter_string_happiness
 
     def calculate_total_happiness(self):
+        """Return the total string happiness."""
         return round(toolbox.average(self.intra_string_happiness,
                                       self.inter_string_happiness))
 
     def calculate_total_unhappiness(self):
+        """Return the total string unhappiness."""
         return 100 - self.total_happiness
 
     def calculate_intra_string_salience(self):
