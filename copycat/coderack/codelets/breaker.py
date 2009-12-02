@@ -18,6 +18,7 @@ import random
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
+from copycat.workspace import Bond, Group, Correspondence
 
 class Breaker(Codelet):
     '''

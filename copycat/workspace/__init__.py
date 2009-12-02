@@ -77,7 +77,6 @@ class Workspace(object):
         self.last_snag_time = 0
         self.snag_structures = []
 
-        # Activate plato object category if a string has length 1.
         if self.initial_string.length == 1 or self.target_string.length == 1:
             slipnet.plato_object_category.activation_buffer += self.activation
 
