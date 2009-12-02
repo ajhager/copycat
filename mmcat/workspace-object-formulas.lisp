@@ -11,6 +11,10 @@
 ; workspace-object.calculate-total-unhappiness
 ;---------------------------------------------
 
+;---------------------------------------------
+; workspace-object.update-object-values | Object.update_object_values
+;---------------------------------------------
+
 (defmethod (workspace-object :calculate-intra-string-salience) ()
 ; An object's intra-string salience represents how much the object is
 ; crying out for attention from codelets that build structures
@@ -52,42 +56,6 @@
   (round (average (send self :intra-string-salience) 
 	          (send self :inter-string-salience))))
 
-;---------------------------------------------
-
-(defmethod (workspace-object :update-object-values) ()
-; This updates all the values (e.g., importance and salience) for the object.
-
-  (send self :set-raw-importance (send self :calculate-raw-importance))
-
-  (send self :set-intra-string-happiness 
-	(send self :calculate-intra-string-happiness))
-
-  (send self :set-intra-string-unhappiness 
-	(send self :calculate-intra-string-unhappiness))
-
-  (send self :set-inter-string-happiness
-	(send self :calculate-inter-string-happiness))
-
-  (send self :set-inter-string-unhappiness
-	(send self :calculate-inter-string-unhappiness))
-
-  (send self :set-total-happiness
-	(send self :calculate-total-happiness))
-
-  (send self :set-total-unhappiness
-	(send self :calculate-total-unhappiness))
-
-  (send self :set-intra-string-salience 
-	(send self :calculate-intra-string-salience))
-
-  (send self :set-inter-string-salience 
-       (send self :calculate-inter-string-salience))
-
-  (send self :set-total-salience 
-        (send self :calculate-total-salience)))
-
-;---------------------------------------------
-
 (defmethod (workspace-string :update-relative-importances) 
            (&aux total-raw-importance)
 ; This updates the relative (normalized) importances of all the objects in 
@@ -102,20 +70,14 @@
 	       else (round (* 100 (/ (send obj :raw-importance) 
 				     total-raw-importance)))))))
   
-;---------------------------------------------
-
 (defmethod (workspace-string :calculate-intra-string-unhappiness) ()
 ; This returns the average of the intra-string unhappinesses of all
 ; the objects in the string.
   (round (list-average (send-method-to-list (send self :object-list) 
 		                            :intra-string-unhappiness))))
 
-;---------------------------------------------
-
 (defmethod (workspace-string :update-intra-string-unhappiness) ()
 ; This updates the string's intra-string unhappiness (the average of the 
 ; intra-string unhappinesses of all the objects in the string.
   (send self :set-intra-string-unhappiness 
 	(send self :calculate-intra-string-unhappiness)))
-
-;---------------------------------------------

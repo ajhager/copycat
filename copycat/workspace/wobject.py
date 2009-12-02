@@ -148,6 +148,7 @@ class Object(object):
                                      self.inter_string_salience))
 
     def update_object_values(self):
+        """Update all the values for the object."""
         self.raw_importance = self.calculate_raw_importance()
         self.intra_sring_happiness = self.calculate_intra_string_happiness()
         self.intra_string_unhappiness = self.calculate_intra_string_unhappiness()
@@ -157,7 +158,7 @@ class Object(object):
         self.total_unhappiness = self.calculate_total_unhappiness()
         self.intra_string_salience = self.calculate_intra_string_salience()
         self.inter_string_salience = self.calculate_inter_string_salience()
-        self.total_string_salience = self.calculate_total_salience()
+        self.total_salience = self.calculate_total_salience()
 
     def letter_span(self):
         '''
