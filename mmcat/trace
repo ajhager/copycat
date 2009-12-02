@@ -2,9 +2,6 @@ abc abd ijk 42 --trace
 truncated at the end of the first Run.step()
 Using this to decide what next to check for accuracy.
 
-Currently finishing slipnet/__init__.py:
-    all the sliplink adding
-
 
 #### INIT WORKSPACE
 

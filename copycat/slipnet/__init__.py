@@ -106,7 +106,7 @@ plato_alphabetic_position_category = add_node('alphabetic-position-category', 80
 plato_direction_category = add_node('direction-category', 70)
 plato_bond_category = add_node('bond-category', 80)
 plato_group_category = add_node('group-category', 80)
-plato_length = add_node('length', 60)
+plato_length = add_node('length', 60, ['DescriptionTopDownScout'])
 plato_object_category = add_node('object-category', 90)
 plato_bond_facet = add_node('bond-facet', 90)
 
