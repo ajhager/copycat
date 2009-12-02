@@ -81,7 +81,7 @@ class Workspace(object):
         if self.initial_string.length == 1 or self.target_string.length == 1:
             slipnet.plato_object_category.activation_buffer += self.activation
 
-        # Make letters for each sting.
+        # Make letters for each string.
         for string in [self.initial_string, self.modified_string, self.target_string]:
             count = 0
             for character in string.name:

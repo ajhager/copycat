@@ -1,9 +1,3 @@
-;---------------------------------------------
-; INITIALIZATION: This file contains functions for initializing the program.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defun init-ccat (initial-string-input modified-string-input 
 		  target-string-input &key random-state no-graphics
 		  &aux command quit)
@@ -135,37 +129,8 @@
    then (run-ccat)))
 
 ;---------------------------------------------
-
-(defun init-workspace (initial-string-input modified-string-input 
-  ; Initialize the letters in the three strings.
-  (make-letters initial-string-input *initial-string*)
-  (make-letters modified-string-input *modified-string*)
-  (make-letters target-string-input *target-string*)
-
-  (send *initial-string* 
-	:set-letter-list (vector-to-list (send *initial-string* 
-					       :letter-vector)))
-  (send *modified-string* 
-	:set-letter-list (vector-to-list (send *modified-string* 
-					       :letter-vector)))
-  (send *target-string* 
-	:set-letter-list (vector-to-list (send *target-string* 
-					       :letter-vector)))
-
-;---------------------------------------------
-
-(defun make-letters (input-letter-list string 
-			&aux current-letter letter-category)
-; Set up letter instance for each input letter.
-  (loop for letter-name in input-letter-list 
-        count t into letter-count do
-        ; Set up an instance of the letter on the workspace.
-        (setq letter-category (get-plato-letter letter-name))
-        (setq current-letter 
-	      (make-letter string letter-category 
-		  (1- letter-count)))
-        (send string :add-letter current-letter)))
-
+; init-workspace | Workspace.__init__
+; make-letters
 ;---------------------------------------------
 
 (defun add-descriptions (&aux leftmost-letter middle-letter rightmost-letter)
@@ -219,5 +184,3 @@
         (send-method-to-list 
 	    (send-method-to-list (send object :descriptions) :descriptor)
 	    :activate-from-workspace)))
-
-;---------------------------------------------
