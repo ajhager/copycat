@@ -776,150 +776,10 @@
 ; group-strength-tester | GroupStrengthTester
 ;---------------------------------------------
 
-(defun group-builder (proposed-group 
-  ; If this group already exists, then add any new descriptions,
-  ; activate descriptions and fizzle.
-  (if* (setq existing-group (send string :group-present? proposed-group))
-   then (if* %verbose% 
-	 then (format t "This group already exists.  Fizzling...~&"))
-        (loop for description in (send existing-group :descriptions) do
-	      (send (send description :descriptor) :activate-from-workspace))
-        ; Add any new descriptions.
-        (loop for d in (send proposed-group :descriptions)
-	      when (not (send existing-group :description-present? d)) do
-	           (build-description
-		       (make-description existing-group
-			                 (send d :description-type)
-			  	         (send d :descriptor))))
-        (send string :delete-proposed-group proposed-group)
-        (return))
-
-  ; See if all the bonds (or their flipped versions) are still there.
-  (let ((all-bonds-still-exist?
-	 (loop for r in (send proposed-group :bond-list)
-	       when (not (or (send string :bond-present? r)
-			     (send string :bond-present? 
-				               (send r :flipped-version))))
-	       return nil
-	       finally (return t))))
-    (if* (not all-bonds-still-exist?)
-     then (if* %verbose% 
-	   then (format t "Not all the bonds in this group still exist. ")
-	        (format t "Fizzling.~&"))
-          (send string :delete-proposed-group proposed-group)
-          (if* %workspace-graphics% 
-	   then (send proposed-group :erase-proposed))
-          (return)))
-
-  (if* %workspace-graphics% then (send proposed-group :flash-proposed))
-
-  ; Take the proposed group off the list of proposed groups.
-  (send string :delete-proposed-group proposed-group)
-
-  ; See if any bonds need to be flipped.  If so, then fight.
-  (setq bonds-to-be-flipped 
-	(send proposed-group :get-bonds-to-be-flipped))
-  (if* bonds-to-be-flipped
-   then (if* %verbose%
-         then (format t "About to try to flip bonds: ") 
-              (send-method-to-list bonds-to-be-flipped :print))
-        (setq fight-result 
-	      (fight-it-out proposed-group (send proposed-group :letter-span)
-                            bonds-to-be-flipped 1))
-        (if* (null fight-result)
-         then (if* %verbose% 
-	       then (format t  "Lost. Fizzling.~&"))
-              (if* %workspace-graphics% 
-	       then (send proposed-group :erase-proposed))
-              (return))
-        (if* %verbose%
-         then (format t "Won!! Old bonds can be flipped.~&")))
-
-  ; If there are incompatible groups, then fight.  The fight is decided 
-  ; probabilistically on the basis of strength.
-  (setq incompatible-groups (send proposed-group :get-incompatible-groups))
-  (if* incompatible-groups
-   then (if* %verbose%
-         then (format t "About to fight with incompatible groups: ")
-              (loop for g in incompatible-groups do 
-		    (send g :print) (format t "~%")))
-
-        (loop for g in incompatible-groups do
-        ; If the two groups are of the same type and direction,
-	; then the weights should depend on the length of each. 
-	; This isn't a very good way to do this, but I'm doing this 
-        ; to solve the problem that shorter samegrps are not that much
-	; weaker than longer samegrps, and I don't have a group-extender
-	; codelet.
-	      (if* (and (eq (send proposed-group :group-category)
-		            (send g :group-category))
-			(eq (send proposed-group :direction-category)
-			    (send g :direction-category)))
-               then (setq proposed-group-weight (send proposed-group :length))
-	            (setq incompatible-group-weight (send g :length))
-	       else (setq proposed-group-weight 1)
-	            (setq incompatible-group-weight 1))
-              (setq fight-result 
-		    (fight-it-out proposed-group proposed-group-weight
-			          (list g) incompatible-group-weight))
-            (if* (null fight-result)
-             then (if* %verbose% 
-	           then (format t  "Lost. Fizzling.~&"))
-                  (if* %workspace-graphics% 
-		   then (send proposed-group :erase-proposed))
-    	          (return)))
-        (if* (null fight-result) then (return))  ; Fizzle.
-        (if* %verbose%
-         then (format t 
-		      "Won!! Old groups can be broken.~&")))
-
-  ; If there are any correspondences incompatible with this group, fight 
-  ; with them.
-  (if* (and (send proposed-group :direction-category)
-	      (setq incompatible-correspondences 
-   	            (send proposed-group :get-incompatible-correspondences)))
-   then (if* %verbose%
-         then (format t "About to fight incompatible correspondences.~&"))
-        (setq fight-result 
-              (fight-it-out proposed-group 1 incompatible-correspondences 1))
-        (if* (null fight-result)
-         then (if* %verbose% 
-               then (format t "Lost. Fizzling.~&"))
-              (if* %workspace-graphics% 
-	       then (send proposed-group :erase-proposed))
-              (return))
-        (if* %verbose%
-         then (format t "Won against incompatible correspondences!!~&")))
-		    
-  ; Break incompatible groups
-  (loop for g in incompatible-groups do (break-group g))
-
-  ; Flip any bonds that need flipping, and replace (in group's 
-  ; bond-list) any bonds that got rebuilt (and thus are equal but not 
-  ; eq to the corresponding bond in the group's bond list).
-  (if* bonds-to-be-flipped
-   then (loop for r in (send proposed-group :bond-list) do
-	      (if* (setq flipped-bond 
-			 (send string :bond-present? 
-			       (send r :flipped-version)))
-	       then (break-bond flipped-bond)
-	            (build-bond r)
-	            (push r new-bond-list)
-               else (if* (not (eq (setq existing-bond 
-					(send string :bond-present? r)) r))
-                     then (push existing-bond new-bond-list)
-	             else (push r new-bond-list)))))
-
-  ; Break incompatible correspondences
-  (loop for c in incompatible-correspondences do (break-correspondence c))
-
-  (if* %verbose% then (format t "About to build group.~&"))
-  (if* %workspace-graphics% 
-   then (if* (send proposed-group :drawn?) 
-	 then (send proposed-group :erase-rectangle)))
-  (build-group proposed-group)))
-
 ;---------------------------------------------
+; group-builder | GroupBuilder
+;---------------------------------------------
+
 
 (defmethod (group :flipped-version) (&aux new-bond-list flipped-group)
 ; Returns the flipped version of this group (e.g., if the group is
@@ -1054,18 +914,7 @@
    then t)))
 
 ;---------------------------------------------
-
-(defmethod (group :get-bonds-to-be-flipped) (&aux bond-to-be-flipped)
-; Returns a list of the bonds that need to be flipped in order for this
-; group to be built.
-  (loop for r in bond-list do
-	(setq bond-to-be-flipped 
-	      (send string :get-bond (send r :to-obj) (send r :from-obj)))
-        when (and (not (null bond-to-be-flipped))
-	          (same-bond? r (send bond-to-be-flipped 
-					  :flipped-version)))
-        collect bond-to-be-flipped))
-
+; group.get-bonds-to-be-flipped | Group.get_bonds_to_be_flipped
 ;---------------------------------------------
 
 (defmethod (group :spans-whole-string?) ()

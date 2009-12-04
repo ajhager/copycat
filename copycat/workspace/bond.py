@@ -233,9 +233,10 @@ class Bond(Structure):
         successor bond going to the right, returns a predecessor bond going
         to the left using the same two objects.
         '''
-        category = self.bond_category.related_node(slipnet.plato_opposite)
+        category = slipnet.get_related_node(self.bond_category,
+                                            slipnet.plato_opposite)
         flipped_bond = Bond(self.workspace, self.to_object, self.from_object,
-                            category, self.bond_facet,self.to_object_descriptor,
+                            category, self.bond_facet, self.to_object_descriptor,
                             self.from_object_descriptor)
         flipped_bond.proposal_level = self.proposal_level
         return flipped_bond

@@ -28,8 +28,7 @@ class GroupBuilder(Codelet):
         group = self.arguments[0]
         string = group.string
 
-        # Make sure this group doesn't already exist.
-        existing_group = string.group_present(group)
+        existing_group = string.is_group_present(group)
         if existing_group:
             for description in existing_group.descriptions:
                 description.desriptor.activation_buffer += workspace.activation
@@ -38,33 +37,29 @@ class GroupBuilder(Codelet):
                     new_description = Description(existing_group,
                                                   description.description_type,
                                                   description.descriptor)
-                    self.build_description(new_description)
-            string.delete_proposed_group(group)
-            return
+                    workspace.build_description(new_description)
+            string.remove_proposed_group(group)
+            return # Fizzle
 
-        # Make sure all bonds or their flipped versions are still there.
         all_bonds_exist = True
-        for bond in group.bonds():
+        for bond in group.bonds:
             flipped = bond.flipped_version()
-            if not (string.bond_present(bond) or string.bond_present(flipped)):
+            if not (string.is_bond_present(bond) or \
+                        string.is_bond_present(flipped)):
                 all_bonds_exist = False
                 break
         if not all_bonds_exist:
-            string.delete_proposed_group(group)
-            return
+            string.remove_proposed_group(group)
+            return # Fizzle
 
-        # Take the proposed group off the list of proposed groups.
-        string.delete_proposed_group(group)
+        string.remove_proposed_group(group)
 
-        # Check if any bonds need to be flipped and fight if so.
-        bonds_to_flip = group.bonds_to_be_flipped()
+        bonds_to_flip = group.get_bonds_to_be_flipped()
         if bonds_to_flip:
-            result = self.fight_it_out(group, group.letter_span,
-                                       bonds_to_flip, 1)
-            if not result:
-                return
+            if not self.fight_it_out(group, group.letter_span(),
+                                     bonds_to_flip, 1):
+                return # Fizzle
 
-        # Fight any incompatible groups.
         incompatible_groups = group.incompatible_groups()
         for incompatible_group in incompatible_groups:
             if (group.group_category == incompatible_group.group_category) and\
@@ -74,47 +69,41 @@ class GroupBuilder(Codelet):
             else:
                 group_weight = 1
                 incompatible_weight = 1
-            result = self.fight_it_out(group, group_weight,
-                                       incompatible_group, incompatible_weight)
-            if not result:
-                return
+            if not self.fight_it_out(group, group_weight,
+                                     incompatible_group, incompatible_weight):
+                return # Fizzle
 
-        # Fight any incompatible correspondences.
         incompatible_correspondences = group.incompatible_correspondences()
         if group.direction_category and incompatible_correspondences:
-            result = self.fight_it_out(group, 1,
-                                       incompatible_correspondences, 1)
-            if not result:
-                return
+            if not self.fight_it_out(group, 1,
+                                     incompatible_correspondences, 1):
+                return # Fizzle
 
-        # Break incompatible groups.
         for incompatible_group in incompatible_groups:
-            self.break_group(incompatible_group)
+            workspace.break_group(incompatible_group)
 
         # Flip any bonds that need it and replace any bonds that were rebuilt.
         new_bonds = []
         if bonds_to_flip:
             for bond in group.bonds():
-                flipped_bond = string.bond_present(bond.flipped_version())
+                flipped_bond = string.is_bond_present(bond.flipped_version())
                 if flipped_bond:
-                    self.break_bond(flipped_bond)
-                    self.build_bond(bond)
+                    workspace.break_bond(flipped_bond)
+                    workspace.build_bond(bond)
                     new_bonds.append(bond)
                 else:
-                    existing_bond = string.bond_present(bond)
+                    existing_bond = string.is_bond_present(bond)
                     if existing_bond != bond:
                         new_bonds.append(existing_bond)
                     else:
                         new_bonds.append(bond)
         # FIXME: Actually replacing the bonds is not in the copycat source.
-        #group.bonds = new_bonds
+        # group.bonds = new_bonds
 
-        # Break incompatible correspondences.
         for incompatible_correspondence in incompatible_correspondences:
-            self.break_correspondence(incompatible_correspondence)
+            workspace.break_correspondence(incompatible_correspondence)
 
-        # Build the group.
-        self.build_group(group)
+        workspace.build_group(group)
 
 class GroupStrengthTester(Codelet):
     """Calculate the proposed group's strength and probabilistically decide
@@ -157,7 +146,7 @@ class GroupTopDownCategoryScout(Codelet):
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
-        bond_category = category.get_related_node(nodes.plato_bond_category)
+        bond_category = nodes.get_related_node(category, nodes.plato_bond_category)
 
         # Choose a string based on local bond category relevance.
         i_string = workspace.initial_string
@@ -196,7 +185,7 @@ class GroupTopDownCategoryScout(Codelet):
         else:
             bond = object.right_bond
 
-        if bond == None or (bond.bond_category != bond_category):
+        if not bond  or (bond.bond_category != bond_category):
             if isinstance(object, Group):
                 return
             objects = [object]

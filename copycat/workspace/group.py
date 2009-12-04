@@ -251,9 +251,10 @@ class Group(Object, Structure):
         '''
         Return a list of the groups that are incompatible with the group.
         '''
-        groups = [obj.group for obj in self.objects]
-        groups = list(set(util.flatten(groups)))
-        groups.remove(self)
+        groups = [obj.group for obj in self.objects if obj.group]
+        groups = list(set(toolbox.flatten(groups)))
+        if self in groups:
+            groups.remove(self)
         return groups
 
     def incompatible_correspondences(self):
@@ -268,7 +269,7 @@ class Group(Object, Structure):
         return correspondences
 
     def is_incompatible_correspondence(self, correspondence, obj):
-        category = self.state.slipnet.plato_string_position_category
+        category = nodes.plato_string_position_category
         for cm in correspondence.concept_mappings:
             if cm.description_type1 == category:
                 concept_mapping = cm
@@ -276,6 +277,7 @@ class Group(Object, Structure):
 
         if concept_mapping:
             other_object = correspondence.other_object(obj)
+            other_bond = None
             if other_object.is_leftmost_in_string():
                 other_bond = other_object.right_bond
             elif other_object.is_rightmost_in_string():
@@ -400,14 +402,12 @@ class Group(Object, Structure):
         return new_bonds
 
     def get_bonds_to_be_flipped(self):
-        '''
-        Return a list of the bonds that need to be flipped in order for the
-        group to be built.
-        '''
+        """Return a list of the bonds that need to be flipped in order for the
+        group to be built."""
         bonds_to_be_flipped = []
         for b in self.bonds:
             to_be_flipped = self.string.get_bond(b.to_object, b.from_object)
-            if b == to_be_flipped.flipped_version():
+            if to_be_flipped and b == to_be_flipped.flipped_version():
                 bonds_to_be_flipped.append(to_be_flipped)
         return bonds_to_be_flipped
 
