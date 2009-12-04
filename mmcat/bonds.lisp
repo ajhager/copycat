@@ -742,6 +742,8 @@
   (if* %workspace-graphics% then (send proposed-bond :draw-proposed)))
 
 ;---------------------------------------------
+; choose-bond-facet | Workspace.choose_bond_facet
+;---------------------------------------------
 
 (defun choose-bond-facet (obj1 obj2 &aux obj1-bond-facets 
 				             obj2-bond-facets)
@@ -761,5 +763,3 @@
   (select-list-item-by-method 
       (intersection obj1-bond-facets obj2-bond-facets) 
       ':total-description-type-support (send obj1 :string)))
-
-;---------------------------------------------

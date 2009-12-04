@@ -780,18 +780,22 @@ class Workspace(object):
         bond.left_object.set_right_bond(None)
         bond.right_object.set_left_bond(None)
 
-    def choose_bond_facet(self, object1, object2):
-        object1_bond_facets = []
-        for description_type in [d.description_type for d in object1.descriptions]:
+    def choose_bond_facet(self, obj1, obj2):
+        """Return a bond facet that is shared by both objects, probabilistically
+        by description type support of the facet in obj1's string."""
+        obj1_bond_facets = []
+        for description_type in [d.description_type for d in obj1.descriptions]:
             if description_type.category() == slipnet.plato_bond_facet:
-                object1_bond_facets.append(description_type)
-        object2_bond_facets = []
-        for description_type in [d.description_type for d in object2.descriptions]:
+                obj1_bond_facets.append(description_type)
+
+        obj2_bond_facets = []
+        for description_type in [d.description_type for d in obj2.descriptions]:
             if description_type.category() == slipnet.plato_bond_facet:
-                object2_bond_facets.append(description_type)
-        items = set(object1_bond_facets).intersection(set(object2_bond_facets))
-        support = [facet.total_description_type_support(object1.string) for facet in items]
-        return toolbox.weighted_select(support, list(items))
+                obj2_bond_facets.append(description_type)
+
+        items = list(set(obj1_bond_facets).intersection(set(obj2_bond_facets)))
+        support = [f.total_description_type_support(obj1.string) for f in items]
+        return toolbox.weighted_select(support, items)
 
     def propose_bond(self, from_object, to_object, bond_category,
                      bond_facet, from_object_descriptor, to_object_descriptor):
