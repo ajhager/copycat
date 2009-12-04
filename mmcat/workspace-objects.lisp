@@ -236,27 +236,13 @@
 ; workspace-object.add-outgoing-bond
 ;----------------------------------------------
 
-(defmethod (workspace-object :structure-list) ()
-; Returns a list of the structures attached to the object.
-  (append descriptions 
-	  (list left-bond right-bond group correspondence)))
-
+;----------------------------------------------
+; workspace-object.structure-list | Object.structures
 ;----------------------------------------------
 
-(defmethod (workspace-object :descriptor-present?) (d)
-; Returns t if this object has a description with this descriptor.
-  (loop for description in descriptions
-	when (eq (send description :descriptor) d) return t
-	finally (return nil)))   	       
-
 ;----------------------------------------------
-
-(defmethod (workspace-object :description-type-present?) (given-description-type)
-; Returns t if this object has a description with this description-type.
-  (loop for description in descriptions
-	when (eq (send description :description-type) given-description-type) return t
-	finally (return nil)))   	       
-
+; workspace-object.descriptor-present?
+; workspace-object.description-type-present?
 ;----------------------------------------------
 
 (defun letter-distance (obj1 obj2 &aux left-obj right-obj)

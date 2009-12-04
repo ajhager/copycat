@@ -432,25 +432,18 @@ class Object(object):
             self.outgoing_bonds.remove(bond)
 
     def structures(self):
-        '''
-        Return a list of the structures attached to the object.
-        '''
+        """Return a list of the structures attached to the object."""
         return self.descriptions + [self.left_bond, self.right_bond,
                                     self.group, self.correspondence]
 
     def is_descriptor_present(self, descriptor):
-        '''
-        Return True if this object has a description with this descriptor.
-        '''
+        """Return True if this object has a description with descriptor."""
         for d in self.descriptions:
             if d.descriptor == descriptor:
                 return True
 
     def is_description_type_present(self, description_type):
-        '''
-        Return True if this object has a description with the given
-        description type.
-        '''
+        """Return True if this object has a description with the given type."""
         for d in self.descriptions:
             if d.description_type == description_type:
                 return True
