@@ -682,33 +682,7 @@
         flipped-group))
                
 ;---------------------------------------------
-
-(defun possible-group-bond-list (bond-category direction-category 
-				 bond-facet bond-list
-				 &aux new-bond-list quit)
-; This is used by the group-scout--whole-string codelet.  It returns a list of
-; bonds that could be used in making a group out of the entire string.
-  (setq new-bond-list bond-list)
-  (loop for bond in new-bond-list until quit do
-	(cond ((null bond) (setq new-bond-list nil) (setq quit t))
-	      ((not (eq (send bond :bond-facet) bond-facet)) 
-	       (setq new-bond-list nil) (setq quit t))
-              ((and (eq (send (send bond :bond-category) 
-			      :get-related-node plato-opposite)
-			bond-category)
- 		    (eq (send (send bond :direction-category) 
-			      :get-related-node plato-opposite)
-			direction-category))
-  	        (setq new-bond-list 
-		      (subst (send bond :flipped-version) 
-			     bond new-bond-list)))
-  	      ((or (not (eq (send bond :bond-category) 
-			    bond-category))
-		   (not (eq (send bond :direction-category) 
-			    direction-category)))
-               (setq new-bond-list nil) (setq quit t))))
-  new-bond-list)
-
+; get-possible-group-bonds | Workspace.possible_group_bonds
 ;---------------------------------------------
 
 (defun group-equal? (group1 group2)   

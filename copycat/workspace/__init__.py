@@ -896,10 +896,8 @@ class Workspace(object):
 
     def possible_group_bonds(self, bond_category, direction_category,
                              bond_facet, bonds):
-        '''
-        This is used by the group scout - whole string codelet. Returns a list
-        of bonds that could be used in making a group of the entire string.
-        '''
+        """Return a list of bonds that could be used in making a group of the
+        entire string."""
         new_bonds = []
         opposite = slipnet.plato_opposite
         for bond in bonds:
@@ -909,15 +907,17 @@ class Workspace(object):
             elif bond.bond_facet != bond_facet:
                 new_bonds = []
                 break
-            elif bond.bond_category.related_node(opposite) == bond_category and \
-                    bond.direction_category.related_node(opposite) == direction_category:
+            elif slipnet.get_related_node(bond.bond_category, opposite) == \
+                    bond_category and \
+                    slipnet.get_related_node(bond.direction_category, opposite) == \
+                    direction_category:
                 new_bonds.append(bond.flipped_version())
-            elif bond.bond_cateogry != bond_category or \
+            elif bond.bond_category != bond_category or \
                     bond.direction_category != direction_category:
                 new_bonds = []
                 break
             else:
-                bond.append(new_bonds)
+                new_bonds.append(bonds)
         return new_bonds
 
     def update_temperature(self):
