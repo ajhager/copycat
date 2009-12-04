@@ -232,17 +232,8 @@
 	collect d))
 
 ;----------------------------------------------
-
-(defmethod (workspace-object :add-incoming-bond) (b)
-; Adds a new incoming bond to the object.
-  (push b incoming-bonds))
-
-;----------------------------------------------
-
-(defmethod (workspace-object :add-outgoing-bond) (b)
-; Adds a new outgoing bond to the object.
-  (push b outgoing-bonds))
-
+; workspace-object.add-incoming-bond
+; workspace-object.add-outgoing-bond
 ;----------------------------------------------
 
 (defmethod (workspace-object :structure-list) ()

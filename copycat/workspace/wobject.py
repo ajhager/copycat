@@ -414,22 +414,20 @@ class Object(object):
         return descriptions
 
     def add_incoming_bond(self, bond):
-        '''
-        Add a new incoming bond to the object.
-        '''
+        """Add a new incoming bond to the object."""
         self.incoming_bonds.append(bond)
 
     def add_outgoing_bond(self, bond):
-        '''
-        Add a new outgoing bond to the object.
-        '''
+        """Add a new outgoing bond to the object."""
         self.outgoing_bonds.append(bond)
 
     def remove_incoming_bond(self, bond):
+        """Remove an incoming bond from the object."""
         if bond in self.incoming_bonds:
             self.incoming_bonds.remove(bond)
 
     def remove_outgoing_bond(self, bond):
+        """Remove an outgoing bond from the object."""
         if bond in self.outgoing_bonds:
             self.outgoing_bonds.remove(bond)
 
