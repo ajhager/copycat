@@ -219,10 +219,8 @@ class Object(object):
                     return right_neighbor
 
     def all_left_neighbors(self):
-        '''
-        Return a list of all the object's immediate left neighbors, both
-        letters and groups.
-        '''
+        """Return a list of all the object's immediate left neighbors, both
+        letters and groups."""
         objects = []
         if not self.is_leftmost_in_string():
             position = self.left_string_position - 1
@@ -235,9 +233,7 @@ class Object(object):
         return objects
 
     def all_right_neighbors(self):
-        '''
-        Return a list of all the objects's left neighbors.
-        '''
+        """Return a list of all the objects's right neighbors."""
         objects = []
         if not self.is_rightmost_in_string():
             position = self.right_string_position + 1
@@ -250,9 +246,7 @@ class Object(object):
         return objects
 
     def all_neighbors(self):
-        '''
-        Return a list of all the immediate neighbors of the objects.
-        '''
+        """Return a list of all the immediate neighbors of the objects."""
         return self.all_left_neighbors() + self.all_right_neighbors()
 
     def random_left_neighbor(self):

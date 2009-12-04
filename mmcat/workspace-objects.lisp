@@ -86,41 +86,10 @@
 ; workspace-object.ungrouped-right-neighbor
 ;---------------------------------------------
 
-(defmethod (workspace-object :all-left-neighbors) ()
-; Returns a list of all of the object's immediate left-neighbors, both 
-; letters and groups.  E.g., E.g., suppose in the string "aabbcc",  the pairs
-; of letters have been grouped as 'A', 'B', and 'C'.  The leftmost 'b' has 
-; two left-neighbors:  the letter 'a' and the group 'A'.
-  (if* (send self :leftmost-in-string?)
-   then nil
-   else (loop for obj in (vref (send string :object-position-vector) 
-			       (1- left-string-position)) 
-	      if (not (and (typep obj 'group) 
-			   (recursive-group-member? self obj)))
-	      collect obj)))  ; Only collect if obj is not the group this 
-                              ; object is in.
-              
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :all-right-neighbors) ()
-; Similar to the "all-left-neighbors" method.
-; Returns a list of all of the object's left-neighbors.
-  (if* (send self :rightmost-in-string?)
-   then nil
-   else (loop for obj in (vref (send string :object-position-vector) 
-			       (1+ right-string-position)) 
-	      if (not (and (typep obj 'group) 
-			   (recursive-group-member? self obj)))
-	      collect obj)))  ; Only collect if obj is not the group 
-                              ; this obj is in.
-              
-;---------------------------------------------
-
-(defmethod (workspace-object :all-neighbors) ()
-; Returns a list of all the immediate neighbors of the object.
-  (append (send self :all-left-neighbors) (send self :all-right-neighbors)))
-
+; workspace-object.all-left-neighbors()
+; workspace-object.all-right-neighbors()
+; workspace-object.all-neighbors()
 ;---------------------------------------------
 
 (defmethod (workspace-object :random-left-neighbor) ()
