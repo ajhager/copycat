@@ -347,33 +347,11 @@
 ;---------------------------------------------
 ; bond-builder | BondBuilder
 ;---------------------------------------------
-	     
-(defun build-bond (new-bond)
-; This function actually builds the new bond.
-  (send new-bond :set-proposal-level %built%)
-  (send (send new-bond :string) :add-bond new-bond)
-  (send (send new-bond :from-obj) :add-outgoing-bond new-bond)
-  (send (send new-bond :to-obj) :add-incoming-bond new-bond)
 
-  ; All sameness bonds go in both directions.  Build the bond in the
-  ; other direction.
-  (if* (eq (send new-bond :bond-category) plato-sameness)  
-   then (send (send new-bond :to-obj) :add-outgoing-bond new-bond)
-        (send (send new-bond :from-obj) 
-	      :add-incoming-bond new-bond))
-
-  (send (send new-bond :left-obj) :set-right-bond new-bond)
-  (send (send new-bond :right-obj) :set-left-bond new-bond)
-
-  ; Activate-from-workspace descriptions of the bond.
-  (send (send new-bond :bond-category) :activate-from-workspace)
-  (if* (send new-bond :direction-category)
-   then (send (send new-bond :direction-category) 
-	      :activate-from-workspace))
-  (if* %workspace-graphics% then (send new-bond :draw)))
-  
 ;---------------------------------------------
-
+; build-bond | Workspace.build-bond
+;---------------------------------------------
+	     
 (defun break-bond (bond)
   (send (send bond :string) :delete-bond bond)
   (send (send bond :from-obj) 

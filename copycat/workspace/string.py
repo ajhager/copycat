@@ -158,10 +158,8 @@ class String(object):
         self.proposed_bonds[from_n][to_n].remove(bond)
 
     def add_bond(self, bond):
-        '''
-        Add a built bond to the string, storing sameness bonds twice, in both
-        directions, since they have no direction.
-        '''
+        """Add a built bond to the string, storing sameness bonds twice,
+        in both directions, since they have no direction."""
         left_number = bond.left_object.string_number
         right_number = bond.right_object.string_number
         self.left_right_bonds[left_number][right_number] = bond
@@ -170,7 +168,7 @@ class String(object):
         to_number = bond.to_object.string_number
         self.from_to_bonds[from_number][to_number] = bond
 
-        if bond.bond_category == self.state.slipnet.plato_sameness:
+        if bond.bond_category == slipnet.plato_sameness:
             self.left_right_bonds[right_number][left_number] = bond
             self.from_to_bonds[to_number][from_number] = bond
 

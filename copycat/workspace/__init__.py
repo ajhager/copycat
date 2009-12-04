@@ -748,23 +748,22 @@ class Workspace(object):
         return Codelet('description_strength_tester', (description, urgency))
 
     def build_bond(self, bond):
-        if bond == None:
-            return
+        """Build a new bond."""
         bond.proposal_level = self.built
         bond.string.add_bond(bond)
         bond.from_object.add_outgoing_bond(bond)
         bond.to_object.add_incoming_bond(bond)
 
-        if bond.bond_category == self.slipnet.plato_sameness:
+        if bond.bond_category == slipnet.plato_sameness:
             bond.to_object.add_outgoing_bond(bond)
             bond.from_object.add_incoming_bond(bond)
 
-        bond.left_object.set_right_bond(bond)
-        bond.right_object.set_left_bond(bond)
+        bond.left_object.right_bond = bond
+        bond.right_object.left_bond = bond
 
-        bond.bond_category.activiate_from_workspace()
+        bond.bond_category.activation_buffer += self.activation
         if bond.direction_category:
-            bond.direction_category.activate_from_workspace()
+            bond.direction_category.activation_buffer += self.activation
 
     def break_bond(self, bond):
         if bond == None:

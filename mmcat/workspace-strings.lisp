@@ -1,11 +1,4 @@
 ;---------------------------------------------
-; WORKSPACE-STRINGS:  This file contains flavor definitions and functions for 
-;                      workspace strings.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
 ; The strings are the initial string, the modified string,
 ; and the target string.  Each object (letter or group) in a 
 ; string has a unique "string number" that distinguishes it from other 
@@ -203,32 +196,7 @@
 				    :string-number)))))
 
 ;---------------------------------------------
-
-(defmethod (workspace-string :add-bond) (b)
-; Adds a built bond to the string.
-  (aset (send self :left-right-bond-array) 
-             (send (send b :left-obj) :string-number)
-             (send (send b :right-obj) :string-number)
-	      b)
-
-  (aset (send self :from-to-bond-array) 
-             (send (send b :from-obj) :string-number)
-             (send (send b :to-obj) :string-number)
-             b)
-  
-  ; Store sameness bonds twice, in both directions, since they
-  ; have no direction.
-  (if* (eq (send b :bond-category) plato-sameness)
-   then (aset (send self :left-right-bond-array) 
-                   (send (send b :right-obj) :string-number)
-                   (send (send b :left-obj) :string-number)
-  	           b)
-
-        (aset (send self :from-to-bond-array) 
-                   (send (send b :to-obj) :string-number)
-                   (send (send b :from-obj) :string-number)
-                   b)))
-  
+; workspace-string.add-bond | String.add_bond
 ;---------------------------------------------
 
 (defmethod (workspace-string :delete-bond) (b)

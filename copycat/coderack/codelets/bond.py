@@ -93,14 +93,14 @@ class BondBuilder(Codelet):
             if not workspace.fight_it_out(bond, 2, incompatible_corrs, 3):
                 return # Fizzle
 
-        for bond in incompatible_bonds:
-            workspace.break_bond(bond)
+        for ibond in incompatible_bonds:
+            workspace.break_bond(ibond)
 
-        for group in incompatible_groups:
-            workspace.break_group(group)
+        for igroup in incompatible_groups:
+            workspace.break_group(igroup)
 
-        for correrspondence in incompatible_corrs:
-            workspace.break_correspondence(correspondence)
+        for icorrespondence in incompatible_corrs:
+            workspace.break_correspondence(icorrespondence)
 
         return workspace.build_bond(bond)
 
