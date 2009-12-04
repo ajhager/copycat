@@ -645,10 +645,10 @@
 	      (return (* 100 (/ bond-count (1- (length object-list))))))))
 
 ;---------------------------------------------
+; recursive-group-member? | Gropu.is_recursive_member
+;---------------------------------------------
 
 (defun recursive-group-member? (object group)
-; Returns t if the object is a member of the group, or is a member of a 
-; member, etc.
   (cond ((typep group 'letter) nil)
 	((memq object (send group :object-list)) t)
 	(t (loop for g in (send group :object-list)

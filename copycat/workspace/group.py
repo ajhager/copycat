@@ -108,19 +108,16 @@ class Group(Object, Structure):
                 self.right_object_position == other.right_object_position and \
                 self.group_category == other.group_category
 
-    def is_recursive_member(self, object):
-        '''
-        Return True if the object is a member of the gruop or is a member of a
-        member, etc.
-        '''
-        if object.type_name == 'letter':
+    def is_recursive_member(self, obj):
+        """Return True if the object is a member of the gruop or is a member
+        of a member, etc."""
+        if obj.type_name == 'letter':
             return False
-        elif object in self.objects:
+        elif obj in self.objects:
             return True
-        else:
-            for g in self.objects:
-                if g.is_recursive_member(object):
-                    return True
+        for g in self.objects:
+            if obj.is_recursive_member(g):
+                return True
 
     def calculate_internal_strength(self):
         '''
@@ -303,7 +300,7 @@ class Group(Object, Structure):
     def rightmost_letter(self):
         """Return the rightmost letter in the group or the rightmost subgroup
         of the group."""
-        if sefl.right_object.type_name == 'letter':
+        if self.right_object.type_name == 'letter':
             return right_object
         else:
             return self.right_object.rightmost_letter()
@@ -379,7 +376,7 @@ class Group(Object, Structure):
         return self.letter_span() == self.string.length
 
     def is_proposed(self):
-        return self.proposal_level < self.state.workspace.built
+        return self.proposal_level < self.workspace.built
 
     def single_letter_group_probability(self):
         '''
