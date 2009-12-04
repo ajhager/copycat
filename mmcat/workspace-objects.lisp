@@ -92,22 +92,10 @@
 ; workspace-object.all-neighbors()
 ;---------------------------------------------
 
-(defmethod (workspace-object :random-left-neighbor) ()
-; Returns a randomly selected left-neighbor.
-  (random-list-item (send self :all-left-neighbors)))
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :random-right-neighbor) ()
-; Returns a randomly selected left-neighbor.
-  (random-list-item (send self :all-right-neighbors)))
-
-;---------------------------------------------
-
-(defmethod (workspace-object :random-neighbor) ()
-; Returns a randomly selected neighbor.
-  (random-list-item (send self :all-neighbors)))
-
+; workspace-object.random-left-neighbor
+; workspace-object.random-right-neighbor
+; workspace-object.random-neighbor
 ;---------------------------------------------
 
 (defmethod (workspace-object :choose-left-neighbor) ()

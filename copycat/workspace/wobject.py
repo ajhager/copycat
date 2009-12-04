@@ -55,6 +55,7 @@ class Object(object):
         self.clamp_salience = False
 
     def flipped_version(self):
+        """Return the default flipped version of an object, itself."""
         return self
 
     def calculate_raw_importance(self):
@@ -251,22 +252,16 @@ class Object(object):
         return self.all_left_neighbors() + self.all_right_neighbors()
 
     def random_left_neighbor(self):
-        '''
-        Return a randomly selected left neighbor.
-        '''
-        return random.choose(self.all_left_neighbors())
+        """Return a randomly selected left neighbor."""
+        return random.choice(self.all_left_neighbors())
 
     def random_right_neighbor(self):
-        '''
-        Return a randomly selected right neighbor.
-        '''
-        return random.choose(self.all_right_neighbors())
+        """Return a randomly selected right neighbor."""
+        return random.choice(self.all_right_neighbors())
 
     def random_neighbor(self):
-        '''
-        Return a randomly selected neighbor.
-        '''
-        return random.choose(self.all_neighbors())
+        """Return a randomly selected neighbor."""
+        return random.choice(self.all_neighbors())
 
     def choose_left_neighbor(self):
         '''
