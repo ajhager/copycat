@@ -53,10 +53,7 @@ class BondBottomUpScout(Codelet):
         
 
 class BondBuilder(Codelet):
-    '''
-    Attempts to build the proposed bond, fighting with competitiors if
-    necessary.
-    '''
+    """Attempt to build the proposed bond, fighting with any competitiors."""
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         bond = self.arguments[0]
@@ -66,50 +63,44 @@ class BondBuilder(Codelet):
 
         objects = workspace.objects()
         if (from_object not in objects) or (to_object not in objects):
-            return
+            return # Fizzle
 
         existing_bond = string.is_bond_present(bond)
         if existing_bond:
-            existing_bond.bond_category.activation_buffer += self.activation
+            existing_bond.bond_category.activation_buffer += workspace.activation
             direction_category = existing_bond.direction_category
             if direction_category:
                 direction_category.activation_buffer += workspace.activation
             string.remove_proposed_bond(bond)
-            return
+            return # Fizzle
 
         string.remove_proposed_bond(bond)
 
         incompatible_bonds = bond.incompatible_bonds()
-        if incompatible_bonds:
-            if not workspace.fight_it_out(bond, 1, incompatible_bonds, 1):
-                return
+        if not workspace.fight_it_out(bond, 1, incompatible_bonds, 1):
+            return # Fizzle
 
         incompatible_groups = workspace.get_common_groups(from_object, to_object)
-        if incompatible_groups:
-            if  not self.fight_it_out(bond, 1, incompatible_groups,
-                max([group.letter_span() for group in incompatible_groups])):
-                return
+        spans = [group.letter_span() for group in incompatible_groups]
+        strength = 0 if len(spans) == 0 else max(spans)
+        if not workspace.fight_it_out(bond, 1, incompatible_groups, strength):
+            return # Fizzle
 
-        incompatible_correspondences = None
-        if bond.direction_category and (bond.is_leftmost_in_string() or \
-                                        bond.is_rightmost_in_string()):
-            incompatible_correspondences = bond.incompatible_correspondences()
-            if incompatible_correspondences:
-                if not self.fight_it_out(bond, 2,
-                                         incompatible_correspondences, 3):
-                    return
+        incompatible_corrs = []
+        at_edge = bond.is_leftmost_in_string() or bond.is_rightmost_in_string()
+        if bond.direction_category and at_edge:
+            incompatible_corrs = bond.incompatible_correspondences()
+            if not workspace.fight_it_out(bond, 2, incompatible_corrs, 3):
+                return # Fizzle
 
-        if incompatible_bonds:
-            for bond in incompatible_bonds:
-                workspace.break_bond(bond)
+        for bond in incompatible_bonds:
+            workspace.break_bond(bond)
 
-        if incompatible_groups:
-            for group in incompatible_groups:
-                workspace.break_group(group)
+        for group in incompatible_groups:
+            workspace.break_group(group)
 
-        if incompatible_correspondences:
-            for correrspondence in incompatible_correspondences:
-                workspace.break_correspondence(correspondence)
+        for correrspondence in incompatible_corrs:
+            workspace.break_correspondence(correspondence)
 
         return workspace.build_bond(bond)
 
@@ -130,11 +121,11 @@ class BondStrengthTester(Codelet):
             bond.string.remove_proposed_bond(bond)
             return # Fizzle
 
+        bond.proposal_level = 2
+
         bond.from_object_descriptor.activation_buffer += workspace.activation
         bond.to_object_descriptor.activation_buffer += workspace.activation
         bond.bond_facet.activation_buffer += workspace.activation
-
-        bond.proposal_level = 2
 
         return [(BondBuilder([bond]), strength)]
 
