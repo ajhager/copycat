@@ -293,11 +293,9 @@ class Group(Object, Structure):
 
 
     def leftmost_letter(self):
-        '''
-        Return the leftmost letter in the group or in the leftmost subgroup of
-        the group.
-        '''
-        if isinstance(self.left_object, Letter):
+        """Return the leftmost letter in the group or in the leftmost subgroup
+        of the group."""
+        if self.left_object.type_name == 'letter':
             return left_object
         else:
             return self.left_object.leftmost_letter()
