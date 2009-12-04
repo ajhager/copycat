@@ -123,33 +123,10 @@
 ; workspace-object.non-distinguishing-descriptions
 ;----------------------------------------------
 
-(defmethod (workspace-object :distinguishing-descriptor?) 
-           (descriptor &aux other-objects other-descriptors)
-; Returns t if no other object of the same type has the same descriptor.
-; For now, object-category and length descriptions are not 
-; distinguishing.  Maybe this should be changed.  
-  (if* (or (eq descriptor plato-letter) (eq descriptor plato-group)
-           (member descriptor *slipnet-numbers*))
-   then nil
-   else (if* (typep self 'letter)
-         then (setq other-objects (remove self (send string :letter-list)))
-         else (setq other-objects (remove self (send string :group-list)))
-              (if* (send self :group) ; Don't count the group this object is 
-		                      ; inside of, if there is one.
-               then (setq other-objects 
-			  (remove (send self :group) other-objects)))
-              ; Don't count other groups inside of this group.
-              (loop for obj in (send self :object-list) 
-                    when (typep obj 'group) do 
-                    (setq other-objects (remove obj other-objects))))
-        (setq other-descriptors 
-              (send-method-to-list 
-	          (flatten (send-method-to-list other-objects 
-			       :descriptions)) :descriptor))
-        (null (memq descriptor other-descriptors))))
-
 ;----------------------------------------------
-  
+; workspace-object.distinguishing-descriptor? | Object.is_distinguishing_descriptor
+;----------------------------------------------
+
 (defmethod (workspace-object :relevant-distinguishing-descriptions) ()
   (loop for description in (send self :distinguishing-descriptions)
 	when (send (send description :description-type) :active?) 

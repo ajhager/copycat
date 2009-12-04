@@ -321,29 +321,26 @@ class Object(object):
         return [d for d in self.descriptions if not f(d.descriptor)]
 
     def is_distinguishing_descriptor(self, descriptor):
-        '''
-        Return True if no other object of the same type has the same descriptor.
-        Object category and length descriptions are not distinguishing.
-        '''
+        """Return True if no other object of the same type has the same
+        descriptor."""
         if descriptor == slipnet.plato_letter or \
            descriptor == slipnet.plato_group or \
            descriptor in slipnet.slipnet_numbers:
-            return
+            return False
+        if self.type_name == 'letter':
+            other_objects = self.string.letters[:]
+            other_objects.remove(self)
         else:
-            if self.type_name == 'letter':
-                other_objects = self.string.letters[:]
-                other_objects.remove(self)
-            else:
-                other_objects = self.string.groups[:]
-                other_objects.remove(self)
-                if self.group:
-                    other_objects.remove(self.group)
-                for obj in self.objects:
-                    if isinstance(obj, Group):
-                        other_objects.remove(obj)
-            descriptions = toolbox.flatten([o.descriptions for o in other_objects])
-            other_descriptors = [d.descriptor for d in descriptions]
-            return not descriptor in other_descriptors
+            other_objects = self.string.groups[:]
+            other_objects.remove(self)
+            if self.group:
+                other_objects.remove(self.group)
+            for obj in self.objects:
+                if obj.type_name == 'group':
+                    other_objects.remove(obj)
+        descriptions = toolbox.flatten([o.descriptions for o in other_objects])
+        other_descriptors = [d.descriptor for d in descriptions]
+        return not descriptor in other_descriptors
 
     def relevant_distinguishing_descriptions(self):
         descriptions = self.distinguishing_descriptions()
