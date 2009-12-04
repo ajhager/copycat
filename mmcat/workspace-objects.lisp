@@ -142,31 +142,10 @@
 ; workspace-object.description-present?
 ;----------------------------------------------
 
-(defmethod (workspace-object :rule-initial-string-descriptions) ()
-; Returns all the descriptions that can be used in making the initial-string
-; part of the rule, with this object as the changed object in the 
-; initial-string.
-  (loop for d in descriptions 
-	when (and (send (send d :description-type) :active?) 
-	          (send self :distinguishing-descriptor? 
-			(send d :descriptor))
-		  (not (eq (send d :description-type) plato-object-category)))
-	collect d))
-
 ;----------------------------------------------
-
-(defmethod (workspace-object :rule-modified-string-descriptions) ()
-; Returns all the non-extrinsic descriptions that can be used in making the
-; modified-string part of the rule, with this object as the object in the
-; modified string corresponding to the initial-string changed object.
-  (loop for d in descriptions 
-	when (and (send (send d :description-type) :active?) 
-	          (send self :distinguishing-descriptor? 
-			(send d :descriptor))
-                  (not (eq (send d :description-type) 
-			    plato-string-position-category))
-		  (not (eq (send d :description-type) plato-object-category)))
-	collect d))
+; workspace-object.rule-initial-string-descriptions
+; workspace-object.rule-modified-string-descriptions
+;----------------------------------------------
 
 ;----------------------------------------------
 ; workspace-object.add-incoming-bond

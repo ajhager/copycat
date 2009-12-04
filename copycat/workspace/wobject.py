@@ -377,28 +377,23 @@ class Object(object):
                 return True
 
     def rule_initial_string_descriptions(self):
-        '''
-        Return all the descriptions that can be used in making the initial
-        string part of the rule, with this object as the changed object in the
-        initial string.
-        '''
+        """Return all the descriptions that can be used in making the initial
+        string part of the rule, with this object as the changed object."""
         descriptions = []
         for d in self.descriptions:
-            if d.description_Type.is_active() and \
+            if d.description_type.is_active() and \
                self.is_distinguishing_descriptor(d.descriptor) and \
-               not d.descriptor == self.state.slipnet.plato_object_category:
+               d.descriptor != slipnet.plato_object_category:
                 descriptions.append(d)
         return descriptions
 
     def rule_modified_string_descriptions(self):
-        '''
-        Return all the non extrinsic descriptions that can be used in make the
-        modified string part of the rule with this object as the object in the
-        modified string corresponding to the initial string changed object.
-        '''
+        """Return all the non extrinsic descriptions that can be used in make
+        the modified string part of the rule with this object as the object in
+        string corresponding to the initial string changed object."""
         descriptions = []
-        categories = [self.state.slipnet.plato_string_position_category,
-                      self.state.slipnet.plato_object_category]
+        categories = [slipnet.plato_string_position_category,
+                      slipnet.plato_object_category]
         for d in self.descriptions:
             if d.description_type.is_active() and \
                self.is_distinguishing_descriptor(d.descriptor) and \
