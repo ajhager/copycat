@@ -127,18 +127,9 @@
 ; workspace-object.distinguishing-descriptor? | Object.is_distinguishing_descriptor
 ;----------------------------------------------
 
-(defmethod (workspace-object :relevant-distinguishing-descriptions) ()
-  (loop for description in (send self :distinguishing-descriptions)
-	when (send (send description :description-type) :active?) 
-	collect description))
-
 ;----------------------------------------------
-
-(defmethod (workspace-object :relevant-non-distinguishing-descriptions) ()
-  (loop for description in (send self :non-distinguishing-descriptions)
-	when (send (send description :description-type) :active?) 
-	collect description))
-
+; workspace-object.relevant-distinguishing-descriptions
+; workspace-object.relevant-non-distinguishing-descriptions
 ;----------------------------------------------
 
 (defmethod (workspace-object :choose-relevant-description-by-activation) 

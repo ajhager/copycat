@@ -343,12 +343,14 @@ class Object(object):
         return not descriptor in other_descriptors
 
     def relevant_distinguishing_descriptions(self):
+        """Return a list of relevant distinguishing descriptions."""
         descriptions = self.distinguishing_descriptions()
-        [d for d in descriptions if d.description_type.is_active()]
+        return [d for d in descriptions if d.description_type.is_active()]
 
     def relevant_non_distinguishing_descriptions(self):
+        """Return a list of relevant non distinguishing descriptions."""
         descriptions = self.non_distinguishing_descriptions()
-        [d for d in descriptions if d.description_type.is_active()]
+        return [d for d in descriptions if d.description_type.is_active()]
 
     def choose_relevant_description_by_activation(self):
         '''
