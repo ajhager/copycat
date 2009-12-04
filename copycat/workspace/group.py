@@ -348,9 +348,7 @@ class Group(Object, Structure):
         self.bond_descriptions.append(description)
 
     def length(self):
-        '''
-        Return the number of objects in the group.
-        '''
+        """Return the number of objects in the group."""
         return len(self.objects)
 
     def flipped_version(self):

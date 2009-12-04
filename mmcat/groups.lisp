@@ -147,10 +147,8 @@
 ; group.add-bond-description | Group.add_bond_description
 ;---------------------------------------------
 
-(defmethod (group :length) ()
-; Returns the number of objects (letters or groups) in the group.
-  (length object-list))
-
+;---------------------------------------------
+; group.length | Group.length
 ;---------------------------------------------
 
 (defmethod (group :leftmost-letter) ()
