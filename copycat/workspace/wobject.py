@@ -353,10 +353,8 @@ class Object(object):
         return [d for d in descriptions if d.description_type.is_active()]
 
     def choose_relevant_description_by_activation(self):
-        '''
-        Choose a relevant description probabilistically based on the
-        descriptor's activation.
-        '''
+        """Return a relevant description probabilistically based on the
+        descriptor's activation."""
         relevant_descriptions = self.relevant_descriptions()
         if relevant_descriptions:
             descriptors = [d.descriptor for d in relevant_descriptions]

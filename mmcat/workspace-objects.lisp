@@ -130,20 +130,10 @@
 ;----------------------------------------------
 ; workspace-object.relevant-distinguishing-descriptions
 ; workspace-object.relevant-non-distinguishing-descriptions
-;----------------------------------------------
 
-(defmethod (workspace-object :choose-relevant-description-by-activation) 
-           (&aux relevant-descriptions)
-; Chooses a relevant description probabilistically, based on the descriptor's
-; activation.
-  (setq relevant-descriptions (send self :relevant-descriptions))
-  (if* (null relevant-descriptions)
-   then nil
-   else (nth (select-list-position 
-		 (send-method-to-list 
-		     (send-method-to-list relevant-descriptions :descriptor)
-	             :activation)) 
-	     relevant-descriptions)))
+;----------------------------------------------
+;workspace-object.choose-relevant-description-by-activation)
+;----------------------------------------------
 
 ;----------------------------------------------
 ; workspace-object.choose-relevant-distinguishing-description-by-conceptual-depth
