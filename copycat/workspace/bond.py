@@ -219,10 +219,8 @@ class Bond(Structure):
         return self.left_string_position == 0
 
     def is_proposed(self):
-        '''
-        Return True if proposal level is less than the proposal level for
-        built structures.
-        '''
+        """Return True if proposal level is less than the level for  built
+        structures."""
         return self.proposal_level < self.workspace.built
 
     def is_rightmost_in_string(self):

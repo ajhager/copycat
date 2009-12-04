@@ -711,9 +711,8 @@
   incompatible-correspondence-list)
   
 ;---------------------------------------------
-
-(defmethod (bond :proposed?) ()
-  (< proposal-level %built%))
+; proposed? | Bond.is_proposed
+;---------------------------------------------
 
 ;---------------------------------------------
 ; propose-bond | Workspace.propose_bond
