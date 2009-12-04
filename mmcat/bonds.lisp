@@ -716,30 +716,8 @@
   (< proposal-level %built%))
 
 ;---------------------------------------------
-
-(defun propose-bond (from-obj to-obj bond-category bond-facet 
-		     from-obj-descriptor to-obj-descriptor 
-		     &aux proposed-bond urgency)
-; Creates a proposed bond, and posts a bond-strength-tester codelet 
-; with urgency a function of the degree of association of the proposed 
-; bond.
-  ; Activate some descriptions.
-  (send from-obj-descriptor :activate-from-workspace)
-  (send to-obj-descriptor :activate-from-workspace)
-  (send bond-facet :activate-from-workspace)
-  (setq proposed-bond 
-	(make-bond from-obj to-obj bond-category bond-facet 
-		   from-obj-descriptor to-obj-descriptor))
-  (send proposed-bond :set-proposal-level 1)
-  (send (send from-obj :string) :add-proposed-bond proposed-bond)
-  (setq urgency (send bond-category :bond-degree-of-association))  
-  (if* %verbose% 
-   then (format t "Posting a bond-strength-tester with urgency ~a~&" 
-		(get-urgency-bin urgency)))
-  (send *coderack* :post 
-        (make-codelet 'bond-strength-tester (list proposed-bond)
-	              (get-urgency-bin urgency)))
-  (if* %workspace-graphics% then (send proposed-bond :draw-proposed)))
+; propose-bond | Workspace.propose_bond
+;---------------------------------------------
 
 ;---------------------------------------------
 ; choose-bond-facet | Workspace.choose_bond_facet
