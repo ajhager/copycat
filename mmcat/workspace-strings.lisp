@@ -152,8 +152,6 @@
 
 (defmethod (workspace-string :add-letter) (l)
 ; Adds a letter to the string.
-  (send l :set-string-number 
-	  (setq highest-string-number (1+ highest-string-number)))
   (vset (send self :letter-vector) (send l :left-string-position) l)
   ; Add letter to the object-position-vector (used for determining left 
   ; and right neighbors of objects).
@@ -250,9 +248,6 @@
 ;---------------------------------------------
     
 (defmethod (workspace-string :add-group) (g)
-; Adds a built group to the string.  A built group is stored at the position 
-;       (send left-obj :string-number)
-; in the group vector.  
   (vset (send self :group-vector)
 	(send (send g :left-obj) :string-number) g)
 

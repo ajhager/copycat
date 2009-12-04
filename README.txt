@@ -47,3 +47,5 @@ Issues
 Having slipnodes in the global slipnet module level ruins enscapulation.
 
 Similarly there is a problem with using the default global random instance.
+
+String() needs an entire overhaul, especially moving from lists to dicts.

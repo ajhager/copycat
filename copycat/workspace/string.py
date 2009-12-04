@@ -116,9 +116,7 @@ class String(object):
         return non_string_spanning
 
     def add_letter(self, letter):
-        '''
-        Add a letter to the string.
-        '''
+        """Add a letter to the string."""
         self.highest_string_number += 1
         letter.string_number = self.highest_string_number
         position = letter.left_string_position
@@ -208,9 +206,7 @@ class String(object):
         self.proposed_groups[left_number][right_number].remove(group)
 
     def add_group(self, group):
-        '''
-        Add a built group to the string.
-        '''
+        """Add a built group to the string."""
         self.groups[group.left_object.string_number] = group
         self.highest_string_number += 1
         group.string_number = self.highest_string_number
