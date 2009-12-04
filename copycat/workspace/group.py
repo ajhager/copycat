@@ -129,13 +129,13 @@ class Group(Object, Structure):
         on other facets. This should be fixed; a more general mechanism is
         needed.
         '''
-        if self.bond_facet == self.slipnet.plato_letter_category:
+        if self.bond_facet == nodes.plato_letter_category:
             bond_facet_factor = 1
         else:
             bond_facet_factor = .5
 
-        bond_component = self.group_categgory.get_related_node(self.slipnet.plato_bond_category).degree_of_association() * \
-                bond_facet_factor
+        bond_component = nodes.get_related_node(self.group_category,
+                                                nodes.plato_bond_category).degree_of_association() * bond_facet_factor
 
         if self.length() == 1:
             length_component = 5
@@ -148,8 +148,8 @@ class Group(Object, Structure):
 
         bond_component_weight = bond_component ** .98
         length_component_weight = 100 - bond_component_weight
-        return util.weighted_average([(bond_component, bond_component_weight),
-                                      (length_compoent, length_component_weight)])
+        return toolbox.weighted_average((bond_component_weight,length_component_weight),
+                                        (bond_component, length_component))
 
     def calculate_external_strength(self):
         if self.spans_whole_string():

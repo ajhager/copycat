@@ -116,33 +116,29 @@ class GroupBuilder(Codelet):
         self.build_group(group)
 
 class GroupStrengthTester(Codelet):
-    '''
-    Calculates the proposed group's strength and probabilistically decides
-    whether or not to post a group builder codelet with urgency a function
-    of the strength.
-    '''
+    """Calculate the proposed group's strength and probabilistically decide
+    whether to post a group builder codelet with urgency a function of the
+    strength."""
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
-        # Calculate the group's stength.
-        group.update_strength_values()
-        stength = group.total_stength()
+        group = self.arguments[0]
 
-        # Decide whether or not to post the group builder codelet.
+        group.update_strengths()
+        strength = group.total_strength
+
         probability = strength / 100.0
-        probability = self.temperature_adjusted_probability(probability)
+        probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
-            group.string.delete_proposed_group(group)
-            return
+            group.string.remove_proposed_group(group)
+            return # Fizzle
 
-        # Add some activation to descriptions.
-        group.bond_category.buffer += self.activation
-        if group.direction_category:
-            group.direction_category.buffer += self.activation
-
-        # Set group's proposal level.
         group.proposal_level = 2
 
-        return Codelet('group_builder', [group], strength)
+        group.bond_category.activation_buffer += workspace.activation
+        if group.direction_category:
+            group.direction_category.activation_buffer += workspace.activation
+
+        return [(GroupBuilder([group]), strength)]
 
 class GroupTopDownCategoryScout(Codelet):
     '''

@@ -773,62 +773,7 @@
   (propose-group object-list bond-list group-category direction-category)))
 
 ;---------------------------------------------
-
-(defun group-strength-tester (proposed-group
-		      	      &aux proposed-group-strength build-probability 
-			           urgency)
-; Calculates the proposed-group's strength, and probabilistically decides
-; whether or not to post a group-builder codelet.  If so, the urgency of
-; the group-builder codelet is a function of the strength.
-(block nil
-  (if* %verbose% 
-   then (format t "In group-strength-tester with group ")
-	(send proposed-group :print))
-
-  (if* %workspace-graphics% then (send proposed-group :flash-proposed))
-
-  ; Calculate the proposed group's strength.
-  (send proposed-group :update-strength-values)
-  (setq proposed-group-strength (send proposed-group :total-strength))
-
-  (if* %verbose% 
-   then (format t "Proposed group's strength: ~a~&" proposed-group-strength))
-
-  ; Decide whether or not to post a group-builder codelet, based on the 
-  ; strength of the proposed-group.
-  (setq build-probability 
-	(get-temperature-adjusted-probability (/ proposed-group-strength 100)))
-
-  (if* %verbose% 
-   then (format t "Build-probability: ~a~&" build-probability))
-  (if* (eq (flip-coin build-probability) 'tails)
-   then (if* %verbose% 
-	 then (format t "Group not strong enough.  Fizzling.~&"))
-        (send (send proposed-group :string) 
-	      :delete-proposed-group proposed-group)
-          (if* %workspace-graphics% 
-	   then (send proposed-group :erase-proposed))
-        (return))
-        
-  ; Activate-from-workspace some descriptions.
-  (send (send proposed-group :bond-category) :activate-from-workspace)
-  (if* (send proposed-group :direction-category) 
-   then (send (send proposed-group :direction-category) 
-	      :activate-from-workspace))
-
-  (if* %workspace-graphics% then (send proposed-group :erase-proposed))
-  (send proposed-group :set-proposal-level 2)
-  (setq urgency proposed-group-strength)
-  (if* %verbose% 
-   then (format t "Posting a group-builder codelet with urgency ~a~&" 
-		(get-urgency-bin urgency)))
-
-  (send *coderack* :post 
-	(make-codelet 'group-builder (list proposed-group) 
-	              (get-urgency-bin urgency)))
-
-  (if* %workspace-graphics% then (send proposed-group :draw-proposed))))
-
+; group-strength-tester | GroupStrengthTester
 ;---------------------------------------------
 
 (defun group-builder (proposed-group 
