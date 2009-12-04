@@ -108,15 +108,10 @@
 ; workspace-object.all-bonds | Object.all_bonds
 ;---------------------------------------------
 
-(defmethod (workspace-object :add-description) (d)
-; Adds the given description to the object's decription list.
-  (send d :set-description-number (length (send self :descriptions)))
-  (push d descriptions))
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :add-extrinsic-description) (d)
-   (push d extrinsic-descriptions))
+; workspace-object.add-description
+; workspace-object.add-extrinsic-description
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace-object.get-descriptor | Object.get_descriptor

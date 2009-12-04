@@ -288,13 +288,13 @@ class Object(object):
         return self.incoming_bonds + self.outgoing_bonds
 
     def add_description(self, description):
-        '''
-        Add the given description to the object's description list.
-        '''
+        """Add the given description to the object's description list."""
         description.descriptor_number = len(self.descriptions)
         self.descriptions.append(description)
 
     def add_extrinsic_description(self, description):
+        """Add the given extrinsic description to the object's extrinsic
+        description list."""
         self.extrinsic_descriptions.append(description)
 
     def get_descriptor(self, description_type):
