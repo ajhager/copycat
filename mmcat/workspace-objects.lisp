@@ -144,20 +144,8 @@
    (push d extrinsic-descriptions))
 
 ;---------------------------------------------
-
-(defmethod (workspace-object :get-descriptor) (description-type)
-; Returns the descriptor of the object corresponding to the given 
-; description-type.  E.g., if the description-type is "object-category", the
-; descriptor might be "letter" or "group".  If the description-type
-; is "letter-category", the descriptor might be 'A' if the object is an
-; 'A'.  If the object has no such description, this returns nil.
-; Note: this assumes that there is at most one description with a given
-; object facet, which is a limitation of the current version of Copycat.
-  (loop for description in descriptions 
-        when (eq (send description :description-type) description-type)
-        return (send description :descriptor)))
-
-;----------------------------------------------
+; workspace-object.get-descriptor | Object.get_descriptor
+;---------------------------------------------
 
 (defmethod (workspace-object :relevant-descriptions) ()
 ; Returns a list of the object's relevant descriptions (those whose

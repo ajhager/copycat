@@ -744,22 +744,3 @@
 ;---------------------------------------------
 ; choose-bond-facet | Workspace.choose_bond_facet
 ;---------------------------------------------
-
-(defun choose-bond-facet (obj1 obj2 &aux obj1-bond-facets 
-				             obj2-bond-facets)
-  (setq obj1-bond-facets
-	(loop for description-type 
-	      in (send-method-to-list (send obj1 :descriptions) 
-		     :description-type)
-	      when (eq (send description-type :category) plato-bond-facet)
-	      collect description-type))
-  (setq obj2-bond-facets
-	(loop for description-type 
-	      in (send-method-to-list (send obj2 :descriptions) 
-		     :description-type)
-	      when (eq (send description-type :category) plato-bond-facet)
-	      collect description-type))
-        
-  (select-list-item-by-method 
-      (intersection obj1-bond-facets obj2-bond-facets) 
-      ':total-description-type-support (send obj1 :string)))

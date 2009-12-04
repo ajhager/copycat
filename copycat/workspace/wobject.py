@@ -309,10 +309,8 @@ class Object(object):
         self.extrinsic_descriptions.append(description)
 
     def get_descriptor(self, description_type):
-        '''
-        Return the descriptor of the object corresponding to the given
-        desicription type.
-        '''
+        """Return the descriptor of the object corresponding to the given
+        desicription type."""
         for description in self.descriptions:
             if description.description_type == description_type:
                 return description.descriptor
