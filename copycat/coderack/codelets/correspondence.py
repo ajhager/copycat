@@ -147,8 +147,8 @@ class CorrespondenceBuilder(Codelet):
                (object2.is_leftmost_in_string() or object2.is_rightmost_in_string()):
             incompatible_bond = correspondence.incompatible_bond()
             if incompatible_bond:
-                if not self.fight_it_out(correspondence, 3,
-                                         [incompatible_bond], 2):
+                if not workspace.fight_it_out(correspondence, 3,
+                                              [incompatible_bond], 2):
                     return
                 # If the bond is in a group, fight against it as well.
                 incompatible_group = incompatible_bond.group

@@ -23,9 +23,9 @@ from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
 from copycat.workspace.description import Description
 from copycat.workspace.description import ExtrinsicDescription
+from copycat.workspace.mapping import Mapping
 from copycat.workspace.group import Group
 from copycat.workspace.letter import Letter
-from copycat.workspace.mapping import Mapping
 from copycat.workspace.correspondence import Correspondence
 from copycat.workspace.bond import Bond
 from copycat.workspace.replacement import Replacement
@@ -917,7 +917,7 @@ class Workspace(object):
                 new_bonds = []
                 break
             else:
-                new_bonds.append(bonds)
+                new_bonds.append(bond)
         return new_bonds
 
     def update_temperature(self):

@@ -10,6 +10,14 @@ website: http://web.cecs.pdx.edu/~mm/
 Status
 ------
 
+12/04/09
+Enough is working for bonds and groups to be successfully built with work
+on Correspondences coming along. On some seeds, the program successfully
+runs to completion (running an AnswerBuilder codelet), although the
+answers aren't accurate yet. Last major update had at most 12 of 25
+codelet types possibly running, and now it is more like 20 of 25. Work
+on providing accuracy continues.
+
 11/29/09
 The original copycat source code has been checked into the mmcat folder.
 I have started a function by function accuracy audit marked by the commit
@@ -32,3 +40,10 @@ only viewing a running Copycat session, but also exploring the status and
 underlying code of each active object. Students of the program will be able
 to see and understand exactly what is going on behind the scenes that allows
 Copycat to work.
+
+Issues
+------
+
+Having slipnodes in the global slipnet module level ruins enscapulation.
+
+Similarly there is a problem with using the default global random instance.

@@ -56,8 +56,8 @@ class GroupBuilder(Codelet):
 
         bonds_to_flip = group.get_bonds_to_be_flipped()
         if bonds_to_flip:
-            if not self.fight_it_out(group, group.letter_span(),
-                                     bonds_to_flip, 1):
+            if not workspace.fight_it_out(group, group.letter_span(),
+                                          bonds_to_flip, 1):
                 return # Fizzle
 
         incompatible_groups = group.incompatible_groups()
@@ -75,8 +75,8 @@ class GroupBuilder(Codelet):
 
         incompatible_correspondences = group.incompatible_correspondences()
         if group.direction_category and incompatible_correspondences:
-            if not self.fight_it_out(group, 1,
-                                     incompatible_correspondences, 1):
+            if not workspace.fight_it_out(group, 1,
+                                          incompatible_correspondences, 1):
                 return # Fizzle
 
         for incompatible_group in incompatible_groups:
@@ -85,7 +85,7 @@ class GroupBuilder(Codelet):
         # Flip any bonds that need it and replace any bonds that were rebuilt.
         new_bonds = []
         if bonds_to_flip:
-            for bond in group.bonds():
+            for bond in group.bonds:
                 flipped_bond = string.is_bond_present(bond.flipped_version())
                 if flipped_bond:
                     workspace.break_bond(flipped_bond)
@@ -212,9 +212,11 @@ class GroupTopDownCategoryScout(Codelet):
         
         direction_category = bond.direction_category
         facet = bond.bond_facet
-        opposite_bond_category = bond_category.get_related_node(plato_opposite)
+        opposite_bond_category = nodes.get_related_node(bond_category, 
+                                                        nodes.plato_opposite)
         if direction_category:
-            opposite_direction_category = direction_category.get_related_node(plato_opposite)
+            opposite_direction_category = nodes.get_related_node(direction_category,
+                                                                 nodes.plato_opposite)
 
         # Get objects and bonds.
         objects = [bond.left_object, bond.right_object]
@@ -254,7 +256,7 @@ class GroupTopDownCategoryScout(Codelet):
                 break
 
         # Propose the group.
-        return self.propose_group(objects, bonds, category, direction_category)
+        return workspace.propose_group(objects, bonds, category, direction_category)
 
 class GroupTopDownDirectionScout(Codelet):
     '''

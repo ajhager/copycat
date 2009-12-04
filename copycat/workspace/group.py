@@ -15,7 +15,7 @@
 # 02110-1301, USA.
 
 import copycat.toolbox as toolbox
-from copycat.workspace import Object, Structure, Description
+from copycat.workspace import Object, Structure, Description, Mapping
 import copycat.slipnet as nodes
 
 class Group(Object, Structure):
@@ -48,8 +48,8 @@ class Group(Object, Structure):
         self.bond_descriptions = []
 
         if self.spans_whole_string():
-            object_category = state.slipnet.plato_object_category
-            group = state.slpinet.plato_group
+            object_category = nodes.plato_object_category
+            group = nodes.plato_group
             description = Description(self, object_category, group)
             self.add_description(description)
 
@@ -102,8 +102,7 @@ class Group(Object, Structure):
             self.add_description(description)
 
     def __eq__(self, other):
-        # HACK
-        if other == None:
+        if other == None or not isinstance(other, Group):
             return False
         return self.left_object_position == other.left_object_position and \
                 self.right_object_position == other.right_object_position and \
@@ -265,7 +264,7 @@ class Group(Object, Structure):
         for obj in self.objects:
             if obj.correspondence and \
                self.is_incompatible_correspondence(obj.correspondence, obj):
-                correspondences.append(ojb.correspondence)
+                correspondences.append(obj.correspondence)
         return correspondences
 
     def is_incompatible_correspondence(self, correspondence, obj):
@@ -284,13 +283,12 @@ class Group(Object, Structure):
                 other_bond = other_object.left_bond
             if other_bond:
                 if other_bond.direction_category:
-                    direction = self.state.slipnet.plato_direction_category
-                    group_mapping = ConceptMapping(direction, direction,
-                                                   self.direction_category,
-                                                   other_bond.direction_category,
-                                                   None, None)
-                    if self.incompatible_concept_mappings(group_mapping,
-                                                          concept_mapping):
+                    direction = nodes.plato_direction_category
+                    group_mapping = Mapping(direction, direction,
+                                            self.direction_category,
+                                            other_bond.direction_category,
+                                            None, None)
+                    if group_mapping.is_incompatible_concept_mapping(concept_mapping):
                         return True
 
 

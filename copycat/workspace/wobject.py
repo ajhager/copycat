@@ -207,7 +207,7 @@ class Object(object):
         if not self.is_leftmost_in_string():
             for left_neighbor in self.all_left_neighbors():
                 group = left_neighbor.group
-                if not group or self.is_recursive_group_member(group):
+                if not group or group.is_recursive_member(self):
                     return left_neighbor
 
     def ungrouped_right_neighbor(self):
@@ -216,7 +216,7 @@ class Object(object):
         if not self.is_rightmost_in_string():
             for right_neighbor in self.all_right_neighbors():
                 group = right_neighbor.group
-                if not group or self.is_recursive_group_member(group):
+                if not group or group.is_recursive_member(self):
                     return right_neighbor
 
     def all_left_neighbors(self):
