@@ -117,30 +117,10 @@
 ; workspace-object.get-descriptor | Object.get_descriptor
 ;---------------------------------------------
 
-(defmethod (workspace-object :relevant-descriptions) ()
-; Returns a list of the object's relevant descriptions (those whose
-; description-type is fully active).
-  (loop for description in descriptions
-	when (send (send description :description-type) :active?) 
-	collect description))
-  
 ;----------------------------------------------
-
-(defmethod (workspace-object :distinguishing-descriptions) ()
-; Returns a list of the object's distinguishing descriptions (those which
-; distinguish it in the string).
-  (loop for d in descriptions 
-	when (send self :distinguishing-descriptor? (send d :descriptor)) 
-	collect d))
-
-;----------------------------------------------
-
-(defmethod (workspace-object :non-distinguishing-descriptions) ()
-  (loop for d in descriptions
-	when (null (send self :distinguishing-descriptor? 
-	  		      (send d :descriptor)))
-	collect d))
-
+; workspace-object.relevant-descriptions
+; workspace-object.distinguishing-descriptions
+; workspace-object.non-distinguishing-descriptions
 ;----------------------------------------------
 
 (defmethod (workspace-object :distinguishing-descriptor?) 

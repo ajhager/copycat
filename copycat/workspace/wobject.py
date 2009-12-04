@@ -305,24 +305,18 @@ class Object(object):
                 return description.descriptor
 
     def relevant_descriptions(self):
-        '''
-        Return a list of the object's relevant desriptions; those whose
-        description type is fully active.
-        '''
+        """Return a list of the object's relevant desriptions; those whose
+        description type is fully active."""
         return [d for d in self.descriptions if d.description_type.is_active()]
 
     def distinguishing_descriptions(self):
-        '''
-        Return a list of the object's distinguishing descriptions; those which
-        distinguish it in a string.
-        '''
+        """Return a list of the object's distinguishing descriptions; those
+        which distinguish it in a string."""
         f = self.is_distinguishing_descriptor
         return [d for d in self.descriptions if f(d.descriptor)]
 
     def non_distinguishing_descriptions(self):
-        '''
-        Return a list of the object's non distinguishing descriptions.
-        '''
+        """Return a list of the object's non distinguishing descriptions."""
         f = self.is_distinguishing_descriptor
         return [d for d in self.descriptions if not f(d.descriptor)]
 
