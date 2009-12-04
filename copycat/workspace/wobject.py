@@ -264,19 +264,15 @@ class Object(object):
         return random.choice(self.all_neighbors())
 
     def choose_left_neighbor(self):
-        '''
-        Choose a left neighbor probabilistically based on intra string
-        salience.
-        '''
+        """Choose a left neighbor probabilistically based on intra string
+        salience."""
         neighbors = self.all_left_neighbors()
         values = [obj.intra_string_salience for obj in neighbors]
         return toolbox.weighted_select(values, neighbors)
 
     def choose_right_neighbor(self):
-        '''
-        Choose a right neighbor probabilistically based on intra string
-        salience.
-        '''
+        """Choose a right neighbor probabilistically based on intra string
+        salience."""
         neighbors = self.all_right_neighbors()
         values = [obj.intra_string_salience for obj in neighbors]
         return toolbox.weighted_select(values, neighbors)

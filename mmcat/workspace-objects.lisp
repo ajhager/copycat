@@ -98,19 +98,9 @@
 ; workspace-object.random-neighbor
 ;---------------------------------------------
 
-(defmethod (workspace-object :choose-left-neighbor) ()
-; Chooses a left-neighbor probabilistically, based on intra-string-salience.
-  (select-list-item-by-method (send self :all-left-neighbors) 
-                              :intra-string-salience))
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :choose-right-neighbor) ()
-; Chooses a right-neighbor probabilistically, based on intra-string-salience.
-  (select-list-item-by-method (send self :all-right-neighbors) 
-                              :intra-string-salience))
- 
-;---------------------------------------------
+; workspace-object.choose-left-neighbor
+; workspace-object.choose-right-neighbor
 ; workspace-object.choose-neighbor | Object.choose_neighber
 ;---------------------------------------------
 
