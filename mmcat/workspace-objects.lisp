@@ -104,11 +104,8 @@
 ; workspace-object.choose-neighbor | Object.choose_neighber
 ;---------------------------------------------
 
-(defmethod (workspace-object :all-bonds) ()
-; Returns all the bonds connected to this object, either incoming or 
-; outgoing.
-  (append incoming-bonds outgoing-bonds))
-
+;---------------------------------------------
+; workspace-object.all-bonds | Object.all_bonds
 ;---------------------------------------------
 
 (defmethod (workspace-object :add-description) (d)

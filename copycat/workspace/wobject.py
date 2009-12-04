@@ -284,10 +284,7 @@ class Object(object):
         return toolbox.weighted_select(saliences, neighbors)
 
     def all_bonds(self):
-        '''
-        Return all bonds connected to this ojbect, either incoming or
-        outgoing.
-        '''
+        """Return all bonds connected to this object."""
         return self.incoming_bonds + self.outgoing_bonds
 
     def add_description(self, description):
