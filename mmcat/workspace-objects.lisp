@@ -146,19 +146,7 @@
 	     relevant-descriptions)))
 
 ;----------------------------------------------
-
-(defmethod (workspace-object 
-	       :choose-relevant-distinguishing-description-by-conceptual-depth) 
-           (&aux relevant-distinguishing-descriptions)
-; Chooses a relevant, distinguishing description probabilistically, based on 
-; the descriptor's conceptual-depth.
-  (setq relevant-distinguishing-descriptions 
-	(send self :relevant-distinguishing-descriptions))
-  (if* (null relevant-distinguishing-descriptions)
-   then nil
-   else (select-list-item-by-method relevant-distinguishing-descriptions
-	                            :conceptual-depth)))
-
+; workspace-object.choose-relevant-distinguishing-description-by-conceptual-depth
 ;----------------------------------------------
 
 (defmethod (workspace-object :description-present?) (new-description)

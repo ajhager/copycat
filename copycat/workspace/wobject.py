@@ -364,14 +364,12 @@ class Object(object):
             return util.weighted_select(activations, relevant_descriptions)
 
     def choose_relevant_distinguishing_description_by_conceptual_depth(self):
-        '''
-        Chooses a relevant, distinguishing description probabilistically based
-        on the descriptor's conceptual depth.
-        '''
+        """Return a relevant, distinguishing description probabilistically
+        based on the descriptor's conceptual depth."""
         relevant_descriptions = self.relevant_distinguishing_descriptions()
         if relevant_descriptions:
-            depths = [d.conceptual_depth for d in relevant_descriptions]
-            return util.weighted_select(depths, relevant_descriptions)
+            depths = [d.conceptual_depth() for d in relevant_descriptions]
+            return toolbox.weighted_select(depths, relevant_descriptions)
 
     def is_description_present(self, description):
         '''

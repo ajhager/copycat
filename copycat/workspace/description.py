@@ -73,7 +73,7 @@ class Description(Structure):
         return self.description_type.is_active()
 
     def conceptual_depth(self):
-        return self.descriptor.conceptual_depth()
+        return self.descriptor.conceptual_depth
 
     def is_bond_description(self):
         '''
