@@ -210,10 +210,10 @@
   (random-list-item (send self :correspondence-list)))
 
 ;---------------------------------------------
+; workspace.choose-object | Workspace.choose_object
+;---------------------------------------------
 
 (defmethod (workspace :choose-object) (method &aux value-list)
-; Returns an object on the workspace chosen probabilistically 
-; (adjusted for temperature) according to the given method.   
   (setq value-list (send-method-to-list (send self :object-list) method))
   (nth (select-list-position (get-temperature-adjusted-value-list value-list))
        (send self :object-list)))

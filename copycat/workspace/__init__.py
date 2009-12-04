@@ -326,17 +326,6 @@ class Workspace(object):
         else:
             return self.translated_rule.descriptor2
 
-    def choose_object(self, method):
-        '''
-        Return an object chosen by temperature adjusted probability according
-        to the given method.
-        '''
-        objects = self.objects()
-        values = [getattr(object, method)() for object in objects]
-        values = self.temperature_adjusted_values(values)
-        index = toolbox.select_list_position(values)
-        return objects[index]
-
     def delete_proposed_structure(self, structure):
         '''
         Delete the given proposed structure from the workspace.
@@ -651,14 +640,11 @@ class Workspace(object):
         return random.choice(self.correspondences())
 
     def choose_object(self, method):
-        '''
-        Return an object on the workspace chosen probabilistically (adjusted
-        for temperature) according to the given method.
-        '''
-        objects = [obj for obj in self.objects() if obj]
-        values = [getattr(obj, method) for obj in objects]
+        """Return an object on the workspace chosen probabilistically
+        (adjusted for temperature) according to the given method."""
+        values = [getattr(obj, method) for obj in self.objects()]
         adjusted_values = self.temperature_adjusted_values(values)
-        return toolbox.weighted_select(values, objects)
+        return toolbox.weighted_select(values, self.objects())
 
     def has_null_replacement(self):
         '''
@@ -1054,7 +1040,8 @@ class Workspace(object):
         return codelets
 
     def objects(self):
-        return self.initial_string.objects() + self.target_string.objects()
+        objects = self.initial_string.objects() + self.target_string.objects()
+        return [obj for obj in objects if obj]
 
     def unreplaced_objects(self):
         unreplaced_objects = []
