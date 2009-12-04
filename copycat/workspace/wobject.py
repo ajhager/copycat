@@ -370,9 +370,7 @@ class Object(object):
             return toolbox.weighted_select(depths, relevant_descriptions)
 
     def is_description_present(self, description):
-        '''
-        Return True if this object already has this description.
-        '''
+        """Return True if this object already has this description."""
         for d in self.descriptions:
             if d.description_type == description.description_type and \
                d.descriptor == description.descriptor:

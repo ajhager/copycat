@@ -137,18 +137,9 @@
 
 ;----------------------------------------------
 ; workspace-object.choose-relevant-distinguishing-description-by-conceptual-depth
+
 ;----------------------------------------------
-
-(defmethod (workspace-object :description-present?) (new-description)
-; Returns t if this object already has this description.
-  (loop for d in descriptions
-	when (and (eq (send d :description-type) 
-		      (send new-description :description-type))
-		  (eq (send d :descriptor) 
-		      (send new-description :descriptor)))
-	return t
-	finally (return nil)))
-
+; workspace-object.description-present?
 ;----------------------------------------------
 
 (defmethod (workspace-object :rule-initial-string-descriptions) ()
