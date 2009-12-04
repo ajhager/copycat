@@ -201,10 +201,8 @@ class Object(object):
         return self.type_name == 'group' and self.spans_whole_string()
 
     def ungrouped_left_neighbor(self):
-        '''
-        Return the left neighbor of the group that either isn't in a group
-        or is in the same group as the given object.
-        '''
+        """Return the left neighbor of the group that either isn't in a group
+        or is in the same group as the object."""
         if not self.is_leftmost_in_string():
             for left_neighbor in self.all_left_neighbors():
                 group = left_neighbor.group
@@ -212,10 +210,8 @@ class Object(object):
                     return left_neighbor
 
     def ungrouped_right_neighbor(self):
-        '''
-        Return the right neighbor of the group that either isn't in a group
-        or is in the same group as the given object.
-        '''
+        """Return the right neighbor of the group that either isn't in a group
+        or is in the same group as the object."""
         if not self.is_rightmost_in_string():
             for right_neighbor in self.all_right_neighbors():
                 group = right_neighbor.group

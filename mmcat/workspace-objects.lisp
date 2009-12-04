@@ -81,34 +81,9 @@
 ; workspace-object.string-spanning-group? | Object.is_string_spanning_group
 ;---------------------------------------------
 
-(defmethod (workspace-object :ungrouped-left-neighbor) ()
-; Returns the left-neighbor of the group that either isn't in a group itself,
-; or is in the same group as the given object.  E.g., suppose in the
-; string "aabbcc",  the pairs of letters have been grouped as 'A', 'B', and
-; 'C', and the whole string has been grouped as 'ABC'.  The leftmost 'b' has 
-; two left-neighbors:  the letter 'a' and the group 'A', which is in 
-; the same higher-level group the 'b' is in, namely, 'ABC'. The ungrouped 
-; left-neighbor of the 'b' is the group 'A'.
-  (if* (send self :leftmost-in-string?)
-   then nil
-   else (loop for left-neighbor in (send self :all-left-neighbors)
-	      when (or (null (send left-neighbor :group))
-		       (recursive-group-member?
-			   self (send left-neighbor :group)))
-	      return left-neighbor)))
-
 ;---------------------------------------------
-
-(defmethod (workspace-object :ungrouped-right-neighbor) ()
-; Similar to the "ungrouped-left-neighbor" method.
-  (if* (send self :rightmost-in-string?)
-   then nil
-   else (loop for right-neighbor in (send self :all-right-neighbors) 
-	      when (or (null (send right-neighbor :group))
-		       (recursive-group-member?
-			   self (send right-neighbor :group)))
-	      return right-neighbor)))
-
+; workspace-object.ungrouped-left-neighbor
+; workspace-object.ungrouped-right-neighbor
 ;---------------------------------------------
 
 (defmethod (workspace-object :all-left-neighbors) ()
