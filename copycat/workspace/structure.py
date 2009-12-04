@@ -20,7 +20,7 @@ class Structure(object):
     def __init__(self):
         self.string = None
         self.structure_category = None
-        self.in_group = False
+        self.group = False
         self.internal_strength = 0
         self.external_strength = 0
         self.total_strength = 0

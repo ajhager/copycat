@@ -777,19 +777,6 @@
 ;---------------------------------------------
 
 (defun group-builder (proposed-group 
-		      &aux (string (send proposed-group :string))
-		           existing-group incompatible-groups 
-			   proposed-group-weight incompatible-group-weight
-		           bonds-to-be-flipped flipped-bond 
-			   existing-bond new-bond-list 
-			   incompatible-correspondences fight-result)
-; Tries to build the proposed group, fighting with competitors if necessary.  
-(block nil  
-  (if* %verbose% 
-   then (format t "~%In group-builder with string ~a, and proposed group: "
-                (send string :pname))
-        (send proposed-group :print))
-
   ; If this group already exists, then add any new descriptions,
   ; activate descriptions and fizzle.
   (if* (setq existing-group (send string :group-present? proposed-group))

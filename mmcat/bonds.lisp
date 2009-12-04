@@ -12,9 +12,6 @@
      to-obj-descriptor)  ; Which descriptor of the to-obj is being related,
                          ; e.g., plato-b.
     (workspace-structure)
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
 
 ;---------------------------------------------
 
@@ -352,30 +349,8 @@
 ; build-bond | Workspace.build_bond
 ;---------------------------------------------
 	     
-(defun break-bond (bond)
-  (send (send bond :string) :delete-bond bond)
-  (send (send bond :from-obj) 
-	:set-outgoing-bonds 
-	(remove bond (send (send bond :from-obj) :outgoing-bonds)))
-  (send (send bond :to-obj) 
-	:set-incoming-bonds 
-	(remove bond (send (send bond :to-obj) :incoming-bonds)))
-
-  ; All sameness bonds go in both directions.  Break the bond in the
-  ; other direction.
-  (if* (eq (send bond :bond-category) plato-sameness)  
-   then (send (send bond :to-obj) :set-outgoing-bonds 
-	      (remove bond (send (send bond :to-obj) 
-				     :outgoing-bonds)))
-        (send (send bond :from-obj) :set-incoming-bonds 
-	      (remove bond (send (send bond :from-obj) 
-				     :incoming-bonds))))
-
-  (send (send bond :left-obj) :set-right-bond nil)
-  (send (send bond :right-obj) :set-left-bond nil)
-
-  (if* %workspace-graphics% then (send bond :erase)))
-
+;---------------------------------------------
+; break-bond | Workspace.break_bond
 ;---------------------------------------------
 
 (defmethod (bond :flipped-version) (&aux flipped-bond)
@@ -403,14 +378,8 @@
 ; get-bond-category | get_bond_category
 ;---------------------------------------------
 
-(defmethod (bond :get-incompatible-bonds) ()
-; Returns the bonds that are incompatible with the given bond, that is
-; any bonds involving one or both of the same two objects bonded by 
-; this bond.
-  (remove-duplicates 
-      (flatten (list (send left-obj :right-bond) 
-		     (send right-obj :left-bond)))))
-
+;---------------------------------------------
+; bond.get-incompatible-bonds | Bond.incompatible_bonds
 ;---------------------------------------------
 
 (defmethod (bond :get-incompatible-correspondences) 

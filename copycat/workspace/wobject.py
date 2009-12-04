@@ -443,6 +443,14 @@ class Object(object):
         '''
         self.outgoing_bonds.append(bond)
 
+    def remove_incoming_bond(self, bond):
+        if bond in self.incoming_bonds:
+            self.incoming_bonds.remove(bond)
+
+    def remove_outgoing_bond(self, bond):
+        if bond in self.outgoing_bonds:
+            self.outgoing_bonds.remove(bond)
+
     def structures(self):
         '''
         Return a list of the structures attached to the object.

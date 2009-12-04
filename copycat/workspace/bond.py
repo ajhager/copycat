@@ -141,12 +141,10 @@ class Bond(Structure):
             return 50
 
     def incompatible_bonds(self):
-        '''
-        Return the bonds that are incompatible with the bond, i.e., any bonds
-        involving one or both of the same two objects bonded by this bond.
-        '''
+        """Return the bonds that are incompatible with the bond."""
+        
         return list(set([self.left_object.right_bond,
-                         self.right_object.left_bond]))
+                         self.right_object.left_bond]) - set([None]))
 
     def incompatible_correspondences(self):
         '''

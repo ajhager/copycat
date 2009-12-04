@@ -185,7 +185,7 @@ class String(object):
         to_number = bond.to_object.string_number
         self.from_to_bonds[from_number][to_number] = None
 
-        if bond.bond_category == self.state.slipnet.plato_sameness:
+        if bond.bond_category == slipnet.plato_sameness:
             self.left_right_bonds[right_number][left_number] = None
             self.from_to_bonds[to_number][from_number] = None
 

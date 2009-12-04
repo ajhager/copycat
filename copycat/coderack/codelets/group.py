@@ -14,17 +14,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import random
+
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 import copycat.slipnet as nodes
 from copycat.workspace import Group
 
 class GroupBuilder(Codelet):
-    '''
-    Tries to build the proposed group, fighting with any competitors.
-    '''
+    """Attempt to build the proposed group, fighting with competitors."""
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
+        group = self.arguments[0]
         string = group.string
 
         # Make sure this group doesn't already exist.
@@ -394,7 +395,7 @@ class GroupWholeStringScout(Codelet):
             objects.append(next_object)
             next_bond = next_object.right_bond
         right_object = next_object
-        if not bonds or not right_object.rightmost_in_string():
+        if not bonds or not right_object.is_rightmost_in_string():
             return
 
         # Choose a random bond and try making a group based on it.

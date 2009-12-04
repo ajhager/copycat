@@ -767,18 +767,17 @@ class Workspace(object):
             bond.direction_category.activation_buffer += self.activation
 
     def break_bond(self, bond):
-        if bond == None:
-            return
-        bond.string.delete_bond(bond)
+        """Break a currently built bond."""
+        bond.string.remove_bond(bond)
         bond.from_object.remove_outgoing_bond(bond)
         bond.to_object.remove_incoming_bond(bond)
 
-        if bond.bond_category == self.slipnet.plato_sameness:
+        if bond.bond_category == slipnet.plato_sameness:
             bond.to_object.remove_outgoing_bond(bond)
             bond.from_object.remove_incoming_bond(bond)
 
-        bond.left_object.set_right_bond(None)
-        bond.right_object.set_left_bond(None)
+        bond.left_object.right_bond = None
+        bond.right_object.left_bond = None
 
     def choose_bond_facet(self, obj1, obj2):
         """Return a bond facet that is shared by both objects, probabilistically

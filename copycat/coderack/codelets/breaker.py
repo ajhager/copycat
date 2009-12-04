@@ -21,34 +21,27 @@ from copycat.coderack import Codelet
 from copycat.workspace import Bond, Group, Correspondence
 
 class Breaker(Codelet):
-    '''
-    Choose a structure at random and decides whether or not to break it as a
-    function of its total weakness.
-    '''
+    """Choose a structure at random and decide whether to break it as a
+    function of its total weakness."""
     def run(self, coderack, slipnet, workspace):
-        # Probabilistically fizzle based on temperature.
         if toolbox.flip_coin((100.0 - workspace.temperature) / 100.0):
-            return
+            return # Fizzle
 
-        # Choose a structure at random.
         structure = random.choice(workspace.structures())
         if not structure:
-            return
+            return # Fizzle
 
-        # If the structure is a bond in a group, have to break the group first.
         if isinstance(structure, Bond) and structure.group:
             structures = [structure, structure.group]
         else:
             structures = [structure]
 
-        # See if the structures can be broken.
         for structure in structures:
             probability = structure.total_weakness() / 100.0
             probability = workspace.temperature_adjusted_probability(probability)
             if not toolbox.flip_coin(probability):
-                return
+                return # Fizzle
 
-        # Break the structures.
         for structure in structures:
             if isinstance(structure, Bond):
                 workspace.break_bond(structure)
