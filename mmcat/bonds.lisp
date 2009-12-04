@@ -148,66 +148,6 @@
 ;---------------------------------------------
 
 (defun bottom-up-bond-scout (&aux from-obj to-obj bond-facet 
-				  from-obj-descriptor to-obj-descriptor 
-				  bond-category)
-; Chooses an object probabilistically by intra-string-salience and a neighbor 
-; of that object probabilistically, also by intra-string-salience.  
-; Chooses a bond-facet (letter-category or length) 
-; probabilistically, by relevance in the string.  Sees if there is a bond 
-; between the two descriptors of this facet, and if so, posts a 
-; bond-strength-tester codelet with urgency a function of the 
-; degree of association of bonds of the bond-category.
-
-(block nil
-  (if* %verbose% then (format t "~%"))
-  (if* %verbose% then (format t "In bottom-up-bond-scout~&"))
-
-  ; Choose object.
-  (setq from-obj (send *workspace* :choose-object ':intra-string-salience))
-  (if* %verbose% 
-   then (format t "Chose from-obj: ") (send from-obj :print))
-
-  ; Choose neighbor.
-  (setq to-obj (send from-obj :choose-neighbor))  
-  (if* (null to-obj) 
-   then (if* %verbose% 
-	 then (format t "This object has no neighbor.  Fizzling.~&"))
-        (return))
-
-  (if* %verbose% 
-   then (format t "Chose to-obj: ") (send to-obj :print))
-  
-  (if* %workspace-graphics% then (draw-bond-grope from-obj to-obj))
-
-  ; Choose bond-facet.
-  (setq bond-facet (choose-bond-facet from-obj to-obj))
-
-  (if* (null bond-facet)
-   then (if* %verbose% 
-         then (format t "No possible bond-facet.  Fizzling.~&"))
-        (return))
-     
-  (if* %verbose% 
-   then (format t "Using bond-facet ~a~&" (send bond-facet :pname)))
-
-  ; Get the two descriptors of this facet, if they exist.
-  (setq from-obj-descriptor (send from-obj :get-descriptor bond-facet))
-  (setq to-obj-descriptor (send to-obj :get-descriptor bond-facet))
-
-  (if* (or (null from-obj-descriptor) (null to-obj-descriptor))
-   then (if* %verbose% 
-	 then (format t "One object has no description with this facet.~&"))
-        (return))
-
-  ; See if there is a possible bond.
-  (setq bond-category 
-	(get-bond-category from-obj-descriptor to-obj-descriptor))
-
-  (if* (null bond-category)
-   then (if* %verbose% 
-         then (format t "No bond.  Fizzling.~&"))
-        (return))
-
   (propose-bond from-obj to-obj bond-category bond-facet 
 		from-obj-descriptor to-obj-descriptor)))
 

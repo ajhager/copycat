@@ -19,36 +19,38 @@ from copycat.coderack import Codelet
 import copycat.slipnet as nodes
 
 class BondBottomUpScout(Codelet):
-    '''
+    """Bottom up bond scout.
+    
     Choose an object and a neighbor of that object probabilistically by
     intra string salience. Choose a bond facet probabilistically by
     relevance in the string. Check if there is a bond between the two
     descriptors of this facet. Post a bond strength tester codelet with
     urgency a function of the degree of association of bonds of the bond
     category.
-    '''
+    """
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         from_object = workspace.choose_object('intra_string_salience')
         to_object = from_object.choose_neighbor()
-        if to_object == None:
-            return
+        if not to_object:
+            return # Fizzle
 
-        facet = workspace.choose_bond_facet(from_object, to_object)
-        if facet == None:
-            return
+        bond_facet = workspace.choose_bond_facet(from_object, to_object)
+        if not bond_facet:
+            return # Fizzle
 
-        from_descriptor = from_object.get_descriptor(facet)
-        to_descriptor = to_object.get_descriptor(facet)
-        if from_descriptor == None or to_descriptor == None:
-            return
+        from_descriptor = from_object.get_descriptor(bond_facet)
+        to_descriptor = to_object.get_descriptor(bond_facet)
+        if not from_descriptor or not to_descriptor:
+            return # Fizzle
 
-        category = nodes.get_bond_category(from_descriptor, to_descriptor)
-        if category == None:
-            return
+        bond_category = nodes.get_bond_category(from_descriptor, to_descriptor)
+        if not bond_category:
+            return # Fizzle
 
-        return workspace.propose_bond(from_object, to_object, category, facet,
-                                      from_descriptor, to_descriptor)
+        return workspace.propose_bond(from_object, to_object, bond_category,
+                                      bond_facet, from_descriptor, to_descriptor)
+        
 
 class BondBuilder(Codelet):
     '''
