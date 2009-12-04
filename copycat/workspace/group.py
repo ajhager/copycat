@@ -301,11 +301,9 @@ class Group(Object, Structure):
             return self.left_object.leftmost_letter()
 
     def rightmost_letter(self):
-        '''
-        Return the rightmost letter in the group or the rightmost subgroup of
-        the group.
-        '''
-        if isinstance(self.right_object, Letter):
+        """Return the rightmost letter in the group or the rightmost subgroup
+        of the group."""
+        if sefl.right_object.type_name == 'letter':
             return right_object
         else:
             return self.right_object.rightmost_letter()

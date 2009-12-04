@@ -151,13 +151,9 @@
 ; group.length | Group.length
 ;---------------------------------------------
 
-(defmethod (group :rightmost-letter) ()
-; Returns the rightmost letter in the group or in the rightmost subgroup of
-; the group.
-  (if* (typep right-obj 'letter)
-   then right-obj
-   else (send right-obj :rightmost-letter)))
-
+;---------------------------------------------
+; group.leftmost-letter | Group.leftmost_letter
+; group.rightmost-letter | Group.rightmost_letter
 ;---------------------------------------------
 
 (defmethod (group :leftmost-in-string?) ()
