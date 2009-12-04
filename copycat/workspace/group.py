@@ -344,9 +344,7 @@ class Group(Object, Structure):
 
 
     def add_bond_description(self, description):
-        '''
-        Add a bond description to the group's list of bond descriptions.
-        '''
+        """Add a bond description to the group's list of bond descriptions."""
         self.bond_descriptions.append(description)
 
     def length(self):

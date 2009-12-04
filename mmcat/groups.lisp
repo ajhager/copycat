@@ -143,11 +143,8 @@
 ; group.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (group :add-bond-description) (d)
-; Adds a bond-description to the group's list of 
-; bond-descriptions.
-  (push d bond-descriptions))
-
+;---------------------------------------------
+; group.add-bond-description | Group.add_bond_description
 ;---------------------------------------------
 
 (defmethod (group :length) ()
