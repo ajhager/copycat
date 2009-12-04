@@ -1,9 +1,3 @@
-;---------------------------------------------
-; GROUPS: This file contains flavors, methods, and codelets for groups.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defflavor group
     (group-category ; E.g., "succgrp" or "predgrp".
      (direction-category nil) ; E.g., "left" or "right".
@@ -26,9 +20,6 @@
     structure-graphics-obj ; Graphics object for displaying group.
     )
     (workspace-object workspace-structure)    
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
 
 ;---------------------------------------------
 
@@ -149,23 +140,7 @@
   new-group)
 
 ;----------------------------------------------
-
-(defmethod (group :print) (&aux sorted-object-list)
-  (setq sorted-object-list 
-	(sort object-list #'(lambda (x y) (< (send x :left-string-position)
-					     (send y :left-string-position)))))
-  (format t "~%")
-  (loop for obj in sorted-object-list do 
-	(format t "~a" (send obj :pname))) 
-  (format t 
-	  "; Group-category: ~a; Direction-category: ~a; level ~a" 
-	  (if* group-category then (send group-category :pname) else "")
-	  (if* direction-category 
-	   then (send direction-category :pname) else "")
-	  proposal-level)
-     
-  (format t "~%"))
-
+; group.print | REMOVED
 ;---------------------------------------------
 
 (defmethod (group :add-bond-description) (d)
@@ -676,68 +651,8 @@
   (propose-group object-list bond-list group-category direction-category)))
 
 ;---------------------------------------------
-
-(defun group-scout--whole-string (&aux string left-obj next-bond next-object
-			               bond-list object-list chosen-bond
-				       bond-category direction-category 
-				       bond-facet group-category right-obj)
-; Tries to make a group out of the entire string.
-; If possible, makes a proposed string-spanning group and posts a 
-; group-strength-tester codelet with urgency a function of the 
-; degree of association of bonds of the given bond-category.
-
-(block nil
-  (if* %verbose% then (format t "In group-string scout~&"))
-
-  (setq string (send *workspace* :random-string))  
-
-  (if* %verbose% then (format t "Chose ~a~&" (send string :pname)))
-
-  ; Choose a salient leftmost-object, and get an object-list and a 
-  ; bond-list.
- 
-  ; If no bonds, then fizzle.
-  (if* (null (send string :bond-list))
-   then (if* %verbose% then (format t "No bonds.  Fizzling.~&"))
-         (return))
-  (setq left-obj (send string :choose-leftmost-object))
-  (setq next-bond (send left-obj :right-bond))
-  (setq object-list (list left-obj))
-  (loop until (null next-bond) do
-        (push next-bond bond-list)
-	(setq next-object (send next-bond :right-obj))
-        (push next-object object-list)
-	(setq next-bond (send next-object :right-bond)))
-  (setq right-obj next-object)
-  (if* (or (null bond-list) (not (send right-obj :rightmost-in-string?)))
-   then (if* %verbose% 
-         then (format t "Bonds do not span string.  Fizzling.~&"))
-        (return))
-	
-  (if* %verbose% 
-   then (format t "The bond-list is ") 
-        (send-method-to-list bond-list :print)
-        (format t "The object-list is ") 
-        (send-method-to-list object-list :print))
-
-  ; Now choose a random bond in the list and try to make a group with 
-  ; that bond type and direction.
-  (setq chosen-bond (random-list-item bond-list))
-  (setq bond-category (send chosen-bond :bond-category))
-  (setq direction-category (send chosen-bond :direction-category))
-  (setq bond-facet (send chosen-bond :bond-facet))
-  (setq bond-list (possible-group-bond-list bond-category 
-			  direction-category bond-facet bond-list))
-
-  (if* (null bond-list)
-   then (if* %verbose% 
-	 then (format t "No possible group.  Fizzling.~&"))
-        (return))
-
-  (setq group-category 
-	(send bond-category :get-related-node plato-group-category))
-
-  (propose-group object-list bond-list group-category direction-category)))
+; group-scout--whole-string | GroupWholeStringScout
+;---------------------------------------------
 
 ;---------------------------------------------
 ; group-strength-tester | GroupStrengthTester

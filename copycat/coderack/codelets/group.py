@@ -360,19 +360,16 @@ class GroupTopDownDirectionScout(Codelet):
         return workspace.propose_group(objects, bonds, group_category, category)
 
 class GroupWholeStringScout(Codelet):
-    '''
-    Try to make a group out of the entire string. If possible, makes a
-    proposed string spanning group and posts a group strength tester
-    codelet with urgency a function of the degree of association of bonds
-    of the given bond category.
-    '''
+    """Try to make a group out of the entire string. If possible, makes a
+    proposed string spanning group and posts a group strength tester codelet
+    with urgency a function of the degree of association of bonds of the given
+    category."""
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         string = workspace.random_string()
-
-        # Choose a salient leftmost object and get objects and bonds.
         if not string.bonds():
-            return
+            return # Fizzle
+
         left_object = string.choose_leftmost_object()
         next_bond = left_object.right_bond
         objects = [left_object]
@@ -385,19 +382,20 @@ class GroupWholeStringScout(Codelet):
             next_bond = next_object.right_bond
         right_object = next_object
         if not bonds or not right_object.is_rightmost_in_string():
-            return
+            return # Fizzle
 
         # Choose a random bond and try making a group based on it.
         bond = random.choice(bonds)
         bond_category = bond.bond_category
         direction_category = bond.direction_category
-        facet = bond.bond_facet
+        bond_facet = bond.bond_facet
         bonds = workspace.possible_group_bonds(bond_category, direction_category,
-                                               facet, bonds)
+                                               bond_facet, bonds)
         if not bonds:
-            return
+            return # Fizzle
 
-        group_category = bond_category.get_related_node(slipnet.plato_group_category)
+        group_category = nodes.get_related_node(bond_category,
+                                                nodes.plato_group_category)
 
         return workspace.propose_group(objects, bonds, group_category,
                                        direction_category)

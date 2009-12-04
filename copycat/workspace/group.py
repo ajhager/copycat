@@ -114,7 +114,7 @@ class Group(Object, Structure):
         Return True if the object is a member of the gruop or is a member of a
         member, etc.
         '''
-        if isinstance(self, Letter):
+        if object.type_name == 'letter':
             return False
         elif object in self.objects:
             return True
@@ -374,32 +374,6 @@ class Group(Object, Structure):
                                   self.right_object, self.objects, self.bonds)
             flipped_group.proposal_level = self.proposal_level
             return flipped_group
-
-    def possible_group_bonds(self, bond_category, direction_category,
-                             bond_facet, bonds):
-        '''
-        This is used by the group scout - whole string codelet. Returns a list
-        of bonds that could be used in making a group of the entire string.
-        '''
-        new_bonds = []
-        opposite = self.state.slipnet.plato_opposite
-        for bond in self.bonds:
-            if not bond:
-                new_bonds = []
-                break
-            elif bond.bond_facet != bond_facet:
-                new_bonds = []
-                break
-            elif bond.bond_category.related_node(opposite) == bond_category and \
-                    bond.direction_category.related_node(opposite) == direction_category:
-                new_bonds.append(bond.flipped_version())
-            elif bond.bond_cateogry != bond_category or \
-                    bond.direction_category != direction_category:
-                new_bonds = []
-                break
-            else:
-                bond.append(new_bonds)
-        return new_bonds
 
     def get_bonds_to_be_flipped(self):
         """Return a list of the bonds that need to be flipped in order for the
