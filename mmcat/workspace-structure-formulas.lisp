@@ -647,12 +647,3 @@
 ;---------------------------------------------
 ; recursive-group-member? | Gropu.is_recursive_member
 ;---------------------------------------------
-
-(defun recursive-group-member? (object group)
-  (cond ((typep group 'letter) nil)
-	((memq object (send group :object-list)) t)
-	(t (loop for g in (send group :object-list)
-		 when (recursive-group-member? object g)
-		 return t
-		 finally (return nil)))))
-

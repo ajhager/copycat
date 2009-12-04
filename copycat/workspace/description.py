@@ -15,6 +15,7 @@
 # 02110-1301, USA.
 
 from copycat.workspace import Structure
+import copycat.slipnet as slipnet
 
 class Description(Structure):
     def __init__(self, object1, description_type, descriptor):
@@ -79,8 +80,8 @@ class Description(Structure):
         Return True if the description refers to the bonds making up the
         group, either the bond category or the bond facet.
         '''
-        return self.description_type == self.slipnet.plato_bond_category or \
-                self.description_type == self.slipnet.plato_bond_facet
+        return self.description_type == slipnet.plato_bond_category or \
+                self.description_type == slipnet.plato_bond_facet
 
     def apply_slippages(self, object1, slippages):
         '''

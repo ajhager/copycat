@@ -734,8 +734,8 @@ class Workspace(object):
             description.object.add_bond_description(description)
         else:
             description.object.add_description(description)
-        description.description_type.activate_from_workspace()
-        description.descriptor.activate_from_workspace()
+        description.description_type.activation_buffer += self.activation
+        description.descriptor.activation_buffer += self.activation
 
     def propose_description(self, object1, description_type, descriptor):
         '''

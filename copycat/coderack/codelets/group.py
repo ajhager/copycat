@@ -19,7 +19,7 @@ import random
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 import copycat.slipnet as nodes
-from copycat.workspace import Group
+from copycat.workspace import Group, Description
 
 class GroupBuilder(Codelet):
     """Attempt to build the proposed group, fighting with competitors."""
