@@ -170,12 +170,12 @@ class Group(Object, Structure):
         for other_group in groups:
             if other_group == None:
                 continue
-            if (not (self.is_subgroup(other_group) or \
-                         other_group.is_subgroup(self) or \
-                         self.groups_overlap(other_group))) and \
+            if (not (self.is_subgroup_of(other_group) or \
+                         other_group.is_subgroup_of(self) or \
+                         self.overlaps(other_group))) and \
                          other_group.group_category == self.group_category and \
                          other_group.direction_category == self.direction_category:
-                number_of_supporting_gruops += 1
+                number_of_supporting_groups += 1
         return number_of_supporting_groups
     
     def local_density(self):
@@ -184,17 +184,17 @@ class Group(Object, Structure):
         same group category and directin category as the given group. This
         method is used in calculating the external strength of a group.
         '''
-        if self.string_spanning_group():
+        if self.is_string_spanning_group():
             return 100
 
         slot_sum = 0
         support_sum = 0
 
         next_object = self.left_object.choose_left_neighbor()
-        if isinstance(next_object, Letter) and next_object.group:
+        if next_object and next_object.type_name == 'letter' and next_object.group:
             next_object = next_object.group
         while next_object:
-            if isinstance(next_object, Letter):
+            if next_object.type_name == 'letter':
                 next_group = None
             else:
                 next_group = next_object

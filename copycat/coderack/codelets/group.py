@@ -31,9 +31,9 @@ class GroupBuilder(Codelet):
         existing_group = string.is_group_present(group)
         if existing_group:
             for description in existing_group.descriptions:
-                description.desriptor.activation_buffer += workspace.activation
+                description.descriptor.activation_buffer += workspace.activation
             for description in group.descriptions:
-                if not existing_group.description_present(description):
+                if not existing_group.is_description_present(description):
                     new_description = Description(existing_group,
                                                   description.description_type,
                                                   description.descriptor)

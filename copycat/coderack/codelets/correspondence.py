@@ -153,8 +153,8 @@ class CorrespondenceBuilder(Codelet):
                 # If the bond is in a group, fight against it as well.
                 incompatible_group = incompatible_bond.group
                 if incompatible_group:
-                    if not self.fight_it_out(correspondence, 1,
-                                             [incompatible_group], 1):
+                    if not workspace.fight_it_out(correspondence, 1,
+                                                  [incompatible_group], 1):
                         return
 
         # If the desired object2 is flipped its existing group.
@@ -175,10 +175,10 @@ class CorrespondenceBuilder(Codelet):
                 workspace.break_correspondence(incompatible_correspondence)
 
         if incompatible_bond:
-            self.break_bond(incompatible_bond)
+            workspace.break_bond(incompatible_bond)
 
         if incompatible_group:
-            self.break_group(incompatible_group)
+            workspace.break_group(incompatible_group)
         
         existing_object2_group = flipped
         if existing_object2_group:

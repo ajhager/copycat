@@ -242,7 +242,7 @@ class Object(object):
                 if not obj:
                     continue
                 if not (obj.type_name == 'group' and \
-                        self.is_recursive_group_member(obj)):
+                        obj.is_recursive_member(self)):
                     objects.append(obj)
         return objects
 

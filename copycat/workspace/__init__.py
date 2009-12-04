@@ -860,7 +860,7 @@ class Workspace(object):
         string = group.string
         if group.group:
             self.break_group(group.group)
-        string.delete_group(group)
+        string.remove_group(group)
 
         proposed_bonds = []
         for i in range(string.highest_string_number):
