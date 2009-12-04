@@ -845,6 +845,7 @@ class Workspace(object):
         self.delete_correspondence(correspondence)
 
     def build_group(self, group):
+        """Build the given group."""
         string = group.string
         group.proposal_level = self.built
         string.add_group(group)
@@ -852,8 +853,8 @@ class Workspace(object):
             obj.group = group
         for bond in group.bonds:
             bond.group = group
-        for d in grup.descriptions:
-            d.descriptor.activate_from_workspace()
+        for d in group.descriptions:
+            d.descriptor.activation_buffer += self.activation
 
     def break_group(self, group):
         string = group.string

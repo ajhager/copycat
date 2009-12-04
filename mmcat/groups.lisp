@@ -247,40 +247,7 @@
                then possible-right-neighbor else nil))))
 
 ;---------------------------------------------
-
-(defun build-group (new-group 
-		    &aux (string (send new-group :string)))
-; This function actually builds the new group.
-  (send new-group :set-proposal-level %built%)
-  (send string :add-group new-group)
-
-  (loop for obj in (send new-group :object-list) do
- 	(send obj :set-group new-group))
-  (loop for r in (send new-group :bond-list) do 
-	(send r :set-group new-group))
-  
-  (loop for description in (send new-group :descriptions) do
-	(send (send description :descriptor) :activate-from-workspace))
-
-  ; Gather statistics on single-letter-groups.
-  (if* (= (send new-group :length) 1)
-   then (incf *single-letter-group-count*))
-
-  (if* %workspace-graphics% 
-   then ; Erase all the proposed bonds and bonds inside this group
-        (loop for bond in (send string :proposed-bond-list)
-  	      when (and bond (send bond :in-group? new-group) 
-			(send bond :drawn?))
-	      do (send bond :erase-spline))
-	(loop for bond in (send new-group :bond-list) 
-	      do (send bond :erase-spline))
-        (send new-group :draw))
-  
-  ; Keep length-description statistics.
-  (loop for d in (send new-group :descriptions) 
-	when (eq (send d :description-type) plato-length) do
-       (incf *length-description-count*)))
-
+; build-group | Workspace.build_group
 ;---------------------------------------------
 
 (defun break-group (group &aux (string (send group :string))
@@ -779,7 +746,6 @@
 ;---------------------------------------------
 ; group-builder | GroupBuilder
 ;---------------------------------------------
-
 
 (defmethod (group :flipped-version) (&aux new-bond-list flipped-group)
 ; Returns the flipped version of this group (e.g., if the group is
