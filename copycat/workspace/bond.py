@@ -190,7 +190,7 @@ class Bond(Structure):
         else:
             return []
 
-        if other_bond == None:
+        if not other_bond:
             return []
         if other_bond.direction_category == None:
             return []
@@ -200,7 +200,7 @@ class Bond(Structure):
                           self.direction_category,
                           other_bond.direction_category,
                           None, None)
-        if mapping.is_incompatible_with(string_position_category_mapping):
+        if mapping.is_incompatible_concept_mapping(string_position_category_mapping):
             incompatible_correspondences.append(correspondence)
 
         return incompatible_correspondences
@@ -256,7 +256,7 @@ class Bond(Structure):
         same bond category and direction category as the given bond. This
         method is used in calculating the external strength of a bond.
         '''
-        def calc(start_object, next_object_method):
+        def calc(direction):
             slot_sum = 0
             support_sum = 0
             method_name = 'choose_%s_neighbor' % direction
@@ -289,7 +289,7 @@ class Bond(Structure):
         density = self.local_density()
         adjusted_density = 100 * (math.sqrt(density / 100.0))
         number_factor = min(1, .6 ** (1 / number ** 3))
-        return round(adjusted_density, number_factor)
+        return round(adjusted_density * number_factor)
 
     def number_of_local_supporting_bonds(self):
         '''

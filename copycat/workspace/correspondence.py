@@ -15,7 +15,7 @@
 # 02110-1301, USA.
 
 import copycat.toolbox as toolbox
-from copycat.workspace import Structure, Letter, Group
+from copycat.workspace import Structure, Letter, Group, Mapping
 import copycat.slipnet as slipnet
 
 class Correspondence(Structure):
@@ -238,16 +238,17 @@ class Correspondence(Structure):
             bond2 = self.object2.left_bond
 
         if bond1 and bond2 and \
-           bond1.direction_cateogry and bond2.direction_category:
-            plato_direction_category = self.slipnet.plato_direction_category
-            bond_concept_mappings = [ConceptMapping(plato_direction_category,
-                                                    plato_direction_category,
-                                                    bond1.direction_category,
-                                                    bond2.direction_category,
-                                                    None, None)]
-            if are_incompatible_concept_mapping_lists(bond_concept_mappings,
-                                                      self.concept_mappings):
-                return bond2
+           bond1.direction_category and bond2.direction_category:
+            plato_direction_category = slipnet.plato_direction_category
+            bond_concept_mappings = [Mapping(plato_direction_category,
+                                             plato_direction_category,
+                                             bond1.direction_category,
+                                             bond2.direction_category,
+                                             None, None)]
+            for m1 in bond_concept_mappings:
+                for m2 in self.concept_mappings:
+                    if m1.is_incompatible_concept_mapping(m2):
+                        return bond2
 
     def is_incompatible_rule(self):
         '''

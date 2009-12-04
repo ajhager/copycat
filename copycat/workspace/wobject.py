@@ -84,11 +84,12 @@ class Object(object):
             return 100
         if self.group:
             return self.group.total_strength()
-        if not self.all_bonds():
+        bonds = self.all_bonds()
+        if not bonds:
             return 0
         if self.is_leftmost_in_string() or self.is_rightmost_in_string():
-            return round(self.bonds[0].total_stength() / 3.0)
-        return round(sum([b.total_strength() for b in self.bonds]) / 6.0)
+            return round(bonds[0].total_strength / 3.0)
+        return round(sum([b.total_strength for b in bonds]) / 6.0)
 
     def calculate_intra_string_unhappiness(self):
         """Return the intra string unhappiness."""
@@ -166,7 +167,7 @@ class Object(object):
         """Return the number of letters spanned by the object."""
         if self.type_name == 'letter':
             return 1
-        return sum([obj.letter_span() for obj in self.objects()])
+        return sum([obj.letter_span() for obj in self.objects])
 
     def letters(self):
         """Return a list of the letters at the lowest level of the object."""

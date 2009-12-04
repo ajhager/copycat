@@ -43,7 +43,7 @@ class Group(Object, Structure):
         self.objects = objects
         self.bonds = bonds
         category = nodes.plato_bond_category
-        self.bond_category = group_category.get_related_node(category)
+        self.bond_category = nodes.get_related_node(group_category, category)
         self.bond_facet = None
         self.bond_descriptions = []
 

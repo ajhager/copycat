@@ -25,8 +25,8 @@ from copycat.workspace.description import Description
 from copycat.workspace.description import ExtrinsicDescription
 from copycat.workspace.group import Group
 from copycat.workspace.letter import Letter
-from copycat.workspace.correspondence import Correspondence
 from copycat.workspace.mapping import Mapping
+from copycat.workspace.correspondence import Correspondence
 from copycat.workspace.bond import Bond
 from copycat.workspace.replacement import Replacement
 from copycat.workspace.rule import Rule
@@ -713,20 +713,21 @@ class Workspace(object):
         positions = [obj.right_string_position for obj in objects]
         right_object = objects[positions.index(min(positions))]
 
-        bond_category = group_category.related_node(self.state.slipnet.plato_bond_category)
+        bond_category = slipnet.get_related_node(group_category,
+                                                 slipnet.plato_bond_category)
 
-        proposed_group = Group(self.state, string, group_category, direction_category,
+        proposed_group = Group(self, string, group_category, direction_category,
                                left_object, right_object, objects, bonds)
         proposed_group.proposal_level = 1
 
-        proposed_group.bond_category.activate_from_workspace()
+        proposed_group.bond_category.activation_buffer += self.activation
         if proposed_group.direction_category:
-            proposed_group.direction_category.activiate_from_workspace()
+            proposed_group.direction_category.activation_buffer += self.activation
 
         string.add_proposed_group(proposed_group)
         urgency = bond_category.bond_degree_of_association()
 
-        return 'group_strength_tester', (proposed_group,), urgency
+        return [(GroupStrengthTester([proposed_group]), urgency)]
 
     def build_description(self, description):
         if description.is_bond_description():
@@ -1183,7 +1184,7 @@ class Workspace(object):
         wins.
         '''
         for competition in others:
-            if competition == None:
+            if not competition:
                 continue
             if not self.structure_vs_structure(structure, structure_weight,
                                                competition, others_weight):

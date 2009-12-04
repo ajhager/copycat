@@ -142,7 +142,7 @@ class GroupStrengthTester(Codelet):
         # Set group's proposal level.
         group.proposal_level = 2
 
-        return Codelet('group_builder', (group,), strength)
+        return Codelet('group_builder', [group], strength)
 
 class GroupTopDownCategoryScout(Codelet):
     '''
@@ -326,8 +326,10 @@ class GroupTopDownDirectionScout(Codelet):
         bond_category = bond.bond_category
         facet = bond.bond_facet
 
-        opposite_bond_category = bond_category.get_related_node(plato_opposite)
-        opposite_category = category.get_related_node(plato_opposite)
+        opposite_bond_category = nodes.get_related_node(bond_category,
+                                                        nodes.plato_opposite)
+        opposite_category = nodes.get_related_node(category,
+                                                   nodes.plato_opposite)
 
         # Get objects and bonds.
         objects = [bond.left_object, bond.right_object]
@@ -366,7 +368,8 @@ class GroupTopDownDirectionScout(Codelet):
             else:
                 break
 
-        group_category = bond_category.get_related_node(plato_group_category)
+        group_category = nodes.get_related_node(bond_category,
+                                                nodes.plato_group_category)
 
         return workspace.propose_group(objects, bonds, group_category, category)
 

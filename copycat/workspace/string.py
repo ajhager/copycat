@@ -195,9 +195,11 @@ class String(object):
         '''
         left_number = group.left_object.string_number
         right_number = group.right_object.string_number
+        if not self.proposed_groups[left_number][right_number]:
+            self.proposed_groups[left_number][right_number] = []
         self.proposed_groups[left_number][right_number].append(group)
 
-    def remove_proposed_groupd(self, group):
+    def remove_proposed_group(self, group):
         '''
         Remove a proposed group from the string.
         '''
@@ -251,7 +253,7 @@ class String(object):
         existing_bond = self.from_to_bonds[from_number][to_number]
         if existing_bond and \
            existing_bond.bond_category == bond.bond_category and \
-           existing_bond.direction_category == bond.directin_category:
+           existing_bond.direction_category == bond.direction_category:
             return existing_bond
 
     def get_bond(self, from_object, to_object):
