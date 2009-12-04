@@ -57,18 +57,7 @@
   new-bond)
 
 ;---------------------------------------------
-
-(defmethod (bond :print) ()
-  (format t "~a-~a:~a ~a ~a (~a), level ~a~&" 
-	  (send from-obj :left-string-position)
-	  (send to-obj :left-string-position)
-	  (send from-obj :pname) 
-	  (if* bond-category then (send bond-category :pname) else "")
-          (send to-obj :pname) 
-	  (if* direction-category 
-	   then (send direction-category :pname) else "")
-	  proposal-level))
-
+; bond.print | REMOVED
 ;---------------------------------------------
 
 (defmethod (bond :letter-span) ()
@@ -144,12 +133,6 @@
 ; Returns t if the bond is in the group g.
   (and (member from-obj (send g :object-list)) 
        (member to-obj (send g :object-list))))
-
-;---------------------------------------------
-
-(defun bottom-up-bond-scout (&aux from-obj to-obj bond-facet 
-  (propose-bond from-obj to-obj bond-category bond-facet 
-		from-obj-descriptor to-obj-descriptor)))
 
 ;---------------------------------------------
 
@@ -358,66 +341,7 @@
 		from-obj-descriptor to-obj-descriptor)))
 
 ;---------------------------------------------
-
-(defun bond-strength-tester (proposed-bond 
-				    &aux proposed-bond-strength 
-	                                 build-probability urgency)
-; Calculates the proposed-bond's strength, and probabilistically decides
-; whether or not to post a bond-builder codelet.  If so, the urgency of
-; the bond-builder codelet is a function of the strength.
-(block nil
-  (if* %verbose% 
-   then (format t "In bond strength-tester with bond ")
-        (send proposed-bond :print))
-
-  (if* %workspace-graphics% then (send proposed-bond :flash-proposed))
-
-  ; Calculate the proposed bond's strength.
-  (send proposed-bond :update-strength-values)
-  (setq proposed-bond-strength (send proposed-bond :total-strength))
-  
-  (if* %verbose% 
-   then (format t "Proposed bond's strength: ~a~&" 
-		proposed-bond-strength))
-
-  ; Decide whether or not to post a bond-builder codelet, based on the 
-  ; strength of the proposed-bond.
-  (setq build-probability 
-	(get-temperature-adjusted-probability 
-	    (/ proposed-bond-strength 100)))
-
-  (if* %verbose% 
-   then (format t "Build-probability: ~a~&" build-probability))
-  (if* (eq (flip-coin build-probability) 'tails)
-   then (if* %verbose% 
-	 then (format t "Bond not strong enough.  Fizzling.~&"))
-        (send (send proposed-bond :string) :delete-proposed-bond 
-	      proposed-bond)
-        (if* %workspace-graphics% 
-	 then (send proposed-bond :erase-proposed))
-        (return))
-        
-  ; The bond-builder will be posted.  Activate-from-workspace some 
-  ; descriptions.
-  (send (send proposed-bond :from-obj-descriptor) 
-	:activate-from-workspace)
-  (send (send proposed-bond :to-obj-descriptor) :activate-from-workspace)
-  (send (send proposed-bond :bond-facet) :activate-from-workspace)
-
-  (if* %workspace-graphics% then (send proposed-bond :erase-proposed))
-  (send proposed-bond :set-proposal-level 2)
-  (setq urgency proposed-bond-strength)
-
-  ; Post the bond-builder codelet.
-  (send *coderack* :post 
-	(make-codelet 'bond-builder (list proposed-bond)
-	              (get-urgency-bin urgency)))
-						             
-  (if* %verbose% 
-   then (format t "Strong enough!  Posting bond-builder with urgency ~a.~&"
-                  (get-urgency-bin urgency)))
-  (if* %workspace-graphics% then (send proposed-bond :draw-proposed))))
-
+; bond-strength-tester | BondStrengthTester
 ;---------------------------------------------
 
 (defun bond-builder (proposed-bond 

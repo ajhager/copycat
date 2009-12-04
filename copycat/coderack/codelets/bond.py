@@ -114,35 +114,29 @@ class BondBuilder(Codelet):
         return workspace.build_bond(bond)
 
 class BondStrengthTester(Codelet):
-    '''
-    Calculates the proposed bond's strength and decides probabilistically
-    wheither or not to post a bond builder codelet with urgency as a
-    function of the strength.
-    '''
+    """Calculate the proposed bond's strength and decide probabilistically
+    whether to post a bond builder codelet with urgency a function of the
+    strength."""
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         bond = self.arguments[0]
 
-        # Update the strength values for the bond.
         bond.update_strengths()
         strength = bond.total_strength
 
-        # Decide whether or not to post the bond builder codelet.
         probability = strength / 100.0
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
             bond.string.remove_proposed_bond(bond)
-            return
+            return # Fizzle
 
-        # Add activation to some relevant descriptions.
         bond.from_object_descriptor.activation_buffer += workspace.activation
         bond.to_object_descriptor.activation_buffer += workspace.activation
         bond.bond_facet.activation_buffer += workspace.activation
 
-        # Change bond's proposal level.
         bond.proposal_level = 2
 
-        return [(BondBuilder((bond,)), strength)]
+        return [(BondBuilder([bond]), strength)]
 
 class BondTopDownCategoryScout(Codelet):
     '''
