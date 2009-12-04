@@ -213,13 +213,6 @@
 ; workspace.choose-object | Workspace.choose_object
 ;---------------------------------------------
 
-(defmethod (workspace :choose-object) (method &aux value-list)
-  (setq value-list (send-method-to-list (send self :object-list) method))
-  (nth (select-list-position (get-temperature-adjusted-value-list value-list))
-       (send self :object-list)))
-
-;---------------------------------------------
-
 (defmethod (workspace :null-replacement?) ()
 ; Returns t if there is at least one letter in the initial string
 ; that doesn't yet have a replacement.

@@ -286,11 +286,9 @@ class Object(object):
         return toolbox.weighted_select(values, neighbors)
 
     def choose_neighbor(self):
-        '''
-        Choose a neighbor probabilistically based on intra string salience.
-        '''
+        """Choose a neighbor probabilistically using intra string salience."""
         neighbors = self.all_neighbors()
-        saliences = [o.intra_string_salience for o in neighbors]
+        saliences = [obj.intra_string_salience for obj in neighbors]
         return toolbox.weighted_select(saliences, neighbors)
 
     def all_bonds(self):

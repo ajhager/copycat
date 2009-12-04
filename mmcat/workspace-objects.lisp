@@ -123,13 +123,7 @@
                               :intra-string-salience))
  
 ;---------------------------------------------
-
-(defmethod (workspace-object :choose-neighbor) ()
-; Chooses a neighbor (left or right) probabilistically, based on 
-; intra-string-salience.
-  (select-list-item-by-method (send self :all-neighbors) 
-                              :intra-string-salience))
- 
+; workspace-object.choose-neighbor | Object.choose_neighber
 ;---------------------------------------------
 
 (defmethod (workspace-object :all-bonds) ()
