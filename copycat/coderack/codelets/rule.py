@@ -16,7 +16,8 @@
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
-from copycat.workspace import Rule
+from copycat.workspace import Rule, ExtrinsicDescription
+import copycat.slipnet as nodes
 
 class RuleBuilder(Codelet):
     '''
@@ -68,54 +69,45 @@ class RuleScout(Codelet):
         if not changed_objects:
             return workspace.propose_rule(None, None, None, None)
 
-        #### This is where the code in rule.lisp picks up.
         i_object = changed_objects[0]
         m_object = i_object.replacement.object2
 
         # Get all relevant distinguishing descriptions.
-        if not i_object.correspondences:
-            i_descriptions = i_object.rule_initial_string_descriptions
+        if not i_object.correspondence:
+            i_descriptions = i_object.rule_initial_string_descriptions()
         else:
-            correspondence_slippages = i_object.correspondence.slippages
+            correspondence_slippages = i_object.correspondence.slippages()
             i_descriptions = []
-            for description in i_object.rule_initial_string_descriptions:
-                # FIXME: Where is this defined?
-                applied_slippages = description.apply_slippages(i_object,
-                        correspondence_slippages)
-                relevant_descriptions = i_object.correspondence.object2.relevant_descriptions()
-                if description_member(applied_slippages, relevant_descriptions):
+            for description in i_object.rule_initial_string_descriptions():
+                applied = description.apply_slippages(i_object,
+                                                      correspondence_slippages)
+                relevant = i_object.correspondence.object2.relevant_descriptions()
+                if applied in relevant:
                     i_descriptions.append(description)
         if not i_descriptions:
-            return
+            return # Fizzle
 
-        # Choose the descriptior for the initial string object.
-        depths = [desription.conceptual_depth for description in i_descriptions]
-        i_probabilities = self.temperature_adjusted_values(depths)
-        index = util.select_list_position(i_probabilities)
-        i_description = i_descriptions[index]
+        depths = [d.conceptual_depth() for d in i_descriptions]
+        i_probabilities = workspace.temperature_adjusted_values(depths)
+        i_description = toolbox.weighted_select(i_probabilities, i_descriptions)
 
-        # Choose the descriptor for the modified string object.
-        m_descriptions = m_object.extrinsic_descriptions() + \
+        m_descriptions = m_object.extrinsic_descriptions + \
                          m_object.rule_modified_string_descriptions()
         if not m_descriptions:
-            return
-        depths = [desription.conceptual_depth for description in m_descriptions]
-        m_probabilities = self.temperature_adjusted_values(depths)
-        index = util.select_list_position(m_probabilities)
-        m_description = m_descriptions[index]
+            return # Fizzle
+        depths = [d.conceptual_depth() for d in m_descriptions]
+        m_probabilities = workspace.temperature_adjusted_values(depths)
+        m_description = toolbox.weighted_select(m_probabilities, m_descriptions)
 
-        # Kludge to avoid rules like "Replace C by succesor of C".
-        relation = m_description.relatino
-        related_descriptor = i_description.descriptor.related_node(relation)
-        if isinstance(m_description, ExtrinsicDescription) and \
-                related_descriptor:
+        related_descriptor = nodes.get_related_node(i_description.descriptor,
+                                                    m_description.relation)
+        if isinstance(m_description, ExtrinsicDescription) and related_descriptor:
             for description in m_object.descriptions:
                 if description.descriptor == related_descriptor:
-                    m_desription = description
+                    m_description = description
                     break
 
-        # Propose the rule.
-        self.propose_rule(i_object, i_description, m_object, m_description)
+        workspace.propose_rule(i_object, i_description, m_object, m_description)
 
 class RuleStrengthTester(Codelet):
     '''

@@ -1,12 +1,3 @@
-;---------------------------------------------
-; DESCRIPTIONS: This file contains flavors, methods, and codelets for 
-;               descriptions.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defflavor description
     (object ; The object to which the description is attached.
      string ; The string this description is in.

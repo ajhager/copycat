@@ -104,4 +104,4 @@ class ExtrinsicDescription(object):
         self.other_object = other_object
 
     def conceptual_depth(self):
-        return self.relation.conceptual_depth()
+        return self.relation.conceptual_depth
