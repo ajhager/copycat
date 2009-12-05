@@ -15,6 +15,7 @@
 # 02110-1301, USA.
 
 import random
+from collections import defaultdict
 
 import copycat.toolbox as toolbox
 import copycat.slipnet as slipnet
@@ -23,6 +24,11 @@ def array(width, height=0):
     if height == 0:
         return [None for i in range(width)]
     return [[None for i in range(width)] for j in range(height)]
+
+def dd():
+    def d():
+        return defaultdict(list)
+    return defaultdict(d)
 
 class String(object):
     """String is a letter string in the workspace.
@@ -47,10 +53,10 @@ class String(object):
         self.letters = array(self.length)
         self.groups = array(self.length)
         self.object_positions = array(self.length)
-        self.proposed_bonds = array(self.length, self.length)
+        self.proposed_bonds = dd()
         self.left_right_bonds = array(self.length, self.length)
         self.from_to_bonds = array(self.length, self.length)
-        self.proposed_groups = array(self.length, self.length)
+        self.proposed_groups = array(100, 100)
         self.number_of_bonds_to_scan_distribution = range(self.length)
         self.intra_string_unhappiness = 0
         self.bonds_to_scan_distribution = range(self.length)
@@ -100,21 +106,12 @@ class String(object):
             values = [obj.relative_importance for obj in leftmost_objects]
             return toolbox.weighted_select(values, leftmost_objects)
 
-    def proposed_bonds(self):
-        '''
-        Return a list of all proposed bonds in the string.
-        '''
-        return list(set(self.proposed_bonds))
-
     def bonds(self):
         '''
         Return a list of all bonds in the string.
         '''
         bs = [b for b in toolbox.flatten(self.from_to_bonds) if b]
         return list(set(bs))
-
-    def proposed_groups(self):
-        pass
 
     def non_string_spanning_objects(self):
         '''
@@ -147,18 +144,10 @@ class String(object):
             return self.groups
 
     def add_proposed_bond(self, bond):
-        '''
-        Add a proposed bond to the string.
-        '''
+        """Add a proposed bond to the string."""
         from_n = bond.from_object.string_number
         to_n = bond.to_object.string_number
-        old_bond = self.proposed_bonds[from_n][to_n]
-        if old_bond == None:
-            new_bonds = [bond]
-        else:
-            old_bond.append(bond)
-            new_bonds = old_bond
-        self.proposed_bonds[from_n][to_n] = new_bonds
+        self.proposed_bonds[from_n][to_n].append(bond)
 
     def remove_proposed_bond(self, bond):
         '''
@@ -223,7 +212,6 @@ class String(object):
         self.groups[group.left_object.string_number] = group
         self.highest_string_number += 1
         group.string_number = self.highest_string_number
-        self.make_room_for_new_object()
         self.object_positions[group.left_string_position].append(group)
         self.object_positions[group.right_string_position].append(group)
 
@@ -234,10 +222,6 @@ class String(object):
         self.groups[group.left_object.string_number] = None
         self.object_positions[group.left_string_position].remove(group)
         self.object_positions[group.right_string_position].remove(group)
-
-    def make_room_for_new_object(self):
-        # TODO: Move the arrays to dicts (sparse matrices).
-        pass
 
     def get_letter(self, position):
         '''

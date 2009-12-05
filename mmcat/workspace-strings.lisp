@@ -271,16 +271,6 @@
 
 
 (defmethod (workspace-string :make-room-for-new-object) () 
-; When a new object (i.e., a new group, since new letters are not 
-; created) is created, there is sometimes a need to create more space for it 
-; in the string.  This method determines if more space is needed, and if 
-; so, creates it.
-(block nil
-  (if* (> object-spaces highest-string-number)
-   then (return))  ; There is enough space for the new object.
-  
-  ; If there is not enough room for the new object, then double the storage
-  ; space.
   (setq object-spaces (* 2 object-spaces))
   (adjust-array proposed-bond-array 
       (list (* 2 (array-rows proposed-bond-array))
@@ -317,7 +307,7 @@
 		       :initial-element nil))
 
 	((eq self *initial-string*)
-         (adjust-array (send *workspace* :proposed-correspondence-array) 
+         (adust-array (send *workspace* :proposed-correspondence-array) 
     	               (list (* 2 (array-dimension 
 				      (send *workspace* 
 					    :proposed-correspondence-array) 

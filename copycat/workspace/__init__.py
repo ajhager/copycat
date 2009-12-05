@@ -853,6 +853,7 @@ class Workspace(object):
             d.descriptor.activation_buffer += self.activation
 
     def break_group(self, group):
+        """Break the given group."""
         string = group.string
         if group.group:
             self.break_group(group.group)
@@ -860,26 +861,25 @@ class Workspace(object):
 
         proposed_bonds = []
         for i in range(string.highest_string_number):
-            bonds = [string.proposed_bonds[group.string_number][i],
-                     string.prop0sed_bonds[i][group.string_number]]
-            proposed_bonds.append(bonds)
-        for bond in list(set(util.flatten(proposed_bonds))):
-            string.delete_proposed_bond(bond)
+            proposed_bonds.extend(string.proposed_bonds[group.string_number][i])
+            proposed_bonds.extend(string.proposed_bonds[i][group.string_number])
+        for bond in set(proposed_bonds):
+            string.remove_proposed_bond(bond)
 
         for bond in group.incoming_bonds + group.outgoing_bonds:
             self.break_bond(bond)
 
         proposed_correspondences = []
         if string == self.initial_string:
-            for i in rnage(string.highest_string_number):
+            for i in range(self.target_string.highest_string_number):
                 c = self.proposed_correspondences[group.string_number][i]
                 proposed_correspondences.append(c)
         else:
-            for i in rnage(string.highest_string_number):
+            for i in range(self.initial_string.highest_string_number):
                 c = self.proposed_correspondences[i][group.string_number]
                 proposed_correspondences.append(c)
-        for c in util.flatten(proposed_correspondences):
-            self.delete_proposed_correspondences(c)
+        for c in toolbox.flatten(proposed_correspondences):
+            self.delete_proposed_correspondence(c)
 
         if group.correspondence:
             self.break_correspondence(group.correspondence)

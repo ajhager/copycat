@@ -207,73 +207,8 @@
 ; build-group | Workspace.build_group
 ;---------------------------------------------
 
-(defun break-group (group &aux (string (send group :string))
-			       proposed-bonds proposed-correspondences)
-
-  (if* (send group :group) ; If this group is contained in another group, then
-                           ; break the containing group.
-   then (break-group (send group :group)))
-
-  (send string :delete-group group)
-
-  ; Delete the proposed bonds from or to this group.
-   (setq proposed-bonds 
-	(loop for i from 0 to (send string :highest-string-number)
-	      collect (append (aref (send string :proposed-bond-array)
-		                    (send group :string-number) i)
-                              (aref (send string :proposed-bond-array)
-			            i (send group :string-number)))))
-                                    
-  (loop for b in (remove-duplicates (flatten proposed-bonds)) do
-        (send string :delete-proposed-bond b)
-        (if* %workspace-graphics% then (send b :erase-proposed)))
-
-  ; Break any bonds from or to this group.
-  (loop for b in (append (send group :incoming-bonds) 
-			 (send group :outgoing-bonds)) do
-	(break-bond b))
-
-  ; Delete the proposed correspondences from or to this group. 
-  (if* (eq string *initial-string*) 
-   then (setq proposed-correspondences 
-	      (loop for i from 0 
-		    to (send *target-string* :highest-string-number)
-		    collect (aref (send *workspace* 
-					:proposed-correspondence-array)
-				   (send group :string-number) i)))
-                                    
-   else (setq proposed-correspondences 
-	      (loop for i from 0 to (send *initial-string* 
-					  :highest-string-number)
-		    collect (aref (send *workspace* 
-					:proposed-correspondence-array)
-				   i (send group :string-number)))))
-
-  (loop for c in (flatten proposed-correspondences) do
-        (send *workspace* :delete-proposed-correspondence c)
-        (if* %workspace-graphics% then (send c :erase-proposed)))
-
-  ; Break the correspondence from or to this group, if any.
-  (if* (send group :correspondence) 
-   then (break-correspondence (send group :correspondence)))
-
-  (loop for obj in (send group :object-list) do 
-	(send obj :set-group nil))
-
-  (loop for r in (send group :bond-list) do (send r :set-group nil))
-
-  (if* %workspace-graphics% 
-   then (send group :erase)
-        ; Draw all the proposed bonds and bonds inside this group.
-        (loop for r in (send string :proposed-bond-list)
-  	      when (and r (send r :in-group? group))
-	      do (if* (= (send r :proposal-level) %built%)
-                  then (send r :draw)
-		  else (send r :draw-proposed)))
-        (loop for bond in (send group :bond-list) 
-	      if (member bond (send string :bond-list)) do 
-	      (send bond :draw))))
-
+;---------------------------------------------
+; break-group | Workspace.break_group
 ;---------------------------------------------
 
 (defun top-down-group-scout--category 
