@@ -491,14 +491,12 @@ class Workspace(object):
         return right_object.left_string_position - left_object.right_string_position
 
     def get_common_groups(self, object1, object2):
-        '''
-        Return any groups that contain both objects at the same level.
-        '''
+        """Return any groups that contain both objects at the same level."""
         common_groups = []
         for group in object1.string.groups:
             if group == None:
                 continue
-            if group.is_recurseive_member(object1) and \
+            if group.is_recursive_member(object1) and \
                     group.is_recursive_member(object2):
                 common_groups.append(group)
         return common_groups

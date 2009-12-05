@@ -171,10 +171,6 @@
      (send left-obj :right-string-position)))
 
 ;----------------------------------------------
+; get-common-groups | Workspace.get_common_groups
+;----------------------------------------------
 
-(defun get-common-groups (obj1 obj2)
-; Returns any groups that contain both objects (at some level).
-  (loop for group in (send (send obj1 :string) :group-list)
-	when (and (recursive-group-member? obj1 group)
-		  (recursive-group-member? obj2 group))
-	collect group))
