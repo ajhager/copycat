@@ -43,41 +43,32 @@ class RuleBuilder(Codelet):
         workspace.build_rule(rule)
 
 class RuleScout(Codelet):
-    '''
-    Fills in the rule template, "Replace _____ by _____". To do this, it
-    chooses descriptions of the changed object in the initial string and
-    the object in the modified string that replaces it. If a rule can be
-    made, it is proposed, and a rule strength tester codelet is posted with
-    urgency a function of the degree of conceptual depth of the chosen
-    descriptions.
-    '''
-    def run(self, coderack, slipnet, workspace):
-        # If not all replacements have been found, then fizzle.
-        if workspace.has_null_replacement():
-            return
+    """Fills in the rule template, "Replace _____ by _____".
 
-        # Find changed object.
+    To do this, it chooses descriptions of the changed object in the initial
+    string and the object in the modified string that replaces it. If a rule
+    can be made, it is proposed, and a rule strength tester codelet is posted
+    with urgency a function of the degree of conceptual depth of the chosen
+    descriptions.
+    """
+    def run(self, coderack, slipnet, workspace):
+        if workspace.has_null_replacement():
+            return # Fizzle
+
         changed_objects = []
         for obj in workspace.initial_string.objects():
-            if not obj:
-                continue
             if obj.is_changed:
                 changed_objects.append(obj)
 
-        # If there is more than one changed object signal an error and quit.
         if len(changed_objects) > 1:
             print "Can't solve problems with more than one letter changed."
+            # FIXME: Too harsh.
             sys.exit()
 
-        # If not changed object, propose rule specifying no changes.
         if not changed_objects:
-            codelets = workspace.propose_rule(None, None, None, None)
-            for codelet, urgency in codelets:
-                deleted_codelet = coderack.post(codelet, urgency)
-                if deleted_codelet:
-                    workspace.delete_proposed_structure(deleted.arguments)
-            return
+            return workspace.propose_rule(None, None, None, None)
 
+        #### This is where the code in rule.lisp picks up.
         i_object = changed_objects[0]
         m_object = i_object.replacement.object2
 

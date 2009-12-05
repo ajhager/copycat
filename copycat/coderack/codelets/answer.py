@@ -81,6 +81,10 @@ class AnswerBuilder(Codelet):
         workspace.answer_string = String(workspace, name)
         for letter in answer_string_letters:
             workspace.answer_string.add_letter(letter)
+        name = ""
+        for letter in workspace.answer_string.letters:
+            name += letter.name
+        workspace.answer_string.name = name
 
         workspace.answer_found = True
 

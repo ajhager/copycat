@@ -1,10 +1,3 @@
-;---------------------------------------------
-; RULE: This file contains flavors, methods, and codelets for the rule and
-;       translated rule.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defflavor rule
   (object-category1 descriptor1-facet descriptor1 
   (object-category2 nil) (descriptor2 nil)
@@ -121,44 +114,6 @@
 ;---------------------------------------------
 
 (defun rule-scout (&aux changed-objects i-obj m-obj 
-			i-descriptions i-probabilities i-description 
-			correspondence-slippage-list 
-			m-descriptions  m-probabilities m-description 
-			related-descriptor)
-; This codelet fills in the rule template (for the time being, we only
-; have one: "Replace _____ by _____"). To do this, it chooses descriptions of
-; the changed object in the initial-string and the object in the 
-; modified-string that replaces it.  If a rule can be made, 
-; then one is proposed, and a rule-strength-tester codelet is posted with 
-; urgency a function of the degree of conceptual-depth of the chosen descriptions.
-
-(block nil
-
-  (if* %verbose% then (format t "In rule-scout~&"))
-
-  ; If not all replacements have been found, then fizzle.
-  (if* (send *workspace* :null-replacement?)
-   then (if* %verbose% 
-	 then (format t "Not all replacements have been found.  Fizzling.~&"))
-        (return))
-
-  ; Find changed object.
-  (setq changed-objects
-	(loop for obj in (send *initial-string* :object-list)
-	      when (send obj :changed?) collect obj))
-
-  ; If there is more than one changed object, then signal and error, and quit.
-  (if* (> (length changed-objects) 1)
-   then (format t "~%More than one letter changed.~&")
-        (format t "Sorry, I can't solve problems like this right now.~&")
-	(setq *quit-program* t)
-	(return))
-
-  ; If no changed object, then propose rule specifying no changes.
-  (if* (null changed-objects) 
-   then (propose-rule nil nil nil nil)
-        (return))
-
   ; Otherwise, go on.
   (setq i-obj (car changed-objects))
   (setq m-obj (send (send i-obj :replacement) :obj2))
