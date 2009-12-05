@@ -18,10 +18,36 @@ from copycat import toolbox as toolbox
 from copycat import slipnet as slipnet
 
 class Object(object):
-    """Object
+    """Object is either a letter or group in the workspace.
     
     Attributes:
-        string:
+        string: Workspace String the object is a part of.
+        string_number: A unique identifying number in its string.
+        left_string_position: Position of the leftmost letter in the object.
+        right_string_position: Position of the rightmost letter in the object.
+        raw_importance:
+        relative_importance:
+        intra_string_happiness:
+        intra_string_unhappiness:
+        inter_string_happiness:
+        inter_string_unhappiness:
+        total_happiness:
+        total_unhappiness:
+        intra_string_salience:
+        inter_string_salience:
+        total_salience:
+        descriptions: A list of descriptions of the object.
+        extrinsic_descriptions: Descriptions with respect to other objects.
+        outgoing_bonds:
+        incoming_bonds:
+        left_bond:
+        right_bond:
+        group:
+        replacement:
+        correspondence:
+        is_change: True if the letter is the initial_string letter that changed.
+        is_new_answer_letter: True if this is the new letter for the answer.
+        clamp_salience: True if the salience of the object is to be clamped.
     """
 
     def __init__(self):

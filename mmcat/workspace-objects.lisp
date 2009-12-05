@@ -7,60 +7,9 @@
 ; workspace-object.print | REMOVED
 ;---------------------------------------------
 
-(defflavor workspace-object 
-     (string ; The string the object is in (e.g., initial-string).
-
-      string-number ; The object's unique identifying number in its string.
-                    ; This number is used for storing and referencing 
-		    ; objects and structures stored in vectors and arrays.
-
-      left-string-position ; If the object is a group, this is the string 
-                           ; position of the leftmost letter in the group.  
-			   ; If the object is a letter, this is its string 
-			   ; position.
-
-      right-string-position ; Similar to left-string-position.  For letters,
-                            ; this is equal to left-string-position.
-
-     ; Some values for the object.  See the file "object-formulas.l"
-     ; for descriptions of these values.
-     (raw-importance 0)  
-     (relative-importance 0) 
-     (intra-string-happiness 0) (intra-string-unhappiness 0) 
-     (inter-string-happiness 0) (inter-string-unhappiness 0)
-     (total-happiness 0) (total-unhappiness 0)
-     (intra-string-salience 0) (inter-string-salience 0) (total-salience 0)
-
-     (descriptions nil) ; A list of descriptions of the object.
-     (extrinsic-descriptions nil) ; A list of descriptions with respect to
-                                  ; other objects.  For now, only the
-				  ; letter in the modified string that 
-				  ; corresponds to the changed letter in
-				  ; the initial string can be given an 
-				  ; extrinsic description (e.g., in 
-                                  ; "abc -> abd, pqrs -> ?", the 'd' would
-				  ; probably get the extrinsic description
-				  ; "Successor of the 'c' in 'abc'").
-
-     ; Variables for structures that can be attached to the object.
-     (outgoing-bonds nil) (incoming-bonds nil) 
-     (left-bond nil) (right-bond nil)
-     (group nil) (replacement nil) (correspondence nil) 
-
-     (changed? nil) ; T if the letter is the initial-string letter that
-                    ; changed.
-
-     (new-answer-letter? nil) ; T if this is a new letter for the answer,
-                              ; not corresponding to any of the target-string
-			      ; letters (this is used when the 
-			      ; translated-rule calls for length changes).
-
-     (clamp-salience? nil) ; T if the salience of this object is to be 
-                           ; clamped (used when a snag has been hit, to
-                           ; clamp the salience of the object causing the 
-                           ; snag).
-     pname ; The print name of the object.
-     ())
+;---------------------------------------------
+; defflavor workspace-object | Object
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace-object.letter-span | Object.letter_span
