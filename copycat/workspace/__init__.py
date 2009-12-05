@@ -872,11 +872,11 @@ class Workspace(object):
         proposed_correspondences = []
         if string == self.initial_string:
             for i in range(self.target_string.highest_string_number):
-                c = self.proposed_correspondences[group.string_number][i]
+                c = self.proposed_correspondences()[group.string_number][i]
                 proposed_correspondences.append(c)
         else:
             for i in range(self.initial_string.highest_string_number):
-                c = self.proposed_correspondences[i][group.string_number]
+                c = self.proposed_correspondences()[i][group.string_number]
                 proposed_correspondences.append(c)
         for c in toolbox.flatten(proposed_correspondences):
             self.delete_proposed_correspondence(c)

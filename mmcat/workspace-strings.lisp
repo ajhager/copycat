@@ -151,28 +151,9 @@
 	 (send self :group-list))))
 
 ;---------------------------------------------
-
-(defmethod (workspace-string :add-proposed-bond) (b)
-; Adds a proposed bond to the string.
-  (aset (send self :proposed-bond-array) 
-             (send (send b :from-obj) :string-number)
-             (send (send b :to-obj) :string-number)
-	     (cons b (aref (send self :proposed-bond-array)
-                           (send (send b :from-obj) :string-number)
-                           (send (send b :to-obj) :string-number)))))
-
+; workspace-string.add-proposed-bond
+; workspace-string.remove-proposed-bond
 ;---------------------------------------------
-
-(defmethod (workspace-string :delete-proposed-bond) (b)
-; Deletes a proposed bond from the string.
-  (aset (send self :proposed-bond-array) 
-             (send (send b :from-obj) :string-number)
-             (send (send b :to-obj) :string-number)
-	     (remove b 
-		   (aref (send self :proposed-bond-array) 
-                              (send (send b :from-obj) :string-number)
-                              (send (send b :to-obj) 
-				    :string-number)))))
 
 ;---------------------------------------------
 ; workspace-string.add-bond | String.add_bond

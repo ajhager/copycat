@@ -150,9 +150,7 @@ class String(object):
         self.proposed_bonds[from_n][to_n].append(bond)
 
     def remove_proposed_bond(self, bond):
-        '''
-        Remove a proposed bond from the string.
-        '''
+        """Remove a proposed bond from the string."""
         from_n = bond.from_object.string_number
         to_n = bond.to_object.string_number
         self.proposed_bonds[from_n][to_n].remove(bond)
