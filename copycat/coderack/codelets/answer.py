@@ -19,7 +19,6 @@ from copycat.workspace import String
 
 class AnswerBuilder(Codelet):
     def run(self, coderack, slipnet, workspace):
-        workspace.answer_string = String(workspace, '')
         workspace.changed_length_group = None
         workspace.snag_object = None
 
@@ -76,6 +75,10 @@ class AnswerBuilder(Codelet):
                     letter.right_string_position = letter.left_string_position+\
                             self.amount_length_changed
 
+        name = ""
+        for letter in answer_string_letters:
+            name += letter.name
+        workspace.answer_string = String(workspace, name)
         for letter in answer_string_letters:
             workspace.answer_string.add_letter(letter)
 
