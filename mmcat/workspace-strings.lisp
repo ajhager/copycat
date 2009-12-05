@@ -1,15 +1,5 @@
-;---------------------------------------------
-; The strings are the initial string, the modified string,
-; and the target string.  Each object (letter or group) in a 
-; string has a unique "string number" that distinguishes it from other 
-; objects in that string.
-
 (defflavor workspace-string
-    (highest-string-number ; The highest string-number of any object in
-	                   ; the string.
-
      letter-vector ; A vector containing all the letters in the string.
-
      letter-list ; A list of all the letters in the string.
 
      (proposed-bond-array nil) ; An array containing all the proposed 
@@ -51,8 +41,6 @@
 				  ;     left-string-position
 				  ; in the vector.
 
-     length ; The number of letters in the string.
-     pname ; The print name of the string.
      object-spaces ; The number of spaces available for objects 
                    ; (letters or groups) in the string.  This number
 		   ; sometimes needs to be increased when new objects 
@@ -66,13 +54,6 @@
      (intra-string-unhappiness 0) ; A variable for the average 
                                   ; intra-string-unhappiness of objects in
 				  ; the string.
-     x y) ; Coordinates for graphical display of the string.
-    ()                               
-    :gettable-instance-variables    
-    :settable-instance-variables            
-    :initable-instance-variables)
-
-;---------------------------------------------
 
 (defmethod (workspace-string :random-object) ()
 ; Returns a random object in the string.

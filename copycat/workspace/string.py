@@ -25,7 +25,20 @@ def array(width, height=0):
     return [[None for i in range(width)] for j in range(height)]
 
 class String(object):
+    """String is a letter string in the workspace.
+
+    This could be the initial string, modified string or target string.
+    Each object in a string has a unique string number that identifies
+    it from other objects in the string.
+
+    Attributes:
+        highest_string_number: The highest number of any objects.
+        name: The literal string this corresponds to.
+        length: The number of letters in the string.
+    """
+
     def __init__(self, workspace, string):
+        """Initializes String."""
         self.workspace = workspace
         self.highest_string_number = -1
         self.name = string
