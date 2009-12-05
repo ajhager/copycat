@@ -14,6 +14,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import math
+
 import copycat.toolbox as toolbox
 from copycat.workspace import Object, Structure, Description, Mapping
 import copycat.slipnet as nodes
@@ -196,17 +198,17 @@ class Group(Object, Structure):
             else:
                 next_group = next_object
             slot_sum += 1
-            if next_group and not self.groups_overlap(next_group) and \
+            if next_group and not self.overlaps(next_group) and \
                next_group.group_category == self.group_category and \
                next_group.direction_category == self.direction_category:
                 support_sum += 1
             next_object = next_object.choose_left_neighbor()
 
         next_object = self.right_object.choose_right_neighbor()
-        if isinstance(next_object, Letter) and next_object.group:
+        if next_object.type_name == 'letter' and next_object.group:
             next_object = next_object.group
         while next_object:
-            if isinstance(next_object, Letter):
+            if next_object.type_name == 'letter':
                 next_group = None
             else:
                 next_group = next_object
@@ -215,7 +217,7 @@ class Group(Object, Structure):
                next_group.group_category == self.group_category and \
                next_group.direction_category == self.direction_category:
                 support_sum += 1
-                nexst_object = next_object.choose_right_neighbor()
+            next_object = next_object.choose_right_neighbor()
 
         if slot_sum == 0:
             return 100
@@ -230,8 +232,7 @@ class Group(Object, Structure):
             density = self.local_density()
             adjusted_density = 100 * (math.sqrt(density / 100.0))
             number_facet = min(1, .6 ** (1 / number ** 3))
-            return round(adjusted_density * number_factor)
-            
+            return round(adjusted_density * number_facet)
 
     def sharing_group(self, other):
         return self.group == other.group

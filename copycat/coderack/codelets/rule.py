@@ -44,7 +44,7 @@ class RuleBuilder(Codelet):
         workspace.build_rule(rule)
 
 class RuleScout(Codelet):
-    """Fills in the rule template, "Replace _____ by _____".
+    """Fills in the rule template, 'Replace _____ by _____'.
 
     To do this, it chooses descriptions of the changed object in the initial
     string and the object in the modified string that replaces it. If a rule
@@ -99,13 +99,14 @@ class RuleScout(Codelet):
         m_probabilities = workspace.temperature_adjusted_values(depths)
         m_description = toolbox.weighted_select(m_probabilities, m_descriptions)
 
-        related_descriptor = nodes.get_related_node(i_description.descriptor,
-                                                    m_description.relation)
-        if isinstance(m_description, ExtrinsicDescription) and related_descriptor:
-            for description in m_object.descriptions:
-                if description.descriptor == related_descriptor:
-                    m_description = description
-                    break
+        if isinstance(m_description, ExtrinsicDescription):
+            related_descriptor = nodes.get_related_node(i_description.descriptor,
+                                                        m_description.relation)
+            if related_descriptor:
+                for description in m_object.descriptions:
+                    if description.descriptor == related_descriptor:
+                        m_description = description
+                        break
 
         workspace.propose_rule(i_object, i_description, m_object, m_description)
 

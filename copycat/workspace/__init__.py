@@ -1237,7 +1237,7 @@ class Workspace(object):
         if not i_object:
             proposed_rule = Rule(None, None, None, None, None)
         else:
-            obj_category = self.slipnet.plato_object_category
+            obj_category = slipnet.plato_object_category
             if isinstance(m_description, ExtrinsicDescription):
                 proposed_rule = Rule(i_object.get_descriptor(obj_category),
                                      i_description.description_type,
@@ -1256,10 +1256,10 @@ class Workspace(object):
         if not i_description:
             urgency = 100
         else:
-            a = toolbox.average([i_description.conceptual_depth(),
-                                 m_description.conceptual_depth()])
+            a = toolbox.average(i_description.conceptual_depth(),
+                                 m_description.conceptual_depth())
             b = a / 100.0
-            urgnecy = math.sqrt(b) * 100
+            urgency = math.sqrt(b) * 100
 
         return [(RuleStrengthTester([proposed_rule]), urgency)]
 

@@ -364,7 +364,7 @@ class Object(object):
             for obj in self.objects:
                 if obj.type_name == 'group':
                     other_objects.remove(obj)
-        descriptions = toolbox.flatten([o.descriptions for o in other_objects])
+        descriptions = toolbox.flatten([o.descriptions for o in other_objects if o])
         other_descriptors = [d.descriptor for d in descriptions]
         return not descriptor in other_descriptors
 

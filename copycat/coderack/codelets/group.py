@@ -64,13 +64,14 @@ class GroupBuilder(Codelet):
         for incompatible_group in incompatible_groups:
             if (group.group_category == incompatible_group.group_category) and\
             (group.direction_category == incompatible_group.direction_category):
-                group_weight = group.length
-                incompatible_weight = incompatible_group.length
+                group_weight = group.length()
+                incompatible_weight = incompatible_group.length()
             else:
                 group_weight = 1
                 incompatible_weight = 1
-            if not self.fight_it_out(group, group_weight,
-                                     incompatible_group, incompatible_weight):
+            if not workspace.fight_it_out(group, group_weight,
+                                          [incompatible_group],
+                                          incompatible_weight):
                 return # Fizzle
 
         incompatible_correspondences = group.incompatible_correspondences()
