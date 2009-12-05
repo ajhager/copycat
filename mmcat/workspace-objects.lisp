@@ -161,14 +161,9 @@
 ; workspace-object.description-type-present?
 ;----------------------------------------------
 
-(defun letter-distance (obj1 obj2 &aux left-obj right-obj)
-; Returns the distance in letters between the two objects.
-  (if* (< (send obj1 :left-string-position) 
-	  (send obj2 :left-string-position))    
-   then (setq left-obj obj1 right-obj obj2)
-   else (setq left-obj obj2 right-obj obj1))
-  (- (send right-obj :left-string-position) 
-     (send left-obj :right-string-position)))
+;----------------------------------------------
+; letter-distance | Workspace.letter_distance
+;----------------------------------------------
 
 ;----------------------------------------------
 ; get-common-groups | Workspace.get_common_groups

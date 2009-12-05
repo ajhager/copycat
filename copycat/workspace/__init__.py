@@ -479,9 +479,7 @@ class Workspace(object):
         return incompatible_correrspondences
 
     def letter_distance(self, object1, object2):
-        '''
-        Return the distance in letters between the two objects.
-        '''
+        """Return the distance in letters between the two objects."""
         if object1.left_string_position < object2.left_string_position:
             left_object = object1
             right_object = object2
