@@ -357,7 +357,7 @@ class Object(object):
             other_objects = self.string.letters[:]
             other_objects.remove(self)
         else:
-            other_objects = self.string.groups[:]
+            other_objects = self.string.get_groups()
             other_objects.remove(self)
             if self.group:
                 other_objects.remove(self.group)

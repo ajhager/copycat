@@ -51,7 +51,7 @@ class String(object):
         self.length = len(string)
         self.object_spaces = self.length
         self.letters = array(self.length)
-        self.groups = array(self.length)
+        self._groups = {}
         self.object_positions = array(self.length)
         self.proposed_bonds = dd()
         self.left_right_bonds = array(self.length, self.length)
@@ -75,8 +75,10 @@ class String(object):
     
     def objects(self):
         letters = filter(lambda x: x != None, self.letters)
-        groups = filter(lambda x: x != None, self.groups)
-        return letters + groups
+        return letters + self.get_groups()
+
+    def get_groups(self):
+        return self._groups.values()
 
     def choose_object(self, method):
         '''
@@ -145,15 +147,15 @@ class String(object):
 
     def add_proposed_bond(self, bond):
         """Add a proposed bond to the string."""
-        from_n = bond.from_object.string_number
-        to_n = bond.to_object.string_number
-        self.proposed_bonds[from_n][to_n].append(bond)
+        from_number = bond.from_object.string_number
+        to_number = bond.to_object.string_number
+        self.proposed_bonds[from_number][to_number].append(bond)
 
     def remove_proposed_bond(self, bond):
         """Remove a proposed bond from the string."""
-        from_n = bond.from_object.string_number
-        to_n = bond.to_object.string_number
-        self.proposed_bonds[from_n][to_n].remove(bond)
+        from_number = bond.from_object.string_number
+        to_number = bond.to_object.string_number
+        self.proposed_bonds[from_number][to_number].remove(bond)
 
     def add_bond(self, bond):
         """Add a built bond to the string, storing sameness bonds twice,
@@ -207,7 +209,7 @@ class String(object):
 
     def add_group(self, group):
         """Add a built group to the string."""
-        self.groups[group.left_object.string_number] = group
+        self._groups[group.left_object.string_number] = group
         self.highest_string_number += 1
         group.string_number = self.highest_string_number
         self.object_positions[group.left_string_position].append(group)
@@ -217,7 +219,7 @@ class String(object):
         '''
         Remove a built group from the string.
         '''
-        self.groups[group.left_object.string_number] = None
+        del(self._groups[group.left_object.string_number])
         self.object_positions[group.left_string_position].remove(group)
         self.object_positions[group.right_string_position].remove(group)
 
@@ -257,12 +259,11 @@ class String(object):
 
     def is_group_present(self, group):
         """Return the existing group if the group exists in the string."""
-        existing_group = self.groups[group.left_object.string_number]
-        if existing_group and \
-           existing_group.length() == group.length() and \
-           existing_group.group_category == group.group_category and \
-           existing_group.direction_category == group.direction_category:
-            return existing_group
+        for g in self.get_groups():
+            if all([g.length() == group.length(),
+                    g.group_category == group.group_category,
+                    g.direction_category == group.direction_category]):
+                return g
 
     def local_bond_category_relevance(self, bond_category):
         '''

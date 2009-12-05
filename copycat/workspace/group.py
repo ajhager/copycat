@@ -163,7 +163,7 @@ class Group(Object, Structure):
         into acount; all qualifying groups in the string are counted the same.
         '''
         number_of_supporting_groups = 0
-        groups = self.string.groups
+        groups = self.string.get_groups()
         if self in groups:
             groups.remove(self)
         for other_group in groups:
@@ -213,7 +213,7 @@ class Group(Object, Structure):
             else:
                 next_group = next_object
             slot_sum += 1
-            if next_group and not self.groups_overlap(next_group) and \
+            if next_group and not self.overlaps(next_group) and \
                next_group.group_category == self.group_category and \
                next_group.direction_category == self.direction_category:
                 support_sum += 1
@@ -349,15 +349,16 @@ class Group(Object, Structure):
         '''
         Return the flipped version of this group.
         '''
-        if not (self.group_category == self.state.slipnet.plato_predgrp or\
-                self.group_category == self.state.slipnet.plato_succgrp):
+        if not (self.group_category == nodes.plato_predecessor_group or\
+                self.group_category == nodes.plato_successor_group):
             return self
         else:
             new_bonds = [bond.flipped_version for bond in self.bonds]
-            opposite = self.state.slipnet.plato_opposite
-            group_category = self.group_category.related_node(opposite)
-            direction_category = self.direction_category.related_node(opposite)
-            flipped_group = Group(self.string, group_category,
+            opposite = nodes.plato_opposite
+            group_category = nodes.get_related_node(self.group_category, opposite)
+            direction_category = nodes.get_related_node(self.direction_category,
+                                                        opposite)
+            flipped_group = Group(self.workspace, self.string, group_category,
                                   direction_category, self.left_object,
                                   self.right_object, self.objects, self.bonds)
             flipped_group.proposal_level = self.proposal_level

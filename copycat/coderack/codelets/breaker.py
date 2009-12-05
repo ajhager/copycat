@@ -27,7 +27,11 @@ class Breaker(Codelet):
         if toolbox.flip_coin((100.0 - workspace.temperature) / 100.0):
             return # Fizzle
 
-        structure = random.choice(workspace.structures())
+        structures = workspace.structures()
+        if not structures:
+            return # Fizzle
+
+        structure = random.choice(structures)
         if not structure:
             return # Fizzle
 

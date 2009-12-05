@@ -491,7 +491,7 @@ class Workspace(object):
     def get_common_groups(self, object1, object2):
         """Return any groups that contain both objects at the same level."""
         common_groups = []
-        for group in object1.string.groups:
+        for group in object1.string.get_groups():
             if group == None:
                 continue
             if group.is_recursive_member(object1) and \
@@ -1091,7 +1091,7 @@ class Workspace(object):
         return self.initial_string.bonds() + self.target_string.bonds()
 
     def groups(self):
-        return self.initial_string.groups + self.target_string.groups
+        return self.initial_string.get_groups() + self.target_string.get_groups()
 
     def unrelated_objects(self):
         unrelated_objects = []

@@ -86,7 +86,7 @@ class Slipnode(object):
         if object_category.name == 'letter':
             objects = string.letters
         else:
-            objects = string.groups
+            objects = string.get_groups()
 
         objects = filter(lambda x: x != None, objects)
 

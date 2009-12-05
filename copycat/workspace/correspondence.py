@@ -184,14 +184,15 @@ class Correspondence(Structure):
                 incomp.append(c)
 
         if isinstance(self.object1, Group):
-            for obj in self.object1.objects():
+            for obj in self.object1.objects:
                 if (obj.correspondence and (isinstance(self.object2, Letter)) or \
-                      obj.correspondence not in self.object2.objects()):
+                      obj.correspondence not in self.object2.objects):
                     incomp.append(obj.correspondence)
         if isinstance(self.object2, Group):
-            for obj in self.object2.objects():
-                if (obj.correspondence and (isinstance(self.object1, Letter)) or \
-                      obj.correspondence not in self.object1.objects()):
+            for obj in self.object2.objects:
+                if obj.correspondence and (isinstance(self.object1, Letter)):
+                    incomp.append(obj.correspondence)
+                elif obj.correspondence not in self.object1.objects:
                     incomp.append(obj.correspondence)
 
         if self.object1.group:
