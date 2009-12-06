@@ -85,7 +85,9 @@ class Workspace(object):
 
     def make_letters(self):
         """Make letters for each string."""
-        for string in [self.initial_string, self.modified_string, self.target_string]:
+        for string in [self.initial_string,
+                       self.modified_string,
+                       self.target_string]:
             count = 0
             for character in string.name:
                 letter_category = slipnet.get_plato_letter(character)
@@ -95,7 +97,9 @@ class Workspace(object):
 
     def add_descriptions(self):
         """Add initial descriptions to the letters in the strings."""
-        for string in [self.initial_string, self.modified_string, self.target_string]:
+        for string in [self.initial_string,
+                       self.modified_string,
+                       self.target_string]:
             for letter in string.letters:
                 description = Description(letter,
                                           slipnet.plato_object_category,
@@ -220,14 +224,14 @@ class Workspace(object):
             if not new_descriptor:
                 self.snag_object = object1
                 return
-            if description_type == self.slipnet.plato_letter_category:
+            if description_type == slipnet.plato_letter_category:
                 new_letter = Letter(self.answer_string, new_descriptor,
                                     object1.let_stringposition)
                 modified_letters.append(new_letter)
             else:
                 self.snag_object = object1
         else:
-            if description_type == self.slipnet.plato_letter_category:
+            if description_type == slipnet.plato_letter_category:
                 for letter in object1.letters:
                     new_descriptor = self.get_new_descriptor_for_answer(letter, description_type)
                     if not new_descriptor:
@@ -239,7 +243,7 @@ class Workspace(object):
             else:
                 self.changed_length_group = object1
                 new_descriptor = self.get_new_descriptor_for_answer(object1, description_type)
-                if new_descriptor not in self.slipnet.plato_numbers:
+                if new_descriptor not in slipnet.plato_numbers:
                     self.snag_object = object1
                     return
                 for group_member in object1.objects:
@@ -247,11 +251,11 @@ class Workspace(object):
                         self.snag_object = object1
                         return
                 group_direction = object1.direction_category
-                a = self.slipnet.node_to_number(new_descriptor)
-                b = self.slipnet.node_to_number(object1.get_descriptor(self.slipnet.plato_length))
+                a = slipnet.node_to_number(new_descriptor)
+                b = slipnet.node_to_number(object1.get_descriptor(slipnet.plato_length))
                 self.amount_length_changed = a - b
                 if not group_direction or \
-                   group_direction == self.slipnet.plato_right:
+                   group_direction == slipnet.plato_right:
                     first_letter = object1.string.get_letter(object1.left_object_position)
                     new_string_position = first_letter.left_string_position
                 else:
@@ -259,19 +263,21 @@ class Workspace(object):
                     new_string_position = first_letter.left_string_position + \
                             self.amount_length_changed
                 new_letter = Letter(self.answer_string,
-                                    first_letter.get_desscriptor(self.slipnet.plato_letter_category),
+                                    first_letter.get_desscriptor(slipnet.plato_letter_category),
                                     new_string_position)
                 modified_letters.append(new_letter)
                 new_string_position = new_letter.left_string_position
-                for i in range(self.slipnet.node_to_number(new_descriptor) - 1):
+                for i in range(slipnet.node_to_number(new_descriptor) - 1):
                     if not new_letter:
                         break
                     if not group_direction or \
-                       group_direction == self.slipnet.plato_right:
+                       group_direction == slipnet.plato_right:
                         new_string_position = new_string_position + 1
                     else:
                         new_string_position = new_string_position - 1
-                    new_letter_category = object1.group_category.iterate_group(self.slipnet.get_plato_letter(new_letter.name))
+                    gcat = object1.group_category
+                    let = slipnet.get_plato_letter(new_letter.name)
+                    new_letter_category = git.iterate_group(let)
                     if not new_letter_category:
                         self.snag_object = new_letter
                         return
@@ -285,7 +291,7 @@ class Workspace(object):
         objects_to_change = []
 
         for obj in self.target_string.objects:
-            if obj.get_descriptor(self.slipnet.plato_object_category) == \
+            if obj.get_descriptor(slipnet.plato_object_category) == \
                self.translated_rule.object_category1:
                 if obj.get_descriptor(self.translated_rule.descriptor1_facet) == \
                    self.translated_rule.descriptor1:
@@ -298,27 +304,28 @@ class Workspace(object):
                                                     self.translated_rule.descriptor1))
                     objects_to_change.append(obj)
 
-        if self.translated_rule.descriptor1_facet == self.slipnet.plato_string_position_category and \
+        if self.translated_rule.descriptor1_facet == slipnet.plato_string_position_category and \
            len(objects_to_change) > 1:
             for obj in self.initial_string.objects:
                 if obj.is_changed():
                     changed_object_correspondence = obj.correspondence
             obj2 = changed_object_correspondence.object2
             if changed_object_correspondence and obj2 in objects_to_change:
-               return [obj2]
+                return [obj2]
             else:
                 for obj in objects_to_change:
-                    if not obj.group or obj.group.get_descriptor(self.slipnet.plato_string_position_category) != self.translated_rule.descriptor1:
+                    if not obj.group or \
+                            obj.group.get_descriptor(slipnet.plato_string_position_category) != self.translated_rule.descriptor1:
                         return [obj]
         else:
-            return objects_to_changed
+            return objects_to_change
 
     def get_new_descriptor_for_answer(self, object1, descriptor_type):
         '''
         Return the new descriptor that should be applied to the given object
         for the answer.
         '''
-        old_descriptor = object1.get_descriptor(description_type)
+        old_descriptor = object1.get_descriptor(descriptor_type)
         if not old_descriptor:
             return
         if self.translated_rule.is_relation():
@@ -460,7 +467,7 @@ class Workspace(object):
         leftmost_object2 = group2.left_object
         rightmost_object2 = group2.right_object
 
-        if direction_category_cm.label == self.slipnet.plato_identity:
+        if direction_category_cm.label == slipnet.plato_identity:
             leftmost_correspondence = leftmost_object1.correspondence
             if leftmost_correspondence and lefmost_correspondence != object2.leftmost_object2:
                 incompatible_correspondences.append(leftmost_correspondence)
@@ -468,7 +475,7 @@ class Workspace(object):
             if rightmost_correspondence and rightmost_corresondence != object2.rightmost_object2:
                 incompatible_correspondences.append(rightmost_crrespondence)
 
-        if direction_category_cm.label == self.slipnet.plato_opposite:
+        if direction_category_cm.label == slipnet.plato_opposite:
             leftmost_correspondence = leftmost_object1.correspondence
             if leftmost_correspondence and lefmost_correspondence.object2 != rightmost_object2:
                 incompatible_correspondences.append(leftmost_correspondence)
@@ -503,14 +510,14 @@ class Workspace(object):
         '''
         Return a list of the proposed bonds on the workspace.
         '''
-        return self.initial_string.propsed_bonds() + \
+        return self.initial_string.proposed_bonds() + \
                 self.target_string.proposed_bonds()
 
     def propsed_groups(self):
         '''
         Return a list of the proposed groups on the workspace.
         '''
-        return self.initial_string.propsed_groups() + \
+        return self.initial_string.proposed_groups() + \
                 self.target_string.proposed_groups()
 
     def proposed_correspondences(self):
@@ -1003,20 +1010,20 @@ class Workspace(object):
         return number
 
     def get_codelets(self, category, codelet, urgency, args=[]):
-            '''
-            Based on the category sent in, test for the probability for the
-            codelet related to that category to be posted.  If the test does
-            succeed, the number of each codelet to return is determined based
-            on category.
-            '''
-            codelets = []
-            probability = self.post_codelet_probability(category)
-            number = self.post_codelet_number(category)
-            if toolbox.flip_coin(probability):
-                for i in range(number):
-                    codelets.append((codelet(args), urgency))
-            return codelets
-
+        '''
+        Based on the category sent in, test for the probability for the
+        codelet related to that category to be posted.  If the test does
+        succeed, the number of each codelet to return is determined based
+        on category.
+        '''
+        codelets = []
+        probability = self.post_codelet_probability(category)
+        number = self.post_codelet_number(category)
+        if toolbox.flip_coin(probability):
+            for i in range(number):
+                codelets.append((codelet(args), urgency))
+                return codelets
+            
     def bottom_up_codelets(self):
         '''
         Returns various bottom up codelets, with urgency and number based on

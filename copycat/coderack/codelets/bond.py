@@ -172,12 +172,14 @@ class BondTopDownCategoryScout(Codelet):
             return
 
         # Check for a possible bond.
-        if nodes.get_bond_category(object_descriptor, neighbor_descriptor) == category:
+        if nodes.get_bond_category(object_descriptor,
+                                   neighbor_descriptor) == category:
             from_object = obj
             to_object = neighbor
             from_descriptor = object_descriptor
             to_descriptor = neighbor_descriptor
-        elif nodes.get_bond_category(neighbor_descriptor, object_descriptor) == category:
+        elif nodes.get_bond_category(neighbor_descriptor,
+                                     object_descriptor) == category:
             from_object = neighbor
             to_object = obj
             from_descriptor = neighbor_descriptor
@@ -235,7 +237,8 @@ class BondTopDownDirectionScout(Codelet):
             return
 
         # Check for a possible bond.
-        bond_category = nodes.get_bond_category(object_descriptor, neighbor_descriptor)
+        bond_category = nodes.get_bond_category(object_descriptor,
+                                                neighbor_descriptor)
         if (not bond_category) or (not bond_category.directed):
             return
 

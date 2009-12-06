@@ -65,7 +65,7 @@ class String(object):
         '''
         Return a random object in the string.
         '''
-        return random.choose(self.letters + self.groups)
+        return random.choice(self.letters + self.get_groups())
 
     def random_letter(self):
         '''
@@ -78,6 +78,7 @@ class String(object):
         return letters + self.get_groups()
 
     def get_groups(self):
+        """Return all groups in the string."""
         return self._groups.values()
 
     def choose_object(self, method):
@@ -142,10 +143,10 @@ class String(object):
         '''
         Return a list of objects in the string of the given object category.
         '''
-        if category == self.state.slipnet.plato_letter:
+        if category == slipnet.plato_letter:
             return self.letters
-        elif category == self.state.slipnet.plato_group:
-            return self.groups
+        elif category == slipnet.plato_group:
+            return self.get_groups()
 
     def add_proposed_bond(self, bond):
         """Add a proposed bond to the string."""
@@ -312,14 +313,15 @@ class String(object):
         Update the relative, normalized importances of all the objects in
         the string.
         '''
-        raw_importance = sum([obj.raw_importance for obj in self.objects() if obj])
+        raw_importance = sum([o.raw_importance for o in self.objects() if o])
         for obj in self.objects():
             if not obj:
                 continue
             if raw_importance == 0:
                 importance = 0
             else:
-                importance = round(100 * (obj.raw_importance / float(raw_importance)))
+                quot = obj.raw_importance / float(raw_importance)
+                importance = round(100 * quot)
             obj.relative_importance = importance
 
     def update_intra_string_unhappiness(self):
@@ -327,6 +329,6 @@ class String(object):
         Calculate the average of the intra-string unhappiness of all the
         objects in the string.
         '''
-        unhappiness = [obj.intra_string_unhappiness for obj in self.objects() if obj]
+        unhappiness = [o.intra_string_unhappiness for o in self.objects() if o]
         length = len(unhappiness)
         self.intra_string_unhappiness = sum(unhappiness) / length

@@ -54,6 +54,7 @@ class Object(object):
 
     def __init__(self):
         """Initializes Object."""
+        self.type_name = ''
         self.string = None
         self.string_number = None
         self.left_string_position = None
@@ -182,7 +183,7 @@ class Object(object):
     def update_object_values(self):
         """Update all the values for the object."""
         self.raw_importance = self.calculate_raw_importance()
-        self.intra_sring_happiness = self.calculate_intra_string_happiness()
+        self.intra_string_happiness = self.calculate_intra_string_happiness()
         self.intra_string_unhappiness = self.calculate_intra_string_unhappiness()
         self.inter_string_happiness = self.calculate_inter_string_happiness()
         self.inter_string_unhappiness = self.calculate_inter_string_unhappiness()
@@ -202,7 +203,7 @@ class Object(object):
         """Return a list of the letters at the lowest level of the object."""
         if self.type_name == 'letter':
             return [self]
-        return toolbox.flatten([obj.letters() for obj in self.objects()])
+        return toolbox.flatten([obj.letters() for obj in self.objects])
 
     def is_leftmost_in_string(self):
         """Return True if object is leftmost in its string."""
@@ -366,7 +367,8 @@ class Object(object):
             for obj in self.objects:
                 if obj.type_name == 'group':
                     other_objects.remove(obj)
-        descriptions = toolbox.flatten([o.descriptions for o in other_objects if o])
+        descriptions = [o.descriptions for o in other_objects if o]
+        descriptions = toolbox.flatten(descriptions)
         other_descriptors = [d.descriptor for d in descriptions]
         return not descriptor in other_descriptors
 

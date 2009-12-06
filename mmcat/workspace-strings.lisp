@@ -3,7 +3,7 @@
      letter-list ; A list of all the letters in the string.
 
      (proposed-bond-array nil) ; An array containing all the proposed 
-                                   ; bonds in the string.  Each proposed 
+                                   ; bondsin the string.  Each proposed 
 				   ; bond is stored at the position 
  			           ;    (string-number-of-from-obj,
 			           ;	    string-number-of-to-obj)
