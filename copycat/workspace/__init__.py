@@ -356,7 +356,7 @@ class Workspace(object):
         on the workspace, weighted by each object's relative imoprtance in
         the string.
         '''
-        s = sum([obj.relative_importance() * obj.intra_string_unhappiness()
+        s = sum([obj.relative_importance * obj.intra_string_unhappiness
                  for obj in self.objects()])
         return min(100, s / 200.0)
 
@@ -366,7 +366,7 @@ class Workspace(object):
         on the workspace, weighted by each object's relative importnace in
         the string.
         '''
-        s = sum([obj.relative_importance() * obj.inter_string_unhappiness()
+        s = sum([obj.relative_importance * obj.inter_string_unhappiness
                  for obj in self.objects()])
         return min(100, s / 200.0)
 
@@ -375,7 +375,7 @@ class Workspace(object):
         Return a weighted average of the total unhappiness of ojbects on the
         workspace, weighted by each object's relative importnace in the string.
         '''
-        s = sum([obj.relative_importance() * obj.total_unhappiness()
+        s = sum([obj.relative_importance * obj.total_unhappiness
                  for obj in self.objects()])
         return min(100, s / 200.0)
 
@@ -1022,7 +1022,7 @@ class Workspace(object):
         if toolbox.flip_coin(probability):
             for i in range(number):
                 codelets.append((codelet(args), urgency))
-                return codelets
+        return codelets
             
     def bottom_up_codelets(self):
         '''

@@ -182,15 +182,15 @@ class String(object):
         '''
         left_number = bond.left_object.string_number
         right_number = bond.right_object.string_number
-        self.left_right_bonds[left_number][right_number] = None
+        del(self.left_right_bonds[left_number][right_number])
 
         from_number = bond.from_object.string_number
         to_number = bond.to_object.string_number
-        self.from_to_bonds[from_number][to_number] = None
+        del(self.from_to_bonds[from_number][to_number])
 
         if bond.bond_category == slipnet.plato_sameness:
-            self.left_right_bonds[right_number][left_number] = None
-            self.from_to_bonds[to_number][from_number] = None
+            del(self.left_right_bonds[right_number][left_number])
+            del(self.from_to_bonds[to_number][from_number])
 
     def add_proposed_group(self, group):
         '''
@@ -244,9 +244,9 @@ class String(object):
         '''
         Return the existing bond if the bond exists in the string.
         '''
+        print self.get_bonds()
         for b in self.get_bonds():
-            if all([b.length() == bond.length(),
-                    b.group_category == bond.bond_category,
+            if all([b.bond_category == bond.bond_category,
                     b.direction_category == bond.direction_category]):
                 return b
 
@@ -256,7 +256,12 @@ class String(object):
         '''
         from_number = from_object.string_number
         to_number = to_object.string_number
-        return self.from_to_bonds[from_number][to_number]
+        bond = None
+        try:
+            bond = self.from_to_bonds[from_number][to_number]
+        except KeyError:
+            print "get_bond key error"
+        return bond
 
     def is_group_present(self, group):
         """Return the existing group if the group exists in the string."""

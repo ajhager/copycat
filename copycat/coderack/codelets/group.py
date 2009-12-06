@@ -167,7 +167,6 @@ class GroupTopDownCategoryScout(Codelet):
             return
 
         # Choose a direction in which to scan.
-        # FIXME: no access to slipnodes.
         if object.is_leftmost_in_string():
             direction = nodes.plato_right
         elif object.is_rightmost_in_string():
@@ -206,8 +205,8 @@ class GroupTopDownCategoryScout(Codelet):
 
                 probability = possible_single_letter_group.single_letter_group_probability()
                 if toolbox.flip_coin(probability):
-                    return self.propose_group(objects, bonds, category,
-                                              possible_single_letter_group_direction)
+                    return workspace.propose_group(objects, bonds, category,
+                                                   possible_single_letter_group_direction)
             return
             
         

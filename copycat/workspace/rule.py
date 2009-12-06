@@ -15,7 +15,7 @@
 # 02110-1301, USA.
 
 from copycat.workspace import Structure
-import copyat.toolbox as toolbox
+import copycat.toolbox as toolbox
 
 class Rule(Structure):
     def __init__(self, object_category1, descriptor1_facet, descriptor1,
