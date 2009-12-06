@@ -299,7 +299,7 @@ class Bond(Structure):
         '''
         number_of_supporting_bonds = 0
         letter_distance = self.workspace.letter_distance
-        for bond in self.string.bonds():
+        for bond in self.string.get_bonds():
             if bond == self:
                 continue
             if all([letter_distance(self.left_object, bond.left_object) != 0,

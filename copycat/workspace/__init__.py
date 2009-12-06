@@ -271,7 +271,7 @@ class Workspace(object):
                         new_string_position = new_string_position + 1
                     else:
                         new_string_position = new_string_position - 1
-                    new_letter_cateogry = object1.group_category.iterate_group(self.slipnet.get_plato_letter(new_letter.name))
+                    new_letter_category = object1.group_category.iterate_group(self.slipnet.get_plato_letter(new_letter.name))
                     if not new_letter_category:
                         self.snag_object = new_letter
                         return
@@ -427,7 +427,7 @@ class Workspace(object):
         urgency = util.average([cm.strength for cm in correspondence.distinguishing_concept_mappings()])
         return Codelet('correspondence_strength_tester', (correspdonence,
                                                           should_flip_object2,
-                                                          urgnecy))
+                                                          urgency))
 
     def get_concept_mappings(self, object1, object2, descriptions1, descriptions2):
         '''
@@ -589,26 +589,12 @@ class Workspace(object):
                slippage.descriptor2 == s.descriptor2:
                 return True
 
-    def objects(self):
-        '''
-        Return a list of all the objects on the workspace.
-        '''
-        return self.initial_string.objects() + \
-                self.target_string.objects()
-
     def letters(self):
         '''
         Return a list of all the letters on the workspace.
         '''
         return self.initial_string.letters() + \
                 self.target_string.letters()
-
-    def structures(self):
-        '''
-        Return a list of all the structures on the workspace.
-        '''
-        return self.bonds() + self.groups + self.correspondences() + \
-                [self.rule]
 
     def random_string(self):
         '''
@@ -640,7 +626,7 @@ class Workspace(object):
         (adjusted for temperature) according to the given method."""
         values = [getattr(obj, method) for obj in self.objects()]
         adjusted_values = self.temperature_adjusted_values(values)
-        return toolbox.weighted_select(values, self.objects())
+        return toolbox.weighted_select(adjusted_values, self.objects())
 
     def has_null_replacement(self):
         '''
@@ -650,25 +636,6 @@ class Workspace(object):
         for letter in self.initial_string.letters:
             if not letter.replacement:
                 return True
-
-    def unrelated_objects(self):
-        '''
-        Return a list of all the objects on the workspace that have at least
-        one bond slot open. Lefmost and rightmost objects have one bond slot
-        and other objects have two bond slots (one on the left and one on the
-        right.)
-        '''
-        result = []
-        for obj in self.objects():
-            if not obj.spans_wholse_string() and not obj.group:
-                number_of_bonds = len(obj.incoming_bonds + obj.outgoing_bonds)
-                if obj.is_leftmost_in_string or obj.is_rightmost_in_string():
-                    if number_of_bonds == 0:
-                        result.append(obj)
-                else:
-                    if number_of_bonds < 2:
-                        result.append(obj)
-        return result
 
     def rough_importance_of_uncorresponding_objects(self):
         '''
@@ -1073,13 +1040,6 @@ class Workspace(object):
         objects = self.initial_string.objects() + self.target_string.objects()
         return [obj for obj in objects if obj]
 
-    def unreplaced_objects(self):
-        unreplaced_objects = []
-        for letter in self.initial_string.letters:
-            if letter.replacement == None:
-                unreplaced_objects.append(letter)
-        return unreplaced_objects
-
     def structures(self):
         structures = self.bonds() + self.groups() + self.correspondences()
         if self.rule:
@@ -1088,7 +1048,7 @@ class Workspace(object):
             return structures
 
     def bonds(self):
-        return self.initial_string.bonds() + self.target_string.bonds()
+        return self.initial_string.get_bonds() + self.target_string.get_bonds()
 
     def groups(self):
         return self.initial_string.get_groups() + self.target_string.get_groups()
@@ -1173,18 +1133,6 @@ class Workspace(object):
             return 'medium'
         else:
             return 'many'
-
-    def total_unhappiness(self):
-        # TODO: implement.
-        return 30
-
-    def intra_string_unhappiness(self):
-        # TODO: implement.
-        return 30
-
-    def inter_string_unhappiness(self):
-        # TODO: implement.
-        return 30
 
     def structure_vs_structure(self, structure1, weight1, structure2, weight2):
         '''

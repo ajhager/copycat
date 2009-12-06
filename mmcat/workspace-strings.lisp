@@ -363,12 +363,5 @@
    else nil))
 
 ;---------------------------------------------
-
-(defmethod (workspace-string :pstring) (&aux (string ""))
-; Prints out the letters in the string.
-   (loop for letter in (send self :letter-list) do
-         (setq string (string-append string (send letter :pname))))
-  (string-downcase string))
-
-
+; workspace-string.pstring | REMOVED
 ;---------------------------------------------

@@ -16,6 +16,7 @@
 
 from copycat.workspace import Structure
 import copycat.slipnet as slipnet
+import copycat.toolbox as toolbox
 
 class Description(Structure):
     def __init__(self, object1, description_type, descriptor):
@@ -34,8 +35,8 @@ class Description(Structure):
         return self.descriptor.conceptual_depth
 
     def calculate_external_strength(self):
-        return util.average([self.local_support(),
-                             self.description_type.activation])
+        return toolbox.average(self.local_support(),
+                               self.description_type.activation)
 
     def local_support(self):
         '''
@@ -46,14 +47,14 @@ class Description(Structure):
         the string give the same amount of support.
         '''
         number_of_supporting_objects = 0
-        objects = string.objects
+        objects = self.string.objects()
         other_objects = objects.remove(self.object)
         for other_object in other_objects:
             if (not (self.workspace.is_recursive_group_member(other_object,
                                                              self.object) or \
                      self.workspace.is_recurisve_group_member(self.object,
                                                               other_object))) and \
-               self.description_type in [obj.description_type for onb in other_object.descriptions]:
+               self.description_type in [obj.description_type for obj in other_object.descriptions]:
                 number_of_supporting_objects += 1
         if number_of_supporting_objects == 0:
             return 0

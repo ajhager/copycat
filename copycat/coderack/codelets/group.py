@@ -225,7 +225,7 @@ class GroupTopDownCategoryScout(Codelet):
         next_bond = bond
         for i in range(2, number):
             bond_to_add = None
-            if direction == plato_left:
+            if direction == nodes.plato_left:
                 next_bond = next_bond.choose_left_neighbor()
                 if not next_bond:
                     break
@@ -271,6 +271,8 @@ class GroupTopDownDirectionScout(Codelet):
     '''
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
+        direction_category = self.arguments[0]
+
         category = self.arguments[0]
         # Choose a string based on local direction category relevance.
         i_string = workspace.initial_string
@@ -326,7 +328,7 @@ class GroupTopDownDirectionScout(Codelet):
         next_bond = bond
         for i in range(2, number):
             bond_to_add = None
-            if direction == plato_left:
+            if direction == nodes.plato_left:
                 next_bond = next_bond.choose_left_neighbor()
                 if not next_bond:
                     break
@@ -347,7 +349,7 @@ class GroupTopDownDirectionScout(Codelet):
                  (next_bond.bond_facet == facet):
                 bond_to_add = next_bond
             elif (next_bond.bond_category == opposite_bond_category) and \
-                 (next_bond.direction_category == opposite_direction_category) and \
+                 (next_bond.direction_category == opposite_category) and \
                  (next_bond.bond_facet == facet):
                 bond_to_add = next_bond.flipped_version()
 
@@ -370,7 +372,7 @@ class GroupWholeStringScout(Codelet):
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         string = workspace.random_string()
-        if not string.bonds():
+        if not string.get_bonds():
             return # Fizzle
 
         left_object = string.choose_leftmost_object()

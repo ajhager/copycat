@@ -177,7 +177,6 @@ class Correspondence(Structure):
     def incompatible_correspondences(self):
         """Return a list of all the already existing correspondences that are
         incompatible with the correspondence"""
-        cors = self.workspace.correspondences()
         incomp = []
         for c in self.workspace.correspondences():
             if c and self.is_incompatible_correspondence(c):
@@ -214,12 +213,12 @@ class Correspondence(Structure):
         for cm in self.concept_mappings:
             if cm.description_type1 == direction_category and \
                cm.description_type2 == direction_category:
-                direction_cateogry_cm = cm
+                direction_category_cm = cm
                 break
         if self.object1.is_string_spanning_group() and \
            self.object2.is_string_spanning_group() and \
            direction_category_cm:
-            incomp.extend(leftmost_and_rightmost_incompatible_correspondences(
+            incomp.extend(self.leftmost_and_rightmost_incompatible_correspondences(
                 self.object1, self.object2, direction_category_cm))
 
         return list(set(incomp))
@@ -267,7 +266,7 @@ class Correspondence(Structure):
         relevant_descriptors = [d.descriptor for d in descriptions]
         slipped = [d.apply_slippages(slippages) for d in relevant_descriptors]
         return self.object1.is_changed and \
-                descritpr1 not in descriptors and \
+                descriptor1 not in descriptors and \
                 descriptor1 not in slipped + slippages
 
     def is_proposed(self):

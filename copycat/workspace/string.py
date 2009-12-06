@@ -54,8 +54,8 @@ class String(object):
         self._groups = {}
         self.object_positions = array(self.length)
         self.proposed_bonds = dd()
-        self.left_right_bonds = array(self.length, self.length)
-        self.from_to_bonds = array(self.length, self.length)
+        self.left_right_bonds = defaultdict(dict)
+        self.from_to_bonds = defaultdict(dict)
         self.proposed_groups = array(100, 100)
         self.number_of_bonds_to_scan_distribution = range(self.length)
         self.intra_string_unhappiness = 0
@@ -108,12 +108,14 @@ class String(object):
             values = [obj.relative_importance for obj in leftmost_objects]
             return toolbox.weighted_select(values, leftmost_objects)
 
-    def bonds(self):
-        '''
-        Return a list of all bonds in the string.
-        '''
-        bs = [b for b in toolbox.flatten(self.from_to_bonds) if b]
-        return list(set(bs))
+    def get_bonds(self):
+        """Return a list of all bonds in the string."""
+        bonds = []
+        for d in self.from_to_bonds.values():
+            bonds.extend(d.values())
+        for d in self.left_right_bonds.values():
+            bonds.extend(d.values())
+        return list(set(bonds))
 
     def non_string_spanning_objects(self):
         '''
@@ -241,13 +243,11 @@ class String(object):
         '''
         Return the existing bond if the bond exists in the string.
         '''
-        from_number = bond.from_object.string_number
-        to_number = bond.to_object.string_number
-        existing_bond = self.from_to_bonds[from_number][to_number]
-        if existing_bond and \
-           existing_bond.bond_category == bond.bond_category and \
-           existing_bond.direction_category == bond.direction_category:
-            return existing_bond
+        for b in self.get_bonds():
+            if all([b.length() == bond.length(),
+                    b.group_category == bond.bond_category,
+                    b.direction_category == bond.direction_category]):
+                return b
 
     def get_bond(self, from_object, to_object):
         '''

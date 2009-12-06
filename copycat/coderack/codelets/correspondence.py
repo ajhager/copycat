@@ -160,7 +160,7 @@ class CorrespondenceBuilder(Codelet):
         # If the desired object2 is flipped its existing group.
         if flip_obj2:
             if not self.fight_it_out(correspondence, 1,
-                                     [existing_object2_group], 1):
+                                     [flipped], 1):
                 return
 
         # The proposed corresondence must win against an incompatible rule.

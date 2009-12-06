@@ -19,7 +19,6 @@ import random
 import copycat.toolbox as toolbox
 from copycat.coderack.codelet import Codelet
 
-
 class Bin(object):
     """Bin is a bucket for holding codelets of a certain urgency.
 

@@ -194,6 +194,6 @@ class Slipnode(object):
             prob = link.degree_of_association() / 100.0
             # FIXME: Requires access to the workspace.  Is it needed?
             #prob = get_temperature_adjusted_probability(prob)
-            if util.flip_coin(prob):
+            if toolbox.flip_coin(prob):
                 similar_links.append(link)
         return similar_links

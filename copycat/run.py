@@ -48,8 +48,8 @@ class Run(object):
             self.slipnet.clamp_initial_nodes()
             codelets = self.workspace.initial_codelets()
             for codelet, urgency in codelets:
-                deleted_codelet = self.coderack.post(codelet, urgency)
-                if deleted_codelet:
+                deleted = self.coderack.post(codelet, urgency)
+                if deleted:
                     self.workspace.delete_proposed_structure(deleted.arguments)
 
         self.run_codelet(self.coderack.choose())

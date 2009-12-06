@@ -15,6 +15,7 @@
 # 02110-1301, USA.
 
 from copycat.coderack import Codelet
+import copycat.toolbox as toolbox
 
 class DescriptionBottomUpScout(Codelet):
     '''
@@ -46,7 +47,7 @@ class DescriptionBottomUpScout(Codelet):
         associations = [link.degree_of_association() for link in links]
         activations = [link.to_node().activation for link in links]
         choices = map(lambda a, b: a * b, associations, activations)
-        index = util.select_list_position(choices)
+        index = toolbox.select_list_position(choices)
         property = links[index].to_node()
         
         # Propose the description.
@@ -59,6 +60,8 @@ class DescriptionBuilder(Codelet):
     '''
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
+        description = self.arguments[0]
+
         # Make sure the object still exists.
         if description.object not in self.objects():
             return
@@ -80,6 +83,8 @@ class DescriptionStrengthTester(Codelet):
     '''
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
+        description = self.arguments[0]
+
         # Activate the descriptor.
         description.descriptor.buffer += self.activation
 
@@ -90,7 +95,7 @@ class DescriptionStrengthTester(Codelet):
         # Decide whether or not to post the description builder codelet.
         probability = strength / 100.0
         probability = self.temperature_adjusted_probability(probability)
-        if not util.flip_coin(probability):
+        if not toolbox.flip_coin(probability):
             return
         
         return [Codelet('description_builder', (description,), strength)]
@@ -105,6 +110,8 @@ class DescriptionTopDownScout(Codelet):
     '''
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
+        description_type = self.arguments[0]
+
         # Choose an object.
         object = self.choose_object('total_salience')
 
@@ -113,7 +120,7 @@ class DescriptionTopDownScout(Codelet):
         if not descriptors:
             return
         activations = [descriptor.activation for descriptor in descriptors]
-        index = util.select_list_position(activations)
+        index = toolbox.select_list_position(activations)
         descriptor = descriptors[index]
 
         # Propose the description.

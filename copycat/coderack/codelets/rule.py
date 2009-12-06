@@ -14,6 +14,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import sys
+
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 from copycat.workspace import Rule, ExtrinsicDescription
@@ -176,7 +178,7 @@ class RuleTranslator(Codelet):
                         rule.descriptor1, rule.object_category2,
                         rule.replaced_description_type, rule.relation]:
                 args.append(arg.apply_slippages(slippages))
-                translated_rule = RelationRule(*args)
+                translated_rule = RelationalRule(*args)
         else:
             args = []
             for arg in [rule.object_category1, rule.descriptor1_facet,

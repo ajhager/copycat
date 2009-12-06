@@ -14,6 +14,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import random
+
 from copycat import toolbox as toolbox
 from copycat import slipnet as slipnet
 
@@ -385,7 +387,7 @@ class Object(object):
         if relevant_descriptions:
             descriptors = [d.descriptor for d in relevant_descriptions]
             activations = [d.activation for d in descriptors]
-            return util.weighted_select(activations, relevant_descriptions)
+            return toolbox.weighted_select(activations, relevant_descriptions)
 
     def choose_relevant_distinguishing_description_by_conceptual_depth(self):
         """Return a relevant, distinguishing description probabilistically

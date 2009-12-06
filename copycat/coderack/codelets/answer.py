@@ -45,7 +45,7 @@ class AnswerBuilder(Codelet):
             for bond in workspace.proposed_bonds:
                 bond.string.delete_proposed_bond(bond)
             for group in workspace.proposed_groups:
-                group.string.delete_proposed_group(g)
+                group.string.delete_proposed_group(group)
             for correspondence in workspace.proposed_correspondences:
                 workspace.delete_proposed_correspondence(correspondence)
         
@@ -66,11 +66,9 @@ class AnswerBuilder(Codelet):
         answer_string_letters.extend(letters)
         if workspace.changed_length_group:
             for letter in answer_string_letters:
-                left_position = letter.left_string_position
-                right_position = letter.right_string_position
                 group_position = self.changed_length_group.right_string_position
                 if (letter not in self.modified_letters) and \
-                   (left_position > group_position):
+                   (letter.left_string_position > group_position):
                     letter.left_string_position += self.amount_length_changed
                     letter.right_string_position = letter.left_string_position+\
                             self.amount_length_changed

@@ -15,7 +15,7 @@
 # 02110-1301, USA.
 
 from copycat.workspace import Structure
-
+import copyat.toolbox as toolbox
 
 class Rule(Structure):
     def __init__(self, object_category1, descriptor1_facet, descriptor1,
@@ -83,8 +83,8 @@ class Rule(Structure):
         shared_descriptor_weight = round(((100 - self.descriptor1.conceptual_depth()) / \
                                          10) ** 1.4)
 
-        rule_strength = round(util.weighted_average([(util.average([conceptual_depth1, conceptual_depth2]), 10)
-                                                     (100 - conceptual_depth_difference, 12),
+        rule_strength = round(toolbox.weighted_average([(toolbox.average([conceptual_depth1, conceptual_depth2]), 10)
+                                                     (100 - conceptual_difference, 12),
                                                      (shared_descriptor_term, shared_descriptor_weight)]))
 
         return min(rule_strength, 100)

@@ -81,7 +81,7 @@ class Group(Object, Structure):
         description = Description(self, category, group_category)
         self.add_description(description)
         if direction_category:
-            cateogry = nodes.plato_direction_category
+            category = nodes.plato_direction_category
             description = Description(self, category, direction_category)
             self.add_description(description)
 
@@ -294,7 +294,7 @@ class Group(Object, Structure):
         """Return the leftmost letter in the group or in the leftmost subgroup
         of the group."""
         if self.left_object.type_name == 'letter':
-            return left_object
+            return self.left_object
         else:
             return self.left_object.leftmost_letter()
 
@@ -302,7 +302,7 @@ class Group(Object, Structure):
         """Return the rightmost letter in the group or the rightmost subgroup
         of the group."""
         if self.right_object.type_name == 'letter':
-            return right_object
+            return self.right_object
         else:
             return self.right_object.rightmost_letter()
 
@@ -321,10 +321,10 @@ class Group(Object, Structure):
     def left_neighbor(self):
         if not self.leftmost_in_string():
             position = self.left_object_position - 1
-            possible_left_neighbor = self.string.get_letter(postion).group
+            possible_left_neighbor = self.string.get_letter(position).group
             if possible_left_neighbor:
                 if self not in possible_left_neighbor.objects and \
-                   not util.is_subgroup(self, possible_left_neighbor):
+                   not self.is_subgroup(possible_left_neighbor):
                     return possible_left_neighbor
 
     def right_neighbor(self):
@@ -333,7 +333,7 @@ class Group(Object, Structure):
             possible_right_neighbor = self.string.get_letter(position).group
             if possible_right_neighbor:
                 if self not in possible_right_neighbor.objects and \
-                   not util.is_subgroup(self, possible_right_neighbor):
+                   not self.is_subgroup(possible_right_neighbor):
                     return possible_right_neighbor
 
 
@@ -360,7 +360,7 @@ class Group(Object, Structure):
                                                         opposite)
             flipped_group = Group(self.workspace, self.string, group_category,
                                   direction_category, self.left_object,
-                                  self.right_object, self.objects, self.bonds)
+                                  self.right_object, self.objects, new_bonds)
             flipped_group.proposal_level = self.proposal_level
             return flipped_group
 
