@@ -680,33 +680,31 @@ class Workspace(object):
                  toolbox.average(*[cm.strength() for cm in dist_mappings]))]
 
     def propose_group(self, objects, bonds, group_category, direction_category):
-        '''
-        Create a proposed group, returning a group strength tester codelet
+        """Create a proposed group, returning a group strength tester codelet
         with urgency a function fo the degree of association of the bonds
-        of the bond category associated with this group.
-        '''
+        of the bond category associated with this group."""
         string = objects[0].string
 
         positions = [obj.left_string_position for obj in objects]
         left_object = objects[positions.index(min(positions))]
         positions = [obj.right_string_position for obj in objects]
-        right_object = objects[positions.index(min(positions))]
+        right_object = objects[positions.index(max(positions))]
 
         bond_category = slipnet.get_related_node(group_category,
                                                  slipnet.plato_bond_category)
 
-        proposed_group = Group(self, string, group_category, direction_category,
-                               left_object, right_object, objects, bonds)
-        proposed_group.proposal_level = 1
+        group = Group(self, string, group_category, direction_category,
+                      left_object, right_object, objects, bonds)
+        group.proposal_level = 1
 
-        proposed_group.bond_category.activation_buffer += self.activation
-        if proposed_group.direction_category:
-            proposed_group.direction_category.activation_buffer += self.activation
+        group.bond_category.activation_buffer += self.activation
+        if group.direction_category:
+            group.direction_category.activation_buffer += self.activation
 
-        string.add_proposed_group(proposed_group)
+        string.add_proposed_group(group)
         urgency = bond_category.bond_degree_of_association()
 
-        return [(GroupStrengthTester([proposed_group]), urgency)]
+        return [(GroupStrengthTester([group]), urgency)]
 
     def build_description(self, description):
         """Build the new description."""

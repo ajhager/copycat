@@ -684,58 +684,9 @@
   (< proposal-level %built%))
 
 ;---------------------------------------------
+; propose-group | Workspace.propose_group
+;---------------------------------------------
   
-(defun propose-group (object-list bond-list group-category 
-		      direction-category
-		      &aux left-obj right-obj proposed-group urgency 
-		           string bond-category)
-; Creates a proposed group, and posts a group-strength-tester codelet with 
-; urgency a function of the degree of association of bonds of the 
-; bond-category associated with this group.
-  (setq string (send (car object-list) :string))
-
-  (setq left-obj 
-        (nth (list-min-position 
-		 (send-method-to-list object-list :left-string-position))
-	     object-list))
-  (setq right-obj 
-	(nth (list-max-position 
-		 (send-method-to-list object-list :right-string-position))
-	     object-list))
-
-  (setq bond-category 
-	(send group-category :get-related-node plato-bond-category))
-
-  (if* %workspace-graphics% then (draw-group-grope left-obj right-obj))
-
-  ; Make proposed-group.
-  (setq proposed-group 
-	(make-group string group-category direction-category 
-	            left-obj right-obj object-list bond-list))
-
-  (send proposed-group :set-proposal-level 1)
-  ; Activate-from-workspace some descriptions.
-  (send (send proposed-group :bond-category) :activate-from-workspace)
-  (if* (send proposed-group :direction-category) 
-   then (send (send proposed-group :direction-category) 
-	      :activate-from-workspace))
-
-  (send string :add-proposed-group proposed-group)
-  (setq urgency (send bond-category :bond-degree-of-association))
-                                                        
-  (if* %verbose% 
-   then (format t 
-		"Posting a group-strength-tester codelet with urgency ~a~&" 
-		(get-urgency-bin urgency)))
-
-  (send *coderack* :post 
-	(make-codelet 'group-strength-tester (list proposed-group) 
-	              (get-urgency-bin urgency)))
-
-  (if* %workspace-graphics% then (send proposed-group :draw-proposed)))
-
-;-------------------------------------------
-
 (defmethod (group :single-letter-group-probability) (&aux exponent)
 ; Returns the probability to be used in deciding whether or not to propose the
 ; single-letter-group g.  
