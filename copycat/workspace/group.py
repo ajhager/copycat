@@ -353,7 +353,7 @@ class Group(Object, Structure):
                 self.group_category == nodes.plato_successor_group):
             return self
         else:
-            new_bonds = [bond.flipped_version for bond in self.bonds]
+            new_bonds = [bond.flipped_version() for bond in self.bonds]
             opposite = nodes.plato_opposite
             group_category = nodes.get_related_node(self.group_category, opposite)
             direction_category = nodes.get_related_node(self.direction_category,

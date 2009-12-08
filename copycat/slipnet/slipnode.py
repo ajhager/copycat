@@ -103,7 +103,7 @@ class Slipnode(object):
     def local_description_type_support(self, string):
         """Return the percentge of objects in the string that have descriptions
         with this descriptor type."""
-        objects = string.objects()
+        objects = string.get_objects()
         description_type_count = 0
         for obj in objects:
             if obj == None:

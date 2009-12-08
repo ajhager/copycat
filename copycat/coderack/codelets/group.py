@@ -28,7 +28,7 @@ class GroupBuilder(Codelet):
         group = self.arguments[0]
         string = group.string
 
-        existing_group = string.is_group_present(group)
+        existing_group = string.get_existing_group(group)
         if existing_group:
             for description in existing_group.descriptions:
                 description.descriptor.activation_buffer += workspace.activation
@@ -44,8 +44,8 @@ class GroupBuilder(Codelet):
         all_bonds_exist = True
         for bond in group.bonds:
             flipped = bond.flipped_version()
-            if not (string.is_bond_present(bond) or \
-                        string.is_bond_present(flipped)):
+            if not (string.get_existing_bond(bond) or \
+                        string.get_existing_bond(flipped)):
                 all_bonds_exist = False
                 break
         if not all_bonds_exist:
@@ -87,13 +87,13 @@ class GroupBuilder(Codelet):
         new_bonds = []
         if bonds_to_flip:
             for bond in group.bonds:
-                flipped_bond = string.is_bond_present(bond.flipped_version())
+                flipped_bond = string.get_existing_bond(bond.flipped_version())
                 if flipped_bond:
                     workspace.break_bond(flipped_bond)
                     workspace.build_bond(bond)
                     new_bonds.append(bond)
                 else:
-                    existing_bond = string.is_bond_present(bond)
+                    existing_bond = string.get_existing_bond(bond)
                     if existing_bond != bond:
                         new_bonds.append(existing_bond)
                     else:
@@ -162,7 +162,7 @@ class GroupTopDownCategoryScout(Codelet):
         string = choices[toolbox.weighted_index(weights)]
 
         # Choose an object by intra string salience.
-        object = string.choose_object('intra_string_salience')
+        object = string.get_random_object('intra_string_salience')
         if object.spans_whole_string():
             return
 
@@ -286,7 +286,7 @@ class GroupTopDownDirectionScout(Codelet):
         string = toolbox.weighted_select(weights, choices)
 
         # Choose an object by intra string salience.
-        obj = string.choose_object('intra_string_salience')
+        obj = string.get_random_object('intra_string_salience')
         if obj.spans_whole_string():
             return
 
@@ -302,7 +302,7 @@ class GroupTopDownDirectionScout(Codelet):
                                                               nodes.plato_right])
 
         # Choose the number of bonds to scan.
-        number = toolbox.weighted_index(string.number_of_bonds_to_scan_distribution)
+        number = toolbox.weighted_index(string.bonds_to_scan_distribution)
 
         # Get the first bond in that direction.
         if direction == nodes.plato_left:
@@ -374,7 +374,7 @@ class GroupWholeStringScout(Codelet):
         if not string.get_bonds():
             return # Fizzle
 
-        left_object = string.choose_leftmost_object()
+        left_object = string.get_random_leftmost_object()
         next_bond = left_object.right_bond
         objects = [left_object]
         bonds = []

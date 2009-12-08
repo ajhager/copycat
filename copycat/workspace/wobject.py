@@ -357,7 +357,7 @@ class Object(object):
            descriptor in slipnet.slipnet_numbers:
             return False
         if self.type_name == 'letter':
-            other_objects = self.string.letters.get_letters()
+            other_objects = self.string.get_letters()
             other_objects.remove(self)
         else:
             other_objects = self.string.get_groups()

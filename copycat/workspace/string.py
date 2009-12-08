@@ -111,11 +111,11 @@ class String(object):
         """Return the group in the string if it has the same properties as
         the given group."""
         existing_group = self.get_group(group.left_object.string_number)
-        if all([existing_group,
-                existing_group.length == group.length,
-                existing_group.group_category == group.group_category,
-                existing_group.direction_category == group.direction_category]):
-            return existing_group
+        if existing_group:
+            if existing_group.length == group.length and \
+                 existing_group.group_category == group.group_category and \
+                 existing_group.direction_category == group.direction_category:
+                return existing_group
 
     def add_proposed_group(self, group):
         """Add a proposed group to the string."""
@@ -174,36 +174,40 @@ class String(object):
 
     def get_bond(self, from_object, to_object):
         """Return the bond between the two objects, if any."""
-        return self.from_to_bonds.get(from_object.string_number,
-                                      to_object.string_number)
+        return self.from_to_bonds.get((from_object.string_number,
+                                       to_object.string_number))
 
     def get_existing_bond(self, bond):
         """Return the bond in the string if it has the same properties as
         the given bond."""
         existing_bond = self.get_bond(bond.from_object, bond.to_object)
-        if all([existing_bond,
-                existing_bond.bond_category == bond.bond_category,
-                existing_bond.direction_category == bon.direction_category]):
-            return existing_bond
+        if existing_bond:
+            if existing_bond.bond_category == bond.bond_category and \
+                    existing_bond.direction_category == bond.direction_category:
+                return existing_bond
 
     def add_proposed_bond(self, bond):
         """Add the proposed bond to the string."""
         position = (bond.from_object.string_number,
                     bond.to_object.string_number)
         if position in self.proposed_bonds:
-            self.proposed_bonds.appen(bond)
+            self.proposed_bonds[position].append(bond)
         else:
             self.proposed_bonds[position] = [bond]
 
-    def add_proposed_bond(self, bond):
+    def remove_proposed_bond(self, bond):
         """Add the proposed bond to the string."""
         position = (bond.from_object.string_number,
                     bond.to_object.string_number)
-        self.proposed_bonds.remove(bond)
+        self.proposed_bonds[position].remove(bond)
 
     def get_proposed_bonds(self):
         """Return a list of proposed bonds in the string."""
         return list(set(toolbox.flatten(self.proposed_bonds.values())))
+
+    def get_proposed_bond(self, first, second):
+        """Return a proposed bonds at first, second in the string."""
+        return self.proposed_bonds.get((first, second))
 
     def get_objects(self, category=None):
         """Return the list of objects of the given object category.
@@ -223,14 +227,15 @@ class String(object):
     def get_random_object(self, method=None):
         """Return a random object from the string."""
         if method:
-            values = [getattr(obj, method) for obj in self.get_objects()]
+            objects = self.get_objects()
+            values = [getattr(obj, method) for obj in objects]
             values = self.workspace.temperature_adjusted_values(values)
-            return self.get_object(toolbox.weighted_index(values))
+            return objects[toolbox.weighted_index(values)]
         return random.choice(self.get_objects())
 
     def get_random_leftmost_object(self):
         """Return a random leftmost object from the string."""
-        lefmost_objects = []
+        leftmost_objects = []
         category = slipnet.plato_string_position_category
         for obj in self.get_objects():
             if obj.get_descriptor(category) == slipnet.plato_leftmost:
@@ -244,7 +249,7 @@ class String(object):
         the string."""
         raw_importance = sum([o.raw_importance for o in self.get_objects()])
         for obj in self.get_objects():
-             if raw_importance == 0:
+            if raw_importance == 0:
                 importance = 0
             else:
                 quot = obj.raw_importance / float(raw_importance)

@@ -31,8 +31,8 @@ class CorrespondenceBottomUpScout(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Choose two objects.
-        object1 = workspace.initial_string.choose_object('inter_string_salience')
-        object2 = workspace.target_string.choose_object('inter_string_salience')
+        object1 = workspace.initial_string.get_random_object('inter_string_salience')
+        object2 = workspace.target_string.get_random_object('inter_string_salience')
 
         # If one object spans the whole string and the other does not, fizzle.
         if object1.spans_whole_string() != object2.spans_whole_string():
@@ -209,7 +209,7 @@ class CorrespondenceImportantObjectScout(Codelet):
     '''
     def run(self, coderack, slipnet, workspace):
         # Choose an object.
-        object1 = workspace.initial_string.choose_object('relative_importance')
+        object1 = workspace.initial_string.get_random_object('relative_importance')
 
         # Choose a description by conceptual depth.
         object1_description = object1.choose_relevant_distinguishing_description_by_conceptual_depth()
@@ -225,7 +225,7 @@ class CorrespondenceImportantObjectScout(Codelet):
 
         # Find an object with that descriptor in the target string.
         object2_candidates = []
-        for object in workspace.target_string.objects():
+        for object in workspace.target_string.get_objects():
             for description in object.relevant_descriptions():
                 if description.descriptor == object2_descriptor:
                     object2_candidates.append(object)

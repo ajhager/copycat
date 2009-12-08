@@ -59,7 +59,7 @@ class RuleScout(Codelet):
             return # Fizzle
 
         changed_objects = []
-        for obj in workspace.initial_string.objects():
+        for obj in workspace.initial_string.get_objects():
             if obj.is_changed:
                 changed_objects.append(obj)
 

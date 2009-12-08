@@ -28,7 +28,7 @@ class ReplacementFinder(Codelet):
     groups or vice versa.
     """
     def run(self, coderack, slipnet, workspace):
-        i_letter = workspace.initial_string.random_letter()
+        i_letter = workspace.initial_string.get_random_letter()
         if i_letter.replacement:
             return # Fizzle
 

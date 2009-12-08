@@ -266,7 +266,7 @@ class Bond(Structure):
                 slot_sum += 1
                 x = next_object.string_number
                 y = last_object.string_number
-                bond = self.string.left_right_bonds[x][y]
+                bond = self.string.left_right_bonds.get((x, y))
                 if bond:
                     if bond.bond_category == self.bond_category and \
                        bond.direction_category == self.direction_category:

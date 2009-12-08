@@ -835,8 +835,12 @@ class Workspace(object):
 
         proposed_bonds = []
         for i in range(string.highest_string_number):
-            proposed_bonds.extend(string.proposed_bonds[group.string_number][i])
-            proposed_bonds.extend(string.proposed_bonds[i][group.string_number])
+            bonds = string.get_proposed_bond(group.string_number, i)
+            if bonds:
+                proposed_bonds.extend(bonds)
+            bonds = string.get_proposed_bond(i, group.string_number)
+            if bonds:
+                proposed_bonds.extend(bonds)
         for bond in set(proposed_bonds):
             string.remove_proposed_bond(bond)
 
@@ -1044,8 +1048,8 @@ class Workspace(object):
         return codelets
 
     def objects(self):
-        objects = self.initial_string.objects() + self.target_string.objects()
-        return [obj for obj in objects if obj]
+        return self.initial_string.get_objects() + \
+            self.target_string.get_objects()
 
     def structures(self):
         structures = self.bonds() + self.groups() + self.correspondences()

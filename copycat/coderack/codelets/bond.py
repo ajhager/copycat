@@ -65,7 +65,7 @@ class BondBuilder(Codelet):
         if (from_object not in objects) or (to_object not in objects):
             return # Fizzle
 
-        existing_bond = string.is_bond_present(bond)
+        existing_bond = string.get_existing_bond(bond)
         if existing_bond:
             existing_bond.bond_category.activation_buffer += workspace.activation
             direction_category = existing_bond.direction_category
@@ -155,7 +155,7 @@ class BondTopDownCategoryScout(Codelet):
         string = toolbox.weighted_select(values, [initial_string, target_string])
 
         # Choose an object and neighbor.
-        obj = string.choose_object('intra_string_salience')
+        obj = string.get_random_object('intra_string_salience')
         neighbor = obj.choose_neighbor()
         if not neighbor:
             return
@@ -217,7 +217,7 @@ class BondTopDownDirectionScout(Codelet):
         string = toolbox.weighted_select(values, [initial_string, target_string])
 
         # Choose an object and neighbor.
-        obj = string.choose_object('intra_string_salience')
+        obj = string.get_random_object('intra_string_salience')
         if category == nodes.plato_left:
             neighbor = obj.choose_left_neighbor()
         elif category == nodes.plato_right:
