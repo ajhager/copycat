@@ -29,11 +29,7 @@
 	  (send *target-string* :group-list)))
 
 ;---------------------------------------------
-
-(defmethod (workspace :proposed-correspondence-list) ()
-; Returns a list of the proposed-correspondences on the workspace.
-  (flatten (array-to-list proposed-correspondence-array)))
-
+; proposed-correspondence-list
 ;---------------------------------------------
 
 (defmethod (workspace :correspondence-list) ()
@@ -47,30 +43,11 @@
   (push r replacement-list))
 
 ;---------------------------------------------
-
-(defmethod (workspace :add-proposed-correspondence) (c)
-; Adds a proposed-correspondence to the workspace's array of
-; proposed-correspondences, using the string-numbers of the two
-; objects as indices.
-  (aset (send self :proposed-correspondence-array) 
-             (send (send c :obj1) :string-number)
-             (send (send c :obj2) :string-number)
-	     (cons c (aref (send self :proposed-correspondence-array) 
-		                (send (send c :obj1) :string-number)
-		                (send (send c :obj2) :string-number)))))
-
+; add-proposed-correspondence
 ;---------------------------------------------
 
-(defmethod (workspace :delete-proposed-correspondence) (c)
-; Deletes a proposed-correspondence from the workspace's array of
-; proposed-correspondences.
-  (aset (send self :proposed-correspondence-array) 
-             (send (send c :obj1) :string-number)
-             (send (send c :obj2) :string-number)
-	     (remove c (aref (send self :proposed-correspondence-array) 
-		                (send (send c :obj1) :string-number)
-		                (send (send c :obj2) :string-number)))))
-
+;---------------------------------------------
+; delete-proposed-corresponence | remove_proposed_correspondence
 ;---------------------------------------------
 
 (defmethod (workspace :add-correspondence) (c)

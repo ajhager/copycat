@@ -10,6 +10,12 @@ website: http://web.cecs.pdx.edu/~mm/
 Status
 ------
 
+12/07/09
+Workspace strings have been completely revamped and enough random bugs
+have been fixed to allow all types of codelets to be run now. Ther are
+no longer an major hurdles left beyond continuing to go through method
+by method to ensure accuracy.
+
 12/04/09
 Enough is working for bonds and groups to be successfully built with work
 on Correspondences coming along. On some seeds, the program successfully
@@ -44,8 +50,8 @@ Copycat to work.
 Issues
 ------
 
+Need to add all description testers to nodes.
+The entire project needs a revamp for consistency and style.
 Having slipnodes in the global slipnet module level ruins enscapulation.
-
 Similarly there is a problem with using the default global random instance.
 
-String() needs an entire overhaul, especially moving from lists to dicts.

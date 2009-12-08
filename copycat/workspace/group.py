@@ -205,7 +205,7 @@ class Group(Object, Structure):
             next_object = next_object.choose_left_neighbor()
 
         next_object = self.right_object.choose_right_neighbor()
-        if next_object.type_name == 'letter' and next_object.group:
+        if next_object and next_object.type_name == 'letter' and next_object.group:
             next_object = next_object.group
         while next_object:
             if next_object.type_name == 'letter':

@@ -936,36 +936,7 @@
   (< proposal-level %built%))
 
 ;---------------------------------------------
+; propose-correspondence | Workspace.propose_correspondence 
+;---------------------------------------------
 
-(defun propose-correspondence (obj1 obj2 concept-mapping-list flip-obj2? 
-			       &aux proposed-correspondence urgency)
-; Creates a proposed correspondence, and posts a 
-; correspondence-strength-tester codelet with urgency a function of the 
-; strength of the distinguishing concept-mappings underlying the proposed 
-; correspondence.
-
-  (setq proposed-correspondence 
-	(make-correspondence obj1 obj2 concept-mapping-list))
-  (send proposed-correspondence :set-proposal-level 1)
-  ; Activate-from-workspace some descriptions.
-  (loop for cm in (send proposed-correspondence :concept-mapping-list) do
-	(send (send cm :description-type1) :activate-from-workspace)
-	(send (send cm :descriptor1) :activate-from-workspace)
-	(send (send cm :description-type2) :activate-from-workspace)
-	(send (send cm :descriptor2) :activate-from-workspace))
-  (send *workspace* :add-proposed-correspondence proposed-correspondence)
-  (if* %workspace-graphics% 
-   then (send proposed-correspondence :draw-proposed))
-  (setq urgency 
-	(list-average (send-method-to-list 
-			  (send proposed-correspondence 
-				:distinguishing-concept-mappings)
-			  :strength)))
- (if* %verbose% 
-  then (format t "About to post correspondence-strength-tester with urg: ~a~&"
-	         (get-urgency-bin urgency)))
- (send *coderack* :post 
-       (make-codelet 'correspondence-strength-tester 
-	             (list proposed-correspondence flip-obj2?)
-                     (get-urgency-bin urgency))))
 

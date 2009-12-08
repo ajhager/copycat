@@ -28,6 +28,9 @@ class Correspondence(Structure):
         self.accessory_concept_mappings = []
         self.structure_category = Correspondence
 
+    def get_concept_mappings(self):
+        return self.concept_mappings
+
     def is_supporting_correspondence(self, other):
         '''
         Return True if this correspondence supports the given correspondence.
@@ -37,8 +40,8 @@ class Correspondence(Structure):
            self.is_incompatible_correspondence(other):
             return
         else:
-            for cm1 in self.distinguishing_concept_mappings():
-                for cm2 in other.distinguishing_concept_mappings():
+            for cm1 in self.get_distinguishing_mappings():
+                for cm2 in other.get_distinguishing_mappings():
                     if cm1.is_supporting_concept_mapping(cm2):
                         return True
 
@@ -167,8 +170,8 @@ class Correspondence(Structure):
     def relevant_concept_mappings(self):
         return [cm for cm in self.concept_mappings if cm.is_relevant()]
 
-    def distinguishing_concept_mappings(self):
-        return [cm for cm in self.concept_mappings if cm.is_distinguishing()]
+    def get_distinguishing_mappings(self):
+        return [m for m in self.get_concept_mappings() if m.is_distinguishing()]
 
     def relevant_distinguishing_concept_mappings(self):
         mps = self.concept_mappings
@@ -184,16 +187,17 @@ class Correspondence(Structure):
 
         if isinstance(self.object1, Group):
             for obj in self.object1.objects:
-                if (obj.correspondence and (isinstance(self.object2, Letter)) or \
-                      obj.correspondence not in self.object2.objects):
-                    incomp.append(obj.correspondence)
+                if obj.correspondence:
+                    if isinstance(self.object2, Letter) or \
+                            obj.correspondence not in self.object2.objects:
+                        incomp.append(obj.correspondence)
+
         if isinstance(self.object2, Group):
             for obj in self.object2.objects:
-                if obj.correspondence and (isinstance(self.object1, Letter)):
-                    incomp.append(obj.correspondence)
-                elif obj.correspondence not in self.object1.objects:
-                    incomp.append(obj.correspondence)
-
+                if obj.correspondence:
+                    if isinstance(self.object1, Letter) or \
+                            obj.correspondence not in self.object1.objects:
+                        incomp.append(obj.correspondence)
         if self.object1.group:
             group_correspondence = self.object1.group.correspondence
             if group_correspondence:
@@ -218,7 +222,7 @@ class Correspondence(Structure):
         if self.object1.is_string_spanning_group() and \
            self.object2.is_string_spanning_group() and \
            direction_category_cm:
-            incomp.extend(self.leftmost_and_rightmost_incompatible_correspondences(
+            incomp.extend(self.workspace.get_leftmost_and_rightmost_incompatible_correspondences(
                 self.object1, self.object2, direction_category_cm))
 
         return list(set(incomp))

@@ -30,7 +30,7 @@ class DescriptionBottomUpScout(Codelet):
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         # Choose an object.
-        object = self.workspace.choose_object('total_salience')
+        object = workspace.choose_object('total_salience')
 
         # Choose a relevant description of the object.
         description = object.choose_relevant_description_by_activation()
@@ -73,7 +73,7 @@ class DescriptionBuilder(Codelet):
             return
 
         # Build the description.
-        self.build_description(description)
+        workspace.build_description(description)
 
 class DescriptionStrengthTester(Codelet):
     '''
@@ -98,7 +98,7 @@ class DescriptionStrengthTester(Codelet):
         if not toolbox.flip_coin(probability):
             return
         
-        return [Codelet('description_builder', (description,), strength)]
+        return [(DescriptionBuilder([description]), strength)]
 
 class DescriptionTopDownScout(Codelet):
     '''
@@ -113,10 +113,10 @@ class DescriptionTopDownScout(Codelet):
         description_type = self.arguments[0]
 
         # Choose an object.
-        object = self.choose_object('total_salience')
+        object = workspace.choose_object('total_salience')
 
         # Choose a relevant descriptor.
-        descriptors = description_type.possible_descriptors(object)
+        descriptors = description_type.get_possible_descriptors(object)
         if not descriptors:
             return
         activations = [descriptor.activation for descriptor in descriptors]

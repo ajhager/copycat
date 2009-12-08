@@ -103,7 +103,8 @@ class CorrespondenceBuilder(Codelet):
         flipped = False
         if flip_obj2:
             flipv = object2.flipped_version()
-            flipped = workspace.target_string.is_group_present(flipv)
+            if flipv.type_name == 'group':
+                flipped = workspace.target_string.get_existing_group(flipv)
 
         if not obj2_present and not flipped:
             return
@@ -111,8 +112,8 @@ class CorrespondenceBuilder(Codelet):
         # If the correspondence exists, add and activiate concept mappings.
         existing_correspondence = workspace.is_correspondence_present(correspondence)
         if existing_correspondence:
-            workspace.delete_proposed_correspondence(correspondence)
-            labels = [m.label for m in correspondence.concept_mappings]
+            workspace.remove_proposed_correspondence(correspondence)
+            labels = [m.label for m in correspondence.get_concept_mappings()]
             for label in labels:
                 label.activation_buffer += workspace.activation
             mappings_to_add = []
@@ -128,7 +129,7 @@ class CorrespondenceBuilder(Codelet):
                 return
 
         # Remove the proposed correpondence from proposed correspondences.
-        workspace.delete_proposed_correspondence(correspondence)
+        workspace.remove_proposed_correspondence(correspondence)
 
         # The proposed correspondence must win against all incompatible ones.
         incompatible_correspondences = correspondence.incompatible_correspondences()
@@ -159,8 +160,7 @@ class CorrespondenceBuilder(Codelet):
 
         # If the desired object2 is flipped its existing group.
         if flip_obj2:
-            if not self.fight_it_out(correspondence, 1,
-                                     [flipped], 1):
+            if not workspace.fight_it_out(correspondence, 1, [flipped], 1):
                 return
 
         # The proposed corresondence must win against an incompatible rule.
@@ -302,7 +302,7 @@ class CorrespondenceStrengthTester(Codelet):
         objects = workspace.objects()
         if (object1 not in objects) or \
             ((object2 not in objects) and \
-            (not (flip_object2 and self.target_string.group_present(flipped)))):
+            (not (flip_object2 and workspace.target_string.get_existing_group(flipped)))):
             return
 
         # Calculate the proposed correspondence's strength.
@@ -313,7 +313,7 @@ class CorrespondenceStrengthTester(Codelet):
         probability = strength / 100.0
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
-            workspace.delete_proposed_correspondence(correspondence)
+            workspace.remove_proposed_correspondence(correspondence)
             return
 
         # Add some activation to some descriptions.

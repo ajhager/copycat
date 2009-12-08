@@ -358,12 +358,12 @@ class Object(object):
             return False
         if self.type_name == 'letter':
             other_objects = self.string.get_letters()
-            other_objects.remove(self)
+            if self in other_objects:
+                other_objects.remove(self)
         else:
             other_objects = self.string.get_groups()
-            other_objects.remove(self)
-            if self.group:
-                other_objects.remove(self.group)
+            if self in other_objects:
+                other_objects.remove(self)
             for obj in self.objects:
                 if obj.type_name == 'group':
                     other_objects.remove(obj)

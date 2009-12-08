@@ -110,7 +110,7 @@ class String(object):
     def get_existing_group(self, group):
         """Return the group in the string if it has the same properties as
         the given group."""
-        existing_group = self.get_group(group.left_object.string_number)
+        existing_group = self.groups.get(group.left_object.string_number)
         if existing_group:
             if existing_group.length == group.length and \
                  existing_group.group_category == group.group_category and \

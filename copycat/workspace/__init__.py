@@ -66,7 +66,7 @@ class Workspace(object):
 
         self.replacements = []
         self._correspondences = {}
-        self._proposed_correspondences = {}
+        self.proposed_correspondences = {}
 
         self.rule = None
         self.translated_rule = None
@@ -469,21 +469,21 @@ class Workspace(object):
 
         if direction_category_cm.label == slipnet.plato_identity:
             leftmost_correspondence = leftmost_object1.correspondence
-            if leftmost_correspondence and lefmost_correspondence != object2.leftmost_object2:
+            if leftmost_correspondence and leftmost_correspondence != leftmost_object2:
                 incompatible_correspondences.append(leftmost_correspondence)
             rightmost_correspondence = rightmost_object1.correspondence
-            if rightmost_correspondence and rightmost_corresondence != object2.rightmost_object2:
-                incompatible_correspondences.append(rightmost_crrespondence)
+            if rightmost_correspondence and rightmost_correspondence != rightmost_object2:
+                incompatible_correspondences.append(rightmost_correspondence)
 
         if direction_category_cm.label == slipnet.plato_opposite:
             leftmost_correspondence = leftmost_object1.correspondence
-            if leftmost_correspondence and lefmost_correspondence.object2 != rightmost_object2:
+            if leftmost_correspondence and leftmost_correspondence.object2 != rightmost_object2:
                 incompatible_correspondences.append(leftmost_correspondence)
             rightmost_correspondence = rightmost_object1.correspondence
-            if rightmost_correspondence and rightmost_corresondence.object2 != leftmost_object2:
-                incompatible_correspondences.append(rightmost_crrespondence)
+            if rightmost_correspondence and rightmost_correspondence.object2 != leftmost_object2:
+                incompatible_correspondences.append(rightmost_correspondence)
 
-        return incompatible_correrspondences
+        return incompatible_correspondences
 
     def letter_distance(self, object1, object2):
         """Return the distance in letters between the two objects."""
@@ -513,18 +513,37 @@ class Workspace(object):
         return self.initial_string.proposed_bonds() + \
                 self.target_string.proposed_bonds()
 
-    def propsed_groups(self):
+    def proposed_groups(self):
         '''
         Return a list of the proposed groups on the workspace.
         '''
         return self.initial_string.proposed_groups() + \
                 self.target_string.proposed_groups()
 
-    def proposed_correspondences(self):
-        '''
-        Return a list of the proposed correspondences on the workspace.
-        '''
-        return self._proposed_correspondences.items()
+    def add_proposed_correspondence(self, correspondence):
+        """Add a proposed correspondence to the workspace."""
+        position = (correspondence.object1.string_number,
+                    correspondence.object2.string_number)
+        if position in self.proposed_correspondences:
+            self.proposed_correspondences[position].append(correspondence)
+        else:
+            self.proposed_correspondences[position] = [correspondence]
+
+    def remove_proposed_correspondence(self, correspondence):
+        """Remove a proposed correspondence from the workspace."""
+        position = (correspondence.object1.string_number,
+                    correspondence.object2.string_number)
+        items = self.proposed_correspondences[position]
+        if correspondence in items:
+            items.remove(correspondence)
+
+    def get_proposed_correspondences(self):
+        """Return a list of proposed correspondences in the workspace."""
+        return self.proposed_correspondences.values()
+
+    def get_proposed_correspondence(self, first, second):
+        """Return a proposed correspondence at first, second."""
+        return self.proposed_correspondences.get((first, second))
 
     def correspondences(self):
         '''
@@ -537,29 +556,6 @@ class Workspace(object):
         Add a replacement to the workspace's list of replacements.
         '''
         self.replacements.append(replacement)
-
-    def add_proposed_correspondence(self, correspondence):
-        '''
-        Add a proposed correspondence to the workspace's array of proposed
-        correspondences, using the string numbers of the two objects as
-        indices.
-        '''
-        x = correspondence.object1.string_number
-        y = correspondence.object2.string_number
-        if (x, y) in self._proposed_correspondences:
-            self._proposed_correspondences[(x, y)].insert(0, correspondence)
-        else:
-            self._proposed_correspondences[(x, y)] = [correspondence]
-
-    def delete_proposed_correspondence(self, correspondence):
-        '''
-        Delete a proposed correspondence from the workspace's array of
-        proposed correspondences.
-        '''
-        x = correspondence.object1.string_number
-        y = correspondence.object2.string_number
-        if (x, y) in self._proposed_correspondences:
-            self._proposed_correspondences[(x, y)].remove(correspondence)
 
     def add_correspondence(self, correspondence):
         '''
@@ -661,14 +657,20 @@ class Workspace(object):
                 return 'high'
 
     def propose_correspondence(self, object1, object2, mappings, flip_obj2):
-        '''
-        Create a proposed correspondence and pots a correspondece strength
+        """Create a proposed correspondence and pots a correspondece strength
         tester codelet with urgency a function of the strength of the
-        distinguishing concept mappings underlying the correspondence.
-        '''
-        # FIXME: Real implementation
+        distinguishing concept mappings underlying the correspondence."""
         correspondence = Correspondence(self, object1, object2, mappings)
-        return [(CorrespondenceStrengthTester([correspondence, False]), 80)]
+        correspondence.proposal_level = 1
+        for cm in correspondence.get_concept_mappings():
+            cm.description_type1.activation_buffer += self.activation
+            cm.descriptor1.activation_buffer += self.activation
+            cm.description_type2.activation_buffer += self.activation
+            cm.descriptor2.activation_buffer += self.activation
+        self.add_proposed_correspondence(correspondence)
+        dist_mappings = correspondence.get_distinguishing_mappings()
+        return [(CorrespondenceStrengthTester([correspondence, flip_obj2]),
+                 toolbox.average(*[cm.strength() for cm in dist_mappings]))]
 
     def propose_group(self, objects, bonds, group_category, direction_category):
         '''
@@ -716,7 +718,7 @@ class Workspace(object):
         description = Description(object1, description_type, descriptor)
         description.descriptor.activate_from_workspace()
         urgency = description_type.activation
-        return Codelet('description_strength_tester', (description, urgency))
+        return [(DescriptionStrengthTester([description]), urgency)]
 
     def build_bond(self, bond):
         """Build a new bond."""
@@ -797,12 +799,12 @@ class Workspace(object):
                 correspondence.add_accessory_concept_mapping(cm.symmetric_version())
 
         if isinstance(object1, Group) and isinstance(object2, Group):
-            for cm in get_concept_mappings(object1, object2,
-                                           object1.bond_descriptions(),
-                                           object2.bond_Descriptions()):
+            for cm in self.get_concept_mappings(object1, object2,
+                                                object1.bond_descriptions,
+                                                object2.bond_descriptions):
                 correspondence.add_accessory_concept_mapping(cm)
                 if cm.is_slippage():
-                    cm_sym = cm.symetric_version()
+                    cm_sym = cm.symmetric_version()
                     correspondence.add_accessory_concept_mapping(cm_sym)
 
         for cm in correspondence.concept_mappings:
@@ -850,14 +852,16 @@ class Workspace(object):
         proposed_correspondences = []
         if string == self.initial_string:
             for i in range(self.target_string.highest_string_number):
-                c = self.proposed_correspondences()[group.string_number][i]
-                proposed_correspondences.append(c)
+                c = self.get_proposed_correspondence(group.string_number, i)
+                if c:
+                    proposed_correspondences.append(c)
         else:
             for i in range(self.initial_string.highest_string_number):
-                c = self.proposed_correspondences()[i][group.string_number]
-                proposed_correspondences.append(c)
+                c = self.get_proposed_correspondence(group.string_number, i)
+                if c:
+                    proposed_correspondences.append(c)
         for c in toolbox.flatten(proposed_correspondences):
-            self.delete_proposed_correspondence(c)
+            self.remove_proposed_correspondence(c)
 
         if group.correspondence:
             self.break_correspondence(group.correspondence)
@@ -973,7 +977,7 @@ class Workspace(object):
         '''
         probability = 0
         if category == 'description':
-            probability = math.sqrt(self.temperature) / 100.
+            probability = math.sqrt(self.temperature)
         elif category in ['bond', 'group']:
             probability = self.intra_string_unhappiness()
         elif category == 'replacement' and self.unreplaced_objects():
