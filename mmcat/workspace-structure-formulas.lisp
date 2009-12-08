@@ -5,29 +5,24 @@
   (send self :set-total-strength (send self :calculate-total-strength)))
 
 ;---------------------------------------------
-
-(defmethod (description :calculate-internal-strength) ()
-  (send descriptor :conceptual-depth))
-
+; description.calculate-internal-strength
 ;---------------------------------------------
 
-(defmethod (description :calculate-external-strength) ()
-  (average (send self :local-support)
-           (send description-type :activation)))
-
+;---------------------------------------------
+; description.calculate-external-strength
 ;---------------------------------------------
 
 (defmethod (bond :calculate-internal-strength) 
            (&aux member-compatibility-factor bond-facet-factor)
-  ; Bonds between objects of the same type (letter-letter or 
+  ; bonds between objects of the same type (letter-letter or 
   ; group-group) are stronger than bonds between different types 
   ; (letter-group or group-letter).					
   (if* (eq (flavor-type from-obj) (flavor-type to-obj))
    then (setq member-compatibility-factor 1)
    else (setq member-compatibility-factor .7))
 
-  ; For now, letter-category bonds are stronger than other types of
-  ; bonds (namely, length bonds).  This should be fixed; a 
+  ; for now, letter-category bonds are stronger than other types of
+  ; bonds (namely, length bonds).  this should be fixed; a 
   ; more general mechanism is needed.	   
   (if* (eq bond-facet plato-letter-category)
    then (setq bond-facet-factor 1)
@@ -49,8 +44,8 @@
 		 bond-component-weight 
 		 length-component length-component-weight)
 
-  ; For now, groups based on letter-category are stronger than groups based
-  ; on other facets (namely, length). This should be fixed; a more 
+  ; for now, groups based on letter-category are stronger than groups based
+  ; on other facets (namely, length). this should be fixed; a more 
   ; general mechanism is needed.	   
   (if* (eq bond-facet plato-letter-category)
          then (setq bond-facet-factor 1)
@@ -85,7 +80,7 @@
 		(&aux relevant-distinguishing-cms 
 		     average-strength internal-coherence-factor
 		     num-of-concept-mappings-factor num-of-concept-mappings)
-; A function of how many concept-mappings there are, how strong they are,
+; a function of how many concept-mappings there are, how strong they are,
 ; and how much internal coherence there is among concept mappings.
   (setq relevant-distinguishing-cms
 	(send self :relevant-distinguishing-cms))
@@ -120,8 +115,8 @@
 
 (defmethod (correspondence :internally-coherent?) 
            (&aux cm-list result)
-; For now this returns t if there is any pair of relevant-distinguishing 
-; concept-mappings that support each other.  This isn't quite right.
+; for now this returns t if there is any pair of relevant-distinguishing 
+; concept-mappings that support each other.  this isn't quite right.
   (setq cm-list
 	(send self :relevant-distinguishing-cms))
   (if* (> (length cm-list) 1)
@@ -147,11 +142,11 @@
 		      then (send relation :conceptual-depth)
   	              else (send descriptor2 :conceptual-depth)))
 
-  ; There should be pressure for descriptor1 and the relation or descriptor2 
+  ; there should be pressure for descriptor1 and the relation or descriptor2 
   ; to have the same level of conceptual-depth
   (setq conceptual-depth-difference (abs (- conceptual-depth1 conceptual-depth2)))
 
-  ; Now see if descriptor1 is shared (perhaps modulo slippage) with the 
+  ; now see if descriptor1 is shared (perhaps modulo slippage) with the 
   ; corresponding object, if any.
   (setq i-obj (loop for obj in (send *initial-string* :object-list)
 	            when (send obj :changed?) return obj))
@@ -172,9 +167,9 @@
 
         (if* (memq descriptor1 slipped-descriptors)
          then (setq shared-descriptor-term 100)
-         else (return 0)))  ; Can't make this rule.
+         else (return 0)))  ; can't make this rule.
 
-  ; The less general descriptor1 is, the more we care if it's shared.
+  ; the less general descriptor1 is, the more we care if it's shared.
   (setq shared-descriptor-weight 
 	(round (expt (/ (fake-reciprocal (send descriptor1 :conceptual-depth)) 10)
 		     1.4)))
@@ -206,15 +201,15 @@
 ;---------------------------------------------
 
 (defmethod (workspace-structure :total-weakness) ()
-; This method is used by breaker codelets.  The .95 exponent is so that even 
+; this method is used by breaker codelets.  the .95 exponent is so that even 
 ; structures with a strength of 100 have some chance of being broken.
   (fake-reciprocal (expt (send self :total-strength) .95)))
 
 ;---------------------------------------------
 
 (defmethod (concept-mapping :slippability) (&aux degree-of-association)
-; This returns a value representing the ease with which this slippage can be
-; made.  Conceptual-Depth gives a resistance to slippage.
+; this returns a value representing the ease with which this slippage can be
+; made.  conceptual-depth gives a resistance to slippage.
   (setq degree-of-association (send self :degree-of-association))
   (if* (= degree-of-association 100) 
    then 100
@@ -224,8 +219,8 @@
 ;---------------------------------------------
 
 (defmethod (concept-mapping :strength) (&aux degree-of-association)
-; This returns a value representing the strength of the concept-mapping.
-; The closer and the more general the nodes, the stronger.  
+; this returns a value representing the strength of the concept-mapping.
+; the closer and the more general the nodes, the stronger.  
   (setq degree-of-association (send self :degree-of-association))
   (if* (= degree-of-association 100) 
    then 100
@@ -235,7 +230,7 @@
 ;---------------------------------------------
 
 (defun supporting-correspondences? (c1 c2 &aux (result nil))
-; Returns t if c1 supports c2, nil otherwise.  For now, c1 is 
+; returns t if c1 supports c2, nil otherwise.  for now, c1 is 
 ; defined to support c2 if c1 is not incompatible with c2, and 
 ; has a concept-mapping that supports the concept-mappings of c2.
 
@@ -254,7 +249,7 @@
 ;---------------------------------------------
 
 (defun incompatible-correspondences? (c1 c2 &aux (result nil))
-; Returns t if c1 is incompatible with c2, nil otherwise.  For now, c1 is 
+; returns t if c1 is incompatible with c2, nil otherwise.  for now, c1 is 
 ; defined to be incompatible with c2 if c1 and c2 share objects, or c1 has a 
 ; concept-mapping incompatible with the concept-mappings of c2.
 
@@ -272,23 +267,23 @@
 ;---------------------------------------------
 
 (defun supporting-concept-mappings? (cm1 cm2)
-; Concept-mappings (a -> b) and (c -> d) support each other if a is related
+; concept-mappings (a -> b) and (c -> d) support each other if a is related
 ; to c and if b is related to d and the a -> b relationship is the same as the
-; c -> d relationship.  E.g., rightmost -> rightmost supports right -> right 
-; and leftmost -> leftmost.  Notice that slipnet distances are not looked 
-; at, only slipnet links.  This should be changed eventually.
+; c -> d relationship.  e.g., rightmost -> rightmost supports right -> right 
+; and leftmost -> leftmost.  notice that slipnet distances are not looked 
+; at, only slipnet links.  this should be changed eventually.
 
-  ; If the two concept-mappings are the same, then return t.  This
+  ; if the two concept-mappings are the same, then return t.  this
   ; means that letter->group supports letter->group, even though these
   ; concept-mappings have no label.
   (cond ((and (eq (send cm1 :descriptor1) (send cm2 :descriptor1))
 	      (eq (send cm1 :descriptor2) (send cm2 :descriptor2))) 
 	 t)
-        ; If the descriptors are not related, then return nil.
+        ; if the descriptors are not related, then return nil.
         ((not (or (related? (send cm1 :descriptor1) (send cm2 :descriptor1))
  	          (related? (send cm1 :descriptor2) (send cm2 :descriptor2))))
          nil)
-        ; If one of the concept-mappings has no label, then return nil.
+        ; if one of the concept-mappings has no label, then return nil.
         ((or (null (send cm1 :label)) (null (send cm2 :label)))
          nil)
         ((eq (send cm1 :label) (send cm2 :label))
@@ -298,12 +293,12 @@
 ;---------------------------------------------
 
 (defun incompatible-concept-mappings? (cm1 cm2)
-; Concept-mappings (a -> b) and (c -> d) are incompatible if a is 
+; concept-mappings (a -> b) and (c -> d) are incompatible if a is 
 ; related to c or if b is related to d, and the a -> b relationship is 
-; different from the c -> d relationship. E.g., rightmost -> leftmost
+; different from the c -> d relationship. e.g., rightmost -> leftmost
 ; is incompatible with right -> right, since rightmost is linked 
 ; to right, but the relationships (opposite and identity) are different.  
-; Notice that slipnet distances are not looked at, only slipnet links. This 
+; notice that slipnet distances are not looked at, only slipnet links. this 
 ; should be changed eventually.
   (if* (not (or (related? (send cm1 :descriptor1) (send cm2 :descriptor1))
  	        (related? (send cm1 :descriptor2) (send cm2 :descriptor2))))
@@ -317,7 +312,7 @@
 ;---------------------------------------------
 
 (defun incompatible-concept-mapping-lists? (l1 l2 &aux incompatible?)
-; Returns t if the two lists of concept-mappings contain incompatible
+; returns t if the two lists of concept-mappings contain incompatible
 ; concept-mappings.
   (loop for cm1 in l1
         until incompatible? do
@@ -328,23 +323,23 @@
   incompatible?)
 
 ;---------------------------------------------
-; related? | Slipnode.are_related
+; related? | slipnode.are_related
 ;---------------------------------------------
 
 ;---------------------------------------------
-; linked? | Slipnode.are_linked
+; linked? | slipnode.are_linked
 ;---------------------------------------------
 
 ;---------------------------------------------
-; slip-linked? | Slipnode.are_slip_linked
+; slip-linked? | slipnode.are_slip_linked
 ;---------------------------------------------
 
 ;---------------------------------------------
-; slipnode.bond-degree-of-association | Slipnode.bond_degree_of_association
+; slipnode.bond-degree-of-association | slipnode.bond_degree_of_association
 ;---------------------------------------------
 
 (defmethod (bond :importance) ()
-; Sameness bonds are more important that other bonds of other 
+; sameness bonds are more important that other bonds of other 
 ; categories (for now, the only other categories are predecessor and 
 ; successor).
   (if* (eq bond-category plato-sameness) 
@@ -366,44 +361,19 @@
   (round (average (send self :importance) (send self :unhappiness))))
 
 ;---------------------------------------------
-; slipnode.local-descriptor-support | Slipnode.local_descriptor_support
+; slipnode.local-descriptor-support | slipnode.local_descriptor_support
 ;---------------------------------------------
   
 ;---------------------------------------------
-; slipnode.local-description-type-support | Slipnode.local_description_type_support
+; slipnode.local-description-type-support | slipnode.local_description_type_support
 ;---------------------------------------------
 
 ;---------------------------------------------
-; slipnode.total-description-type-support | Slipnode.total_desription_type_support
+; slipnode.total-description-type-support | slipnode.total_desription_type_support
 ;---------------------------------------------
 
-(defmethod (description :local-support) (&aux num-of-supporting-objects)
-; Returns the support for this description in its
-; string.  This is a rough (not perfect) version.  Looks at all the other 
-; objects in the string, getting support from objects with a description
-; of the given object facet.  This doesn't take into account distance; all
-; qualifying objects in the string give the same amount of support.
-  (setq num-of-supporting-objects
-	(loop for other-object 
-	      in (remove object (send string :object-list)) 
-   	      when (and (not (or (recursive-group-member? 
-				     other-object object)
-			         (recursive-group-member? 
-				     object other-object)))
-		        (memq description-type 
-			      (send-method-to-list 
-				  (send other-object :descriptions)
-				  :description-type)))
-  	      count t into supporting-object-count
-	      finally (return supporting-object-count)))
-
-  (case num-of-supporting-objects
-        (0 0)
-	(1 20)
-	(2 60)
-	(3 90)
-	(otherwise 100)))
-
+;---------------------------------------------
+; description.local-support
 ;---------------------------------------------
 
 (defmethod (bond :number-of-local-supporting-bonds) 

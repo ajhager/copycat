@@ -1,135 +1,43 @@
-(defflavor description
-    (object ; The object to which the description is attached.
-     string ; The string this description is in.
-     description-type ; The facet of the object that the description refers to,
-                  ; e.g., "letter-category", or "string-position-category".
-     descriptor ; The descriptor applying to the given facet, e.g., "A"
-                ; or "leftmost".
-     description-number ; A unique number given to each description of an 
-                        ; object.
-     )
-    (workspace-structure)    
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
-
+;---------------------------------------------
+; defflavor description | Description
+; make-description
 ;---------------------------------------------
 
-(defun make-description (object description-type descriptor &aux new-description)
-; Returns a new description.
-  (setq new-description 
-	(make-instance 'description 
-	    :object object
-	    :string (send object :string)
-	    :description-type description-type
-            :descriptor descriptor))
-  new-description)
-
+;---------------------------------------------
+; description.print | REMOVED
+; description.description-string
 ;---------------------------------------------
 
-(defmethod (description :print) ()
-  (format t "~a:~a; ~a: ~a " 
-	  (send object :pname) (send object :left-string-position)
-          (send description-type :pname) (send descriptor :pname))
-  (format t "~%"))
-
+;---------------------------------------------
+; description.relevant?
 ;---------------------------------------------
 
-(defmethod (description :description-string) ()
-  (send descriptor :short-name))
-
+;---------------------------------------------
+; description.conceptual-depth
 ;---------------------------------------------
 
-(defmethod (description :relevant?) ()
-; Returns t if the description-type being described is active (e.g., if 
-; "letter-category" is active, then letter-category descriptions, such as "A",
-; are relevant).
-  (send description-type :active?))
-
+;---------------------------------------------
+; description.bond-description?
 ;---------------------------------------------
 
-(defmethod (description :conceptual-depth) ()
-  (send descriptor :conceptual-depth))
+;---------------------------------------------
+; description.apply-slppages
+;---------------------------------------------
 
 ;----------------------------------------------
-
-(defmethod (description :bond-description?) ()
-; Returns t if the description (of a group) refers to the bonds making up 
-; the group, either the bond-category (e.g., "successor") 
-; or the bond-facet ("letter-category" or "length").
-  (or (eq description-type plato-bond-category)
-      (eq description-type plato-bond-facet)))
-
-;---------------------------------------------
-
-(defflavor extrinsic-description
-; An extrinsic description is a description with respect to another object on 
-; the workspace. For example, "successor" of "letter-category" of <other-obj>.
-; In "abc -> abd", the 'd' might get the description "successor of the 'c'".
-    (relation ; E.g., "successor".
-     description-type-related ; E.g., "letter-category".
-     other-obj ; The object this description refers to.
-    )
-    ()    
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
-
-;---------------------------------------------
-
-(defmethod (extrinsic-description :conceptual-depth) ()
-  (send relation :conceptual-depth))
-
+; descriptions-equal? | Description.__eq__
 ;----------------------------------------------
 
-(defun make-extrinsic-description (relation description-type-related other-obj)
-; Returns a new extrinsic description.
-  (make-instance 'extrinsic-description
-    :relation relation
-    :description-type-related description-type-related
-    :other-obj other-obj))
-
-;---------------------------------------------
-
-(defmethod (extrinsic-description :print) ()
-  (format t "~a of ~a of " (send relation :pname) 
-	                   (send description-type-related :pname))
-  (send other-obj :print))
-
-;---------------------------------------------
-
-(defmethod (description :apply-slippages) (object slippage-list 
-					   &aux new-description-type 
-					        new-descriptor)
-; Returns a new description with the given slippages applied.
-  (setq new-description-type description-type)
-  (setq new-descriptor descriptor)
-  (loop for s in slippage-list 
-	when (eq (send s :descriptor1) description-type) 
-	do (setq new-description-type (send s :descriptor2))
-	     
-	when (eq (send s :descriptor1) descriptor) 
-	do (setq new-descriptor (send s :descriptor2)))
-	     
-  (make-description object new-description-type new-descriptor))
-	    
+;----------------------------------------------
+; description-member? | REMOVED
 ;----------------------------------------------
 
-(defun descriptions-equal? (d1 d2)
-; Returns t if the two descriptions are the same.
-  (and (eq (send d1 :description-type) (send d2 :description-type))
-       (eq (send d1 :descriptor) (send d2 :descriptor))))
-
+;----------------------------------------------
+; build-description | Workspace.build_description
 ;----------------------------------------------
 
-(defun description-member? (description list-of-descriptions)
-; Returns t if the given description (or its equivalent) is a member of the 
-; given list of descriptions.
-  (loop for d in list-of-descriptions
-	when (descriptions-equal? description d)
-	return t
-	finally (return nil)))
-
+;----------------------------------------------
+; propose-description | Workspace.propose_description
 ;----------------------------------------------
 
 (defun bottom-up-description-scout 
@@ -320,49 +228,14 @@
   (build-description proposed-description)))
 
 ;---------------------------------------------
-
-(defun build-description (new-description)
-; This function actually builds the new description.
-  (if* (send new-description :bond-description?)
-   then (send (send new-description :object) 
-	      :add-bond-description new-description)
-   else (send (send new-description :object) 
-	      :add-description new-description))
-  (send (send new-description :description-type) :activate-from-workspace)
-  (send (send new-description :descriptor) :activate-from-workspace)
-  (if* %workspace-graphics% 
-   then (send (send new-description :object) 
-	      :init-description-graphics new-description))
-
-  ; If the description describes the length of a group, then display the
-  ; length.
-  (if* (and %workspace-graphics% 
-	    (eq (send new-description :description-type) plato-length))
-   then (send (send new-description :object) :init-length-graphics)
-        (send (send new-description :object) :draw-length))
-  
-    ; Keep length-description statistics.
-    (if* (eq (send new-description :description-type) plato-length)
-     then (incf *length-description-count*)))
-
-
-
+; defflavor extrinsic-description | ExtrinsicDescription
+; make-extrinsic-description
 ;---------------------------------------------
 
-(defun propose-description (object description-type descriptor
-		            &aux proposed-description urgency)
-; Creates a proposed description, and posts a description-strength-tester 
-; codelet with  urgency a function of the activation of the description's
-; descriptor.
-  (setq proposed-description (make-description object description-type descriptor))
-  (send (send proposed-description :descriptor) :activate-from-workspace)
-  (setq urgency (send description-type :activation))
-  (if* %verbose% 
-   then (format t "Posting a description-strength-tester with urgency ~a~&" 
-		(get-urgency-bin urgency)))
-  (send *coderack* :post 
-        (make-codelet 'description-strength-tester (list proposed-description)
-	              (get-urgency-bin urgency))))
+;----------------------------------------------
+; extrinsic-description.print | REMOVED
+;----------------------------------------------
 
-;---------------------------------------------
-
+;----------------------------------------------
+; extrinsice-description.conceptual-depth
+;----------------------------------------------

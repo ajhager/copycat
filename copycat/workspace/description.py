@@ -19,75 +19,75 @@ import copycat.slipnet as slipnet
 import copycat.toolbox as toolbox
 
 class Description(Structure):
-    def __init__(self, object1, description_type, descriptor):
+    """Description
+
+    Attributes:
+        object: The object the description is attached to.
+        string: The string this description is in.
+        description_type: The facet of the object this refers to.
+        descriptor: the descriptor applying to the facet.
+        description_number: A unique identifier within an object.
+    """
+
+    def __init__(self, obj, description_type, descriptor):
+        """Initialize Description."""
         super(Description, self).__init__()
-        self.object = object1
-        self.string = object1.string
+        self.object = obj
+        self.string = obj.string
         self.description_type = description_type
         self.descriptor = descriptor
         self.description_number = None
 
     def __eq__(self, other):
+        """Return True if the two descriptions are equal."""
         return self.description_type == other.description_type and \
                 self.descriptor == other.descriptor
 
     def calculate_internal_strength(self):
+        """Return the internal strength of the description."""
         return self.descriptor.conceptual_depth
 
     def calculate_external_strength(self):
+        """Return the external strength of the description."""
         return toolbox.average(self.local_support(),
                                self.description_type.activation)
 
     def local_support(self):
-        '''
-        Return the support for this description in its string. This is a rough
-        (not perfect) version.  Look at all the objects in the string, getting
-        support from objects with a description of the given object facet.
-        This does not take into account distance; all qualifying objects in
-        the string give the same amount of support.
-        '''
-        number_of_supporting_objects = 0
-        objects = self.string.objects()
-        other_objects = objects.remove(self.object)
-        for other_object in other_objects:
-            if (not (self.workspace.is_recursive_group_member(other_object,
-                                                             self.object) or \
-                     self.workspace.is_recurisve_group_member(self.object,
-                                                              other_object))) and \
-               self.description_type in [obj.description_type for obj in other_object.descriptions]:
-                number_of_supporting_objects += 1
-        if number_of_supporting_objects == 0:
-            return 0
-        elif number_of_supporting_objects == 1:
-            return 20
-        elif number_of_supporting_objects == 2:
-            return 60
-        elif number_of_supporting_objects == 3:
-            return 90
+        """Return the support for this description in its string."""
+        total = 0
+        objects = self.string.get_objects()
+        if self.object in objects:
+            objects.remove(self.object)
+
+        recurs = self.workspace.is_recursive_group_member
+        for obj in objects:
+            dtypes = [o.description_type for o in obj.descriptions]
+            if not (recurs(obj, self.object) or recurs(obj, self.object)) and \
+                    self.description_type in dtypes:
+                total += 1
+
+        values = {0: 0, 1: 20, 2: 60, 3: 90}
+        if total in values:
+            return values[total]
         else:
             return 100
 
     def is_relevant(self):
-        '''
-        Return True if the description type being described is active.
-        '''
+        """Return True if the description type being described is active."""
         return self.description_type.is_active()
 
     def conceptual_depth(self):
+        """Return this description's conceptual depth."""
         return self.descriptor.conceptual_depth
 
     def is_bond_description(self):
-        '''
-        Return True if the description refers to the bonds making up the
-        group, either the bond category or the bond facet.
-        '''
+        """Return True if the description refers to the bonds making up the
+        group, either the bond category or the bond facet."""
         return self.description_type == slipnet.plato_bond_category or \
                 self.description_type == slipnet.plato_bond_facet
 
-    def apply_slippages(self, object1, slippages):
-        '''
-        Return a new description with the slippages applied.
-        '''
+    def apply_slippages(self, obj, slippages):
+        """Return a new description with the slippages applied."""
         new_description_type = self.description_type
         new_descriptor = self.descriptor
         for slippage in slippages:
@@ -96,13 +96,22 @@ class Description(Structure):
             if slippage.descriptor1 == self.descriptor:
                 new_descriptor == slippage.descriptor2
 
-        return Description(self.object, new_description_type, new_descriptor)
+        return Description(obj, new_description_type, new_descriptor)
 
 class ExtrinsicDescription(object):
+    """ExtrinsicDescription is a description with respect to another object
+    on the workspace.
+
+    For example, 'successor' of 'letter-category' of other-obj.
+    In 'abc -> abd', the 'd' might get the description "successor of the 'c'.
+    """
+
     def __init__(self, relation, description_type_related, other_object):
+        """Initialize ExtrinsicDescription."""
         self.relation = relation
         self.description_type_related = description_type_related
         self.other_object = other_object
 
     def conceptual_depth(self):
+        """Return the conceptual depth of the extrinsic description."""
         return self.relation.conceptual_depth
