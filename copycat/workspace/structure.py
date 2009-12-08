@@ -17,7 +17,19 @@
 import copycat.toolbox as toolbox
 
 class Structure(object):
+    """Structure
+
+    Attributes:
+        string: The string the structure is in.
+        structure_category: E.g., Bond or Group.
+        group: True if the structure is inside a group.
+        internal_strength:
+        external_strength:
+        total_strength:
+    """
+
     def __init__(self):
+        """Initialize Structure."""
         self.string = None
         self.structure_category = None
         self.group = False
@@ -27,24 +39,28 @@ class Structure(object):
         self.proposal_level = None
 
     def update_strengths(self):
+        """Update the values for the structure."""
         self.update_internal_strength()
         self.update_external_strength()
         self.update_total_strength()
 
     def update_internal_strength(self):
+        """Update the internal strength."""
         self.internal_strength = self.calculate_internal_strength()
 
     def update_external_strength(self):
+        """Update the external strength."""
         self.external_strength = self.calculate_external_strength()
 
     def update_total_strength(self):
+        """Update the total strength."""
         weights = [self.internal_strength, 100 - self.internal_strength]
         values = [self.internal_strength, self.external_strength]
         self.total_strength = toolbox.weighted_average(weights, values)
 
     def total_weakness(self):
-        '''
-        Used by break codelets.  Even structures with 100 strength have a
-        chance of being broken.
-        '''
+        """Return the total weakness of the structure.
+        
+        Even structures with 100 strength have a chance of being broken.
+        """
         return 100 - (self.total_strength ** .95)

@@ -1,8 +1,6 @@
-(defmethod (workspace-structure :update-strength-values) ()
-; Updates the strength values for the structure.
-  (send self :set-internal-strength (send self :calculate-internal-strength))
-  (send self :set-external-strength (send self :calculate-external-strength))
-  (send self :set-total-strength (send self :calculate-total-strength)))
+;---------------------------------------------
+; workspace-structure.update_strengths
+;---------------------------------------------
 
 ;---------------------------------------------
 ; description.calculate-internal-strength
@@ -187,24 +185,11 @@
   (send self :internal-strength))
 
 ;---------------------------------------------
-
-(defmethod (workspace-structure :calculate-total-strength) 
-           (&aux internal-strength external-strength 
-		 internal-strength-weight external-strength-weight)
-  (setq internal-strength (send self :internal-strength))    
-  (setq external-strength (send self :external-strength))
-  (setq internal-strength-weight internal-strength)
-  (setq external-strength-weight (fake-reciprocal internal-strength-weight))
-  (weighted-average `((,internal-strength . ,internal-strength-weight)
-	              (,external-strength . ,external-strength-weight))))
-
+; workspace-structure.calculate-total-strength
 ;---------------------------------------------
 
-(defmethod (workspace-structure :total-weakness) ()
-; this method is used by breaker codelets.  the .95 exponent is so that even 
-; structures with a strength of 100 have some chance of being broken.
-  (fake-reciprocal (expt (send self :total-strength) .95)))
-
+;---------------------------------------------
+; workspace-structure.total-weakness
 ;---------------------------------------------
 
 (defmethod (concept-mapping :slippability) (&aux degree-of-association)
