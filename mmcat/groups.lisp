@@ -17,9 +17,6 @@
                                  ;  making up the group.  These are separated 
 				 ; from other descriptions since they are not 
 				 ; always used in the same way.
-    structure-graphics-obj ; Graphics object for displaying group.
-    )
-    (workspace-object workspace-structure)    
 
 ;---------------------------------------------
 
@@ -120,23 +117,11 @@
   (setq length-description-probability 
         (send new-group :length-description-probability))
 
-  (if* %verbose% 
-   then (format t "Deciding whether to add length description.  Prob: ~a~&"
-		  length-description-probability))
-
   (if* (eq (flip-coin length-description-probability) 'heads)
-   then (if* %verbose% 
-         then (format t "Adding length description.~&"))
+   then  
         (send new-group :add-description
 	      (make-description new-group plato-length
 		                (get-plato-number (send new-group :length))))
-   else (if* %verbose% 
-         then (format t "Not adding length description.~&")))
-
-  (if* %workspace-graphics% 
-   then (send new-group :init-graphics)
-        (send new-group :init-graphics))
-
   new-group)
 
 ;----------------------------------------------
@@ -773,5 +758,4 @@
 			(/ (fake-reciprocal (send plato-length 
 						  :activation)) 100))))))
 
-;-------------------------------------------
 

@@ -45,13 +45,13 @@ class DescriptionBottomUpScout(Codelet):
 
         # Choose a property by degree of association and activation.
         associations = [link.degree_of_association() for link in links]
-        activations = [link.to_node().activation for link in links]
+        activations = [link.to_node.activation for link in links]
         choices = map(lambda a, b: a * b, associations, activations)
-        index = toolbox.select_list_position(choices)
-        property = links[index].to_node()
+        index = toolbox.weighted_index(choices)
+        property = links[index].to_node
         
         # Propose the description.
-        return self.propose_description(object, property.category(), property)
+        return workspace.propose_description(object, property.category(), property)
 
 class DescriptionBuilder(Codelet):
     '''
@@ -63,13 +63,13 @@ class DescriptionBuilder(Codelet):
         description = self.arguments[0]
 
         # Make sure the object still exists.
-        if description.object not in self.objects():
+        if description.object not in workspace.objects():
             return
 
         # Make sure the description does not exist.
-        if description in description.object.descriptions():
-            description.description_type.buffer += self.activation
-            description.descriptor.buffer += self.activation
+        if description in description.object.descriptions:
+            description.description_type.activation_buffer += workspace.activation
+            description.descriptor.activation_buffer += workspace.activation
             return
 
         # Build the description.
@@ -86,15 +86,15 @@ class DescriptionStrengthTester(Codelet):
         description = self.arguments[0]
 
         # Activate the descriptor.
-        description.descriptor.buffer += self.activation
+        description.descriptor.activation_buffer += workspace.activation
 
         # Update the strength values for the description.
-        description.update_strength_values()
-        strength = description.total_strength()
+        description.update_strengths()
+        strength = description.total_strength
 
         # Decide whether or not to post the description builder codelet.
         probability = strength / 100.0
-        probability = self.temperature_adjusted_probability(probability)
+        probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
             return
         
@@ -120,8 +120,8 @@ class DescriptionTopDownScout(Codelet):
         if not descriptors:
             return
         activations = [descriptor.activation for descriptor in descriptors]
-        index = toolbox.select_list_position(activations)
+        index = toolbox.weighted_index(activations)
         descriptor = descriptors[index]
 
         # Propose the description.
-        return self.propose_description(object, description_type, descriptor)
+        return workspace.propose_description(object, description_type, descriptor)

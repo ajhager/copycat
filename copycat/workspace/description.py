@@ -59,10 +59,10 @@ class Description(Structure):
         if self.object in objects:
             objects.remove(self.object)
 
-        recurs = self.workspace.is_recursive_group_member
         for obj in objects:
             dtypes = [o.description_type for o in obj.descriptions]
-            if not (recurs(obj, self.object) or recurs(obj, self.object)) and \
+            if not (obj.is_recursive_member(self.object) or \
+                        obj.is_recursive_member(self.object)) and \
                     self.description_type in dtypes:
                 total += 1
 

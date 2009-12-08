@@ -74,9 +74,9 @@ plato_whole.description_tester = lambda obj: obj.type_name == 'group' and obj.sp
 
 # Alphabetic position nodes
 plato_first = add_node('first', 60)
-plato_first.description_tester = lambda obj: obj.get_descriptor(plato_letter_category) == plato_letters[0]
+plato_first.description_tester = lambda obj: obj.get_descriptor(plato_letter_category) == slipnet_letters[0]
 plato_last = add_node('last', 60)
-plato_last.description_tester = lambda obj: obj.get_descriptor(plato_letter_category) == plato_letters[len(plato_letters) - 1]
+plato_last.description_tester = lambda obj: obj.get_descriptor(plato_letter_category) == slipnet_letters[len(slipnet_letters) - 1]
 
 # Direction nodes
 plato_left = add_node('left', 40, ['BondTopDownDirectionScout',

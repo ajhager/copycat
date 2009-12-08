@@ -21,8 +21,15 @@ from copycat.workspace import Object, Structure, Description, Mapping
 import copycat.slipnet as nodes
 
 class Group(Object, Structure):
+    """Group
+
+    Attributes:
+        string: The string the group is in.
+    """
+
     def __init__(self, workspace, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):
+        """Initialize Group."""
         super(Group, self).__init__()
         self.workspace = workspace
         self.type_name = 'group'
@@ -109,17 +116,6 @@ class Group(Object, Structure):
         return self.left_object_position == other.left_object_position and \
                 self.right_object_position == other.right_object_position and \
                 self.group_category == other.group_category
-
-    def is_recursive_member(self, obj):
-        """Return True if the object is a member of the gruop or is a member
-        of a member, etc."""
-        if obj.type_name == 'letter':
-            return False
-        elif obj in self.objects:
-            return True
-        for g in self.objects:
-            if obj.is_recursive_member(g):
-                return True
 
     def calculate_internal_strength(self):
         '''

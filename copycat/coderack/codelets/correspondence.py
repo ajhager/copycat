@@ -115,7 +115,8 @@ class CorrespondenceBuilder(Codelet):
             workspace.remove_proposed_correspondence(correspondence)
             labels = [m.label for m in correspondence.get_concept_mappings()]
             for label in labels:
-                label.activation_buffer += workspace.activation
+                if label:
+                    label.activation_buffer += workspace.activation
             mappings_to_add = []
             for mapping in correspondence.concept_mappings:
                 if not correspondence.is_concept_mapping_present(mapping):
@@ -166,7 +167,7 @@ class CorrespondenceBuilder(Codelet):
         # The proposed corresondence must win against an incompatible rule.
         incompatible_rule = correspondence.is_incompatible_rule()
         if incompatible_rule:
-            if not self.fight_it_out(correspondence, 1, [self.rule], 1):
+            if not self.fight_it_out(correspondence, 1, [workspace.rule], 1):
                 return
 
         # Break all incompatible structures.
@@ -182,15 +183,15 @@ class CorrespondenceBuilder(Codelet):
         
         existing_object2_group = flipped
         if existing_object2_group:
-            self.break_group(existing_object2_group)
-            for bond in existing_object2_group.bonds():
-                self.break_bond(bond)
-            for bond in object2.bonds():
-                self.build_bond(bond)
-            self.build_group(object2)
+            workspace.break_group(existing_object2_group)
+            for bond in existing_object2_group.bonds:
+                workspace.break_bond(bond)
+            for bond in object2.bonds:
+                workspace.build_bond(bond)
+            workspace.build_group(object2)
 
         if incompatible_rule:
-            self.break_rule(self.rule)
+            workspace.break_rule(workspace.rule)
 
         # Build the correspondence.
         workspace.build_correspondence(correspondence)

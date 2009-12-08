@@ -199,7 +199,10 @@ class String(object):
         """Add the proposed bond to the string."""
         position = (bond.from_object.string_number,
                     bond.to_object.string_number)
-        self.proposed_bonds[position].remove(bond)
+        if position in self.proposed_bonds:
+            items = self.proposed_bonds[position]
+            if bond in items:
+                self.proposed_bonds[position].remove(bond)
 
     def get_proposed_bonds(self):
         """Return a list of proposed bonds in the string."""

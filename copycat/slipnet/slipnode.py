@@ -16,6 +16,8 @@
 
 import math
 
+import copycat.toolbox as toolbox
+
 class Slipnode(object):
     """Slipnode
 

@@ -539,9 +539,10 @@ class Workspace(object):
         """Remove a proposed correspondence from the workspace."""
         position = (correspondence.object1.string_number,
                     correspondence.object2.string_number)
-        items = self.proposed_correspondences[position]
-        if correspondence in items:
-            items.remove(correspondence)
+        if position in self.proposed_correspondences:
+            items = self.proposed_correspondences[position]
+            if correspondence in items:
+                items.remove(correspondence)
 
     def get_proposed_correspondences(self):
         """Return a list of proposed correspondences in the workspace."""

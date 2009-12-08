@@ -372,6 +372,17 @@ class Object(object):
         other_descriptors = [d.descriptor for d in descriptions]
         return not descriptor in other_descriptors
 
+    def is_recursive_member(self, obj):
+        """Return True if the object is a member of the gruop or is a member
+        of a member, etc."""
+        if obj.type_name == 'letter':
+            return False
+        elif obj in self.objects:
+            return True
+        for obj in self.objects:
+            if obj.is_recursive_member(obj):
+                return True
+
     def relevant_distinguishing_descriptions(self):
         """Return a list of relevant distinguishing descriptions."""
         descriptions = self.distinguishing_descriptions()
