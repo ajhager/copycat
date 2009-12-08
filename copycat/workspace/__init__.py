@@ -139,18 +139,21 @@ class Workspace(object):
             for description in obj.descriptions:
                 description.descriptor.activation_buffer += self.activation
 
+    def initial_codelets(self):
+        codelets = [(BondBottomUpScout(), 0),
+                    (ReplacementFinder(), 0),
+                    (CorrespondenceBottomUpScout(), 0)]
+        number_needed = len(self.objects()) * 2
+        return codelets * number_needed
+
     def update(self):
-        '''
-        Update various values of the structures, objects, and strings in the
+        """Update various values of the structures, objects, and strings in the
         workspace. Check to see if the snag conditions have been met so that
-        everything can go back to normal.  Finally, update the temperature.
-        '''
+        everything can go back to normal.  Finally, update the temperature."""
         for structure in self.structures():
-            if structure:
-                structure.update_strengths()
-        for object_ in self.objects():
-            if object_:
-                object_.update_object_values()
+            structure.update_strengths()
+        for obj in self.objects():
+            obj.update_object_values()
 
         self.initial_string.update_relative_importances()
         self.target_string.update_relative_importances()
@@ -161,37 +164,40 @@ class Workspace(object):
 
         self.update_temperature()
 
-    def initial_codelets(self):
-        codelets = [(BondBottomUpScout(), 0),
-                    (ReplacementFinder(), 0),
-                    (CorrespondenceBottomUpScout(), 0)]
-        number_needed = len(self.objects()) * 2
-        return codelets * number_needed
-
     def test_snag_condition(self):
-        '''
-        If the program is dealing with a snag, then see if any new structures
-        have been made.  If so, see if the snag condition should be ended.
-        This will also need work as we learn more about handling snags.
-        '''
-        return # need to revisit this
+        """If the program is dealing with a snag, then see if any new
+        structures have been made. If so, see if the snag condition should
+        be ended. This will also need work as we learn more about handling
+        snags."""
         if self.snag_object and self.snag_condition:
             new_structures = []
-            for structure in self.structures:
-                if snag_structures(structure):
+            for structure in self.structures():
+                if not isinstance(structure, Bond) and \
+                        not self.is_structure_in_snag_structures(structure):
                     new_structures.append(structure)
             
             unclamp_probability = 0
             if new_structures:
-                unclamp_probability = max([structure.total_strength() \
-                    for structure in new_structures]) / 100.
+                strengths = [s.total_strength for s in new_structures]
+                unclamp_probability = max(strengths) / 100.0
 
             if toolbox.flip_coin(unclamp_probability):
                 self.snag_condition = None
                 self.clamp_temperature = False
                 for description in self.snag_object.descriptions:
-                    description.set_clamp(False)
-                self.snag_object.set_clamp_salience(False)
+                    description.descriptor.clamp = False
+                self.snag_object.clamp_salience = False
+
+    def update_temperature(self):
+        """Update the temperature, which is a function of the average total
+        unhappiness of objects in the workspace and weakness of the rule."""
+        if not self.clamp_temperature:
+            rule_weakness = 100
+            if self.rule:
+                rule_weakness -= self.rule.total_strength
+            self.temperature = toolbox.weighted_average([8, 2],
+                                                        [self.total_unhappiness(),
+                                                         rule_weakness])
 
     def get_unmodified_letters_for_answer(self, objects_to_change):
         '''
@@ -897,21 +903,6 @@ class Workspace(object):
                 new_bonds.append(bond)
         return new_bonds
 
-    def update_temperature(self):
-        '''
-        Updates the temperature, which is a function of the average total
-        unhappiness of objects on the blackboard (weighted by importance)
-        and the weakness of the rule.
-        '''
-        if not self.clamp_temperature:
-            rule_weakness = 100
-            if self.rule:
-                rule_weakness = 100 - self.rule.total_strength
-
-            self.temperature = toolbox.weighted_average([8, 2],
-                                                        [self.total_unhappiness(),
-                                                         rule_weakness])
-
     def answer_temperature_threshold_distribution(self):
         if self.initial_string.length == 1 and \
            self.target_string.length == 1:
@@ -1018,7 +1009,7 @@ class Workspace(object):
 
     def get_codelets(self, category, codelet, urgency, args=[]):
         '''
-        Based on the category sent in, test for the probability for the
+        Based on the category sent in, testfor the probability for the
         codelet related to that category to be posted.  If the test does
         succeed, the number of each codelet to return is determined based
         on category.

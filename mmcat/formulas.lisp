@@ -1,20 +1,3 @@
-(defun update-temperature (&aux rule-weakness)
-; Updates the temperature, which is a function of the average total-unhappiness
-; of objects on the workspace (weigted by importance) and the weakness of the
-; rule.
-  (if* (not *clamp-temperature*)
-   then (setq rule-weakness 
-	      (if* (null *rule*) 
-	       then 100
-	       else (fake-reciprocal (send *rule* :total-strength))))
-  
-        (setq *temperature* 
-	      (weighted-average 
-	          `((,(send *workspace* :total-unhappiness) . 8) 
-		    (,rule-weakness . 2))))))
-
-;---------------------------------------------
-
 (defun get-answer-temperature-threshold-distribution (&aux bond-density)
 ; Returns the probability-distribution from which to 
 ; choose a temperature threshold, used by rule-translator codelets in deciding

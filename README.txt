@@ -12,8 +12,8 @@ Status
 
 12/07/09
 Workspace strings have been completely revamped and enough random bugs
-have been fixed to allow all types of codelets to be run now. Ther are
-no longer an major hurdles left beyond continuing to go through method
+have been fixed to allow all types of codelets to be run now. There are
+no longer any major hurdles left beyond continuing to go through method
 by method to ensure accuracy.
 
 12/04/09
