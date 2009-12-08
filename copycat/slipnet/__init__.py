@@ -54,19 +54,29 @@ for letter in string.ascii_lowercase:
 # Number nodes
 slipnet_numbers = []
 for number in range(1, 6):
-    slipnet_numbers.append(add_node(str(number), 30))
+    node = add_node(str(number), 30)
+    node.description_tester = lambda obj: obj.type_name == 'group' and \
+        obj.length() == number
+    slipnet_numbers.append(node)
 
 # String position nodes.
 plato_leftmost = add_node('leftmost', 40)
+plato_leftmost.description_tester = lambda obj: not obj.spans_whole_string() and obj.is_leftmost_in_string()
 plato_rightmost = add_node('rightmost', 40)
+plato_rightmost.description_tester = lambda obj: not obj.spans_whole_string() and obj.is_rightmost_in_string()
 plato_middle = add_node('middle', 40)
+plato_middle.description_tester = lambda obj: obj.ungrouped_left_neighbor() and obj.ungrouped_right_neighbor() and obj.ungrouped_left_neighbor().is_leftmost_in_string() and obj.ungrouped_right_neighbor().is_rightmost_in_string()
 plato_single = add_node('single', 40)
+plato_single.description_tester = lambda obj: obj.type_name == 'letter' and obj.spans_whole_string()
 plato_whole = add_node('whole', 40)
+plato_whole.description_tester = lambda obj: obj.type_name == 'group' and obj.spans_whole_string()
 
 
 # Alphabetic position nodes
 plato_first = add_node('first', 60)
+plato_first.description_tester = lambda obj: obj.get_descriptor(plato_letter_category) == plato_letters[0]
 plato_last = add_node('last', 60)
+plato_last.description_tester = lambda obj: obj.get_descriptor(plato_letter_category) == plato_letters[len(plato_letters) - 1]
 
 # Direction nodes
 plato_left = add_node('left', 40, ['BondTopDownDirectionScout',
@@ -84,9 +94,12 @@ plato_sameness = add_node('sameness', 80, ['BondTopDownCategoryScout'], 0)
 # Group nodes
 plato_predecessor_group = add_node('predgroup', 50,
                                    ['GroupTopDownCategoryScout'], directed=True)
+plato_predecessor_group.iterate_group = lambda category: get_related_group(category, plato_predecessor)
 plato_successor_group = add_node('succgrp', 50, ['GroupTopDownCategoryScout'],
                                 directed=True)
+plato_successor_group.iterate_group = lambda category: get_related_group(category, plato_successor)
 plato_sameness_group = add_node('samegrp', 80, ['GroupTopDownCategoryScout'])
+plato_sameness_group.iterate_group = lambda category: category
 
 # Other relation nodes
 plato_identity = add_node('identity', 90, [], 0)
@@ -94,7 +107,9 @@ plato_opposite = add_node('opposite', 90, [], 80)
 
 # Object nodes
 plato_letter = add_node('letter', 20)
+plato_letter.description_tester = lambda obj: obj.type_name == 'letter'
 plato_group = add_node('group', 80)
+plato_group.description_tester = lambda obj: obj.type_name == 'group'
 
 # Category nodes
 plato_letter_category = add_node('letter-category', 30, initially_clamped=True)
