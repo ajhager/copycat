@@ -15,20 +15,9 @@
 # 02110-1301, USA.
 
 import random
-from collections import defaultdict
 
 import copycat.toolbox as toolbox
 import copycat.slipnet as slipnet
-
-def array(width, height=0):
-    if height == 0:
-        return [None for i in range(width)]
-    return [[None for i in range(width)] for j in range(height)]
-
-def dd():
-    def d():
-        return defaultdict(list)
-    return defaultdict(d)
 
 class String(object):
     """String is a letter string in the workspace.
@@ -36,99 +25,33 @@ class String(object):
     This could be the initial string, modified string or target string.
     Each object in a string has a unique string number that identifies
     it from other objects in the string.
-
-    Attributes:
-        highest_string_number: The highest number of any objects.
-        name: The literal string this corresponds to.
-        length: The number of letters in the string.
     """
 
     def __init__(self, workspace, string):
-        """Initializes String."""
         self.workspace = workspace
-        self.highest_string_number = -1
         self.name = string
+        self.highest_string_number = -1
         self.length = len(string)
-        self.object_spaces = self.length
-        self.letters = array(self.length)
-        self._groups = {}
-        self.object_positions = array(self.length)
-        self.proposed_bonds = dd()
-        self.left_right_bonds = defaultdict(dict)
-        self.from_to_bonds = defaultdict(dict)
-        self.proposed_groups = array(100, 100)
-        self.number_of_bonds_to_scan_distribution = range(self.length)
+        self.letters = {}
+        self.groups = {}
+        self.proposed_groups = {}
+        self.object_positions = {}
+        self.left_right_bonds = {}
+        self.from_to_bonds = {}
+        self.proposed_bonds = {}
         self.intra_string_unhappiness = 0
         self.bonds_to_scan_distribution = range(self.length)
 
-    def random_object(self):
-        '''
-        Return a random object in the string.
-        '''
-        return random.choice(self.letters + self.get_groups())
+    def add_to_object_positions(self, obj, position):
+        """Add an object to the object positions."""
+        if position in self.object_positions:
+            self.object_positions[position].append(obj)
+        else:
+            self.object_positions[position] = [obj]
 
-    def random_letter(self):
-        '''
-        Return a random letter in the string.
-        '''
-        return random.choice(self.letters)
-    
-    def objects(self):
-        letters = filter(lambda x: x != None, self.letters)
-        return letters + self.get_groups()
-
-    def get_groups(self):
-        """Return all groups in the string."""
-        return self._groups.values()
-
-    def choose_object(self, method):
-        '''
-        Return an object in the string chosen probabilistically,
-        adjusted for temperature, according to the given method.
-        '''
-        objects = [obj for obj in self.objects() if obj]
-        values = [getattr(obj, method) for obj in objects]
-        values = self.workspace.temperature_adjusted_values(values)
-        return objects[toolbox.weighted_index(values)]
-
-    def choose_leftmost_object(self):
-        '''
-        Return one of the leftmost objects in the string, chosen
-        probabilistically according to the relative importance of the
-        lefmost objects in the string.
-        '''
-        leftmost_objects = []
-        category = slipnet.plato_string_position_category
-        for workspace_object in self.objects():
-            if not workspace_object:
-                continue
-            descriptor = workspace_object.get_descriptor(category)
-            if descriptor == slipnet.plato_leftmost:
-                leftmost_objects.append(workspace_object)
-        if leftmost_objects:
-            values = [obj.relative_importance for obj in leftmost_objects]
-            return toolbox.weighted_select(values, leftmost_objects)
-
-    def get_bonds(self):
-        """Return a list of all bonds in the string."""
-        bonds = []
-        for d in self.from_to_bonds.values():
-            bonds.extend(d.values())
-        for d in self.left_right_bonds.values():
-            bonds.extend(d.values())
-        return list(set(bonds))
-
-    def non_string_spanning_objects(self):
-        '''
-        Return a list of all non string spanning objects in the string.
-        '''
-        non_string_spanning = []
-        for workspace_object in self.objects():
-            if not workspace_object:
-                continue
-            if workspace_object.spans_whole_string():
-                non_string_spanning.append(workspace_object)
-        return non_string_spanning
+    def remove_from_object_positions(self, obj, position):
+        """Remove an object from the object positions."""
+        self.object_positions[position].remove(obj)
 
     def add_letter(self, letter):
         """Add a letter to the string."""
@@ -136,140 +59,185 @@ class String(object):
         letter.string_number = self.highest_string_number
         position = letter.left_string_position
         self.letters[position] = letter
-        right_object = self.object_positions[position]
-        self.object_positions[position] = [letter, right_object]
+        self.add_to_object_positions(letter, position)
 
-    def objects_by_category(self, category):
-        '''
-        Return a list of objects in the string of the given object category.
-        '''
-        if category == slipnet.plato_letter:
-            return self.letters
-        elif category == slipnet.plato_group:
-            return self.get_groups()
-
-    def add_proposed_bond(self, bond):
-        """Add a proposed bond to the string."""
-        from_number = bond.from_object.string_number
-        to_number = bond.to_object.string_number
-        self.proposed_bonds[from_number][to_number].append(bond)
-
-    def remove_proposed_bond(self, bond):
-        """Remove a proposed bond from the string."""
-        from_number = bond.from_object.string_number
-        to_number = bond.to_object.string_number
-        self.proposed_bonds[from_number][to_number].remove(bond)
-
-    def add_bond(self, bond):
-        """Add a built bond to the string, storing sameness bonds twice,
-        in both directions, since they have no direction."""
-        left_number = bond.left_object.string_number
-        right_number = bond.right_object.string_number
-        self.left_right_bonds[left_number][right_number] = bond
-
-        from_number = bond.from_object.string_number
-        to_number = bond.to_object.string_number
-        self.from_to_bonds[from_number][to_number] = bond
-
-        if bond.bond_category == slipnet.plato_sameness:
-            self.left_right_bonds[right_number][left_number] = bond
-            self.from_to_bonds[to_number][from_number] = bond
-
-    def remove_bond(self, bond):
-        '''
-        Remove a built bond from the string, deleting both sameness bonds
-        since they are stored twice in both directions.
-        '''
-        left_number = bond.left_object.string_number
-        right_number = bond.right_object.string_number
-        del(self.left_right_bonds[left_number][right_number])
-
-        from_number = bond.from_object.string_number
-        to_number = bond.to_object.string_number
-        del(self.from_to_bonds[from_number][to_number])
-
-        if bond.bond_category == slipnet.plato_sameness:
-            del(self.left_right_bonds[right_number][left_number])
-            del(self.from_to_bonds[to_number][from_number])
-
-    def add_proposed_group(self, group):
-        '''
-        Add a proposed group to the string.
-        '''
-        left_number = group.left_object.string_number
-        right_number = group.right_object.string_number
-        if not self.proposed_groups[left_number][right_number]:
-            self.proposed_groups[left_number][right_number] = []
-        self.proposed_groups[left_number][right_number].append(group)
-
-    def remove_proposed_group(self, group):
-        '''
-        Remove a proposed group from the string.
-        '''
-        left_number = group.left_object.string_number
-        right_number = group.right_object.string_number
-        self.proposed_groups[left_number][right_number].remove(group)
-
-    def add_group(self, group):
-        """Add a built group to the string."""
-        self._groups[group.left_object.string_number] = group
-        self.highest_string_number += 1
-        group.string_number = self.highest_string_number
-        self.object_positions[group.left_string_position].append(group)
-        self.object_positions[group.right_string_position].append(group)
-
-    def remove_group(self, group):
-        '''
-        Remove a built group from the string.
-        '''
-        del(self._groups[group.left_object.string_number])
-        self.object_positions[group.left_string_position].remove(group)
-        self.object_positions[group.right_string_position].remove(group)
+    def get_letters(self):
+        """Return a list of letters in the string."""
+        return self.letters.values()
 
     def get_letter(self, position):
-        '''
-        Return the object at the given position in the letter list of the
-        string.
-        '''
-        return self.letters[position]
+        """Return the letter at the given position in the string."""
+        return self.letters.get(position)
+
+    def get_random_letter(self):
+        """Return a random letter from the string."""
+        return random.choice(self.get_letters())
+
+    def get_leftmost_letter(self):
+        """Return the leftmost letter in the string."""
+        return self.letters.get(0)
+
+    def get_rightmost_letter(self):
+        """Return the rightmost letter in the string."""
+        return self.letters.get(len(self.letters) - 1)
+
+    def add_group(self, group):
+        """Add a group to the string."""
+        self.highest_string_number += 1
+        group.string_number = self.highest_string_number
+        self.groups[group.left_object.string_number] = group
+        self.add_to_object_positions(group, group.left_string_position)
+        self.add_to_object_positions(group, group.right_string_position)
+
+    def remove_group(self, group):
+        """Remove a group from the string."""
+        del(self.groups[group.left_object.string_number])
+        self.remove_from_object_positions(group, group.left_string_position)
+        self.remove_from_object_positions(group, group.right_string_position)
+
+    def get_groups(self):
+        """Return a list of groups in the string."""
+        return self.groups.values()
 
     def get_group(self, position):
-        '''
-        Return the group at the given position in the letter list of the
-        string.
-        '''
-        return self.get_letter[position].group
+        """Return the group at the given position in letters.
 
-    def is_bond_present(self, bond):
-        '''
-        Return the existing bond if the bond exists in the string.
-        '''
-        print self.get_bonds()
-        for b in self.get_bonds():
-            if all([b.bond_category == bond.bond_category,
-                    b.direction_category == bond.direction_category]):
-                return b
+        Positions start at 0 and refer to the position of the leftmost object
+        in the group.
+        """
+        return self.get_letter(position).group
+
+    def get_existing_group(self, group):
+        """Return the group in the string if it has the same properties as
+        the given group."""
+        existing_group = self.get_group(group.left_object.string_number)
+        if all([existing_group,
+                existing_group.length == group.length,
+                existing_group.group_category == group.group_category,
+                existing_group.direction_category == group.direction_category]):
+            return existing_group
+
+    def add_proposed_group(self, group):
+        """Add a proposed group to the string."""
+        position = (group.left_object.string_number,
+                    group.right_object.string_number)
+        if position in self.proposed_groups:
+            self.proposed_groups[position].append(group)
+        else:
+            self.proposed_groups[position] = [group]
+
+    def remove_proposed_group(self, group):
+        """Remove a proposed group from the string."""
+        position = (group.left_object.string_number,
+                    group.right_object.string_number)
+        self.proposed_groups[position].remove(group)
+
+    def get_proposed_groups(self):
+        """Return a list of the proposed groups in the string."""
+        return list(set(toolbox.flatten(self.proposed_groups.values())))
+
+    def get_proposed_group(self, first, second):
+        """Return the proposed group at first, second position."""
+        return self.proposed_groups.get((first, second))
+
+    def add_bond(self, bond):
+        """Add a bond to the string, sameness bonds in both directions."""
+        left_number = bond.left_object.string_number
+        right_number = bond.right_object.string_number
+        self.left_right_bonds[(left_number, right_number)] = bond
+
+        from_number = bond.from_object.string_number
+        to_number = bond.to_object.string_number
+        self.from_to_bonds[(from_number, to_number)] = bond
+
+        if bond.bond_category == slipnet.plato_sameness:
+            self.left_right_bonds[(right_number, left_number)] = bond
+            self.from_to_bonds[(to_number, from_number)] = bond
+
+    def remove_bond(self, bond):
+        """Remove a bulit bond from the string."""
+        left_number = bond.left_object.string_number
+        right_number = bond.right_object.string_number
+        del(self.left_right_bonds[(left_number, right_number)])
+
+        from_number = bond.from_object.string_number
+        to_number = bond.to_object.string_number
+        del(self.from_to_bonds[(from_number, to_number)])
+
+        if bond.bond_category == slipnet.plato_sameness:
+            del(self.left_right_bonds[(right_number, left_number)])
+            del(self.from_to_bonds[(to_number, from_number)])
+
+    def get_bonds(self):
+        """Return a list of the built bonds in the string."""
+        return list(set(self.from_to_bonds.values()))
 
     def get_bond(self, from_object, to_object):
-        '''
-        Return the bond, if any, from the from_object to the to_object.
-        '''
-        from_number = from_object.string_number
-        to_number = to_object.string_number
-        bond = None
-        try:
-            bond = self.from_to_bonds[from_number][to_number]
-        except KeyError:
-            print "get_bond key error"
-        return bond
+        """Return the bond between the two objects, if any."""
+        return self.from_to_bonds.get(from_object.string_number,
+                                      to_object.string_number)
 
-    def is_group_present(self, group):
-        """Return the existing group if the group exists in the string."""
-        for g in self.get_groups():
-            if all([g.length() == group.length(),
-                    g.group_category == group.group_category,
-                    g.direction_category == group.direction_category]):
-                return g
+    def get_existing_bond(self, bond):
+        """Return the bond in the string if it has the same properties as
+        the given bond."""
+        existing_bond = self.get_bond(bond.from_object, bond.to_object)
+        if all([existing_bond,
+                existing_bond.bond_category == bond.bond_category,
+                existing_bond.direction_category == bon.direction_category]):
+            return existing_bond
+
+    def add_proposed_bond(self, bond):
+        """Add the proposed bond to the string."""
+        position = (bond.from_object.string_number,
+                    bond.to_object.string_number)
+        if position in self.proposed_bonds:
+            self.proposed_bonds.appen(bond)
+        else:
+            self.proposed_bonds[position] = [bond]
+
+    def add_proposed_bond(self, bond):
+        """Add the proposed bond to the string."""
+        position = (bond.from_object.string_number,
+                    bond.to_object.string_number)
+        self.proposed_bonds.remove(bond)
+
+    def get_proposed_bonds(self):
+        """Return a list of proposed bonds in the string."""
+        return list(set(toolbox.flatten(self.proposed_bonds.values())))
+
+    def get_objects(self, category=None):
+        """Return the list of objects of the given object category.
+
+        If no category is given, return all objects.
+        """
+        if category == slipnet.plato_letter:
+            return self.get_letters()
+        elif category == slipnet.plato_group:
+            return self.get_groups()
+        return self.get_letters() + self.get_groups()
+
+    def get_non_string_spanning_objects(self):
+        """Return all objects that do not span the entire string."""
+        return [o for o in self.get_objects() if not o.spans_whole_string()]
+
+    def get_random_object(self, method=None):
+        """Return a random object from the string."""
+        if method:
+            values = [getattr(obj, method) for obj in self.get_objects()]
+            values = self.workspace.temperature_adjusted_values(values)
+            return self.get_object(toolbox.weighted_index(values))
+        return random.choice(self.get_objects())
+
+    def get_random_leftmost_object(self):
+        """Return a random leftmost object from the string."""
+        lefmost_objects = []
+        category = slipnet.plato_string_position_category
+        for obj in self.get_objects():
+            if obj.get_descriptor(category) == slipnet.plato_leftmost:
+                leftmost_objects.append(obj)
+        if leftmost_objects:
+            values = [obj.relative_importance for obj in leftmost_objects]
+            return toolbox.weighted_select(values, leftmost_objects)
 
     def local_bond_category_relevance(self, bond_category):
         '''

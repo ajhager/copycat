@@ -100,7 +100,7 @@ class Workspace(object):
         for string in [self.initial_string,
                        self.modified_string,
                        self.target_string]:
-            for letter in string.letters:
+            for letter in string.get_letters():
                 description = Description(letter,
                                           slipnet.plato_object_category,
                                           slipnet.plato_letter)
@@ -110,9 +110,9 @@ class Workspace(object):
                                           slipnet.get_plato_letter(letter.name))
                 letter.add_description(description)
 
-            leftmost_letter = string.letters[0]
+            leftmost_letter = string.get_leftmost_letter()
             if string.length > 1:
-                rightmost_letter = string.letters[-1]
+                rightmost_letter = string.get_rightmost_letter()
                 description = Description(leftmost_letter,
                                           slipnet.plato_string_position_category,
                                           slipnet.plato_leftmost)
@@ -129,7 +129,7 @@ class Workspace(object):
                 leftmost_letter.add_description(description)
 
             if string.length == 3:
-                middle_letter = string.letters[1]
+                middle_letter = string.get_letter(1)
                 description = Description(middle_letter,
                                           slipnet.plato_string_position_category,
                                           slipnet.plato_middle)
@@ -202,7 +202,7 @@ class Workspace(object):
             objects_to_change = []
         letters = []
         category = slipnet.plato_letter_category
-        for letter in self.target_string.letters:
+        for letter in self.target_string.get_letters():
             t = False
             for obj in objects_to_change:
                 if letter in obj.letters:
@@ -600,8 +600,8 @@ class Workspace(object):
         '''
         Return a list of all the letters on the workspace.
         '''
-        return self.initial_string.letters() + \
-                self.target_string.letters()
+        return self.initial_string.get_letters() + \
+                self.target_string.get_letters()
 
     def random_string(self):
         '''
@@ -640,7 +640,7 @@ class Workspace(object):
         Return True if there is at least one letter in the initial string
         that deson't yet have a replacement.
         '''
-        for letter in self.initial_string.letters:
+        for letter in self.initial_string.get_letters():
             if not letter.replacement:
                 return True
 
@@ -1091,7 +1091,7 @@ class Workspace(object):
 
     def unreplaced_objects(self):
         unreplaced_objects = []
-        for letter in self.initial_string.letters:
+        for letter in self.initial_string.get_letters():
             if letter.replacement == None:
                 unreplaced_objects.append(letter)
         return unreplaced_objects

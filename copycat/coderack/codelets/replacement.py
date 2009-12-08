@@ -33,7 +33,7 @@ class ReplacementFinder(Codelet):
             return # Fizzle
 
         index = i_letter.left_string_position
-        m_letter = workspace.modified_string.letters[index]
+        m_letter = workspace.modified_string.get_letter(index)
 
         i_letter_category = i_letter.get_descriptor(nodes.plato_letter_category)
         m_letter_category = m_letter.get_descriptor(nodes.plato_letter_category)

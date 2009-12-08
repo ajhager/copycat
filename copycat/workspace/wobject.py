@@ -211,7 +211,7 @@ class Object(object):
 
     def is_rightmost_in_string(self):
         """Return True if object is rightmost in its string."""
-        right_position = len(self.string.letters) - 1
+        right_position = len(self.string.get_letters()) - 1
         return self.right_string_position == right_position
 
     def is_middle_in_string(self):
@@ -357,7 +357,7 @@ class Object(object):
            descriptor in slipnet.slipnet_numbers:
             return False
         if self.type_name == 'letter':
-            other_objects = self.string.letters[:]
+            other_objects = self.string.letters.get_letters()
             other_objects.remove(self)
         else:
             other_objects = self.string.get_groups()
