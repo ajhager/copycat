@@ -599,50 +599,13 @@
 ; correspondence.support | Correspondence.support
 ;---------------------------------------------
 
-(defmethod (workspace-string :local-bond-category-relevance)
-           (given-bond-category &aux object-list)
-
-; A function of how many bonds in the string have the given 
-; bond-category.  This function is not perfect; it gives just a rough 
-; estimate of the relevance of this bond category.
-; This method is used in the top-down-bond-scout--category codelet and the
-; top-down-group-scout--category codelet as a way of probabilistically choosing
-; a string to work in.
-  (setq object-list (send self :non-string-spanning-object-list))
-  (if* (= (length object-list) 1) 
-   then 0
-   else (loop for obj in object-list
-              when (and (send obj :right-bond)
-	                (eq (send (send obj :right-bond) 
-				  :bond-category) 
-		            given-bond-category))
-              count t into bond-count
-              finally 
-	      (return (* 100 (/ bond-count (1- (length object-list))))))))
-
+;---------------------------------------------
+; local-bond-category-relevance
 ;---------------------------------------------
 
-(defmethod (workspace-string :local-direction-category-relevance)
-           (given-direction-category &aux object-list)
-
-; A function of how many bonds in the string have the given 
-; direction-category.  This function is not perfect; it gives just a rough 
-; estimate of the relevance of this direction category.
-; This method is used in the top-down-bond-scout--direction codelet and the
-; top-down-group-scout--direction codelet as a way of probabilistically 
-; choosing a string to work in.
-
-  (setq object-list (send self :non-string-spanning-object-list))
-  (if* (= (length object-list) 1) 
-   then 0
-   else (loop for obj in object-list
-              when (and (send obj :right-bond)
-	                (eq (send (send obj :right-bond) 
-				  :direction-category) 
-		            given-direction-category))
-              count t into bond-count
-              finally 
-	      (return (* 100 (/ bond-count (1- (length object-list))))))))
+;---------------------------------------------
+; local-direction-category-relevance
+;---------------------------------------------
 
 ;---------------------------------------------
 ; recursive-group-member? | Gropu.is_recursive_member

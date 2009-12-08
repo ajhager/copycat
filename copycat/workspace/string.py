@@ -239,58 +239,12 @@ class String(object):
             values = [obj.relative_importance for obj in leftmost_objects]
             return toolbox.weighted_select(values, leftmost_objects)
 
-    def local_bond_category_relevance(self, bond_category):
-        '''
-        A function of how many bonds in the string have the given bond
-        category. This function is not perfect; it gives just a rough
-        estimate of the relevance of this bond category.
-
-        It is used in top down bond scout - category and top down group
-        scout - category codelets as a way of probabilistically choosing
-        a string to work in.
-        '''
-        objects = self.non_string_spanning_objects()
-        if len(objects) == 1:
-            return 0
-        else:
-            bond_count = 0
-            for obj in objects:
-                if obj.right_bond:
-                    if obj.right_bond.bond_category == bond_category:
-                        bond_count += 1
-            return 100 * (float(bond_count) / (len(objects) - 1))
-
-    def local_direction_category_relevance(self, direction_category):
-        '''
-        A function of how many bonds in the string have the given direction
-        category. This function is not perfect; it gives just a rough
-        estimate of the relevance of this direction category.
-
-        It is used in the top down bond scout - direction and top down group
-        scout - direction codelets as a way of probabilistically choosing
-        a string to work in.
-        '''
-        objects = self.non_string_spanning_objects()
-        if len(objects) == 1:
-            return 0
-        else:
-            bond_count = 0
-            for obj in objects:
-                if obj.right_bond:
-                    if obj.right_bond.direction_category == direction_category:
-                        bond_count += 1
-            return 100 * (float(bond_count) / (len(objects) - 1))
-
     def update_relative_importances(self):
-        '''
-        Update the relative, normalized importances of all the objects in
-        the string.
-        '''
-        raw_importance = sum([o.raw_importance for o in self.objects() if o])
-        for obj in self.objects():
-            if not obj:
-                continue
-            if raw_importance == 0:
+        """Update the relative, normalized importances of all the objects in
+        the string."""
+        raw_importance = sum([o.raw_importance for o in self.get_objects()])
+        for obj in self.get_objects():
+             if raw_importance == 0:
                 importance = 0
             else:
                 quot = obj.raw_importance / float(raw_importance)
@@ -298,10 +252,35 @@ class String(object):
             obj.relative_importance = importance
 
     def update_intra_string_unhappiness(self):
-        '''
-        Calculate the average of the intra-string unhappiness of all the
-        objects in the string.
-        '''
-        unhappiness = [o.intra_string_unhappiness for o in self.objects() if o]
-        length = len(unhappiness)
-        self.intra_string_unhappiness = sum(unhappiness) / length
+        """Calculate the average of the intra-string unhappiness of all the
+        objects in the string."""
+        unhappiness = [o.intra_string_unhappiness for o in self.get_objects()]
+        self.intra_string_unhappiness = round(toolbox.average(*unhappiness))
+
+    def local_bond_category_relevance(self, bond_category):
+        """A function of how many bonds in the string have the given bond
+        category. This function is not perfect; it gives just a rough
+        estimate of the relevance of this bond category."""
+        objects = self.get_non_string_spanning_objects()
+        if len(objects) == 1:
+            return 0
+        bond_count = 0
+        for obj in objects:
+            if obj.right_bond:
+                if obj.right_bond.bond_category == bond_category:
+                    bond_count += 1
+        return 100 * (float(bond_count) / (len(objects) - 1))
+
+    def local_direction_category_relevance(self, direction_category):
+        """A function of how many bonds in the string have the given direction
+        category. This function is not perfect; it gives just a rough estimate
+        of the relevance of this direction category."""
+        objects = self.get_non_string_spanning_objects()
+        if len(objects) == 1:
+            return 0
+        bond_count = 0
+        for obj in objects:
+            if obj.right_bond:
+                if obj.right_bond.direction_category == direction_category:
+                    bond_count += 1
+        return 100 * (float(bond_count) / (len(objects) - 1))
