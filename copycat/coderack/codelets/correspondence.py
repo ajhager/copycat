@@ -167,7 +167,7 @@ class CorrespondenceBuilder(Codelet):
         # The proposed corresondence must win against an incompatible rule.
         incompatible_rule = correspondence.is_incompatible_rule()
         if incompatible_rule:
-            if not self.fight_it_out(correspondence, 1, [workspace.rule], 1):
+            if not workspace.fight_it_out(correspondence, 1, [workspace.rule], 1):
                 return
 
         # Break all incompatible structures.

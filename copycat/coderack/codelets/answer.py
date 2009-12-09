@@ -80,7 +80,7 @@ class AnswerBuilder(Codelet):
         for letter in answer_string_letters:
             workspace.answer_string.add_letter(letter)
         name = ""
-        for letter in workspace.answer_string.letters:
+        for letter in workspace.answer_string.get_letters():
             name += letter.name
         workspace.answer_string.name = name
 

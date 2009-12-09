@@ -18,9 +18,11 @@ from copycat.workspace import Structure
 import copycat.toolbox as toolbox
 
 class Rule(Structure):
-    def __init__(self, object_category1, descriptor1_facet, descriptor1,
-                 object_category2, replaced_description_type, relation=None):
+    def __init__(self, workspace, object_category1, descriptor1_facet,
+                 descriptor1, object_category2, replaced_description_type,
+                 relation=None):
         super(Rule, self).__init__()
+        self.workspace = workspace
         self.object_category1 = object_category1
         self.descriptor1_facet = descriptor1_facet
         self.descriptor1 = descriptor1
@@ -46,19 +48,20 @@ class Rule(Structure):
         return not self.descriptor1
 
     def calculate_internal_strength(self):
+        """Return the rule's internal strength."""
         if self.has_no_change():
             return 100
 
-        conceptual_depth1 = self.description1.conceptual_depth()
+        conceptual_depth1 = self.descriptor1.conceptual_depth
         if self.relation:
-            conceptual_depth2 = self.relation.conceptual_depth()
+            conceptual_depth2 = self.relation.conceptual_depth
         else:
-            conceptual_depth2 = self.description2.conceptual_depth()
+            conceptual_depth2 = self.description2.conceptual_depth
 
         conceptual_difference = abs(conceptual_depth1 - conceptual_depth2)
 
-        for obj in self.workspace.initial_string.objects:
-            if obj.has_changed():
+        for obj in self.workspace.initial_string.get_objects():
+            if obj.is_changed:
                 i_object = obj
                 break
 
@@ -73,21 +76,22 @@ class Rule(Structure):
             slipped_descriptors = []
             for d in i_object_corresponding_object.relevant_descriptions():
                 ds = d.apply_slippages(i_object_corresponding_object,
-                                       self.workspace.slippages)
+                                       self.workspace.slippages())
                 slipped_descriptors.append(ds.descriptor)
             if self.descriptor1 in slipped_descriptors:
                 shared_descriptor_term = 100
             else:
                 return 0
-
-        shared_descriptor_weight = round(((100 - self.descriptor1.conceptual_depth()) / \
-                                         10) ** 1.4)
-
-        rule_strength = round(toolbox.weighted_average([(toolbox.average([conceptual_depth1, conceptual_depth2]), 10)
-                                                     (100 - conceptual_difference, 12),
-                                                     (shared_descriptor_term, shared_descriptor_weight)]))
-
+            
+        depth = (100 - self.descriptor1.conceptual_depth) / 10.
+        shared_descriptor_weight = round(depth ** 1.4)
+        weights = [18, 12, shared_descriptor_weight]
+        items = [toolbox.average(conceptual_depth1, conceptual_depth2),
+                 100 - conceptual_difference,
+                 shared_descriptor_term]
+        rule_strength = round(toolbox.weighted_average(weights, items))
         return min(rule_strength, 100)
 
     def calculate_external_strength(self):
+        """Return external strength."""
         return self.internal_strength

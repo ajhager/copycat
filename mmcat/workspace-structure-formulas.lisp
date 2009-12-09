@@ -125,64 +125,12 @@
   result)
 	      
 ;---------------------------------------------
-
-(defmethod (rule :calculate-internal-strength) 
-           (&aux conceptual-depth1 conceptual-depth2 conceptual-depth-difference
-		 shared-descriptor-term shared-descriptor-weight
-                 i-obj i-obj-corresponding-object slipped-descriptors
-		 rule-strength)
-(block nil
-  (if* (send self :no-change?)
-   then (return 100))
-        
-  (setq conceptual-depth1 (send descriptor1 :conceptual-depth))
-  (setq conceptual-depth2 (if* (send self :relation?) 
-		      then (send relation :conceptual-depth)
-  	              else (send descriptor2 :conceptual-depth)))
-
-  ; there should be pressure for descriptor1 and the relation or descriptor2 
-  ; to have the same level of conceptual-depth
-  (setq conceptual-depth-difference (abs (- conceptual-depth1 conceptual-depth2)))
-
-  ; now see if descriptor1 is shared (perhaps modulo slippage) with the 
-  ; corresponding object, if any.
-  (setq i-obj (loop for obj in (send *initial-string* :object-list)
-	            when (send obj :changed?) return obj))
-
-  (setq i-obj-corresponding-object 
-	(if* (send i-obj :correspondence)
-	 then (send (send i-obj :correspondence) :obj2) else nil))
-
-  (if* (null i-obj-corresponding-object) 
-   then (setq shared-descriptor-term 0)
-   else (setq slipped-descriptors
-	      (loop for d in (send i-obj-corresponding-object 
-			           :relevant-descriptions)
-		    collect (send (send d :apply-slippages 
-					i-obj-corresponding-object
-					(send *workspace* :slippage-list))
-				  :descriptor)))
-
-        (if* (memq descriptor1 slipped-descriptors)
-         then (setq shared-descriptor-term 100)
-         else (return 0)))  ; can't make this rule.
-
-  ; the less general descriptor1 is, the more we care if it's shared.
-  (setq shared-descriptor-weight 
-	(round (expt (/ (fake-reciprocal (send descriptor1 :conceptual-depth)) 10)
-		     1.4)))
-
-  (setq rule-strength 
-	(round (weighted-average 
- 	         `((,(expt (average conceptual-depth1 conceptual-depth2) 1.1) . 18)
-		   (,(fake-reciprocal conceptual-depth-difference) . 12)
-		   (,shared-descriptor-term . ,shared-descriptor-weight)))))
-  (min rule-strength 100)))
-
+; rule.calculate-internal-strength
 ;---------------------------------------------
 
-(defmethod (rule :calculate-external-strength) ()
-  (send self :internal-strength))
+;---------------------------------------------
+; rule.calculate-external-strength
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace-structure.calculate-total-strength

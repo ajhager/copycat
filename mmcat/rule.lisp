@@ -117,15 +117,6 @@
 
 (defun rule-strength-tester (proposed-rule &aux proposed-rule-strength
 				                build-probability urgency)
-; Calculates the proposed-rule's strength, and probabilistically decides
-; whether or not to post a rule-builder codelet.  If so, the urgency of
-; the rule-builder codelet is a function of the strength.
-(block nil
-  (if* %verbose% 
-   then (format t "In rule-strength-tester with rule ")
-        (send proposed-rule :print))
-
-  ; Calculate the proposed rule's strength.
   (send proposed-rule :update-strength-values)
   (setq proposed-rule-strength (send proposed-rule :total-strength))
   (if* %verbose% 

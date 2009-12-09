@@ -233,11 +233,11 @@ class GroupTopDownCategoryScout(Codelet):
                 bond_to_add = None
             elif all([next_bond.bond_category == bond_category,
                       next_bond.direction_category == direction_category,
-                      next_bond.bond_facet == facet])
+                      next_bond.bond_facet == facet]):
                 bond_to_add = next_bond
             elif all([next_bond.bond_category == opposite_bond_category,
                       next_bond.direction_category == opposite_direction_category,
-                      next_bond.bond_facet == facet]:
+                      next_bond.bond_facet == facet]):
                 bond_to_add = next_bond.flipped_version()
 
             if bond_to_add:

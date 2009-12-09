@@ -1187,18 +1187,20 @@ class Workspace(object):
         descriptions in the rule.
         '''
         if not i_object:
-            proposed_rule = Rule(None, None, None, None, None)
+            proposed_rule = Rule(self, None, None, None, None, None)
         else:
             obj_category = slipnet.plato_object_category
             if isinstance(m_description, ExtrinsicDescription):
-                proposed_rule = Rule(i_object.get_descriptor(obj_category),
+                proposed_rule = Rule(self,
+                                     i_object.get_descriptor(obj_category),
                                      i_description.description_type,
                                      i_description.descriptor,
                                      m_object.get_descriptor(obj_category),
                                      m_description.description_type_related,
                                      m_description.relation)
             else:
-                proposed_rule = Rule(i_object.get_descriptor(obj_category),
+                proposed_rule = Rule(self,
+                                     i_object.get_descriptor(obj_category),
                                      i_description.description_type,
                                      i_description.descriptor,
                                      m_object.get_descriptor(obj_category),
@@ -1217,9 +1219,9 @@ class Workspace(object):
 
     def activate_from_workspace_rule_descriptions(self, rule):
         if rule.descriptor1:
-            rule.descriptor1.activate_from_workspace()
+            rule.descriptor1.activation_buffer += self.activation
         if rule.expresses_relation():
-            rule.relation.activate_from_workspace()
+            rule.relation.activation_buffer += self.activation
         else:
             if rule.descriptor2:
-                rule.descriptor2.activate_from_workspace()
+                rule.descriptor2.activation_buffer += self.activation

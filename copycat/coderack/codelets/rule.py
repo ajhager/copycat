@@ -36,7 +36,7 @@ class RuleBuilder(Codelet):
 
         # Fight an existing rule.
         if workspace_rule:
-            result = workspace.fight_it_out(rule, 1, workspace_rule, 1)
+            result = workspace.fight_it_out(rule, 1, [workspace_rule], 1)
             if not result:
                 return
 
@@ -74,7 +74,6 @@ class RuleScout(Codelet):
         i_object = changed_objects[0]
         m_object = i_object.replacement.object2
 
-        # Get all relevant distinguishing descriptions.
         if not i_object.correspondence:
             i_descriptions = i_object.rule_initial_string_descriptions()
         else:
@@ -97,6 +96,7 @@ class RuleScout(Codelet):
                          m_object.rule_modified_string_descriptions()
         if not m_descriptions:
             return # Fizzle
+
         depths = [d.conceptual_depth() for d in m_descriptions]
         m_probabilities = workspace.temperature_adjusted_values(depths)
         m_description = toolbox.weighted_select(m_probabilities, m_descriptions)
@@ -110,16 +110,14 @@ class RuleScout(Codelet):
                         m_description = description
                         break
 
-        workspace.propose_rule(i_object, i_description, m_object, m_description)
+        return workspace.propose_rule(i_object, i_description,
+                                      m_object, m_description)
 
 class RuleStrengthTester(Codelet):
-    '''
-    Calculates the proposed rule's strength and probabilistically decides
+    """Calculate the proposed rule's strength and probabilistically decides
     whether or not to post a rule builder codelet with urgency a fucntion
-    for its strength.
-    '''
+    for its strength."""
     def run(self, coderack, slipnet, workspace):
-        # Calculate strength.
         rule = self.arguments[0]
         rule.update_strengths()
         strength = rule.total_strength
@@ -142,7 +140,8 @@ class RuleTranslator(Codelet):
         if not workspace_rule:
             return
         if workspace_rule.has_no_change:
-            workspace.translated_rule = Rule(None, None, None, None, None, None)
+            workspace.translated_rule = Rule(workspace, None, None, None,
+                                             None, None, None)
             return
 
         # If the temperature is too high, fizzle.
