@@ -19,24 +19,25 @@ from copycat.workspace import String
 
 class AnswerBuilder(Codelet):
     def run(self, coderack, slipnet, workspace):
+        workspace.answer_string = String(workspace, "")
+
         workspace.changed_length_group = None
         workspace.snag_object = None
 
         if workspace.translated_rule.has_no_change():
-            objects_to_change = None
+            objects_to_change = []
         else:
             objects_to_change = workspace.objects_to_change_for_answer()
 
         desc_type = workspace.translated_rule.replaced_description_type
 
-        # Change the objects needed in the target string.
         answer_string_letters = []
-        if objects_to_change:
-            for obj in workspace.target_string.objects():
-                if obj in objects_to_change:
-                    letters = workspace.modified_letters_for_answer(obj, desc_type)
-                    answer_string_letters.extend(letters)
+        for obj in workspace.target_string.get_objects():
+            if obj in objects_to_change:
+                letters = workspace.modified_letters_for_answer(obj, desc_type)
+                answer_string_letters.extend(letters)
 
+        # DEAL WITH SNAG NEEDS CHECKED
         if workspace.snag_object:
             workspace.snag_count += 1
             workspace.last_snag_time = coderack.time
@@ -66,23 +67,16 @@ class AnswerBuilder(Codelet):
         answer_string_letters.extend(letters)
         if workspace.changed_length_group:
             for letter in answer_string_letters:
-                group_position = self.changed_length_group.right_string_position
-                if (letter not in self.modified_letters) and \
-                   (letter.left_string_position > group_position):
-                    letter.left_string_position += self.amount_length_changed
-                    letter.right_string_position = letter.left_string_position+\
-                            self.amount_length_changed
+                group_position = workspace.changed_length_group.right_string_position
+                if all([letter not in workspace.modified_letters,
+                        letter.left_string_position > group_position]):
+                    letter.left_string_position += workspace.amount_length_changed
+                    letter.right_string_position = letter.left_string_position + \
+                            workspace.amount_length_changed
 
-        name = ""
-        for letter in answer_string_letters:
-            name += letter.name
-        workspace.answer_string = String(workspace, name)
+        workspace.answer_string.length = len(answer_string_letters)
         for letter in answer_string_letters:
             workspace.answer_string.add_letter(letter)
-        name = ""
         for letter in workspace.answer_string.get_letters():
-            name += letter.name
-        workspace.answer_string.name = name
-
-        workspace.answer_found = True
+            workspace.answer_string.name += letter.name
 

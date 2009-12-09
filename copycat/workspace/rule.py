@@ -45,7 +45,7 @@ class Rule(Structure):
         return self.relation
 
     def has_no_change(self):
-        return not self.descriptor1
+        return self.descriptor1 == None
 
     def calculate_internal_strength(self):
         """Return the rule's internal strength."""

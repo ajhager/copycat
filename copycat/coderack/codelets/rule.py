@@ -139,7 +139,7 @@ class RuleTranslator(Codelet):
         workspace_rule = workspace.rule
         if not workspace_rule:
             return
-        if workspace_rule.has_no_change:
+        if workspace_rule.has_no_change():
             workspace.translated_rule = Rule(workspace, None, None, None,
                                              None, None, None)
             return
