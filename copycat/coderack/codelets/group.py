@@ -132,8 +132,7 @@ class GroupStrengthTester(Codelet):
         return [(GroupBuilder([group]), strength)]
 
 class GroupTopDownCategoryScout(Codelet):
-    '''
-    Chooses an object, a direction to scan in, and a number of bonds to
+    """Choose an object, a direction to scan in, and a number of bonds to
     scan in that direction. The direction category of the group is the
     direction of the first bond scanned. If there are no bonds and the
     group category is not plato-same-group, the chooses a direction
@@ -143,72 +142,66 @@ class GroupTopDownCategoryScout(Codelet):
     objects scanned and posts a group length tester codelet with urgency
     a function of the degree of association of bonds of the given bond
     category.
-    '''
+    """
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
-        bond_category = nodes.get_related_node(category, nodes.plato_bond_category)
+        bond_category = nodes.get_related_node(category,
+                                               nodes.plato_bond_category)
 
-        # Choose a string based on local bond category relevance.
         i_string = workspace.initial_string
         i_relevance = i_string.local_bond_category_relevance(bond_category)
         i_unhappiness = i_string.intra_string_unhappiness
         t_string = workspace.target_string
         t_relevance = t_string.local_bond_category_relevance(bond_category)
         t_unhappiness = t_string.intra_string_unhappiness
-        choices = [i_string, t_string]
         weights = [round(toolbox.average(i_relevance, i_unhappiness)),
                    round(toolbox.average(t_relevance, t_unhappiness))]
-        string = choices[toolbox.weighted_index(weights)]
+        choices = [i_string, t_string]
+        string = toolbox.weighted_select(weights, choices)
 
-        # Choose an object by intra string salience.
-        object = string.get_random_object('intra_string_salience')
-        if object.spans_whole_string():
-            return
+        obj = string.get_random_object('intra_string_salience')
+        if obj.spans_whole_string():
+            return # Fizzle
 
-        # Choose a direction in which to scan.
-        if object.is_leftmost_in_string():
+        if obj.is_leftmost_in_string():
             direction = nodes.plato_right
-        elif object.is_rightmost_in_string():
+        elif obj.is_rightmost_in_string():
             direction = nodes.plato_left
         else:
             activations = [nodes.plato_left.activation, nodes.plato_right.activation]
-            index = toolbox.weighted_index(activations)
-            direction = [nodes.plato_left, nodes.plato_right][index]
+            choices = [nodes.plato_left, nodes.plato_right]
+            direction = toolbox.weighted_select(activations, choices) 
 
-        # Choose the number of bonds to scan.
         number = toolbox.weighted_index(string.bonds_to_scan_distribution)
 
-        # Get the first bond in that direction.
         if direction == nodes.plato_left:
-            bond = object.left_bond
+            bond = obj.left_bond
         else:
-            bond = object.right_bond
+            bond = obj.right_bond
 
-        if not bond  or (bond.bond_category != bond_category):
-            if isinstance(object, Group):
-                return
-            objects = [object]
+        if not bond or (bond.bond_category != bond_category):
+            if obj.type_name == 'group':
+                return # Fizzle
+            objects = [obj]
             bonds = []
             if category == nodes.plato_sameness_group:
-                possible_single_letter_group_direction = None
+                single_letter_group_direction = None
             else:
                 choices = [nodes.plato_left, nodes.plato_right]
                 weights = [node.local_descriptor_support(string, nodes.plato_group) \
                             for node in choices]
                 index = toolbox.weighted_index(weights)
-                possible_single_letter_group_direction = choices[index]
+                single_letter_group_direction = choices[index]
+                single_letter_group = Group(workspace, string, category,
+                                            single_letter_group_direction,
+                                            obj, obj, objects, bonds)
 
-                possible_single_letter_group = Group(workspace, string, category,
-                                                     possible_single_letter_group_direction,
-                                                     object, object, objects, bonds)
-
-                probability = possible_single_letter_group.single_letter_group_probability()
+                probability = single_letter_group.single_letter_group_probability()
                 if toolbox.flip_coin(probability):
                     return workspace.propose_group(objects, bonds, category,
-                                                   possible_single_letter_group_direction)
-            return
-            
+                                                   single_letter_group_direction)
+            return # Fizzle
         
         direction_category = bond.direction_category
         facet = bond.bond_facet
@@ -218,7 +211,6 @@ class GroupTopDownCategoryScout(Codelet):
             opposite_direction_category = nodes.get_related_node(direction_category,
                                                                  nodes.plato_opposite)
 
-        # Get objects and bonds.
         objects = [bond.left_object, bond.right_object]
         bonds = [bond]
         next_bond = bond
@@ -237,16 +229,15 @@ class GroupTopDownCategoryScout(Codelet):
                 else:
                     next_object = next_bond.right_object
 
-            # Decide whether or not to add bond.
             if not next_bond:
                 bond_to_add = None
-            elif (next_bond.bond_category == bond_category) and \
-                 (next_bond.direction_category == direction_category) and\
-                 (next_bond.bond_facet == facet):
+            elif all([next_bond.bond_category == bond_category,
+                      next_bond.direction_category == direction_category,
+                      next_bond.bond_facet == facet])
                 bond_to_add = next_bond
-            elif (next_bond.bond_category == opposite_bond_category) and \
-                 (next_bond.direction_category == opposite_direction_category) and \
-                 (next_bond.bond_facet == facet):
+            elif all([next_bond.bond_category == opposite_bond_category,
+                      next_bond.direction_category == opposite_direction_category,
+                      next_bond.bond_facet == facet]:
                 bond_to_add = next_bond.flipped_version()
 
             if bond_to_add:
@@ -255,7 +246,6 @@ class GroupTopDownCategoryScout(Codelet):
             else:
                 break
 
-        # Propose the group.
         return workspace.propose_group(objects, bonds, category, direction_category)
 
 class GroupTopDownDirectionScout(Codelet):
