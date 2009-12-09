@@ -31,10 +31,36 @@ from copycat.workspace.bond import Bond
 from copycat.workspace.replacement import Replacement
 from copycat.workspace.rule import Rule
 from copycat.workspace.string import String
+from copycat.workspace.distribution import Distribution
 
 from copycat.coderack.codelets import *
 
 import copycat.slipnet as slipnet
+
+very_low_distribution = Distribution("very_low")
+for i, v in {10:5, 20:150, 30:5, 40:2, 50:1,
+             60:1, 70:1, 80:1, 90:1, 100:1}.items():
+    very_low_distribution.set(i, v)
+
+low_distribution = Distribution("low")
+for i, v in {10:2, 20:5, 30:150, 40:5, 50:2,
+             60:1, 70:1, 80:1, 90:1, 100:1}.items():
+    low_distribution.set(i, v)
+
+medium_distribution = Distribution("medium")
+for i, v in {10:1, 20:2, 30:5, 40:150, 50:5,
+             60:2, 70:1, 80:1, 90:1, 100:1}.items():
+    medium_distribution.set(i, v)
+
+high_distribution = Distribution("high")
+for i, v in {10:1, 20:1, 30:2, 40:5, 50:150,
+             60:5, 70:2, 80:1, 90:1, 100:1}.items():
+    high_distribution.set(i, v)
+
+very_high_distribution = Distribution("very_high")
+for i, v in {10:5, 20:150, 30:5, 40:2, 50:1,
+             60:1, 70:1, 80:1, 90:1, 100:1}.items():
+    very_high_distribution.set(i, v)
 
 class Workspace(object):
     """Workspace
@@ -907,23 +933,22 @@ class Workspace(object):
            self.target_string.length == 1:
             bond_density = 1
         else:
-            a = len(self.initial_string.bonds + \
-                    self.target_string.bonds)
+            a = len(self.initial_string.get_bonds() + \
+                    self.target_string.get_bonds())
             b = (1 - self.initial_string.length) + \
                     (1 - self.target_string.length)
             bond_density = a / float(b)
 
-        # FIXME: Return actual distributions.
         if bond_density >= .8:
-            return 'very_low_answer_temperature_threshold_distribution'
+            return very_low_distribution
         elif bond_density >= .6:
-            return 'low_answer_temperature_threshold_distribution'
+            return low_distribution
         elif bond_density >= .4:
-            return 'medium_answer_temperature_threshold_distribution'
+            return medium_distribution
         elif bond_density >= .2:
-            return 'high_answer_temperature_threshold_distribution'
+            return high_distribution
         else:
-            return 'very_high_answer_temperature_threshold_distribution'
+            return very_high_distribution
 
     def temperature_adjusted_probability(self, probability):
         if probability == 0:
@@ -1225,3 +1250,4 @@ class Workspace(object):
         else:
             if rule.descriptor2:
                 rule.descriptor2.activation_buffer += self.activation
+

@@ -215,6 +215,4 @@
 		    *answer-string* 
 		    (send letter :get-descriptor plato-letter-category)
 		    (send letter :left-string-position))))
-		  
-;---------------------------------------------
 

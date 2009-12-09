@@ -1,15 +1,3 @@
-;---------------------------------------------
-; UTIL: This file contains utilities for Copycat.
-;--------------------------------------------- 
-
-(in-package 'user)
-
-;---------------------------------------------
-
-; SELECTION FUNCTIONS
-
-;---------------------------------------------
-
 (defun select-list-position (list &aux (sum 0) (value 0))
 ; LIST is a list of integers. Probabilistically chooses one of the 
 ; integers on the list according to value. Returns the position of that 
@@ -68,48 +56,17 @@
 		   list))))
 
 ;---------------------------------------------
-
-; PROBABILITY DISTRIBUTIONS
-
+; make-probability-distribution | Distribution.__init__
+; defflavor probability-distribution
+; probability-distribution.update
 ;---------------------------------------------
 
-(defflavor probability-distribution
-    (probability-vector length probability-sum pname)
-    ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
-
+;---------------------------------------------
+; probability-distribution.vset | Distribution.set_value
 ;---------------------------------------------
 
-(defun make-probability-distribution (pname vector-size)
-; Returns a new probability distribution.
-  (make-instance 'probability-distribution
-      :pname pname
-      :probability-vector (make-vector vector-size)))
-
 ;---------------------------------------------
-
-(defmethod (probability-distribution :update) ()
-  (send self :set-length (vsize probability-vector))
-  (send self :set-probability-sum (vector-sum probability-vector)))
-
-;---------------------------------------------
-
-(defmethod (probability-distribution :vset) (index value)
-  (vset probability-vector index value))
-
-;---------------------------------------------
-
-(defmethod (probability-distribution :choose) ()
-; Returns a number between 0 and 100, choosing probabilistically
-; according to the given distribution.
-  (select-list-position (vector-to-list probability-vector)))
-         
-;---------------------------------------------
-
-; STRUCTURE-COMPETITION FUNCTIONS
-
+; probability-distribution.choose | Distribution.choose
 ;---------------------------------------------
 
 (defun structure-vs-structure (structure1 weight1 structure2 weight2 
@@ -550,6 +507,4 @@
   (with-open-file (istream random-state-file  :direction :input)
       (setq random-state-list (read istream)))
   (nth n random-state-list))
-
-;---------------------------------------------
 

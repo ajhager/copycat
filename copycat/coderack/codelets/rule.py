@@ -145,7 +145,7 @@ class RuleTranslator(Codelet):
             return
 
         # If the temperature is too high, fizzle.
-        threshold = workspace.answer_temperature_threshold_distribution.choose()
+        threshold = workspace.answer_temperature_threshold_distribution().choose()
         if workspace.temperature > threshold:
             return
 
