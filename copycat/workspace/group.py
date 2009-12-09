@@ -111,11 +111,13 @@ class Group(Object, Structure):
             self.add_description(description)
 
     def __eq__(self, other):
+        """Return True if the given object is equal to this group."""
         if other == None or not isinstance(other, Group):
             return False
-        return self.left_object_position == other.left_object_position and \
-                self.right_object_position == other.right_object_position and \
-                self.group_category == other.group_category
+        return all([self.left_object_position == other.left_object_position,
+                    self.right_object_position == other.right_object_position,
+                    self.direction_category == other.direction_category,
+                    self.group_category == other.group_category])
 
     def calculate_internal_strength(self):
         '''
@@ -234,26 +236,24 @@ class Group(Object, Structure):
         return self.group == other.group
 
     def is_subgroup_of(self, other):
+        """Return True if this group is a subgroup of the given group."""
         return other.left_object_position <= self.left_object_position and \
                 other.right_object_position >= self.right_object_position
 
     def overlaps(self, other):
+        """Return True if the two groups overlap."""
         return set(self.objects).issubset(set(other.objects))
 
-    def incompatible_groups(self):
-        '''
-        Return a list of the groups that are incompatible with the group.
-        '''
+    def get_incompatible_groups(self):
+        """Return a list of the groups that are incompatible with the group."""
         groups = [obj.group for obj in self.objects if obj.group]
         groups = list(set(toolbox.flatten(groups)))
         if self in groups:
             groups.remove(self)
         return groups
 
-    def incompatible_correspondences(self):
-        '''
-        Return a list of the correspondences that are incompatible.
-        '''
+    def get_incompatible_correspondences(self):
+        """Return a list of the correspondences that are incompatible."""
         correspondences = []
         for obj in self.objects:
             if obj.correspondence and \
@@ -303,18 +303,15 @@ class Group(Object, Structure):
             return self.right_object.rightmost_letter()
 
     def is_leftmost_in_string(self):
-        '''
-        Return True if the group is leftmost in its string.
-        '''
+        """Return True if the group is leftmost in its string."""
         return self.left_object_position == 0
 
     def is_rightmost_in_string(self):
-        '''
-        Return True if the group is righmost in its string.
-        '''
+        """Return True if the group is righmost in its string."""
         return self.right_object_position == self.string.length - 1
 
-    def left_neighbor(self):
+    def get_left_neighbor(self):
+        """Return the leftmost neighbor, if any."""
         if not self.leftmost_in_string():
             position = self.left_object_position - 1
             possible_left_neighbor = self.string.get_letter(position).group
@@ -323,7 +320,8 @@ class Group(Object, Structure):
                    not self.is_subgroup(possible_left_neighbor):
                     return possible_left_neighbor
 
-    def right_neighbor(self):
+    def get_right_neighbor(self):
+        """Return the rightmost neighbor, if any."""
         if not self.rightmost_in_string():
             position = self.right_object_position + 1
             possible_right_neighbor = self.string.get_letter(position).group
@@ -342,13 +340,9 @@ class Group(Object, Structure):
         return len(self.objects)
 
     def flipped_version(self):
-        '''
-        Return the flipped version of this group.
-        '''
-        if not (self.group_category == nodes.plato_predecessor_group or\
-                self.group_category == nodes.plato_successor_group):
-            return self
-        else:
+        """Return the flipped version of this group."""
+        if self.group_category == nodes.plato_predecessor_group or \
+                self.group_category == nodes.plato_successor_group:
             new_bonds = [bond.flipped_version() for bond in self.bonds]
             opposite = nodes.plato_opposite
             group_category = nodes.get_related_node(self.group_category, opposite)
@@ -359,6 +353,8 @@ class Group(Object, Structure):
                                   self.right_object, self.objects, new_bonds)
             flipped_group.proposal_level = self.proposal_level
             return flipped_group
+        else:
+            return self
 
     def get_bonds_to_be_flipped(self):
         """Return a list of the bonds that need to be flipped in order for the
@@ -371,30 +367,25 @@ class Group(Object, Structure):
         return bonds_to_be_flipped
 
     def spans_whole_string(self):
+        """Return True if the group spans the string."""
         return self.letter_span() == self.string.length
 
     def is_proposed(self):
+        """Return True if the group's proposal level is less than built."""
         return self.proposal_level < self.workspace.built
 
     def single_letter_group_probability(self):
-        '''
-        Return the probability to be used in deciding whether or not to propose
-        the single letter group.
-        '''
-        n = self.number_of_local_supporting_groups()
-        if n == 1:
-            exponent = 4
-        elif n == 2:
-            exponent = 2
-        else:
-            exponent =  1
-
+        """Return the probability to be used in deciding whether or not to
+        propose the single letter group."""
+        exp = {1:4, 2:2}.get(self.number_of_local_supporting_groups(), 1)
         a = self.local_support() / 100.
         b = nodes.plato_length.activation / 100.
-        prob = (a * b) ** exponent
+        prob = (a * b) ** exp
         return self.workspace.temperature_adjusted_probability(prob)
 
     def length_description_probability(self):
+        """Return the probability to be used in deciding to add a length
+        description."""
         if self.length() > 5:
             return 0
         a = self.length() ** 3

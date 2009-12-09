@@ -60,7 +60,7 @@ class GroupBuilder(Codelet):
                                           bonds_to_flip, 1):
                 return # Fizzle
 
-        incompatible_groups = group.incompatible_groups()
+        incompatible_groups = group.get_incompatible_groups()
         for incompatible_group in incompatible_groups:
             if (group.group_category == incompatible_group.group_category) and\
             (group.direction_category == incompatible_group.direction_category):
@@ -74,7 +74,7 @@ class GroupBuilder(Codelet):
                                           incompatible_weight):
                 return # Fizzle
 
-        incompatible_correspondences = group.incompatible_correspondences()
+        incompatible_correspondences = group.get_incompatible_correspondences()
         if group.direction_category and incompatible_correspondences:
             if not workspace.fight_it_out(group, 1,
                                           incompatible_correspondences, 1):

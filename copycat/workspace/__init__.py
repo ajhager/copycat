@@ -706,6 +706,62 @@ class Workspace(object):
 
         return [(GroupStrengthTester([group]), urgency)]
 
+    def build_group(self, group):
+        """Build the given group."""
+        string = group.string
+        group.proposal_level = self.built
+        string.add_group(group)
+        for obj in group.objects:
+            obj.group = group
+        for bond in group.bonds:
+            bond.group = group
+        for d in group.descriptions:
+            d.descriptor.activation_buffer += self.activation
+
+    def break_group(self, group):
+        """Break the given group."""
+        string = group.string
+        if group.group:
+            self.break_group(group.group)
+        string.remove_group(group)
+
+        proposed_bonds = []
+        for i in range(string.highest_string_number):
+            bonds = string.get_proposed_bond(group.string_number, i)
+            if bonds:
+                proposed_bonds.extend(bonds)
+            bonds = string.get_proposed_bond(i, group.string_number)
+            if bonds:
+                proposed_bonds.extend(bonds)
+        for bond in set(proposed_bonds):
+            string.remove_proposed_bond(bond)
+
+        for bond in group.incoming_bonds + group.outgoing_bonds:
+            self.break_bond(bond)
+
+        proposed_correspondences = []
+        if string == self.initial_string:
+            for i in range(self.target_string.highest_string_number):
+                c = self.get_proposed_correspondence(group.string_number, i)
+                if c:
+                    proposed_correspondences.append(c)
+        else:
+            for i in range(self.initial_string.highest_string_number):
+                c = self.get_proposed_correspondence(group.string_number, i)
+                if c:
+                    proposed_correspondences.append(c)
+        for c in toolbox.flatten(proposed_correspondences):
+            self.remove_proposed_correspondence(c)
+
+        if group.correspondence:
+            self.break_correspondence(group.correspondence)
+
+        for obj in group.objects:
+            obj.group = None
+
+        for bond in group.bonds:
+            bond.group = None
+
     def build_description(self, description):
         """Build the new description."""
         if description.is_bond_description():
@@ -819,62 +875,6 @@ class Workspace(object):
         correspondence.object1.correspondence = None
         correspondence.object2.correspondence = None
         self.delete_correspondence(correspondence)
-
-    def build_group(self, group):
-        """Build the given group."""
-        string = group.string
-        group.proposal_level = self.built
-        string.add_group(group)
-        for obj in group.objects:
-            obj.group = group
-        for bond in group.bonds:
-            bond.group = group
-        for d in group.descriptions:
-            d.descriptor.activation_buffer += self.activation
-
-    def break_group(self, group):
-        """Break the given group."""
-        string = group.string
-        if group.group:
-            self.break_group(group.group)
-        string.remove_group(group)
-
-        proposed_bonds = []
-        for i in range(string.highest_string_number):
-            bonds = string.get_proposed_bond(group.string_number, i)
-            if bonds:
-                proposed_bonds.extend(bonds)
-            bonds = string.get_proposed_bond(i, group.string_number)
-            if bonds:
-                proposed_bonds.extend(bonds)
-        for bond in set(proposed_bonds):
-            string.remove_proposed_bond(bond)
-
-        for bond in group.incoming_bonds + group.outgoing_bonds:
-            self.break_bond(bond)
-
-        proposed_correspondences = []
-        if string == self.initial_string:
-            for i in range(self.target_string.highest_string_number):
-                c = self.get_proposed_correspondence(group.string_number, i)
-                if c:
-                    proposed_correspondences.append(c)
-        else:
-            for i in range(self.initial_string.highest_string_number):
-                c = self.get_proposed_correspondence(group.string_number, i)
-                if c:
-                    proposed_correspondences.append(c)
-        for c in toolbox.flatten(proposed_correspondences):
-            self.remove_proposed_correspondence(c)
-
-        if group.correspondence:
-            self.break_correspondence(group.correspondence)
-
-        for obj in group.objects:
-            obj.group = None
-
-        for bond in group.bonds:
-            bond.group = None
 
     def possible_group_bonds(self, bond_category, direction_category,
                              bond_facet, bonds):

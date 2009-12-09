@@ -18,8 +18,6 @@
 				 ; from other descriptions since they are not 
 				 ; always used in the same way.
 
-;---------------------------------------------
-
 (defun make-group (string group-category direction-category 
 	           left-obj right-obj object-list bond-list 
 		   &aux new-group new-group-letter-category 
@@ -124,6 +122,79 @@
 		                (get-plato-number (send new-group :length))))
   new-group)
 
+(defun in-group? (obj1 obj2)
+; Returns t if the two objects are in a group.
+ (and (send obj1 :group) (eq (send obj1 :group) (send obj2 :group))))
+
+;---------------------------------------------
+; subgroup? | Group.is_subgroup_of
+;---------------------------------------------
+
+;---------------------------------------------
+; overlaps? | Group.overlaps
+;---------------------------------------------
+
+;---------------------------------------------
+; get-incompatible-groups
+;---------------------------------------------
+
+;---------------------------------------------
+; get-incompatible-correspondences
+;---------------------------------------------
+
+(defmethod (group :incompatible-correspondence?) 
+           (c obj &aux string-position-category-concept-mapping other-obj
+		    other-bond group-concept-mapping)
+; Returns t if the given correspondence is incompatible with the given group.
+(block nil
+  (setq string-position-category-concept-mapping
+        (loop for cm in (send c :concept-mapping-list)
+              when (eq (send cm :description-type1) plato-string-position-category)
+	      return cm))
+
+  (if* (null string-position-category-concept-mapping)
+   then (return nil))
+  (setq other-obj (send c :other-obj obj))
+  (if* (send other-obj :leftmost-in-string?)
+   then (setq other-bond (send other-obj :right-bond))
+   else (if* (send other-obj :rightmost-in-string?)
+	 then (setq other-bond (send other-obj :left-bond))))
+  (if* (or (null other-bond) 
+	   (null (send other-bond :direction-category))) 
+   then (return nil))
+  (setq group-concept-mapping
+        (make-concept-mapping 
+	    plato-direction-category plato-direction-category
+ 	    direction-category (send other-bond :direction-category)
+	    nil nil))
+  (if* (incompatible-concept-mappings? 
+	   group-concept-mapping string-position-category-concept-mapping)
+   then t)))
+
+;---------------------------------------------
+; group.get-bonds-to-be-flipped | Group.get_bonds_to_be_flipped
+;---------------------------------------------
+
+;---------------------------------------------
+; spans-whole-string?
+;---------------------------------------------
+
+;---------------------------------------------
+; proposed?
+;---------------------------------------------
+
+;---------------------------------------------
+; propose-group | Workspace.propose_group
+;---------------------------------------------
+  
+;---------------------------------------------
+; single-letter-group-probability
+;---------------------------------------------
+
+;---------------------------------------------
+; length-description-probability
+;---------------------------------------------
+
 ;----------------------------------------------
 ; group.print | REMOVED
 ;---------------------------------------------
@@ -141,52 +212,15 @@
 ; group.rightmost-letter | Group.rightmost_letter
 ;---------------------------------------------
 
-(defmethod (group :leftmost-in-string?) ()
-; Returns t if the group is leftmost in its string.
-  (if* (= left-obj-position 0) then t else nil))
-
+;---------------------------------------------
+; leftmost-in-string?
+; rightmost-in-string?
 ;---------------------------------------------
 
-(defmethod (group :rightmost-in-string?) ()
-; Returns t if the group is rightmost in its string.
-  (if* (= right-obj-position (1- (send string :length))) 
-   then t else nil))
-
 ;---------------------------------------------
-
-(defmethod (group :left-neighbor) (&aux possible-left-neighbor)
-  (if* (send self :leftmost-in-string?) 
-   then nil
-   else (setq possible-left-neighbor
-	      (send (send string :get-letter (1- left-obj-position)) 
-		    :group))
-        (if* (null possible-left-neighbor) 
-	 then nil
-	 else ; If this group is grouped with the object to the 
-	      ; left, or if this group is a subgroup of the group to the left,
-              ; don't count the larger group as the left-neighbor.
-              (if* (and (not (memq self (send possible-left-neighbor 
-					      :object-list)))
-			(not (subgroup? self possible-left-neighbor)))
-               then possible-left-neighbor else nil))))
-
+; left-neighbor | Group.get_left_neighbor
+; right-neighbor | Group.get_right_neighbor
 ;---------------------------------------------
-
-(defmethod (group :right-neighbor) (&aux possible-right-neighbor)
-  (if* (send self :rightmost-in-string?) 
-   then nil
-   else (setq possible-right-neighbor
-	      (send (send string :get-letter (1+ right-obj-position)) 
-		    :group))
-        (if* (null possible-right-neighbor)
-         then nil
-	 else ; If this group is grouped with the object to the 
-              ; right, or if this group is a subgroup of the group to the 
-	      ; right, don't count the larger group as the right-neighbor.
-              (if* (and (not (memq self (send possible-right-neighbor 
-					      :object-list)))
-			(not (subgroup? self possible-right-neighbor)))
-               then possible-right-neighbor else nil))))
 
 ;---------------------------------------------
 ; build-group | Workspace.build_group
@@ -564,149 +598,15 @@
 ; group-builder | GroupBuilder
 ;---------------------------------------------
 
-(defmethod (group :flipped-version) (&aux new-bond-list flipped-group)
-; Returns the flipped version of this group (e.g., if the group is
-; a successor group going to the right, returns a predecessor group going to
-; the left, using the same objects).
-  (if* (not (or (eq group-category plato-predgrp) 
-		(eq group-category plato-succgrp)))
-   then self
-   else (setq new-bond-list 
-	      (loop for r in bond-list collect (send r :flipped-version)))
+;---------------------------------------------
+; flipped-version
+;---------------------------------------------
 
-        (setq flipped-group
-              (make-group 
-		  string 
-		  (send group-category :get-related-node plato-opposite) 
-		  (send direction-category :get-related-node plato-opposite) 
-		  left-obj right-obj object-list new-bond-list))
-        (send flipped-group :set-proposal-level (send self :proposal-level))
-        flipped-group))
-               
 ;---------------------------------------------
 ; get-possible-group-bonds | Workspace.possible_group_bonds
 ;---------------------------------------------
 
-(defun group-equal? (group1 group2)   
-; Returns t if the two groups are the same.
-  (if* (and group1 group2
-           (= (send group1 :left-obj-position) 
-	      (send group2 :left-obj-position))
-           (= (send group1 :right-obj-position) 
-	      (send group2 :right-obj-position))
-           (eq (send group1 :group-category) 
-	       (send group2 :group-category))
-           (eq (send group1 :direction-category) 
-	       (send group2 :direction-category)))
-   then t else nil))
-   
 ;---------------------------------------------
-
-(defun in-group? (obj1 obj2)
-; Returns t if the two objects are in a group.
- (and (send obj1 :group) (eq (send obj1 :group) (send obj2 :group))))
-
+; group-equal? | Group.__eq__
 ;---------------------------------------------
-
-(defun subgroup? (group1 group2)
-; Returns t if group1 is a subgroup of group2.  Otherwise, returns nil.
-  (and (<= (send group2 :left-obj-position) 
-	   (send group1 :left-obj-position))
-       (>= (send group2 :right-obj-position) 
-	   (send group1 :right-obj-position))))
-
-;---------------------------------------------
-
-(defun groups-overlap? (group1 group2)
-; Returns t if the two groups overlap.  Otherwise returns nil.
-  (intersection (send group1 :object-list) (send group2 :object-list)))
-
-;---------------------------------------------
-
-(defmethod (group :get-incompatible-groups) ()
-; Returns a list of the groups that are incompatible with the given group.
-  (remove self (remove-duplicates 
-		   (flatten (send-method-to-list object-list :group)))))
-
-;---------------------------------------------
-
-(defmethod (group :get-incompatible-correspondences) ()
-; Returns a list of the correspondences that are incompatible with the given 
-; group.
-  (loop for obj in object-list
-        when (and (send obj :correspondence) 
-	  	  (send self :incompatible-correspondence? 
-			     (send obj :correspondence) obj))
-        collect (send obj :correspondence)))
-
-;---------------------------------------------
-
-(defmethod (group :incompatible-correspondence?) 
-           (c obj &aux string-position-category-concept-mapping other-obj
-		    other-bond group-concept-mapping)
-; Returns t if the given correspondence is incompatible with the given group.
-(block nil
-  (setq string-position-category-concept-mapping
-        (loop for cm in (send c :concept-mapping-list)
-              when (eq (send cm :description-type1) plato-string-position-category)
-	      return cm))
-
-  (if* (null string-position-category-concept-mapping)
-   then (return nil))
-  (setq other-obj (send c :other-obj obj))
-  (if* (send other-obj :leftmost-in-string?)
-   then (setq other-bond (send other-obj :right-bond))
-   else (if* (send other-obj :rightmost-in-string?)
-	 then (setq other-bond (send other-obj :left-bond))))
-  (if* (or (null other-bond) 
-	   (null (send other-bond :direction-category))) 
-   then (return nil))
-  (setq group-concept-mapping
-        (make-concept-mapping 
-	    plato-direction-category plato-direction-category
- 	    direction-category (send other-bond :direction-category)
-	    nil nil))
-  (if* (incompatible-concept-mappings? 
-	   group-concept-mapping string-position-category-concept-mapping)
-   then t)))
-
-;---------------------------------------------
-; group.get-bonds-to-be-flipped | Group.get_bonds_to_be_flipped
-;---------------------------------------------
-
-(defmethod (group :spans-whole-string?) ()
-; Returns t if the group spans the string.
-  (= (send self :letter-span) (send string :length)))
-
-;---------------------------------------------
-
-(defmethod (group :proposed?) ()
-  (< proposal-level %built%))
-
-;---------------------------------------------
-; propose-group | Workspace.propose_group
-;---------------------------------------------
-  
-(defmethod (group :single-letter-group-probability) (&aux exponent)
-; Returns the probability to be used in deciding whether or not to propose the
-; single-letter-group g.  
-  (setq exponent (case (send self :number-of-local-supporting-groups)
-		       (1 4)
-		       (2 2)
-		       (otherwise 1)))
-	
-  (get-temperature-adjusted-probability
-      (expt (* (/ (send self :local-support) 100)
-	       (/ (send plato-length :activation) 100)) exponent)))
-
-;-------------------------------------------
-
-(defmethod (group :length-description-probability) ()
-  (if* (> (send self :length) 5)
-   then 0
-   else (get-temperature-adjusted-probability 
-	    (expt .5 (* (cube (send self :length))
-			(/ (fake-reciprocal (send plato-length 
-						  :activation)) 100))))))
-
 
