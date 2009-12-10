@@ -10,6 +10,18 @@ website: http://web.cecs.pdx.edu/~mm/
 Status
 ------
 
+1000 runs of abc -> abd => ijk -> ?
+
+answer    totals    avgtmp
+------    ------    ------
+  ijl   847   86%     32
+  jjk    94   10%     47
+  ikl    18    2%     53
+  ijd    11    1%     41
+  jkk     5    1%     58
+  djk     4    0%     52
+  ijk     3    0%     52
+
 12/09/09
 Copycat.py abc abd ijk 42 runs to completion with the answer ijl and a
 final temperature of 30! This marks the first successful run. There is
