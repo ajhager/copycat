@@ -130,35 +130,8 @@
 	              (get-urgency-bin urgency)))))
 
 ;---------------------------------------------
-
-(defun description-builder (proposed-description)
-; Tries to build the proposed description, fizzling if the object no longer
-; exists or if the description already exists.
-
-(block nil
-  (if* %verbose% 
-   then (format t "In description-builder with proposed-description ")
-        (send proposed-description :print)
-	(format t "~%"))
-  
-  ; If the object no longer exists, then fizzle.
-  (if* (null (memq (send proposed-description :object)
-		   (send *workspace* :object-list)))
-   then (if* %verbose% 
-	 then (format t 
-		      "This object no longer exists.  Fizzling.~&"))
-        (return))
-
-  ; If this description already exists, then fizzle.
-  (if* (send (send proposed-description :object) 
-	     :description-present? proposed-description)
-   then (if* %verbose% 
- 	 then (format t "This description already exists.  Fizzling.~&"))
-        (send (send proposed-description :description-type) :activate-from-workspace)
-        (send (send proposed-description :descriptor) :activate-from-workspace)
-        (return))
-
-  (build-description proposed-description)))
+; description-builder | DescriptionBuilder
+;---------------------------------------------
 
 ;---------------------------------------------
 ; defflavor extrinsic-description | ExtrinsicDescription

@@ -46,25 +46,20 @@ class DescriptionBottomUpScout(Codelet):
         return workspace.propose_description(obj, prop.category(), prop)
 
 class DescriptionBuilder(Codelet):
-    '''
-    Attempts to build the proposed description. If it already exists, its
-    activations are boosted.
-    '''
+    """Attempt to build the proposed description. If it already exists, its
+    activations are boosted."""
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         description = self.arguments[0]
 
-        # Make sure the object still exists.
         if description.object not in workspace.objects():
-            return
+            return # Fizzle
 
-        # Make sure the description does not exist.
         if description in description.object.descriptions:
             description.description_type.activation_buffer += workspace.activation
             description.descriptor.activation_buffer += workspace.activation
-            return
+            return # Fizzle
 
-        # Build the description.
         workspace.build_description(description)
 
 class DescriptionStrengthTester(Codelet):
