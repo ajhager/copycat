@@ -264,12 +264,12 @@ class Workspace(object):
                 self.snag_object = object1
         else:
             if description_type == slipnet.plato_letter_category:
-                for letter in object1.letters:
+                for letter in object1.letters():
                     new_descriptor = self.get_new_descriptor_for_answer(letter, description_type)
                     if not new_descriptor:
                         self.snag_object = letter
                         return
-                    new_letter = Letter(self.answer_string, new_descriptor,
+                    new_letter = Letter(new_descriptor.name, self.answer_string, new_descriptor,
                                         letter.left_string_position)
                     modified_letters.append(new_letter)
             else:
@@ -338,8 +338,8 @@ class Workspace(object):
 
         if self.translated_rule.descriptor1_facet == slipnet.plato_string_position_category and \
            len(objects_to_change) > 1:
-            for obj in self.initial_string.objects:
-                if obj.is_changed():
+            for obj in self.initial_string.get_objects():
+                if obj.is_changed:
                     changed_object_correspondence = obj.correspondence
             obj2 = changed_object_correspondence.object2
             if changed_object_correspondence and obj2 in objects_to_change:

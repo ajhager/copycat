@@ -83,8 +83,7 @@ if options.mode == 'headless':
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:
         run.step()
-    print str(run.workspace.answer_string.name)
-    print run.workspace.temperature
+    print seed, str(run.workspace.answer_string.name), run.workspace.temperature, run.coderack.time
 elif options.mode == 'curses':
     CursesClient(initial, modified, target, seed)
 elif options.mode == 'opengl':

@@ -166,8 +166,8 @@ class RuleTranslator(Codelet):
         slippages = workspace.slippages()
         if changed_object_correspondence:
             for slippage in workspace.slippages():
-                for mapping in changed_object_correspondence.concept_mapptings:
-                    if self.contradictory_concept_mappings(mapping, slippage):
+                for mapping in changed_object_correspondence.get_concept_mappings():
+                    if mapping.are_contradictory_concept_mappings(slippage):
                         slippages.remove(slippage)
 
         rule = workspace_rule
