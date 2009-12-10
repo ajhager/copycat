@@ -83,51 +83,8 @@
   (propose-description chosen-object description-type chosen-descriptor)))
 
 ;---------------------------------------------
-
-(defun description-strength-tester (proposed-description 
-				    &aux proposed-description-strength
-				         build-probability urgency)
-; Calculates the proposed-description's strength, and probabilistically decides
-; whether or not to post a description-builder codelet.  If so, the urgency of
-; the description-builder codelet is a function of the strength.
-(block nil
-
-  ; Activate the descriptor.
-  (send (send proposed-description :descriptor) :activate-from-workspace)
-
-  ; Update the strength values for this description.
-  (send proposed-description :update-strength-values)
-
-  (setq proposed-description-strength 
-	(send proposed-description :total-strength))
-
-  (if* %verbose% 
-   then (format t "Proposed description: ")
-        (send proposed-description :print)
-        (format t "~% Strength: ~a~&" proposed-description-strength))
-
-  ; Decide whether or not to post a description-builder codelet, based on the 
-  ; total strength of the proposed-description.
-  (setq build-probability 
-	(get-temperature-adjusted-probability 
-	    (/ proposed-description-strength 100)))
-  (if* %verbose% 
-   then (format t "Build-probability: ~a~&" build-probability))
-  (if* (eq (flip-coin build-probability) 'tails)
-   then (if* %verbose% 
-	 then (format t "Description not strong enough.  Fizzling.~&"))
-        (return))
-        
-  (setq urgency proposed-description-strength)
-
-  (if* %verbose% 
-   then (format t "Posting a description-builder with urgency ~a.~&"
-		(get-urgency-bin urgency)))
-
-  ; Post the description-builder codelet.
-  (send *coderack* :post 
-	(make-codelet 'description-builder (list proposed-description)
-	              (get-urgency-bin urgency)))))
+; description-strength-tester | DescriptionStrengthTester
+;---------------------------------------------
 
 ;---------------------------------------------
 ; description-builder | DescriptionBuilder

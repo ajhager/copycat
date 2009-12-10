@@ -63,27 +63,22 @@ class DescriptionBuilder(Codelet):
         workspace.build_description(description)
 
 class DescriptionStrengthTester(Codelet):
-    '''
-    Calculates the proposed descriptions's strength and probabilistically
-    decides whether or not to post a description builder codelet with
-    urgency as a function of the strength.
-    '''
+    """Calculate the proposed descriptions's strength and probabilistically
+    decides whether or not to post a description builder codelet with urgency
+    as a function of the strength."""
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         description = self.arguments[0]
 
-        # Activate the descriptor.
         description.descriptor.activation_buffer += workspace.activation
 
-        # Update the strength values for the description.
         description.update_strengths()
         strength = description.total_strength
 
-        # Decide whether or not to post the description builder codelet.
         probability = strength / 100.0
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
-            return
+            return # Fizzle
         
         return [(DescriptionBuilder([description]), strength)]
 
