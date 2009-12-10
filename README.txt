@@ -10,6 +10,12 @@ website: http://web.cecs.pdx.edu/~mm/
 Status
 ------
 
+12/09/09
+Copycat.py abc abd ijk 42 runs to completion with the answer ijl and a
+final temperature of 30! This marks the first successful run. There is
+still a lot of code to go through for accuracy, but this ensures that
+we are at least on the right track.
+
 12/07/09
 Workspace strings have been completely revamped and enough random bugs
 have been fixed to allow all types of codelets to be run now. There are

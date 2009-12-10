@@ -237,7 +237,7 @@ class Workspace(object):
         for letter in self.target_string.get_letters():
             t = False
             for obj in objects_to_change:
-                if letter in obj.letters:
+                if letter in obj.letters():
                     t = True
             if not t:
                 letters.append(Letter(letter.name, self.answer_string,
@@ -257,8 +257,8 @@ class Workspace(object):
                 self.snag_object = object1
                 return
             if description_type == slipnet.plato_letter_category:
-                new_letter = Letter(self.answer_string, new_descriptor,
-                                    object1.let_stringposition)
+                new_letter = Letter(new_descriptor.name, self.answer_string, new_descriptor,
+                                    object1.left_string_position)
                 modified_letters.append(new_letter)
             else:
                 self.snag_object = object1
@@ -322,7 +322,7 @@ class Workspace(object):
     def get_objects_to_change_for_answer(self):
         objects_to_change = []
 
-        for obj in self.target_string.objects:
+        for obj in self.target_string.get_objects():
             if obj.get_descriptor(slipnet.plato_object_category) == \
                self.translated_rule.object_category1:
                 if obj.get_descriptor(self.translated_rule.descriptor1_facet) == \
@@ -352,16 +352,15 @@ class Workspace(object):
         else:
             return objects_to_change
 
-    def get_new_descriptor_for_answer(self, object1, descriptor_type):
-        '''
-        Return the new descriptor that should be applied to the given object
-        for the answer.
-        '''
-        old_descriptor = object1.get_descriptor(descriptor_type)
+    def get_new_descriptor_for_answer(self, obj, description_type):
+        """Return the new descriptor that should be applied to the given object
+        for the answer."""
+        old_descriptor = obj.get_descriptor(description_type)
         if not old_descriptor:
-            return
-        if self.translated_rule.is_relation():
-            return old_descriptor.get_related_node(self.translated_rule.relation)
+            return None
+        if self.translated_rule.relation:
+            return slipnet.get_related_node(old_descriptor,
+                                            self.translated_rule.relation)
         else:
             return self.translated_rule.descriptor2
 
@@ -1212,7 +1211,7 @@ class Workspace(object):
         descriptions in the rule.
         '''
         if not i_object:
-            proposed_rule = Rule(self, None, None, None, None, None)
+            proposed_rule = Rule(self, None, None, None, None, None, None)
         else:
             obj_category = slipnet.plato_object_category
             if isinstance(m_description, ExtrinsicDescription):
@@ -1223,6 +1222,7 @@ class Workspace(object):
                                      m_object.get_descriptor(obj_category),
                                      m_description.description_type_related,
                                      m_description.relation)
+                proposed_rule.relation = m_description.relation
             else:
                 proposed_rule = Rule(self,
                                      i_object.get_descriptor(obj_category),

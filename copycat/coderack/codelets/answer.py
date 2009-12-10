@@ -27,14 +27,14 @@ class AnswerBuilder(Codelet):
         if workspace.translated_rule.has_no_change():
             objects_to_change = []
         else:
-            objects_to_change = workspace.objects_to_change_for_answer()
+            objects_to_change = workspace.get_objects_to_change_for_answer()
 
         desc_type = workspace.translated_rule.replaced_description_type
 
         answer_string_letters = []
         for obj in workspace.target_string.get_objects():
             if obj in objects_to_change:
-                letters = workspace.modified_letters_for_answer(obj, desc_type)
+                letters = workspace.get_modified_letters_for_answer(obj, desc_type)
                 answer_string_letters.extend(letters)
 
         # DEAL WITH SNAG NEEDS CHECKED

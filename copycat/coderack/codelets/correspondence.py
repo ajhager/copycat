@@ -77,9 +77,9 @@ class CorrespondenceBottomUpScout(Codelet):
             old_object2_string_number = object2.string_number
             object2 = object2.flipped_version()
             object2.string_number = old_object2_string_number
-            mappings = self.concept_mappings(object1, object2,
-                                             object1.relevant_descriptions(),
-                                             object2.relevant_descriptions())
+            mappings = workspace.get_concept_mappings(object1, object2,
+                                                      object1.relevant_descriptions(),
+                                                      object2.relevant_descriptions())
 
         return workspace.propose_correspondence(object1, object2, mappings, True)
 

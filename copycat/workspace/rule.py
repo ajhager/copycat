@@ -20,16 +20,16 @@ import copycat.toolbox as toolbox
 class Rule(Structure):
     def __init__(self, workspace, object_category1, descriptor1_facet,
                  descriptor1, object_category2, replaced_description_type,
-                 relation=None):
+                 descriptor2):
         super(Rule, self).__init__()
         self.workspace = workspace
         self.object_category1 = object_category1
         self.descriptor1_facet = descriptor1_facet
         self.descriptor1 = descriptor1
-        self.descriptor2 = None
+        self.descriptor2 = descriptor2
         self.object_category2 = object_category2
         self.replaced_description_type = replaced_description_type
-        self.relation = relation
+        self.relation = None
         self.structure_category = 'rule'
 
     def __eq__(self, other):
@@ -56,7 +56,7 @@ class Rule(Structure):
         if self.relation:
             conceptual_depth2 = self.relation.conceptual_depth
         else:
-            conceptual_depth2 = self.description2.conceptual_depth
+            conceptual_depth2 = self.descriptor2.conceptual_depth
 
         conceptual_difference = abs(conceptual_depth1 - conceptual_depth2)
 

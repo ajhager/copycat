@@ -47,4 +47,3 @@ class Distribution(object):
         """Return a number 0-100 based on the probabilities."""
         values = [self.probabilities[i] for i in sorted(self.probabilities)]
         return toolbox.weighted_select(values, sorted(self.probabilities))
-        

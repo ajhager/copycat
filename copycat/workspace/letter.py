@@ -33,6 +33,7 @@ class Letter(Object):
         self.type_name = 'letter'
         self.name = name
         self.string = string
+        self.category = category
         self.left_string_position = string_position
         self.right_string_position = string_position
         self.objects = []

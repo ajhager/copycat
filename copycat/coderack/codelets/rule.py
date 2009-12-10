@@ -151,10 +151,10 @@ class RuleTranslator(Codelet):
 
         # Build the translation of the rule.
         changed_object = None
-        for obj in self.initial_string.objects():
+        for obj in workspace.initial_string.get_objects():
             if not obj:
                 continue
-            if obj.changed:
+            if obj.is_changed:
                 changed_object = obj
                 break
         if not changed_object:
@@ -163,27 +163,29 @@ class RuleTranslator(Codelet):
         changed_object_correspondence = changed_object.correspondence
 
         # Get the slippages to use.
-        slippages = self.slippages
+        slippages = workspace.slippages()
         if changed_object_correspondence:
-            for slippage in workspace.slippages:
+            for slippage in workspace.slippages():
                 for mapping in changed_object_correspondence.concept_mapptings:
                     if self.contradictory_concept_mappings(mapping, slippage):
                         slippages.remove(slippage)
 
         rule = workspace_rule
-        if rule.relation():
+        if rule.relation:
             args = []
-            for arg in [rule.object_category1, rule.descriptor1_face,
+            for arg in [rule.object_category1, rule.descriptor1_facet,
                         rule.descriptor1, rule.object_category2,
-                        rule.replaced_description_type, rule.relation]:
+                        rule.replaced_description_type]:
                 args.append(arg.apply_slippages(slippages))
-                translated_rule = RelationalRule(*args)
+            args.append(None)
+            translated_rule = Rule(workspace, *args)
+            translated_rule.relation = rule.relation
         else:
             args = []
             for arg in [rule.object_category1, rule.descriptor1_facet,
                         rule.descriptor1, rule.object_category2,
                         rule.replaced_description_type, rule.descriptor2]:
                 args.append(arg.apply_slippages(slippages))
-                translated_rule = NonRelationRule(*args)
+            translated_rule = Rule(workspace, *args)
 
-        self.build_translated_rule(translated_rule)
+        workspace.build_translated_rule(translated_rule)

@@ -225,6 +225,7 @@
 	    (all-opposite-concept-mappings? 
 		possible-opposite-concept-mappings)
 	    (not (send plato-opposite :active?)))
+
    then (setq old-obj2-string-number (send obj2 :string-number))
         (setq obj2 (send obj2 :flipped-version))
         (send obj2 :set-string-number old-obj2-string-number)

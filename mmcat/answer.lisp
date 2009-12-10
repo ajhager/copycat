@@ -189,18 +189,7 @@
   modified-letter-list))
 
 ;---------------------------------------------
-
-(defun get-new-descriptor-for-answer (obj description-type &aux old-descriptor)
-; Return the new descriptor that should be applied to the given object    
-; for the answer.
-  (setq old-descriptor (send obj :get-descriptor description-type))
-  (if* (null old-descriptor) 
-   then nil
-   else (if* (send *translated-rule* :relation?)
-         then (send old-descriptor :get-related-node
-		    (send *translated-rule* :relation))
-         else (send *translated-rule* :descriptor2))))
-
+; get-new-descriptor-for-answer | Workspace.get_new_descriptor_for_answer
 ;---------------------------------------------
 
 (defun get-unmodified-letters-for-answer (objects-to-change)
