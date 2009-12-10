@@ -64,59 +64,16 @@
   (+ (send from-obj :letter-span) (send to-obj :letter-span)))
 
 ;---------------------------------------------
-
-(defmethod (bond :leftmost-in-string?) ()
-; Returns t if the bond is on the left edge of the string.
-  (= left-string-position 0))
-
+; bond.leftmost-in-string?
+; bond.rightmost-in-string?
 ;---------------------------------------------
 
-(defmethod (bond :rightmost-in-string?) ()
-; Returns t if the bond is on the right edge of the string.
-  (if* (= right-string-position (1- (send string :length)))
-   then t else nil))
-
+;---------------------------------------------
+; bond.choose-left-neighbor
 ;---------------------------------------------
 
-(defmethod (bond :choose-left-neighbor) (&aux possible-left-neighbor
-				              left-neighbor-list)
-; Returns one of the left-neighbors of the bond, probabilistically,
-; by salience.
-  (if* (send self :leftmost-in-string?)
-   then nil
-   else (setq left-neighbor-list
-	      (loop for left-neighbor-obj 
-	            in (send (send self :left-obj) :all-left-neighbors) do
-                       (setq possible-left-neighbor
-		             (aref (send string :left-right-bond-array)
-                                   (send left-neighbor-obj :string-number)
-			           (send (send self :left-obj) 
-					 :string-number)))
-	      when possible-left-neighbor
-	      collect possible-left-neighbor))
-        (select-list-item-by-method left-neighbor-list ':salience)))
-
 ;---------------------------------------------
-
-(defmethod (bond :choose-right-neighbor) (&aux possible-right-neighbor
-				   	       right-neighbor-list)
-; Returns one of the right-neighbors of the bond, probabilistically,
-; by salience.
-  (if* (send self :rightmost-in-string?)
-   then nil
-   else (setq right-neighbor-list
-	      (loop for right-neighbor-obj 
-	            in (send (send self :right-obj) :all-right-neighbors) do
-                    (setq possible-right-neighbor
-		          (aref (send string :left-right-bond-array)
-			             (send (send self :right-obj) 
-				           :string-number)
-                                     (send right-neighbor-obj 
-				           :string-number)))
-	      when possible-right-neighbor
-	      collect possible-right-neighbor))
-         (select-list-item-by-method right-neighbor-list ':salience)))
-
+; bond.choose-right-neighbor
 ;---------------------------------------------
 
 (defmethod (bond :bond-members?) (obj1 obj2)
@@ -125,12 +82,7 @@
        (or (eq from-obj obj2) (eq to-obj obj2))))
 
 ;---------------------------------------------
-
-(defmethod (bond :in-group?) (g)
-; Returns t if the bond is in the group g.
-  (and (member from-obj (send g :object-list)) 
-       (member to-obj (send g :object-list))))
-
+; bond.in-group?
 ;---------------------------------------------
 
 (defun top-down-bond-scout--category 
@@ -353,17 +305,8 @@
 ; break-bond | Workspace.break_bond
 ;---------------------------------------------
 
-(defmethod (bond :flipped-version) (&aux flipped-bond)
-; Returns the flipped version of this bond (e.g., if the bond is
-; a successor bond going to the right, returns a predecessor bond 
-; going to the left, using the same two objects).
-  (setq flipped-bond
-	(make-bond to-obj from-obj 
-                   (send bond-category :get-related-node plato-opposite)
-                    bond-facet to-obj-descriptor from-obj-descriptor))
-  (send flipped-bond :set-proposal-level (send self :proposal-level))
-  flipped-bond)
-
+;---------------------------------------------
+; bond.flipped-version
 ;---------------------------------------------
 
 (defun same-bond? (b1 b2)

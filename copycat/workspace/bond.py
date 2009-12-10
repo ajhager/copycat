@@ -86,34 +86,28 @@ class Bond(Structure):
                               bond_facet_factor * degree_of_association))
 
     def choose_left_neighbor(self):
-        '''
-        Return one of the left neighbors of the bond chosen probabilistically
-        by salience.
-        '''
+        """Return one of the left neighbors of the bond chosen by salience."""
         if self.is_leftmost_in_string():
             return None
         left_neighbors = []
         for left_neighbor_object in self.left_object.all_left_neighbors():
             x = left_neighbor_object.string_number
             y = self.left_object.string_number
-            possible_left_neighbor = self.string.left_right_bonds[x][y]
+            possible_left_neighbor = self.string.left_right_bonds.get((x, y))
             if possible_left_neighbor != None:
                 left_neighbors.append(possible_left_neighbor)
         saliences = [neighbor.salience() for neighbor in left_neighbors]
         return toolbox.weighted_select(saliences, left_neighbors)
 
     def choose_right_neighbor(self):
-        '''
-        Return one of the right neighbors of the bond chosen probabilistically
-        by salience.
-        '''
+        """Return one of the right neighbors of the bond chosen by salience."""
         if self.is_rightmost_in_string():
             return None
         right_neighbors = []
         for right_neighbor_object in self.right_object.all_right_neighbors():
             x = self.right_object.string_number
             y = right_neighbor_object.string_number
-            possible_right_neighbor = self.string.left_right_bonds[x][y]
+            possible_right_neighbor = self.string.left_right_bonds.get((x, y))
             if possible_right_neighbor != None:
                 right_neighbors.append(possible_right_neighbor)
         saliences = [neighbor.salience() for neighbor in right_neighbors]
@@ -121,7 +115,7 @@ class Bond(Structure):
 
     def happiness(self):
         if self.group:
-            return self.group.total_strength()
+            return self.group.total_strength
         return 0
 
     def has_members(self, object1, object2):
@@ -204,35 +198,29 @@ class Bond(Structure):
         return incompatible_correspondences
 
     def is_in_group(self, group):
-        '''
-        Return True if the bond is in the given group.
-        '''
+        """Return True if the bond is in the given group."""
         objects = group.objects
         return self.from_object in objects and self.to_object in objects
-
-    def is_leftmost_in_string(self):
-        '''
-        Return True if the bond is on the left edge of the string.
-        '''
-        return self.left_string_position == 0
 
     def is_proposed(self):
         """Return True if proposal level is less than the level for  built
         structures."""
         return self.proposal_level < self.workspace.built
 
+    def is_leftmost_in_string(self):
+        """Return True if the bond is on the left edge of the string."""
+        return self.left_string_position == 0
+
     def is_rightmost_in_string(self):
-        '''
-        Return True if the bond is on the right edge of the string.
-        '''
+        """Return True if the bond is on the right edge of the string."""
         return self.right_string_position == self.string.length - 1
 
     def flipped_version(self):
-        '''
-        Return the flipped version of this bond, e.g., if the bond is a
-        successor bond going to the right, returns a predecessor bond going
-        to the left using the same two objects.
-        '''
+        """Return the flipped version of this bond.
+
+        For example, if the bond is a successor bond going to the right,
+        returns a predecessor bond going to the left using the same two objects.
+        """
         category = slipnet.get_related_node(self.bond_category,
                                             slipnet.plato_opposite)
         flipped_bond = Bond(self.workspace, self.to_object, self.from_object,
@@ -310,7 +298,7 @@ class Bond(Structure):
         return number_of_supporting_bonds
 
     def salience(self):
-        return round(toolbox.average([self.importance(), self.unhappiness()]))
+        return round(toolbox.average(self.importance(), self.unhappiness()))
 
     def unhappiness(self):
         return 100 - self.happiness()
