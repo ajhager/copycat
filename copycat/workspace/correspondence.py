@@ -29,6 +29,7 @@ class Correspondence(Structure):
         self.structure_category = Correspondence
 
     def get_concept_mappings(self):
+        """Return the mappings in the correspondence."""
         return self.concept_mappings
 
     def is_supporting_correspondence(self, other):

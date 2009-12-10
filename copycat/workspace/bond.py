@@ -63,14 +63,13 @@ class Bond(Structure):
                     self.direction_category == other.direction_category])
 
     def calculate_external_strength(self):
+        """Return the bond's external strength."""
         return self.local_support()
 
     def calculate_internal_strength(self):
-        '''
-        Bonds between objects of the same type are stronger than bonds between
-        different types. Letter category bonds are stronger than other types
-        of bonds.  A more general mechanism is needed.
-        '''
+        """Bonds between objects of the same type are stronger than bonds
+        between different types. Letter category bonds are stronger than other
+        types of bonds.  A more general mechanism is needed."""
         if type(self.from_object) == type(self.to_object):
             member_compatibility_factor = 1
         else:
@@ -114,9 +113,18 @@ class Bond(Structure):
         return toolbox.weighted_select(saliences, right_neighbors)
 
     def happiness(self):
-        if self.group:
+        """Return the happiness of the bond."""
+        if self.group != None:
             return self.group.total_strength
         return 0
+
+    def unhappiness(self):
+        """Return the unhappiness of the bond."""
+        return 100 - self.happiness()
+
+    def salience(self):
+        """Return the salience of the bond."""
+        return round(toolbox.average(self.importance(), self.unhappiness()))
 
     def has_members(self, object1, object2):
         '''
@@ -126,13 +134,11 @@ class Bond(Structure):
         return object1 in objects and object2 in objects
 
     def importance(self):
-        '''
-        Sameness bonds are more important than other bonds of other categories.
-        '''
+        """Sameness bonds are more important than other bonds of other
+        categories."""
         if self.bond_category == slipnet.plato_sameness:
             return 100
-        else:
-            return 50
+        return 50
 
     def incompatible_bonds(self):
         """Return the bonds that are incompatible with the bond."""
@@ -296,9 +302,3 @@ class Bond(Structure):
                     bond.direction_category == self.direction_category]):
                 number_of_supporting_bonds += 1
         return number_of_supporting_bonds
-
-    def salience(self):
-        return round(toolbox.average(self.importance(), self.unhappiness()))
-
-    def unhappiness(self):
-        return 100 - self.happiness()

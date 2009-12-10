@@ -9,32 +9,8 @@
 ;---------------------------------------------
 ; description.calculate-external-strength
 ;---------------------------------------------
-
-(defmethod (bond :calculate-internal-strength) 
-           (&aux member-compatibility-factor bond-facet-factor)
-  ; bonds between objects of the same type (letter-letter or 
-  ; group-group) are stronger than bonds between different types 
-  ; (letter-group or group-letter).					
-  (if* (eq (flavor-type from-obj) (flavor-type to-obj))
-   then (setq member-compatibility-factor 1)
-   else (setq member-compatibility-factor .7))
-
-  ; for now, letter-category bonds are stronger than other types of
-  ; bonds (namely, length bonds).  this should be fixed; a 
-  ; more general mechanism is needed.	   
-  (if* (eq bond-facet plato-letter-category)
-   then (setq bond-facet-factor 1)
-   else (setq bond-facet-factor .7)) 
-
-  (min 100 (round (* member-compatibility-factor bond-facet-factor
-			   (send bond-category 
-				 :bond-degree-of-association)))))
-
-;---------------------------------------------
-
-(defmethod (bond :calculate-external-strength) ()
-  (send self :local-support))
- 
+; bond.calculate-internal-strength
+; bond.calculate-external-strength
 ;---------------------------------------------
 
 (defmethod (group :calculate-internal-strength) 
@@ -185,18 +161,8 @@
 
 ;---------------------------------------------
 ; incompatible-concept-mappings? | Mapping.is_incompatible_concept_mapping
+; incompatible-concept-mapping-lists?
 ;---------------------------------------------
-
-(defun incompatible-concept-mapping-lists? (l1 l2 &aux incompatible?)
-; returns t if the two lists of concept-mappings contain incompatible
-; concept-mappings.
-  (loop for cm1 in l1
-        until incompatible? do
-        (loop for cm2 in l2
- 	      when (incompatible-concept-mappings? cm1 cm2) do
-	           (setq incompatible? t)
-	           (return)))
-  incompatible?)
 
 ;---------------------------------------------
 ; related? | slipnode.are_related
@@ -214,27 +180,18 @@
 ; slipnode.bond-degree-of-association | slipnode.bond_degree_of_association
 ;---------------------------------------------
 
-(defmethod (bond :importance) ()
-; sameness bonds are more important that other bonds of other 
-; categories (for now, the only other categories are predecessor and 
-; successor).
-  (if* (eq bond-category plato-sameness) 
-   then 100 else 50))
-
+;---------------------------------------------
+; bond.importance
 ;---------------------------------------------
 
-(defmethod (bond :happiness) ()
-  (if* group then (send group :total-strength) else 0))
-
+;---------------------------------------------
+; bond.happiness
+; bond.unhappiness
 ;---------------------------------------------
 
-(defmethod (bond :unhappiness) ()
-  (fake-reciprocal (send self :happiness)))
-
 ;---------------------------------------------
-
-(defmethod (bond :salience) ()
-  (round (average (send self :importance) (send self :unhappiness))))
+; bond.salience
+;---------------------------------------------
 
 ;---------------------------------------------
 ; slipnode.local-descriptor-support | slipnode.local_descriptor_support

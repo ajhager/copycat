@@ -28,6 +28,7 @@ class BondBottomUpScout(Codelet):
     urgency a function of the degree of association of bonds of the bond
     category.
     """
+
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         from_object = workspace.choose_object('intra_string_salience')
@@ -54,6 +55,7 @@ class BondBottomUpScout(Codelet):
 
 class BondBuilder(Codelet):
     """Attempt to build the proposed bond, fighting with any competitiors."""
+
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         bond = self.arguments[0]
@@ -108,6 +110,7 @@ class BondStrengthTester(Codelet):
     """Calculate the proposed bond's strength and decide probabilistically
     whether to post a bond builder codelet with urgency a function of the
     strength."""
+
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         bond = self.arguments[0]
@@ -130,20 +133,18 @@ class BondStrengthTester(Codelet):
         return [(BondBuilder([bond]), strength)]
 
 class BondTopDownCategoryScout(Codelet):
-    '''
-    Chooses a string probabilistically by the relevance of the category in
-    the string and the string's unhappiness. Chooses an object and a
-    neighbor of the object in the string probabilistically by instra
-    string salience. Chooses a bond facet probabilistically by relevance
-    in the string. Checks if there is a bond of the category between the
-    two descriptors of the facet, posting a bond strength tester codelet
-    with urgency a function of the degree of association of bonds of the
-    category.
-    '''
+    """Choose a string probabilistically by the relevance of the category in
+    the string and the string's unhappiness. Chooses an object and a neighbor
+    of the object in the string probabilistically by instra string salience.
+    Choose a bond facet probabilistically by relevance in in the string.
+    Checks if there is a bond of the category between the two descriptors of
+    the facet, posting a bond strength tester codelet with urgency a function
+    of the degree of association of bonds of the category."""
+
     structure_category = 'bond'
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
-        # Choose a string.
+
         initial_string = workspace.initial_string
         target_string = workspace.target_string
         i_relevance = initial_string.local_bond_category_relevance(category)
@@ -154,24 +155,20 @@ class BondTopDownCategoryScout(Codelet):
                   round(toolbox.average(t_relevance, t_unhappiness))]
         string = toolbox.weighted_select(values, [initial_string, target_string])
 
-        # Choose an object and neighbor.
         obj = string.get_random_object('intra_string_salience')
         neighbor = obj.choose_neighbor()
-        if not neighbor:
-            return
+        if neighbor == None:
+            return # Fizzle
 
-        # Choose bond facet.
         facet = workspace.choose_bond_facet(obj, neighbor)
-        if not facet:
-            return
+        if facet == None:
+            return # Fizzle
 
-        # Get the descriptors of the facet if they exist.
         object_descriptor = obj.get_descriptor(facet)
         neighbor_descriptor = neighbor.get_descriptor(facet)
-        if (not object_descriptor) or (not neighbor_descriptor):
-            return
+        if object_descriptor == None or neighbor_descriptor == None:
+            return # Fizzle
 
-        # Check for a possible bond.
         if nodes.get_bond_category(object_descriptor,
                                    neighbor_descriptor) == category:
             from_object = obj
@@ -185,9 +182,8 @@ class BondTopDownCategoryScout(Codelet):
             from_descriptor = neighbor_descriptor
             to_descriptor = object_descriptor
         else:
-            return
+            return # Fizzle
 
-        # Propose the bond.
         return workspace.propose_bond(from_object, to_object, category, facet,
                                       from_descriptor, to_descriptor)
 

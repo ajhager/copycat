@@ -207,16 +207,7 @@
   (push (make-codelet 'breaker nil '*extremely-low-bin*) 
 	*codelets-to-post*))
 
-(defun post-initial-codelets ()
-; Post the initial codelets the program starts out with.
-  (loop for i from 1 to (* 2 (length (send *workspace* :object-list))) do
-        (send *coderack* :post 
-	      (make-codelet 'bottom-up-bond-scout nil '*very-low-bin*))
-	(send *coderack* :post 
-	      (make-codelet 'replacement-finder nil '*very-low-bin*))
-	(send *coderack* :post
-	      (make-codelet 'bottom-up-correspondence-scout nil 
-		            '*very-low-bin*)))
 
-  (send *coderack* :post-codelet-list *codelets-to-post*)
-  (setq *codelets-to-post* nil))
+;---------------------------------------------
+; post-initial-codelets | Workspace.initial_codelets
+;---------------------------------------------

@@ -166,6 +166,7 @@ class Workspace(object):
                 description.descriptor.activation_buffer += self.activation
 
     def initial_codelets(self):
+        """Return the codelets the program starts out with."""
         codelets = [(BondBottomUpScout(), 0),
                     (ReplacementFinder(), 0),
                     (CorrespondenceBottomUpScout(), 0)]
