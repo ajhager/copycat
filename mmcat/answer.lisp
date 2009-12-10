@@ -2,65 +2,8 @@
 ; answer-builder
 ;---------------------------------------------
 
-(defun get-objects-to-change-for-answer 
-       (&aux objects-to-change changed-object-correspondence obj2)
-; Returns a list of objects in the target-string that should be changed for
-; the answer.
-  (loop for object in (send *target-string* :object-list) do
-        ; See if this object one of the ones the translated rule says to 
-	; change.
-        (if* (eq (send object :get-descriptor plato-object-category) 
-	         (send *translated-rule* :object-category1))
-         then (if* (eq (send object :get-descriptor 
-			     (send *translated-rule* :descriptor1-facet))
-	               (send *translated-rule* :descriptor1))
-               then (push object objects-to-change)
-
-	       else ; If the object fits the description given in the 
-	            ; translated rule even though it doesn't already have that 
-		    ; description, then add that description and add the
-                    ; object to the list of objects to change.
-                    (if* (and (send (send *translated-rule* :descriptor1)
-			            :description-tester)
-		               (funcall 
-				   (send (send *translated-rule* :descriptor1)
-				         :description-tester) object))
-	             then (send object :add-description
-				(make-description 
-				    object 
-				    (send *translated-rule* :descriptor1-facet)
- 		                    (send *translated-rule* :descriptor1)))
-	                  (push object objects-to-change)))))
-
-  ; If the descriptor is "leftmost", "middle", or "rightmost", there might be 
-  ; some ambiguity (e.g., there is sometimes more than one "rightmost group", 
-  ; as in "aabbcciijjkk".  In this case, only one of the possible objects 
-  ; should be changed:  the one the changed-object in the initial-string 
-  ; corresponds to, if any, and if not, the highest-level group.  This is not 
-  ; very general, and should be fixed eventually.
-  (if* (and (eq (send *translated-rule* :descriptor1-facet) 
-		plato-string-position-category)
-	    (> (length objects-to-change) 1)) ; More than 1 possible object 
-                                              ; to change.
-   then ; Find the object corresponding to the changed object in the 
-        ; initial-string.
-        (setq changed-object-correspondence
-	      (send (loop for obj in (send *initial-string* :object-list)
-		          when (send obj :changed?) return obj) 
-		    :correspondence))  
-        (if* (and changed-object-correspondence
- 	          (memq (setq obj2 (send changed-object-correspondence :obj2))
-		        objects-to-change))
-	 then (list obj2)
-	 else (loop for obj in objects-to-change
-		    when (or (null (send obj :group))
-			     (not (eq (send (send obj :group) :get-descriptor
-					    plato-string-position-category)
-				      (send *translated-rule* :descriptor1))))
-		    return (list obj)))
-
-   else	objects-to-change))
-
+;---------------------------------------------
+; get-objects-to-change-for-answer | Workspace.get_objects_to_change_for_answer
 ;---------------------------------------------
 
 (defun get-modified-letters-for-answer 

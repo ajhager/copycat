@@ -19,7 +19,6 @@
 import optparse
 
 from copycat.run import Run
-from clients import CursesClient
 
 # TRACE: http://www.dalkescientific.com/
 import sys
@@ -83,8 +82,12 @@ if options.mode == 'headless':
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:
         run.step()
-    print seed, str(run.workspace.answer_string.name), run.workspace.temperature, run.coderack.time
+    print "%5s %s %s %s" % (seed,
+                            str(run.workspace.answer_string.name),
+                            run.workspace.temperature,
+                            run.coderack.time)
 elif options.mode == 'curses':
+    from clients import CursesClient
     CursesClient(initial, modified, target, seed)
 elif options.mode == 'opengl':
     from clients import OpenglClient

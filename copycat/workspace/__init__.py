@@ -320,37 +320,43 @@ class Workspace(object):
         return modified_letters
 
     def get_objects_to_change_for_answer(self):
+        """Return a list of objects in the target string that should be changed
+        for the answer."""
         objects_to_change = []
 
+        descriptor1 = self.translated_rule.descriptor1
+        descriptor1_facet = self.translated_rule.descriptor1_facet
         for obj in self.target_string.get_objects():
             if obj.get_descriptor(slipnet.plato_object_category) == \
                self.translated_rule.object_category1:
-                if obj.get_descriptor(self.translated_rule.descriptor1_facet) == \
-                   self.translated_rule.descriptor1:
+                if obj.get_descriptor(descriptor1_facet) == descriptor1:
                     objects_to_change.append(obj)
             else:
                 if self.translated_rule.descriptor1.description_tester and \
                    self.translated_rule.descriptor1.description_tester(obj):
-                    obj.add_description(Description(obj,
-                                                    self.translated_rule.descriptor1_facet,
-                                                    self.translated_rule.descriptor1))
+                    desc = Description(obj, descriptor1_facet, descriptor1)
+                    obj.add_description(desc)
                     objects_to_change.append(obj)
 
-        if self.translated_rule.descriptor1_facet == slipnet.plato_string_position_category and \
-           len(objects_to_change) > 1:
+        if all([descriptor1_facet == slipnet.plato_string_position_category,
+                len(objects_to_change) > 1]):
             for obj in self.initial_string.get_objects():
                 if obj.is_changed:
                     changed_object_correspondence = obj.correspondence
-            obj2 = changed_object_correspondence.object2
-            if changed_object_correspondence and obj2 in objects_to_change:
-                return [obj2]
+                    break
+            if changed_object_correspondence:
+                obj2 = changed_object_correspondence.object2
+                if obj2 in objects_to_change:
+                    return [obj2]
+                else:
+                    for obj in objects_to_change:
+                        group = obj.group
+                        category = slipnet.plato_string_position_category
+                        if not group or \
+                                group.get_descriptor(category) != descriptor1:
+                            return [obj]
             else:
-                for obj in objects_to_change:
-                    if not obj.group or \
-                            obj.group.get_descriptor(slipnet.plato_string_position_category) != self.translated_rule.descriptor1:
-                        return [obj]
-        else:
-            return objects_to_change
+                return objects_to_change
 
     def get_new_descriptor_for_answer(self, obj, description_type):
         """Return the new descriptor that should be applied to the given object
