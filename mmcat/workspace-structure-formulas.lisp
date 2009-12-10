@@ -140,26 +140,8 @@
 ; workspace-structure.total-weakness
 ;---------------------------------------------
 
-(defmethod (concept-mapping :slippability) (&aux degree-of-association)
-; this returns a value representing the ease with which this slippage can be
-; made.  conceptual-depth gives a resistance to slippage.
-  (setq degree-of-association (send self :degree-of-association))
-  (if* (= degree-of-association 100) 
-   then 100
-   else (* degree-of-association
-	   (- 1 (sqr (/ (send self :conceptual-depth) 100))))))
-
 ;---------------------------------------------
-
-(defmethod (concept-mapping :strength) (&aux degree-of-association)
-; this returns a value representing the strength of the concept-mapping.
-; the closer and the more general the nodes, the stronger.  
-  (setq degree-of-association (send self :degree-of-association))
-  (if* (= degree-of-association 100) 
-   then 100
-   else (* degree-of-association
-	   (+ 1 (sqr (/ (send self :conceptual-depth) 100))))))
-
+; concept-mapping.slippability
 ;---------------------------------------------
 
 (defun supporting-correspondences? (c1 c2 &aux (result nil))
@@ -198,50 +180,11 @@
   result)
 
 ;---------------------------------------------
-
-(defun supporting-concept-mappings? (cm1 cm2)
-; concept-mappings (a -> b) and (c -> d) support each other if a is related
-; to c and if b is related to d and the a -> b relationship is the same as the
-; c -> d relationship.  e.g., rightmost -> rightmost supports right -> right 
-; and leftmost -> leftmost.  notice that slipnet distances are not looked 
-; at, only slipnet links.  this should be changed eventually.
-
-  ; if the two concept-mappings are the same, then return t.  this
-  ; means that letter->group supports letter->group, even though these
-  ; concept-mappings have no label.
-  (cond ((and (eq (send cm1 :descriptor1) (send cm2 :descriptor1))
-	      (eq (send cm1 :descriptor2) (send cm2 :descriptor2))) 
-	 t)
-        ; if the descriptors are not related, then return nil.
-        ((not (or (related? (send cm1 :descriptor1) (send cm2 :descriptor1))
- 	          (related? (send cm1 :descriptor2) (send cm2 :descriptor2))))
-         nil)
-        ; if one of the concept-mappings has no label, then return nil.
-        ((or (null (send cm1 :label)) (null (send cm2 :label)))
-         nil)
-        ((eq (send cm1 :label) (send cm2 :label))
-         t)
-        (t nil)))
-
+; supporting-concept-mappings? | Mapping.is_supporting_concept_mapping
 ;---------------------------------------------
 
-(defun incompatible-concept-mappings? (cm1 cm2)
-; concept-mappings (a -> b) and (c -> d) are incompatible if a is 
-; related to c or if b is related to d, and the a -> b relationship is 
-; different from the c -> d relationship. e.g., rightmost -> leftmost
-; is incompatible with right -> right, since rightmost is linked 
-; to right, but the relationships (opposite and identity) are different.  
-; notice that slipnet distances are not looked at, only slipnet links. this 
-; should be changed eventually.
-  (if* (not (or (related? (send cm1 :descriptor1) (send cm2 :descriptor1))
- 	        (related? (send cm1 :descriptor2) (send cm2 :descriptor2))))
-   then nil
-   else (if* (or (null (send cm1 :label)) (null (send cm2 :label)))
-         then nil
-         else (if* (not (eq (send cm1 :label) (send cm2 :label)))
-               then t
-	       else nil))))
-
+;---------------------------------------------
+; incompatible-concept-mappings? | Mapping.is_incompatible_concept_mapping
 ;---------------------------------------------
 
 (defun incompatible-concept-mapping-lists? (l1 l2 &aux incompatible?)
