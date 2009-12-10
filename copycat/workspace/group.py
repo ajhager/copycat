@@ -275,8 +275,9 @@ class Group(Object, Structure):
                 other_bond = other_object.right_bond
             elif other_object.is_rightmost_in_string():
                 other_bond = other_object.left_bond
-            if other_bond:
-                if other_bond.direction_category:
+            if other_bond != None:
+                if other_bond.direction_category != None and \
+                        self.direction_category != None:
                     direction = nodes.plato_direction_category
                     group_mapping = Mapping(direction, direction,
                                             self.direction_category,
@@ -284,6 +285,7 @@ class Group(Object, Structure):
                                             None, None)
                     if group_mapping.is_incompatible_concept_mapping(concept_mapping):
                         return True
+        return False
 
 
     def leftmost_letter(self):

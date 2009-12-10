@@ -155,18 +155,22 @@ class String(object):
             self.from_to_bonds[(to_number, from_number)] = bond
 
     def remove_bond(self, bond):
-        """Remove a bulit bond from the string."""
+        """Remove a built bond from the string."""
         left_number = bond.left_object.string_number
         right_number = bond.right_object.string_number
-        del(self.left_right_bonds[(left_number, right_number)])
+        if (left_number, right_number) in self.left_right_bonds:
+            del(self.left_right_bonds[(left_number, right_number)])
 
         from_number = bond.from_object.string_number
         to_number = bond.to_object.string_number
-        del(self.from_to_bonds[(from_number, to_number)])
+        if (from_number, to_number) in self.from_to_bonds:
+            del(self.from_to_bonds[(from_number, to_number)])
 
         if bond.bond_category == slipnet.plato_sameness:
-            del(self.left_right_bonds[(right_number, left_number)])
-            del(self.from_to_bonds[(to_number, from_number)])
+            if (right_number, left_number) in self.left_right_bonds:
+                del(self.left_right_bonds[(right_number, left_number)])
+            if (to_number, from_number) in self.from_to_bonds:
+                del(self.from_to_bonds[(to_number, from_number)])
 
     def get_bonds(self):
         """Return a list of the built bonds in the string."""
