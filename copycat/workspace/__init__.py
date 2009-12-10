@@ -226,20 +226,16 @@ class Workspace(object):
                                                          rule_weakness])
 
     def get_unmodified_letters_for_answer(self, objects_to_change):
-        '''
-        Return the letters from the targe string that do not need to be
-        changed for the answer.
-        '''
-        if objects_to_change == None:
-            objects_to_change = []
+        """Return the letters from the targe string that do not need to be
+        changed for the answer."""
         letters = []
         category = slipnet.plato_letter_category
         for letter in self.target_string.get_letters():
-            t = False
+            present = False
             for obj in objects_to_change:
                 if letter in obj.letters():
-                    t = True
-            if not t:
+                    present = True
+            if not present:
                 letters.append(Letter(letter.name, self.answer_string,
                                       letter.get_descriptor(category),
                                       letter.left_string_position))
