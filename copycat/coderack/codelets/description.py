@@ -83,27 +83,22 @@ class DescriptionStrengthTester(Codelet):
         return [(DescriptionBuilder([description]), strength)]
 
 class DescriptionTopDownScout(Codelet):
-    '''
-    Chooses an object probabilistically by total salience, checking if it
+    """Choose an object probabilistically by total salience, checking if it
     fits any of the descriptions in the description_type's "has instance"
     list. If so, proposes a description based on the property and posts a
     description strength tester codelet with urgency a funtion of the
-    activation of the proposed descriptor.
-    '''
+    activation of the proposed descriptor."""
     structure_category = 'description'
     def run(self, coderack, slipnet, workspace):
         description_type = self.arguments[0]
 
-        # Choose an object.
-        object = workspace.choose_object('total_salience')
+        obj = workspace.choose_object('total_salience')
 
-        # Choose a relevant descriptor.
-        descriptors = description_type.get_possible_descriptors(object)
-        if not descriptors:
-            return
+        descriptors = description_type.get_possible_descriptors(obj)
+        if descriptors == []:
+            return # Fizzle
+
         activations = [descriptor.activation for descriptor in descriptors]
-        index = toolbox.weighted_index(activations)
-        descriptor = descriptors[index]
+        descriptor = toolbox.weighted_select(activations, descriptors)
 
-        # Propose the description.
-        return workspace.propose_description(object, description_type, descriptor)
+        return workspace.propose_description(obj, description_type, descriptor)
