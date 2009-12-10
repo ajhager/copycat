@@ -40,76 +40,9 @@
 ; propose-description | Workspace.propose_description
 ;----------------------------------------------
 
-(defun bottom-up-description-scout 
-       (&aux chosen-object chosen-description chosen-descriptor
-	     has-property-links choice-list chosen-property)
-
-; Chooses an object probabilistically by total salience, and chooses a relevant
-; description of the object probabilistically by activation.  Sees if the 
-; descriptor has any "has property"
-; links that are short enough. (E.g., "A" has a "has property" link to "
-; first").  If so, chooses one
-; of the properties probabilistically, based on degree of association and 
-; activation, proposes a description based on the property, and posts a 
-; description-strength-tester codelet with urgency a function of the 
-; activation of the property. 
-
-(block nil
-  (if* %verbose% 
-   then (format t "~&In bottom-up-description-scout.~&"))
-
-  ; Choose an object.
-  (setq chosen-object (send *workspace* :choose-object ':total-salience))
-  (if* %verbose% 
-   then (format t "Chose object ") 
-        (send chosen-object :print))
-
-  ; Choose a relevant description of the object.
-  (setq chosen-description 
-	(send chosen-object :choose-relevant-description-by-activation))
-  (if* (null chosen-description)
-   then (if* %verbose% 
-	 then (format t 
-		      "Couldn't choose a description.  Fizzling.~&"))
-        (return))
-  (setq chosen-descriptor (send chosen-description :descriptor))
-  (if* %verbose% then (format t "Chose descriptor ~a~&" 
-			        (send chosen-descriptor :pname)))
-
-  ; See if this descriptor has any "has property" links that are short
-  ; enough (decided probabilistically).
-  (setq has-property-links 
-	(send chosen-descriptor :similar-has-property-links))
-
-  (if* %verbose% 
-   then (format t "Similar has-property-links:~&")
-        (send-method-to-list has-property-links :print))
-
-  (if* (null has-property-links)
-   then (if* %verbose% 
-         then (format t "No short-enough has-property-links. Fizzling.~&"))
-        (return))
-
-  ; Choose a property probabilistically, based on degree of association and 
-  ; activation.
-  (setq choice-list 
-        (list-multiply 
-	    (send-method-to-list has-property-links :degree-of-association)
-            (send-method-to-list
-		(send-method-to-list has-property-links :to-node) 
-		:activation)))
-  (setq chosen-property 
-	(send (nth (select-list-position choice-list) has-property-links)
-	      :to-node))
-
-  (if* %verbose% 
-   then (format t 
-		"Chosen-property: ~a~&" (send chosen-property :pname)))
-
-  (propose-description chosen-object (send chosen-property :category) 
-		       chosen-property)))
-
-;---------------------------------------------
+;----------------------------------------------
+; bottom-up-description-scout  | DescriptionBottomUpScout
+;----------------------------------------------
 
 (defun top-down-description-scout (description-type 
 				   &aux chosen-object possible-descriptors

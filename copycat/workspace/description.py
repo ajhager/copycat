@@ -40,6 +40,8 @@ class Description(Structure):
 
     def __eq__(self, other):
         """Return True if the two descriptions are equal."""
+        if other == None or not isinstance(other, Description):
+            return False
         return self.description_type == other.description_type and \
                 self.descriptor == other.descriptor
 
