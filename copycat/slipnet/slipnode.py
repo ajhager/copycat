@@ -52,7 +52,7 @@ class Slipnode(object):
         self.codelets = codelets
         self.clamp = False
         self.intrinsic_link_length = intrinsic_link_length
-        if intrinsic_link_length:
+        if intrinsic_link_length != None:
             self.shrunk_link_length = round(intrinsic_link_length * .4)
         else:
             self.shrunk_link_length = None

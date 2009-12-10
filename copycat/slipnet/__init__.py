@@ -94,10 +94,10 @@ plato_sameness = add_node('sameness', 80, ['BondTopDownCategoryScout'], 0)
 # Group nodes
 plato_predecessor_group = add_node('predgroup', 50,
                                    ['GroupTopDownCategoryScout'], directed=True)
-plato_predecessor_group.iterate_group = lambda category: get_related_group(category, plato_predecessor)
+plato_predecessor_group.iterate_group = lambda category: get_related_node(category, plato_predecessor)
 plato_successor_group = add_node('succgrp', 50, ['GroupTopDownCategoryScout'],
                                 directed=True)
-plato_successor_group.iterate_group = lambda category: get_related_group(category, plato_successor)
+plato_successor_group.iterate_group = lambda category: get_related_node(category, plato_successor)
 plato_sameness_group = add_node('samegrp', 80, ['GroupTopDownCategoryScout'])
 plato_sameness_group.iterate_group = lambda category: category
 

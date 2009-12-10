@@ -279,7 +279,7 @@ class Workspace(object):
                 self.changed_length_group = obj
                 new_descriptor = self.get_new_descriptor_for_answer(obj,
                                                                     description_type)
-                if new_descriptor not in slipnet.plato_numbers:
+                if new_descriptor not in slipnet.slipnet_numbers:
                     self.snag_object = obj
                     return # Snag
 
@@ -289,8 +289,9 @@ class Workspace(object):
                         return # Snag
 
                 group_direction = obj.direction_category
-                a = slipnet.node_to_number(new_descriptor)
-                b = slipnet.node_to_number(obj.get_descriptor(slipnet.plato_length))
+                a = int(new_descriptor.name)
+                b = int(obj.get_descriptor(slipnet.plato_length).name)
+                
                 self.amount_length_changed = a - b
 
                 if not group_direction or group_direction == slipnet.plato_right:
@@ -307,7 +308,7 @@ class Workspace(object):
                 modified_letters.append(new_letter)
                 new_string_position = new_letter.left_string_position
 
-                for i in range(1, slipnet.node_to_number(new_descriptor) - 1):
+                for i in range(1, int(new_descriptor.name) - 1):
                     if not new_letter:
                         break
                     if not group_direction or \

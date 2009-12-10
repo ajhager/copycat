@@ -33,14 +33,14 @@ class Sliplink(object):
 
     def intrinsic_degree_of_association(self):
         """Return the intrinsic degree of association of the link."""
-        if self.fixed_length:
+        if self.fixed_length != None:
             return 100 - self.fixed_length
         else:
             return self.label.intrinsic_degree_of_association()
 
     def degree_of_association(self):
         """Return the degree of association of the link."""
-        if self.fixed_length:
+        if self.fixed_length != None:
             return 100 - self.fixed_length
         else:
             return self.label.degree_of_association()
