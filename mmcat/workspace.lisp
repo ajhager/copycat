@@ -349,12 +349,7 @@
                     sum (* (send obj :relative-importance)
 		           (send obj :inter-string-unhappiness))) 200)))
 
-;---------------------------------------------
 
-(defmethod (workspace :total-unhappiness) ()
-; Returns a weighted average of the total unhappiness of objects
-; on the workspace, weighted by each object's relative importance in the 
-; string.
-  (min 100 (/ (loop for obj in (send self :object-list)
-                    sum (* (send obj :relative-importance)
-		           (send obj :total-unhappiness))) 200)))
+;---------------------------------------------
+; workspace.total-unhappiness
+;---------------------------------------------

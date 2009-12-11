@@ -419,10 +419,9 @@ class Workspace(object):
         return min(100, s / 200.0)
 
     def total_unhappiness(self):
-        '''
-        Return a weighted average of the total unhappiness of ojbects on the
-        workspace, weighted by each object's relative importnace in the string.
-        '''
+        """Return a weighted average of the total unhappiness of ojbects on
+        the workspace, weighted by each object's relative importnace in the
+        string."""
         s = sum([obj.relative_importance * obj.total_unhappiness
                  for obj in self.objects()])
         return min(100, s / 200.0)
