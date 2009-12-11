@@ -28,18 +28,9 @@
 ; correspondence.calculate-external-strength
 ;---------------------------------------------
 
-(defmethod (correspondence :internally-coherent?) 
-           (&aux cm-list result)
-; for now this returns t if there is any pair of relevant-distinguishing 
-; concept-mappings that support each other.  this isn't quite right.
-  (setq cm-list
-	(send self :relevant-distinguishing-cms))
-  (if* (> (length cm-list) 1)
-   then (loop for cm in cm-list until result do
-	      (loop for other-cm in (remove cm cm-list) 
-	            when (supporting-concept-mappings? cm other-cm)
-	            return (setq result t))))
-  result)
+;---------------------------------------------
+; correspondence.internally-coherent?
+;---------------------------------------------
 	      
 ;---------------------------------------------
 ; rule.calculate-internal-strength

@@ -110,10 +110,8 @@ class Correspondence(Structure):
                               number_of_cms_factor))
 
     def is_internally_coherent(self):
-        '''
-        Returns True if there is any pair of relevant distinguishing
-        concept mappings that support each other.
-        '''
+        """Return True if there is any pair of relevant distinguishing
+        concept mappings that support each other."""
         cms = self.relevant_distinguishing_concept_mappings()
         if len(cms) > 1:
             for cm in cms:
