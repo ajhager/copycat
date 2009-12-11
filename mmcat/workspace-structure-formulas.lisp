@@ -260,81 +260,12 @@
   num-of-supporting-groups)
 
 ;---------------------------------------------
-
-(defmethod (group :local-density) 
-           (&aux next-obj next-group  
-		 (slot-sum 0) (support-sum 0))
-
-; Returns a rough measure of the density in the string of groups of the same 
-; group-category and direction-category as the given group.
-; This method is used in calculating the external strength of a group.
-; I don't think this method is quite right.  The result depends on which
-; right and left neighbors are chosen, which is probabilistic, so it doesn't
-; always give the same value.
-(block nil
-  (if* (send self :string-spanning-group?)
-   then (return 100))
-  
-  ; First loop though left-neighbors.
-  (setq next-obj (send left-obj :choose-left-neighbor))
-  ; If the next object is a letter in a group, then set the next object
-  ; to the the group.  I'm not sure that this is the right 
-  ; way to do all this; it might need to be fixed.
-  (if* (and (typep next-obj 'letter) (send next-obj :group))
-   then (setq next-obj (send next-obj :group)))
-  (loop until (null next-obj) do
-        ; Look at next-obj's group.  Count the next-group only if it doesn't 
-	; overlap the original group.  
-	(setq next-group (if* (typep next-obj 'letter) then nil else next-obj))
-        (incf slot-sum) ; Add 1 to the number of possible group slots looked 
-	                ; at.
-        (if* (and next-group
-                  ; Don't count the group if it overlaps this group.
-	          (not (groups-overlap? self next-group))
-                  (eq (send next-group :group-category) group-category)
-                  (eq (send next-group :direction-category) 
-		      direction-category))
-	 then (incf support-sum))
-	(setq next-obj (send next-obj :choose-left-neighbor)))
-
-  ; Now loop though right-neighbors.
-  (setq next-obj (send right-obj :choose-right-neighbor))
-  ; If the next object is a letter in a group, then set the next object
-  ; to the group.  I'm not sure that this is the right 
-  ; way to do all this; it might need to be fixed.
-  (if* (and (typep next-obj 'letter) (send next-obj :group))
-   then (setq next-obj (send next-obj :group)))
-  (loop until (null next-obj) do
-        ; Look at next-obj's group.  Count the next-group only if it doesn't 
-	; overlap the original group.  
-	(setq next-group (if* (typep next-obj 'letter) then nil else next-obj))
-        (incf slot-sum) ; Add 1 to the number of possible group slots looked 
-	                ; at.
-        ; Support-sum gets full weight for same type of group, 0 
-        ; weight for null group, and 0 for different type of group.
-        (if* (and next-group
-                  ; Don't count the group if it overlaps this group.
-	          (not (groups-overlap? self next-group))
-                  (eq (send next-group :group-category) group-category)
-                  (eq (send next-group :direction-category) 
-		      direction-category))
-	 then (incf support-sum))
-	(setq next-obj (send next-obj :choose-right-neighbor)))
-
-  (if* (= slot-sum 0) 
-   then 100 else (round (* 100 (/ support-sum slot-sum))))))
-
+; group.local-density
 ;---------------------------------------------
 
-(defmethod (group :local-support) (&aux number density adjusted-density
-					   number-factor)
-  (setq number (send self :number-of-local-supporting-groups))    
-  (if* (= number 0)
-   then 0
-   else (setq density (send self :local-density))
-        (setq adjusted-density (* 100 (sqrt (/ density 100))))
-        (setq number-factor (min 1 (expt .6 (/ 1 (cube number)))))
-        (round (* adjusted-density number-factor))))
+;---------------------------------------------
+; group.local-support
+;---------------------------------------------
 	   
 ;---------------------------------------------
 ; correspondence.support | Correspondence.support

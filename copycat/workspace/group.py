@@ -176,11 +176,9 @@ class Group(Object, Structure):
         return number_of_supporting_groups
     
     def local_density(self):
-        '''
-        Return the rough measure of the density in the string of groups of the
-        same group category and directin category as the given group. This
-        method is used in calculating the external strength of a group.
-        '''
+        """Return the rough measure of the density in the string of groups of
+        the same group category and directin category as the given group. This
+        method is used in calculating the external strength of a group."""
         if self.is_string_spanning_group():
             return 100
 
@@ -190,7 +188,7 @@ class Group(Object, Structure):
         next_object = self.left_object.choose_left_neighbor()
         if next_object and next_object.type_name == 'letter' and next_object.group:
             next_object = next_object.group
-        while next_object:
+        while next_object != None:
             if next_object.type_name == 'letter':
                 next_group = None
             else:
@@ -205,7 +203,7 @@ class Group(Object, Structure):
         next_object = self.right_object.choose_right_neighbor()
         if next_object and next_object.type_name == 'letter' and next_object.group:
             next_object = next_object.group
-        while next_object:
+        while next_object == None:
             if next_object.type_name == 'letter':
                 next_group = None
             else:
@@ -223,14 +221,14 @@ class Group(Object, Structure):
             return round(100 * (support_sum / float(slot_sum)))
 
     def local_support(self):
+        """Return the local support of the group in the string."""
         number = self.number_of_local_supporting_groups()
         if number == 0:
             return 0
-        else:
-            density = self.local_density()
-            adjusted_density = 100 * (math.sqrt(density / 100.0))
-            number_facet = min(1, .6 ** (1 / number ** 3))
-            return round(adjusted_density * number_facet)
+        density = self.local_density()
+        adjusted_density = 100 * (math.sqrt(density / 100.0))
+        number_factor = min(1, .6 ** (1 / number ** 3))
+        return round(adjusted_density * number_factor)
 
     def sharing_group(self, other):
         return self.group == other.group
