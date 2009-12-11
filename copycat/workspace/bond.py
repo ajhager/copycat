@@ -244,11 +244,9 @@ class Bond(Structure):
         return self.from_object.letter_span() + self.to_object.letter_span()
 
     def local_density(self):
-        '''
-        Return a rough measure of the density in the string of bonds of the
-        same bond category and direction category as the given bond. This
-        method is used in calculating the external strength of a bond.
-        '''
+        """Return a rough measure of the density in the string of bonds of the
+        same bond category and direction category as the given bond. This method
+        is used in calculating the external strength of a bond."""
         def calc(direction):
             slot_sum = 0
             support_sum = 0
@@ -272,16 +270,16 @@ class Bond(Structure):
         slot_sum, support_sum = map(sum, zip(calc('left'), calc('right')))
         if slot_sum == 0:
             return 100
-        else:
-            return round(100 * (support_sum / float(slot_sum)))
+        return round(100 * (support_sum / float(slot_sum)))
 
     def local_support(self):
+        """Return this bond's local support in the string."""
         number = self.number_of_local_supporting_bonds()
         if number == 0:
             return 0
         density = self.local_density()
         adjusted_density = 100 * (math.sqrt(density / 100.0))
-        number_factor = min(1, .6 ** (1 / number ** 3))
+        number_factor = min(1, .6 ** (1.0 / number ** 3))
         return round(adjusted_density * number_factor)
 
     def number_of_local_supporting_bonds(self):

@@ -142,34 +142,9 @@
 ; get-incompatible-correspondences
 ;---------------------------------------------
 
-(defmethod (group :incompatible-correspondence?) 
-           (c obj &aux string-position-category-concept-mapping other-obj
-		    other-bond group-concept-mapping)
-; Returns t if the given correspondence is incompatible with the given group.
-(block nil
-  (setq string-position-category-concept-mapping
-        (loop for cm in (send c :concept-mapping-list)
-              when (eq (send cm :description-type1) plato-string-position-category)
-	      return cm))
-
-  (if* (null string-position-category-concept-mapping)
-   then (return nil))
-  (setq other-obj (send c :other-obj obj))
-  (if* (send other-obj :leftmost-in-string?)
-   then (setq other-bond (send other-obj :right-bond))
-   else (if* (send other-obj :rightmost-in-string?)
-	 then (setq other-bond (send other-obj :left-bond))))
-  (if* (or (null other-bond) 
-	   (null (send other-bond :direction-category))) 
-   then (return nil))
-  (setq group-concept-mapping
-        (make-concept-mapping 
-	    plato-direction-category plato-direction-category
- 	    direction-category (send other-bond :direction-category)
-	    nil nil))
-  (if* (incompatible-concept-mappings? 
-	   group-concept-mapping string-position-category-concept-mapping)
-   then t)))
+;---------------------------------------------
+; group.incompatible-correspondence?
+;---------------------------------------------
 
 ;---------------------------------------------
 ; group.get-bonds-to-be-flipped | Group.get_bonds_to_be_flipped

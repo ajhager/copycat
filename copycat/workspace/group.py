@@ -262,31 +262,32 @@ class Group(Object, Structure):
         return correspondences
 
     def is_incompatible_correspondence(self, correspondence, obj):
-        category = nodes.plato_string_position_category
-        for cm in correspondence.concept_mappings:
-            if cm.description_type1 == category:
+        """Return True if the given corresponence is incompatible with the
+        group."""
+        concept_mapping = None
+        for cm in correspondence.get_concept_mappings():
+            if cm.description_type1 == nodes.plato_string_position_category:
                 concept_mapping = cm
                 break
+        if concept_mapping == None:
+            return False
 
-        if concept_mapping:
-            other_object = correspondence.other_object(obj)
-            other_bond = None
-            if other_object.is_leftmost_in_string():
-                other_bond = other_object.right_bond
-            elif other_object.is_rightmost_in_string():
-                other_bond = other_object.left_bond
-            if other_bond != None:
-                if other_bond.direction_category != None and \
-                        self.direction_category != None:
-                    direction = nodes.plato_direction_category
-                    group_mapping = Mapping(direction, direction,
-                                            self.direction_category,
-                                            other_bond.direction_category,
-                                            None, None)
-                    if group_mapping.is_incompatible_concept_mapping(concept_mapping):
-                        return True
-        return False
-
+        other_object = correspondence.other_object(obj)
+        other_bond = None
+        if other_object.is_leftmost_in_string():
+            other_bond = other_object.right_bond
+        elif other_object.is_rightmost_in_string():
+            other_bond = other_object.left_bond
+        if other_bond != None:
+            if other_bond.direction_category != None and \
+                    self.direction_category != None:
+                direction = nodes.plato_direction_category
+                group_mapping = Mapping(direction, direction,
+                                        self.direction_category,
+                                        other_bond.direction_category,
+                                        None, None)
+                if group_mapping.is_incompatible_concept_mapping(concept_mapping):
+                    return True
 
     def leftmost_letter(self):
         """Return the leftmost letter in the group or in the leftmost subgroup

@@ -233,73 +233,11 @@
   num-of-supporting-bonds)
 
 ;---------------------------------------------
-
-(defmethod (bond :local-density)
-           (&aux next-obj last-obj next-bond 
-		 (slot-sum 0) (support-sum 0))
-
-; Returns a rough measure of the density in the string of bonds of 
-; the same bond-category and direction-category as the given bond.  
-; This method is used in calculating the external strength of a bond.
-; I don't think this method is quite right.  The result depends on which
-; right and left neighbors are chosen, which is probabilistic, so it doesn't
-; always give the same value.
-
-  ; First loop though left-neighbors.
-  (setq last-obj left-obj)
-  (setq next-obj (send left-obj :choose-left-neighbor))
-  (loop until (null next-obj) do
-	(incf slot-sum) ; Add 1 to the number of possible bond slots looked at.
-        ; Look at the bond between these two objects.
-	(setq next-bond (aref (send string :left-right-bond-array)
-			      (send next-obj :string-number)
-			      (send last-obj :string-number)))
-
-        (if* (and next-bond 
-		  (eq (send next-bond :bond-category) 
-		      bond-category)
-                  (eq (send next-bond :direction-category) 
-		      direction-category))
-                 then (incf support-sum))
-  	(setq last-obj next-obj)
-	(setq next-obj (send next-obj :choose-left-neighbor)))
-
-    
-  ; Now loop though right-neighbors.
-  (setq last-obj right-obj)
-  (setq next-obj (send right-obj :choose-right-neighbor))
-  (loop until (null next-obj) do
-	(incf slot-sum) ; Add 1 to the number of possible bond slots looked at.
-        ; Look at the bond between these two objects.
-	(setq next-bond (aref (send string :left-right-bond-array)
-			      (send last-obj :string-number)
-			      (send next-obj :string-number)))
-
-        (if* (and next-bond
-		  (eq (send next-bond :bond-category) 
-		      bond-category)
-                  (eq (send next-bond :direction-category) 
-		      direction-category))
-         then (incf support-sum))
-	(setq last-obj next-obj)
-	(setq next-obj (send next-obj :choose-right-neighbor)))
-    
-  (if* (= slot-sum 0) 
-   then 100 else (round (* 100 (/ support-sum slot-sum)))))
-  
+; bond.local-density
 ;---------------------------------------------
 
-(defmethod (bond :local-support) (&aux number density adjusted-density
-					   number-factor)
-  (setq number (send self :number-of-local-supporting-bonds))    
-  (if* (= number 0)
-   then 0
-   else (setq density (send self :local-density))
-        (setq adjusted-density (* 100 (sqrt (/ density 100))))
-        (setq number-factor (min 1 (expt .6 (/ 1 (cube number)))))
-        (round (* adjusted-density number-factor))))
-	   
-
+;---------------------------------------------
+; bond.local-support
 ;---------------------------------------------
 
 (defmethod (group :number-of-local-supporting-groups) 
