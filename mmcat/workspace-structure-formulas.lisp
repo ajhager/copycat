@@ -240,24 +240,9 @@
 ; bond.local-support
 ;---------------------------------------------
 
-(defmethod (group :number-of-local-supporting-groups) 
-           (&aux num-of-supporting-groups)
-; Returns the number of supporting groups in the given group's string.
-; Looks at all the other groups in the string, counting groups of the 
-; same grouup-category and direction-category.  Doesn't take distance into 
-; account; all qualifying groups in the string are counted the same.
-  (setq num-of-supporting-groups
-	(loop for other-group in (remove self (send string :group-list)) 
-	      when (and (not (or (subgroup? self other-group)
-				 (subgroup? other-group self)
-			         (groups-overlap? self other-group)))
-  		        (eq (send other-group :group-category) group-category)
-		        (eq (send other-group :direction-category) 
-			    direction-category))
-	      count t into supporting-group-count
-	      finally (return supporting-group-count)))
-
-  num-of-supporting-groups)
+;---------------------------------------------
+; group.number-of-local-supporting-groups
+;---------------------------------------------
 
 ;---------------------------------------------
 ; group.local-density

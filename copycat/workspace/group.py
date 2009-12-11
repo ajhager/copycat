@@ -154,19 +154,16 @@ class Group(Object, Structure):
             return self.local_support()
 
     def number_of_local_supporting_groups(self):
-        '''
-        Return the number of supporting groups in the given gruop's string.
+        """Return the number of supporting groups in the given gruop's string.
         Looks at all the other groups in the string, counting groups of the
         same group category and direction category.  Does not take distance
-        into acount; all qualifying groups in the string are counted the same.
-        '''
+        into acount; all qualifying groups in the string are counted the
+        same."""
         number_of_supporting_groups = 0
         groups = self.string.get_groups()
         if self in groups:
             groups.remove(self)
         for other_group in groups:
-            if other_group == None:
-                continue
             if (not (self.is_subgroup_of(other_group) or \
                          other_group.is_subgroup_of(self) or \
                          self.overlaps(other_group))) and \
@@ -203,7 +200,7 @@ class Group(Object, Structure):
         next_object = self.right_object.choose_right_neighbor()
         if next_object and next_object.type_name == 'letter' and next_object.group:
             next_object = next_object.group
-        while next_object == None:
+        while next_object != None:
             if next_object.type_name == 'letter':
                 next_group = None
             else:
