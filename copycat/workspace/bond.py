@@ -283,17 +283,16 @@ class Bond(Structure):
         return round(adjusted_density * number_factor)
 
     def number_of_local_supporting_bonds(self):
-        '''
-        Return the number of supporting bonds in the given bond's string.
+        """Return the number of supporting bonds in the given bond's string.
         Looks at all the other bonds in the string, counting bonds of the same
         bond category and direction category.  Does not take distance into
-        account; all qualifying bonds in the string are counted the same.
-        '''
+        account; all qualifying bonds in the string are counted the same."""
         number_of_supporting_bonds = 0
         letter_distance = self.workspace.letter_distance
+        bonds = self.string.get_bonds()
+        if self in bonds:
+            bonds.remove(self)
         for bond in self.string.get_bonds():
-            if bond == self:
-                continue
             if all([letter_distance(self.left_object, bond.left_object) != 0,
                     letter_distance(self.right_object, bond.right_object) != 0,
                     bond.bond_category == self.bond_category,

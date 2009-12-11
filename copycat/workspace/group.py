@@ -128,7 +128,7 @@ class Group(Object, Structure):
         else:
             bond_facet_factor = .5
 
-        related = ndoes.get_related_node(self.group_category,
+        related = nodes.get_related_node(self.group_category,
                                          nodes.plato_bond_category)
         bond_component = related.degree_of_association() * bond_facet_factor
         length_component = {1:5, 2:20, 3:60}.get(self.length(), 90)
@@ -136,7 +136,7 @@ class Group(Object, Structure):
         bond_component_weight = bond_component ** .98
         length_component_weight = 100 - bond_component_weight
         return toolbox.weighted_average((bond_component_weight,
-                                         ength_component_weight),
+                                         length_component_weight),
                                         (bond_component,
                                          length_component))
 

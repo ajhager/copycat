@@ -182,12 +182,9 @@
 ; description.local-support
 ;---------------------------------------------
 
-(defmethod (bond :number-of-local-supporting-bonds) 
-           (&aux num-of-supporting-bonds)
-; Returns the number of supporting bonds in the given bond's string.
-; Looks at all the other bonds in the string, counting bonds of the 
-; same bond-category and direction-category.  Doesn't take distance into 
-; account; all qualifying bonds in the string are counted the same.
+;---------------------------------------------
+; bond.number-of-local-supporting-bonds
+;---------------------------------------------
   (setq num-of-supporting-bonds 
 	(loop for other-bond in (remove self (send string :bond-list)) 
 	      when (and (not (= (letter-distance 
