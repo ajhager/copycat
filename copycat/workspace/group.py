@@ -120,38 +120,31 @@ class Group(Object, Structure):
                     self.group_category == other.group_category])
 
     def calculate_internal_strength(self):
-        '''
-        For now, groups based on letter category are stronger than groups based
-        on other facets. This should be fixed; a more general mechanism is
-        needed.
-        '''
+        """For now, groups based on letter category are stronger than groups
+        based on other facets. This should be fixed; a more general mechanism is
+        needed."""
         if self.bond_facet == nodes.plato_letter_category:
             bond_facet_factor = 1
         else:
             bond_facet_factor = .5
 
-        bond_component = nodes.get_related_node(self.group_category,
-                                                nodes.plato_bond_category).degree_of_association() * bond_facet_factor
-
-        if self.length() == 1:
-            length_component = 5
-        elif self.length() == 2:
-            length_component = 20
-        elif self.length() == 3:
-            length_component = 60
-        else:
-            length_component = 90
+        related = ndoes.get_related_node(self.group_category,
+                                         nodes.plato_bond_category)
+        bond_component = related.degree_of_association() * bond_facet_factor
+        length_component = {1:5, 2:20, 3:60}.get(self.length(), 90)
 
         bond_component_weight = bond_component ** .98
         length_component_weight = 100 - bond_component_weight
-        return toolbox.weighted_average((bond_component_weight,length_component_weight),
-                                        (bond_component, length_component))
+        return toolbox.weighted_average((bond_component_weight,
+                                         ength_component_weight),
+                                        (bond_component,
+                                         length_component))
 
     def calculate_external_strength(self):
+        """Return the group's external strength."""
         if self.spans_whole_string():
             return 100
-        else:
-            return self.local_support()
+        return self.local_support()
 
     def number_of_local_supporting_groups(self):
         """Return the number of supporting groups in the given gruop's string.

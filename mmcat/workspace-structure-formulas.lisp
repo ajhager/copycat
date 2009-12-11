@@ -9,45 +9,18 @@
 ;---------------------------------------------
 ; description.calculate-external-strength
 ;---------------------------------------------
+
+;---------------------------------------------
 ; bond.calculate-internal-strength
 ; bond.calculate-external-strength
 ;---------------------------------------------
 
-(defmethod (group :calculate-internal-strength) 
-           (&aux bond-facet-factor bond-component 
-		 bond-component-weight 
-		 length-component length-component-weight)
-
-  ; for now, groups based on letter-category are stronger than groups based
-  ; on other facets (namely, length). this should be fixed; a more 
-  ; general mechanism is needed.	   
-  (if* (eq bond-facet plato-letter-category)
-         then (setq bond-facet-factor 1)
-         else (setq bond-facet-factor .5))
-
-  (setq bond-component 
-	(* (send (send group-category :get-related-node 
-		       plato-bond-category) :degree-of-association) 
-	   bond-facet-factor))
-  
-  (setq length-component 
-        (cond ((= (send self :length) 1) 5)
-	      ((= (send self :length) 2) 20)
-	      ((= (send self :length) 3) 60)
-	      (t 90)))
-
-  (setq bond-component-weight (expt bond-component .98))
-  (setq length-component-weight (fake-reciprocal bond-component-weight))
-	      
-  (weighted-average `((,bond-component . ,bond-component-weight)
-                      (,length-component . ,length-component-weight))))
+;---------------------------------------------
+; group.calculate-internal-strength
+;---------------------------------------------
     
 ;---------------------------------------------
-
-(defmethod (group :calculate-external-strength)  ()
-  (if* (send self :spans-whole-string?) 
-   then 100 else (send self :local-support)))
-
+; group.calculate-external-strength
 ;---------------------------------------------
 
 (defmethod (correspondence :calculate-internal-strength) 
