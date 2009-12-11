@@ -54,9 +54,9 @@ class Bond(Structure):
         self.to_object_descriptor = to_object_descriptor
 
     def __eq__(self, other):
-        '''
-        Return True if this and the given bond represent the same bond.
-        '''
+        """Return True if this and the given bond represent the same bond."""
+        if other == None or not isinstance(other, Bond):
+            return False
         return all([self.from_object == other.from_object,
                     self.to_object == other.to_object,
                     self.bond_category == other.bond_category,

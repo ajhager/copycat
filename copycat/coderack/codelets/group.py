@@ -141,8 +141,7 @@ class GroupTopDownCategoryScout(Codelet):
     found. If possible, makes a proposed group of the given type of the
     objects scanned and posts a group length tester codelet with urgency
     a function of the degree of association of bonds of the given bond
-    category.
-    """
+    category."""
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
@@ -180,7 +179,7 @@ class GroupTopDownCategoryScout(Codelet):
         else:
             bond = obj.right_bond
 
-        if not bond or (bond.bond_category != bond_category):
+        if bond == None or bond.bond_category != bond_category:
             if obj.type_name == 'group':
                 return # Fizzle
             objects = [obj]
@@ -210,6 +209,8 @@ class GroupTopDownCategoryScout(Codelet):
         if direction_category:
             opposite_direction_category = nodes.get_related_node(direction_category,
                                                                  nodes.plato_opposite)
+        else:
+            opposite_direction_category = None
 
         objects = [bond.left_object, bond.right_object]
         bonds = [bond]
@@ -218,18 +219,18 @@ class GroupTopDownCategoryScout(Codelet):
             bond_to_add = None
             if direction == nodes.plato_left:
                 next_bond = next_bond.choose_left_neighbor()
-                if not next_bond:
+                if next_bond == None:
                     break
                 else:
                     next_object = next_bond.left_object
             else:
                 next_bond = next_bond.choose_right_neighbor()
-                if not next_bond:
+                if next_bond == None:
                     break
                 else:
                     next_object = next_bond.right_object
 
-            if not next_bond:
+            if next_bond == None:
                 bond_to_add = None
             elif all([next_bond.bond_category == bond_category,
                       next_bond.direction_category == direction_category,

@@ -32,7 +32,7 @@ class Structure(object):
         """Initialize Structure."""
         self.string = None
         self.structure_category = None
-        self.group = False
+        self.group = None
         self.internal_strength = 0
         self.external_strength = 0
         self.total_strength = 0

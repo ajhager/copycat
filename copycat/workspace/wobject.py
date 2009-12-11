@@ -366,7 +366,8 @@ class Object(object):
                 other_objects.remove(self)
             for obj in self.objects:
                 if obj.type_name == 'group':
-                    other_objects.remove(obj)
+                    if obj in other_objects:
+                        other_objects.remove(obj)
         descriptions = [o.descriptions for o in other_objects if o]
         descriptions = toolbox.flatten(descriptions)
         other_descriptors = [d.descriptor for d in descriptions]

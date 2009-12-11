@@ -43,19 +43,19 @@ class AnswerBuilder(Codelet):
             workspace.last_snag_time = coderack.time
             workspace.snag_structures = workspace.structures()
 
-            for bond in workspace.proposed_bonds:
-                bond.string.delete_proposed_bond(bond)
-            for group in workspace.proposed_groups:
-                group.string.delete_proposed_group(group)
-            for correspondence in workspace.proposed_correspondences:
-                workspace.delete_proposed_correspondence(correspondence)
+            for bond in workspace.proposed_bonds():
+                bond.string.remove_proposed_bond(bond)
+            for group in workspace.proposed_groups():
+                group.string.remove_proposed_group(group)
+            for correspondence in workspace.get_proposed_correspondences():
+                workspace.remove_proposed_correspondence(correspondence)
         
             workspace.translated_rule = None
             workspace.answer_string = None
             workspace.snag_condition = True
             workspace.temperature = 100
             workspace.clamp_temperature = True
-            for description in workspace.snag_object.descriptions():
+            for description in workspace.snag_object.descriptions:
                 description.descriptor.clamp = True
             workspace.snag_object.clamp_salience = True
             

@@ -51,7 +51,8 @@ class String(object):
 
     def remove_from_object_positions(self, obj, position):
         """Remove an object from the object positions."""
-        self.object_positions[position].remove(obj)
+        if obj in self.object_positions[position]:
+            self.object_positions[position].remove(obj)
 
     def add_letter(self, letter):
         """Add a letter to the string."""
@@ -91,7 +92,8 @@ class String(object):
 
     def remove_group(self, group):
         """Remove a group from the string."""
-        del(self.groups[group.left_object.string_number])
+        if group.left_object.string_number in self.groups:
+            del(self.groups[group.left_object.string_number])
         self.remove_from_object_positions(group, group.left_string_position)
         self.remove_from_object_positions(group, group.right_string_position)
 
@@ -130,7 +132,9 @@ class String(object):
         """Remove a proposed group from the string."""
         position = (group.left_object.string_number,
                     group.right_object.string_number)
-        self.proposed_groups[position].remove(group)
+        items = self.proposed_groups.get(position, [])
+        if group in items:
+            self.proposed_groups[position].remove(group)
 
     def get_proposed_groups(self):
         """Return a list of the proposed groups in the string."""

@@ -252,7 +252,7 @@ class Workspace(object):
                                                                 description_type)
             if not new_descriptor:
                 self.snag_object = obj
-                returno # Snag
+                return [] # Snag
 
             if description_type == slipnet.plato_letter_category:
                 new_letter = Letter(new_descriptor.name,
@@ -269,7 +269,7 @@ class Workspace(object):
                                                                         description_type)
                     if not new_descriptor:
                         self.snag_object = letter
-                        return # Snag
+                        return [] # Snag
 
                     new_letter = Letter(new_descriptor.name,
                                         self.answer_string,
@@ -282,12 +282,12 @@ class Workspace(object):
                                                                     description_type)
                 if new_descriptor not in slipnet.slipnet_numbers:
                     self.snag_object = obj
-                    return # Snag
+                    return [] # Snag
 
                 for group_member in obj.objects:
                     if isinstance(group_member, Group):
                         self.snag_object = obj
-                        return # Snag
+                        return [] # Snag
 
                 group_direction = obj.direction_category
                 a = int(new_descriptor.name)
@@ -322,7 +322,7 @@ class Workspace(object):
                     new_letter_category = gcat.iterate_group(let)
                     if not new_letter_category:
                         self.snag_object = new_letter
-                        return # Snag
+                        return [] # Snag
                     new_letter = Letter(new_letter_category.name,
                                         self.answer_string,
                                         new_letter_category,
@@ -427,7 +427,7 @@ class Workspace(object):
                  for obj in self.objects()])
         return min(100, s / 200.0)
 
-    def is_structure_in_snag_strucutres(self, structure):
+    def is_structure_in_snag_structures(self, structure):
         '''
         This method is used after a snag has been hit and the temperature has
         been clamped, to determine whether or not to release the temperature
@@ -456,8 +456,8 @@ class Workspace(object):
                 if isinstance(struct, Correspondence):
                     if struct.object1 == structure.object1 and \
                        struct.object2 == structure.object2 and \
-                       len(struct.relevant_distinguishing_concept_mappings) >= \
-                       len(structure.relevant_distinguishing_concept_mappings):
+                       len(struct.relevant_distinguishing_concept_mappings()) >= \
+                       len(structure.relevant_distinguishing_concept_mappings()):
                         return True
         elif isinstance(structure, Rule):
             for struct in self.snag_structures:
@@ -558,15 +558,15 @@ class Workspace(object):
         '''
         Return a list of the proposed bonds on the workspace.
         '''
-        return self.initial_string.proposed_bonds() + \
-                self.target_string.proposed_bonds()
+        return self.initial_string.get_proposed_bonds() + \
+                self.target_string.get_proposed_bonds()
 
     def proposed_groups(self):
         '''
         Return a list of the proposed groups on the workspace.
         '''
-        return self.initial_string.proposed_groups() + \
-                self.target_string.proposed_groups()
+        return self.initial_string.get_proposed_groups() + \
+                self.target_string.get_proposed_groups()
 
     def add_proposed_correspondence(self, correspondence):
         """Add a proposed correspondence to the workspace."""
@@ -588,7 +588,7 @@ class Workspace(object):
 
     def get_proposed_correspondences(self):
         """Return a list of proposed correspondences in the workspace."""
-        return self.proposed_correspondences.values()
+        return toolbox.flatten(self.proposed_correspondences.values())
 
     def get_proposed_correspondence(self, first, second):
         """Return a proposed correspondence at first, second."""
