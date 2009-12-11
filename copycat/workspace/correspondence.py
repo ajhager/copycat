@@ -84,24 +84,22 @@ class Correspondence(Structure):
             return min(100, support_sum)
 
     def calculate_external_strength(self):
+        """Return the correspondence's external strength."""
         return self.support()
 
     def calculate_internal_strength(self):
-        '''
+        """Return the correspondence's internal strength.
+
         A function of how many concept mappings there are, how strong they
         are and how much internal coherence there is among concept mappings.
-        '''
+        """
         relevant_distinguishing_cms = self.relevant_distinguishing_concept_mappings()
-        if not relevant_distinguishing_cms:
+        if relevant_distinguishing_cms == []:
             return 0
-        average_strength = toolbox.average(*[cm.strength() for cm in relevant_distinguishing_cms])
+        strengths = [cm.strength() for cm in relevant_distinguishing_cms]
+        average_strength = toolbox.average(*strengths)
         number_of_cms = len(relevant_distinguishing_cms)
-        if number_of_cms == 1:
-            number_of_cms_factor = .8
-        elif number_of_cms == 2:
-            number_of_cms_factor = 1.2
-        else:
-            number_of_cms_factor = 1.6
+        number_of_cms_factor = {1:.8, 2:1.2}.get(number_of_cms, 1.6)
 
         if self.is_internally_coherent():
             internal_coherence_factor = 2.5

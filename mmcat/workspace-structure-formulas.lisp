@@ -23,41 +23,9 @@
 ; group.calculate-external-strength
 ;---------------------------------------------
 
-(defmethod (correspondence :calculate-internal-strength) 
-		(&aux relevant-distinguishing-cms 
-		     average-strength internal-coherence-factor
-		     num-of-concept-mappings-factor num-of-concept-mappings)
-; a function of how many concept-mappings there are, how strong they are,
-; and how much internal coherence there is among concept mappings.
-  (setq relevant-distinguishing-cms
-	(send self :relevant-distinguishing-cms))
-
-  (if* (null relevant-distinguishing-cms)
-   then 0
-   else (setq average-strength
-	      (list-average 
-		  (send-method-to-list 
-		      relevant-distinguishing-cms :strength)))
-
-        (setq num-of-concept-mappings (length relevant-distinguishing-cms))
-        (setq num-of-concept-mappings-factor
-	      (case num-of-concept-mappings
-		    (1 .8)  
-		    (2 1.2)
-		    (t 1.6)))
-
-        (if* (send self :internally-coherent?)
-         then (setq internal-coherence-factor 2.5)
-         else (setq internal-coherence-factor 1))
-
-        (min 100 (round (* average-strength internal-coherence-factor
-			   num-of-concept-mappings-factor)))))
-
 ;---------------------------------------------
-
-(defmethod (correspondence :calculate-external-strength) ()
-  (send self :support))
-
+; correspondence.calculate-internal-strength
+; correspondence.calculate-external-strength
 ;---------------------------------------------
 
 (defmethod (correspondence :internally-coherent?) 
@@ -185,22 +153,6 @@
 ;---------------------------------------------
 ; bond.number-of-local-supporting-bonds
 ;---------------------------------------------
-  (setq num-of-supporting-bonds 
-	(loop for other-bond in (remove self (send string :bond-list)) 
-	      when (and (not (= (letter-distance 
-				    (send self :left-obj)
-		                    (send other-bond :left-obj)) 0))
-                        (not (= (letter-distance 
-				    (send self :right-obj)
-			            (send other-bond :right-obj)) 0))
-		        (eq (send other-bond :bond-category) 
-			    bond-category)
-		        (eq (send other-bond :direction-category) 
-			    direction-category))
-	      count t into supporting-bond-count
-	      finally (return supporting-bond-count)))
-
-  num-of-supporting-bonds)
 
 ;---------------------------------------------
 ; bond.local-density
