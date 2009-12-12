@@ -349,7 +349,6 @@
                     sum (* (send obj :relative-importance)
 		           (send obj :inter-string-unhappiness))) 200)))
 
-
 ;---------------------------------------------
 ; workspace.total-unhappiness
 ;---------------------------------------------

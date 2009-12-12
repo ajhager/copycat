@@ -77,6 +77,8 @@ class Window(pyglet.window.Window):
         self.layout.y = -60
 
     def update(self, dt):
+        if self.run.workspace.answer_string:
+            pyglet.app.exit()
         self.run.step()
         self.coderack_stats.update()
         self.draw_coderack()
@@ -108,4 +110,8 @@ class OpenglClient(pyglet.window.Window):
         coderack_stats = CoderackStatistics(run.coderack)
         window = Window(run, coderack_stats)
         pyglet.app.run()
+        print "%5s %s %s %s" % (seed,
+                                str(run.workspace.answer_string.name),
+                                run.workspace.temperature,
+                                run.coderack.time)
 
