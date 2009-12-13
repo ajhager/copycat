@@ -22,7 +22,8 @@
 #     make size and shape of each module perfectly customizable
 #     Add dedicated scenes for each module that adds full detail
 #     Add the ability to type in the problem and seed in client
-#     Add play/pause/stop/dump buttons
+#     Add play/pause/stop/dump buttons on the top left
+#     Add icons to switch between modules on the top right
 #     Add a module for doing bulk runs showing a graph of stats
 #     Abstract out theme and add one more amenable to being used in a paper
 #     Give slipnodes and codelet types better label names.
@@ -30,6 +31,7 @@
 #     Break each renderer off into its own separte module.
 #     Add arrows to indicate the flow of the analogy
 #     graphs in dedicated views showing activites over time.
+#     Consider dynamic tooltips that show details of the underlying object.
 
 import random
 

@@ -81,4 +81,3 @@ Having slipnodes in the global slipnet module level ruins enscapulation.
 Similarly there is a problem with using the default global random instance.
 Need to start thinking about multiplatform packaging.
 Need to create both text and GUI tutorial/overview.
-
