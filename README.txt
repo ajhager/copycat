@@ -22,6 +22,14 @@ answer    totals    avgtmp
   djk     4    0%     52
   ijk     3    0%     52
 
+12/13/09
+An initial GUI using the pure python package 'pyglet' has been added.
+For now, to use it you add --mode=opengl to the command line.
+
+e.g., ./Copycat.py abc abd ijk 42 --mode=opengl
+
+A more efficient and complete interface is being planned.
+
 12/09/09
 Copycat.py abc abd ijk 42 runs to completion with the answer ijl and a
 final temperature of 30! This marks the first successful run. There is
@@ -68,8 +76,9 @@ Copycat to work.
 Issues
 ------
 
-Need to add all description testers to nodes.
 The entire project needs a revamp for consistency and style.
 Having slipnodes in the global slipnet module level ruins enscapulation.
 Similarly there is a problem with using the default global random instance.
+Need to start thinking about multiplatform packaging.
+Need to create both text and GUI tutorial/overview.
 

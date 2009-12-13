@@ -23,6 +23,11 @@
 #     use color to indicate age and urgency for codelets.
 #     use a caching mechanism to optimize color/size changes.
 #     make size and shape of each module perfectly customizable
+#     Add dedicated scenes for each module that adds full detail
+#     Add the ability to type in the problem and seed in client
+#     Add play/pause/stop/dump buttons
+#     Add a module for doing bulk runs showing a graph of stats
+#     Abstract out theme and add one more amenable to being used in a paper
 
 import pyglet
 from pyglet.gl import *
