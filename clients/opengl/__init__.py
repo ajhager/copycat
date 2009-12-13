@@ -16,7 +16,6 @@
 
 ### NOTE: This is just a quickly thrown together mockup.
 # IDEAS:
-#     Modify the slipnode drawing code so it doesn't jitter on scaling.
 #     center workspace string vertically with respect to each other
 #     Add drawing routines for workspace structures
 #     use color to indicate age and urgency for codelets.
@@ -29,9 +28,11 @@
 #     Add a module for doing bulk runs showing a graph of stats
 #     Abstract out theme and add one more amenable to being used in a paper
 #     Give slipnodes and codelet types better label names.
-#     Consider using audio as cues to building/breaking/chaos/order.
+#     Consider using audio as cues to building/breaking/chaos/order/pause/end
 #     Break each renderer off into its own separte module.
 #     Make the digits of the timer more stable (less distracting)
+
+import random
 
 import pyglet
 from pyglet.gl import *
@@ -70,7 +71,8 @@ class Slipnet(object):
                 x = node_x * node_w + node_w / 2.0
                 y = node_y * node_h + node_h / 2.0 + 15
                 sprite = pyglet.sprite.Sprite(square, x=x, y=y, batch=self.batch)
-                sprite.opacity = 90
+                sprite.opacity = 100
+                sprite.rotation = 10
                 self.nodes.append(sprite)
                 label = pyglet.text.Label(node.name[:6], "EraserDust", 12, x=x,
                                           y=y-30, anchor_x="center", batch=self.batch)
@@ -93,7 +95,7 @@ class Slipnet(object):
             if node.clamp:
                 image.color = (c * 2, c * 2.55, c * 2.55)
             else:
-                image.color = (20, c * 1.5, c * 2)
+                image.color = (20, c * 1.9, c * 2.4)
 
     def draw(self):
         self.batch.draw()
