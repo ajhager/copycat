@@ -16,11 +16,13 @@
 
 ### NOTE: This is just a quickly thrown together mockup.
 # IDEAS:
-#     Make the letters come from the center outward taking up the entire upper half.
 #     Make the slipnet circles lerp from size to size.
+#     center workspace string vertically with respect to each other
 #     Add coderack representation on the bottom right side.
 #     Add drawing routines for workspace structures
 #     use color to indicate age and urgency for codelets.
+#     use a caching mechanism to optimize color/size changes.
+#     make size and shape of each module perfectly customizable
 
 import pyglet
 from pyglet.gl import *
@@ -134,6 +136,51 @@ class Workspace(object):
     def draw(self):
         self.batch.draw()
 
+class Coderack(object):
+    def __init__(self, coderack, x, y, w, h):
+        self.coderack = coderack
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+        self.batch = pyglet.graphics.Batch()
+        import copycat.coderack.codelets
+        names = [s for s in dir(copycat.coderack.codelets) if s[0].isupper()]
+        names.remove('AnswerBuilder')
+        vnames = [s[:25] for s in names]
+
+        self.codelets = []
+        self.counts = []
+        x = self.x + 50
+        y = self.h - 15
+        z = 0
+        for name, vname in zip(names, vnames):
+            if z == 12:
+                x += 250
+                y = self.h - 15
+            label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
+                                      color=(255,255,255, 125), batch=self.batch)
+            label2 = pyglet.text.Label("00", "EraserDust", 12, x=x - 30, y=y,
+                                       color=(255,255,255, 125), batch=self.batch)
+            label.name = name
+            self.codelets.append(label)
+            self.counts.append(label2)
+            y -= 25
+            z += 1
+
+    def update(self, dt):
+        from collections import defaultdict as dd
+        counts = dd(int)
+        for codelet in self.coderack.codelets():
+            counts[codelet.__class__.__name__] += 1
+
+        for name, number in zip(self.codelets, self.counts):
+            number.text = str(counts[name.name])
+
+    def draw(self):
+        self.batch.draw()
+
 class Window(pyglet.window.Window):
     def __init__(self, run):
         super(Window, self).__init__(1024, 600, caption="Copycat", vsync=False)
@@ -146,6 +193,7 @@ class Window(pyglet.window.Window):
         self.background = pyglet.resource.image("blackboard.png")
 
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
+        self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300)
         self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300)
 
         pyglet.clock.schedule(self.update)
@@ -153,8 +201,9 @@ class Window(pyglet.window.Window):
     def update(self, dt):
         if self.done:
             return
-        self.workspace.update(dt)
         self.slipnet.update(dt)
+        self.coderack.update(dt)
+        self.workspace.update(dt)
         if self.run.workspace.answer_string:
             self.done = True
         self.run.step()
@@ -162,8 +211,9 @@ class Window(pyglet.window.Window):
     def on_draw(self):
         self.clear()
         self.background.blit(0, 0)
-        self.workspace.draw()
         self.slipnet.draw()
+        self.coderack.draw()
+        self.workspace.draw()
         self.clock.draw()
 
 class OpenglClient(pyglet.window.Window):
