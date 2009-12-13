@@ -18,8 +18,6 @@
 # IDEAS:
 #     center workspace string vertically with respect to each other
 #     Add drawing routines for workspace structures
-#     use color to indicate age and urgency for codelets.
-#     use color and lerp to indicate the last time a type of codelet was run.
 #     use a caching mechanism to optimize color/size changes.
 #     make size and shape of each module perfectly customizable
 #     Add dedicated scenes for each module that adds full detail
@@ -30,8 +28,8 @@
 #     Give slipnodes and codelet types better label names.
 #     Consider using audio as cues to building/breaking/chaos/order/pause/end
 #     Break each renderer off into its own separte module.
-#     Make the digits of the timer more stable (less distracting)
-#     Make a better slipnode image that mimics the look of the font.
+#     Add arrows to indicate the flow of the analogy
+#     graphs in dedicated views showing activites over time.
 
 import random
 
@@ -217,7 +215,7 @@ class Timer(object):
                                       halign="center", anchor_x="center")
 
     def update(self, dt):
-        self.numl.text = str(self.run.coderack.time)
+        self.numl.text = str(self.run.coderack.time / self.run.timestep)
 
     def draw(self):
         self.batch.draw()
