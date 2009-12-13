@@ -33,23 +33,59 @@ square.anchor_y = square.height / 2.
 
 from copycat.run import Run
 
-class Slipnode(object):
-    def __init__(self, node, x, y):
-        self.node = node
-        self.image = pyglet.sprite.Sprite(square, x=x, y=y)
-        self.image.opacity = 100
-        self.label = pyglet.text.Label(self.node.name[:6], "EraserDust", 12,
-                                       x=x, y=y-30, anchor_x="center")
+class Slipnet(object):
+    def __init__(self, slipnet, x, y, w, h):
+        self.slipnet = slipnet
+        self.nodes = []
+        self.labels = []
+
+        self.batch = pyglet.graphics.Batch()
+        self.time = 1
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+        node_w = w / 10.0
+        node_h = h / 6.0
+
+        print node_w, node_h
+        index = 0
+        for node_y in range(6):
+            for node_x in range(10):
+                if index >= len(slipnet.slipnodes):
+                    break
+                node = slipnet.slipnodes[index]
+                x = node_x * node_w + node_w / 2.0
+                y = node_y * node_h + node_h / 2.0 + 15
+                sprite = pyglet.sprite.Sprite(square, x=x, y=y, batch=self.batch)
+                sprite.opacity = 100
+                self.nodes.append(sprite)
+                label = pyglet.text.Label(node.name[:6], "EraserDust", 12, x=x,
+                                          y=y-30, anchor_x="center", batch=self.batch)
+                self.labels.append(label)
+                index += 1
         
+    def update(self, dt):
+        self.time += dt
+        if self.time <= 1:
+            return
+        self.time = 0
+        for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
+            if node.is_active():
+                label.color = (255, 255, 255, 255)
+            else:
+                label.color = (255, 255, 255, 130)
+
+            image.scale = node.activation * .01 + .1
+
+            if node.clamp:
+                image.color = (160, 200, 255)
+            else:
+                image.color = (255, 255, 255)
+
     def draw(self):
-        self.image.scale = self.node.activation * .0045 + .1
-        if self.node.is_active():
-            self.label.color = (255, 255, 255, 255)
-        else:
-            self.label.color = (255, 255, 255, 130)
-        
-        self.image.draw()
-        self.label.draw()
+        self.batch.draw()
 
 class Letter(object):
     def __init__(self, letter, x, y):
@@ -67,7 +103,7 @@ class Letter(object):
 
 class Window(pyglet.window.Window):
     def __init__(self, run):
-        super(Window, self).__init__(1024, 600, caption="Copycat")
+        super(Window, self).__init__(1024, 600, caption="Copycat", vsync=False)
         self.clock = pyglet.clock.ClockDisplay()
         self.done = False
         glEnable(GL_BLEND)
@@ -76,16 +112,7 @@ class Window(pyglet.window.Window):
         self.run = run
         self.background = pyglet.resource.image("blackboard.png")
 
-        self.nodes = []
-        x, y = 0, 0
-        z = 0
-        for y in range(10):
-            for x in range(10):
-                if z >= len(self.run.slipnet.slipnodes):
-                    break
-                node = self.run.slipnet.slipnodes[z]
-                self.nodes.append(Slipnode(node, x * 50 + 30, y * 50 + 40))
-                z += 1
+        self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
 
         self.letters = []
         x, y = 110, 510
@@ -112,6 +139,7 @@ class Window(pyglet.window.Window):
             for letter in self.run.workspace.answer_string.get_letters():
                 self.letters.append(Letter(letter, x, y))
                 x += 50
+        self.slipnet.update(dt)
         self.run.step()
 
     def on_draw(self):
@@ -120,8 +148,7 @@ class Window(pyglet.window.Window):
         self.background.blit(0, 0)
         for letter in self.letters:
             letter.draw()
-        for node in self.nodes:
-            node.draw()
+        self.slipnet.draw()
 
         self.clock.draw()
 
