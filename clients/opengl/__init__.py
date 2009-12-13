@@ -40,7 +40,6 @@ class Slipnet(object):
         self.labels = []
 
         self.batch = pyglet.graphics.Batch()
-        self.time = 1
         self.x = x
         self.y = y
         self.w = w
@@ -49,7 +48,6 @@ class Slipnet(object):
         node_w = w / 10.0
         node_h = h / 6.0
 
-        print node_w, node_h
         index = 0
         for node_y in range(6):
             for node_x in range(10):
@@ -67,17 +65,14 @@ class Slipnet(object):
                 index += 1
         
     def update(self, dt):
-        self.time += dt
-        if self.time <= 1:
-            return
-        self.time = 0
+
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
+            image.scale = node.activation * .01 + .1
+
             if node.is_active():
                 label.color = (255, 255, 255, 255)
             else:
-                label.color = (255, 255, 255, 130)
-
-            image.scale = node.activation * .01 + .1
+                label.color = (200, 200, 200, 130)
 
             if node.clamp:
                 image.color = (160, 200, 255)
@@ -87,19 +82,57 @@ class Slipnet(object):
     def draw(self):
         self.batch.draw()
 
-class Letter(object):
-    def __init__(self, letter, x, y):
-        self.letter = letter
-        self.label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                       color=(255,255,255, 125))
+class Workspace(object):
+    def __init__(self, workspace, x, y, w, h):
+        self.workspace = workspace
+        self.batch = pyglet.graphics.Batch()
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+        self.letters = []
+        self.wletters = []
+        x, y = self.w / 2.0 - 100.0, self.h + self.h / 3.0 * 2.0
+        for letter in reversed(workspace.initial_string.get_letters()):
+            label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
+                                      color=(255,255,255, 125), batch=self.batch)
+            self.letters.append(label)
+            self.wletters.append(letter)
+            x -= 50
+        x, y = self.w / 2.0 + 70.0, self.h + self.h / 3.0 * 2.0
+        for letter in workspace.modified_string.get_letters():
+            label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
+                                      color=(255,255,255, 125), batch=self.batch)
+            self.letters.append(label)
+            self.wletters.append(letter)
+            x += 50
+        x, y = self.w / 2.0 - 100.0, self.h + self.h / 4.0
+        for letter in reversed(workspace.target_string.get_letters()):
+            label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
+                                      color=(255,255,255, 125), batch=self.batch)
+            self.letters.append(label)
+            self.wletters.append(letter)
+            x -= 50
+
+    def update(self, dt):
+        if self.workspace.answer_string:
+            x, y = self.w / 2.0 + 70.0, self.h + self.h / 4.0
+            for letter in self.workspace.answer_string.get_letters():
+                label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
+                                          color=(255,255,255, 125), batch=self.batch)
+                self.letters.append(label)
+                self.wletters.append(letter)
+                x += 50
+                
+        for label, letter in zip(self.letters, self.wletters):
+            if letter.is_changed:
+                label.color = (255, 100, 100, 130)
+            else:
+                label.color = (255, 255, 255, 130)
 
     def draw(self):
-        if self.letter.is_changed:
-            self.label.color = (255, 100, 100, 130)
-        else:
-            self.label.color = (255, 255, 255, 130)
-
-        self.label.draw()
+        self.batch.draw()
 
 class Window(pyglet.window.Window):
     def __init__(self, run):
@@ -113,43 +146,24 @@ class Window(pyglet.window.Window):
         self.background = pyglet.resource.image("blackboard.png")
 
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
-
-        self.letters = []
-        x, y = 110, 510
-        for letter in self.run.workspace.initial_string.get_letters():
-            self.letters.append(Letter(letter, x, y))
-            x += 50
-        x += 100
-        for letter in self.run.workspace.modified_string.get_letters():
-            self.letters.append(Letter(letter, x, y))
-            x += 50
-        x, y = 110, 375
-        for letter in self.run.workspace.target_string.get_letters():
-            self.letters.append(Letter(letter, x, y))
-            x += 50
+        self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300)
 
         pyglet.clock.schedule(self.update)
 
     def update(self, dt):
         if self.done:
             return
+        self.workspace.update(dt)
+        self.slipnet.update(dt)
         if self.run.workspace.answer_string:
             self.done = True
-            x, y = 350, 375
-            for letter in self.run.workspace.answer_string.get_letters():
-                self.letters.append(Letter(letter, x, y))
-                x += 50
-        self.slipnet.update(dt)
         self.run.step()
 
     def on_draw(self):
         self.clear()
-
         self.background.blit(0, 0)
-        for letter in self.letters:
-            letter.draw()
+        self.workspace.draw()
         self.slipnet.draw()
-
         self.clock.draw()
 
 class OpenglClient(pyglet.window.Window):
