@@ -29,6 +29,9 @@
 #     Add a module for doing bulk runs showing a graph of stats
 #     Abstract out theme and add one more amenable to being used in a paper
 #     Give slipnodes and codelet types better label names.
+#     Consider using audio as cues to building/breaking/chaos/order.
+#     Break each renderer off into its own separte module.
+#     Make the digits of the timer more stable (less distracting)
 
 import pyglet
 from pyglet.gl import *
@@ -67,7 +70,7 @@ class Slipnet(object):
                 x = node_x * node_w + node_w / 2.0
                 y = node_y * node_h + node_h / 2.0 + 15
                 sprite = pyglet.sprite.Sprite(square, x=x, y=y, batch=self.batch)
-                sprite.opacity = 100
+                sprite.opacity = 90
                 self.nodes.append(sprite)
                 label = pyglet.text.Label(node.name[:6], "EraserDust", 12, x=x,
                                           y=y-30, anchor_x="center", batch=self.batch)
@@ -79,17 +82,18 @@ class Slipnet(object):
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
             target = node.activation * .01
             self.scales[node] += (target - self.scales[node]) * dt
-            image.scale = self.scales[node] + .075
+            image.scale = self.scales[node]
 
+            c = self.scales[node] * 100
             if node.is_active():
-                label.color = (255, 255, 255, 255)
+                label.color = (255, 255, 255, int(c * 2))
             else:
                 label.color = (200, 200, 200, 130)
 
             if node.clamp:
-                image.color = (160, 200, 255)
+                image.color = (c * 2, c * 2.55, c * 2.55)
             else:
-                image.color = (255, 255, 255)
+                image.color = (20, c * 1.5, c * 2)
 
     def draw(self):
         self.batch.draw()
