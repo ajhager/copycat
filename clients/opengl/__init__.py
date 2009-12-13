@@ -28,6 +28,9 @@
 #     Add play/pause/stop/dump buttons
 #     Add a module for doing bulk runs showing a graph of stats
 #     Abstract out theme and add one more amenable to being used in a paper
+#     time displays.
+#     Give slipnodes and codelet types better label names.
+#     Lerp the color changes from temperature
 
 import pyglet
 from pyglet.gl import *
@@ -195,7 +198,9 @@ class Window(pyglet.window.Window):
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         self.run = run
-        self.background = pyglet.resource.image("blackboard.png")
+        
+        background = pyglet.resource.image("blackboard.png")
+        self.background = pyglet.sprite.Sprite(background)
 
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
         self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300)
@@ -211,11 +216,13 @@ class Window(pyglet.window.Window):
         self.workspace.update(dt)
         if self.run.workspace.answer_string:
             self.done = True
+        temp = self.run.workspace.temperature * 2.55
+        self.background.color = (255, 255 - temp, 255 - temp)
         self.run.step()
 
     def on_draw(self):
         self.clear()
-        self.background.blit(0, 0)
+        self.background.draw()
         self.slipnet.draw()
         self.coderack.draw()
         self.workspace.draw()
