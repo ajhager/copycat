@@ -28,7 +28,7 @@
 #     Add play/pause/stop/dump buttons
 #     Add a module for doing bulk runs showing a graph of stats
 #     Abstract out theme and add one more amenable to being used in a paper
-#     time displays.
+#     time display.
 #     Give slipnodes and codelet types better label names.
 #     Lerp the color changes from temperature
 
@@ -189,6 +189,21 @@ class Coderack(object):
     def draw(self):
         self.batch.draw()
 
+class Timer(object):
+    def __init__(self, run, x, y):
+        self.run = run
+
+        self.batch = pyglet.graphics.Batch()
+        self.numl = pyglet.text.Label("", "EraserDust", 12, x=x, y=y,
+                                      color=(255,255,255, 125), batch=self.batch,
+                                      halign="center", anchor_x="center")
+
+    def update(self, dt):
+        self.numl.text = str(self.run.coderack.time)
+
+    def draw(self):
+        self.batch.draw()
+
 class Window(pyglet.window.Window):
     def __init__(self, run):
         super(Window, self).__init__(1024, 600, caption="Copycat", vsync=False)
@@ -202,6 +217,7 @@ class Window(pyglet.window.Window):
         background = pyglet.resource.image("blackboard.png")
         self.background = pyglet.sprite.Sprite(background)
 
+        self.timer = Timer(self.run, 512, 580)
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
         self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300)
         self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300)
@@ -217,12 +233,14 @@ class Window(pyglet.window.Window):
         if self.run.workspace.answer_string:
             self.done = True
         temp = self.run.workspace.temperature * 2.55
+        self.timer.update(dt)
         self.background.color = (255, 255 - temp, 255 - temp)
         self.run.step()
 
     def on_draw(self):
         self.clear()
         self.background.draw()
+        self.timer.draw()
         self.slipnet.draw()
         self.coderack.draw()
         self.workspace.draw()
