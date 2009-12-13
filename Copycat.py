@@ -16,12 +16,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+import sys
+sys.path.insert(0, "lib")
 import optparse
 
 from copycat.run import Run
 
 # TRACE: http://www.dalkescientific.com/
-import sys
 import linecache
 import inspect
 
