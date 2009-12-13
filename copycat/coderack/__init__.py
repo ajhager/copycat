@@ -98,6 +98,8 @@ class Coderack(object):
                      self.low_bin, self.medium_bin, self.high_bin,
                      self.very_high_bin, self.extremely_high_bin]
 
+        self.last_chosen = None
+
     def choose(self):
         """Choose a codelet from the coderack."""
         if self.is_empty():
@@ -105,7 +107,8 @@ class Coderack(object):
         urgencies = [bin.urgency_sum(self.temperature) for bin in self.bins]
         bin = toolbox.weighted_select(urgencies, self.bins)
         self.time += 1
-        return bin.choose()
+        self.last_chosen = bin.choose()
+        return self.last_chosen
 
     def clear(self):
         """Empty the coderack of all codelets."""

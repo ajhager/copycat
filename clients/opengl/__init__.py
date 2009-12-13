@@ -31,6 +31,7 @@
 #     Consider using audio as cues to building/breaking/chaos/order/pause/end
 #     Break each renderer off into its own separte module.
 #     Make the digits of the timer more stable (less distracting)
+#     Make a better slipnode image that mimics the look of the font.
 
 import random
 
@@ -176,9 +177,9 @@ class Coderack(object):
                 x += 250
                 y = self.h - 15
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
-                                      color=(255,255,255, 125), batch=self.batch)
+                                      color=(255,255,255, 130), batch=self.batch)
             label2 = pyglet.text.Label("00", "EraserDust", 12, x=x - 30, y=y,
-                                       color=(255,255,255, 125), batch=self.batch)
+                                       color=(255,255,255, 130), batch=self.batch)
             label.name = name
             self.codelets.append(label)
             self.counts.append(label2)
@@ -192,6 +193,11 @@ class Coderack(object):
             counts[codelet.__class__.__name__] += 1
 
         for name, number in zip(self.codelets, self.counts):
+            if self.coderack.last_chosen.__class__.__name__ == name.name:
+                name.color = (255, 255, 255, 200)
+            else:
+                alpha = max(80, name.color[3] - (name.color[3] * dt))
+                name.color = (255, 255, 255, int(alpha))
             number.text = str(counts[name.name])
 
     def draw(self):
