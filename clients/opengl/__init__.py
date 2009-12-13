@@ -16,11 +16,11 @@
 
 ### NOTE: This is just a quickly thrown together mockup.
 # IDEAS:
-#     Make the slipnet circles lerp from size to size.
+#     Modify the slipnode drawing code so it doesn't jitter on scaling.
 #     center workspace string vertically with respect to each other
-#     Add coderack representation on the bottom right side.
 #     Add drawing routines for workspace structures
 #     use color to indicate age and urgency for codelets.
+#     use color and lerp to indicate the last time a type of codelet was run.
 #     use a caching mechanism to optimize color/size changes.
 #     make size and shape of each module perfectly customizable
 #     Add dedicated scenes for each module that adds full detail
@@ -46,6 +46,7 @@ class Slipnet(object):
         self.slipnet = slipnet
         self.nodes = []
         self.labels = []
+        self.scales = {}
 
         self.batch = pyglet.graphics.Batch()
         self.x = x
@@ -62,6 +63,7 @@ class Slipnet(object):
                 if index >= len(slipnet.slipnodes):
                     break
                 node = slipnet.slipnodes[index]
+                self.scales[node] = 0
                 x = node_x * node_w + node_w / 2.0
                 y = node_y * node_h + node_h / 2.0 + 15
                 sprite = pyglet.sprite.Sprite(square, x=x, y=y, batch=self.batch)
@@ -75,7 +77,9 @@ class Slipnet(object):
     def update(self, dt):
 
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
-            image.scale = node.activation * .01 + .1
+            target = node.activation * .01
+            self.scales[node] += (target - self.scales[node]) * dt
+            image.scale = self.scales[node] + .075
 
             if node.is_active():
                 label.color = (255, 255, 255, 255)
