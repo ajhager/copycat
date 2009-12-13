@@ -178,7 +178,7 @@ class Coderack(object):
                 y = self.h - 15
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
                                       color=(255,255,255, 130), batch=self.batch)
-            label2 = pyglet.text.Label("00", "EraserDust", 12, x=x - 30, y=y,
+            label2 = pyglet.text.Label("00", "EraserDust", 12, x=x - 25, y=y,
                                        color=(255,255,255, 130), batch=self.batch)
             label.name = name
             self.codelets.append(label)
@@ -194,11 +194,15 @@ class Coderack(object):
 
         for name, number in zip(self.codelets, self.counts):
             if self.coderack.last_chosen.__class__.__name__ == name.name:
-                name.color = (255, 255, 255, 200)
+                name.color = (200, 255, 180, 200)
             else:
-                alpha = max(80, name.color[3] - (name.color[3] * dt))
-                name.color = (255, 255, 255, int(alpha))
-            number.text = str(counts[name.name])
+                alpha = int(name.color[3] - (name.color[3] * dt))
+                if alpha >= 80:
+                    name.color = (200, 255, 180, int(alpha))
+            num = counts[name.name]
+            number.text = str(num)
+            number.color = (255, 255, 255, min(200, int(num / 2.0 * 80)))
+            
 
     def draw(self):
         self.batch.draw()
