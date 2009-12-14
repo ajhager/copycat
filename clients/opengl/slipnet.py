@@ -16,7 +16,6 @@
 
 import pyglet
 
-# Set up resources
 square = pyglet.resource.image("square.png")
 square.anchor_x = square.width / 2.
 square.anchor_y = square.height / 2.
@@ -56,7 +55,6 @@ class Slipnet(object):
                 index += 1
         
     def update(self, dt):
-
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
             target = node.activation * .01
             self.scales[node] += (target - self.scales[node]) * dt
