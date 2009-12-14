@@ -145,6 +145,9 @@ class Window(pyglet.window.Window):
         else:
             self.button.sprite.image = self.play
 
+    def on_stop_button(self):
+        print "Stop"
+
     def update(self, dt):
         self.button.update(dt) 
 

@@ -59,15 +59,15 @@ class Slipnet(object):
     def update(self, dt):
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
             target = node.activation * .01
-            self.scales[node] += (target - self.scales[node]) * dt
+            self.scales[node] += (target - self.scales[node]) * dt * 2
             image.scale = self.scales[node]
 
-            c = self.scales[node] * 100
             if node.is_active():
-                label.color = (255, 255, 255, int(c * 2))
+                label.color = (255, 255, 255, 200)
             else:
                 label.color = (200, 200, 200, 130)
 
+            c = self.scales[node] * 100
             if node.clamp:
                 image.color = (c * 2, c * 2.55, c * 2.55)
             else:
