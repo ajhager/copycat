@@ -26,7 +26,6 @@
 #     Add icons to switch between modules on the top right
 #     Add a module for doing bulk runs showing a graph of stats
 #     Abstract out theme and add one more amenable to being used in a paper
-#     Give slipnodes and codelet types better label names.
 #     Consider using audio as cues to building/breaking/chaos/order/pause/end
 #     Break each renderer off into its own separte module.
 #     Add arrows to indicate the flow of the analogy
@@ -162,19 +161,39 @@ class Coderack(object):
         self.h = h
 
         self.batch = pyglet.graphics.Batch()
-        import copycat.coderack.codelets
-        names = [s for s in dir(copycat.coderack.codelets) if s[0].isupper()]
-        names.remove('AnswerBuilder')
-        vnames = [s[:25] for s in names]
 
+        names = ['BondBottomUpScout', 'BondBuilder', 'BondStrengthTester',
+                 'BondTopDownCategoryScout', 'BondTopDownDirectionScout',
+                 'Breaker', 'CorrespondenceBottomUpScout',
+                 'CorrespondenceBuilder', 'CorrespondenceImportantObjectScout',
+                 'CorrespondenceStrengthTester', 'DescriptionBottomUpScout',
+                 'DescriptionBuilder', 'DescriptionStrengthTester',
+                 'DescriptionTopDownScout', 'GroupBuilder',
+                 'GroupStrengthTester', 'GroupTopDownCategoryScout',
+                 'GroupTopDownDirectionScout', 'GroupWholeStringScout',
+                 'ReplacementFinder', 'RuleBuilder', 'RuleScout',
+                 'RuleStrengthTester', 'RuleTranslator']
+
+        vnames = ['Bond Scout', 'Bond Builder', 'Bond Strength Tester',
+                  'Bond Category Scout', 'Bond Direction Scout',
+                  'Breaker', 'Correspondence Scout',
+                  'Correspondence Builder', 'Correspondence Importance Scout',
+                  'Correspondence Strength Tester', 'Description Scout',
+                  'Description Builder', 'Description Strength Tester',
+                  'Description Top Down Scout', 'Group Builder',
+                  'Group Strength Tester', 'Group Category Scout',
+                  'Group Direction Scout', 'Group Whole String Scout',
+                  'Replacement Finder', 'Rule Builder', 'Rule Scout',
+                  'Rule Strenth Tester', 'Rule Translator']
+        
         self.codelets = []
         self.counts = []
-        x = self.x + 50
+        x = self.x + 45
         y = self.h - 15
         z = 0
         for name, vname in zip(names, vnames):
             if z == 12:
-                x += 250
+                x += 270
                 y = self.h - 15
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
                                       color=(255,255,255, 130), batch=self.batch)
@@ -234,8 +253,7 @@ class Window(pyglet.window.Window):
         
         background = pyglet.resource.image("blackboard.png")
         self.background = pyglet.sprite.Sprite(background)
-        self.old_temp = 0
-        self.target_temp = 0
+        self.saved_temp = 0
 
         self.timer = Timer(self.run, 512, 580)
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
@@ -254,9 +272,9 @@ class Window(pyglet.window.Window):
             self.done = True
         self.timer.update(dt)
 
-        self.target_temp = self.run.workspace.temperature * 2.55
-        self.old_temp += (self.target_temp - self.old_temp) * dt
-        self.background.color = (255, 255 - self.old_temp, 255 - self.old_temp)
+        target_temp = self.run.workspace.temperature * 2.55
+        self.saved_temp += (target_temp - self.saved_temp) * dt
+        self.background.color = (255, 255 - self.saved_temp, 255 - self.saved_temp)
         self.run.step()
 
     def on_draw(self):

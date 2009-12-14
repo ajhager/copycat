@@ -60,9 +60,9 @@ for number in range(1, 6):
     slipnet_numbers.append(node)
 
 # String position nodes.
-plato_leftmost = add_node('l-most', 40)
+plato_leftmost = add_node('lmost', 40)
 plato_leftmost.description_tester = lambda obj: not obj.spans_whole_string() and obj.is_leftmost_in_string()
-plato_rightmost = add_node('r-most', 40)
+plato_rightmost = add_node('rmost', 40)
 plato_rightmost.description_tester = lambda obj: not obj.spans_whole_string() and obj.is_rightmost_in_string()
 plato_middle = add_node('middle', 40)
 plato_middle.description_tester = lambda obj: obj.ungrouped_left_neighbor() and obj.ungrouped_right_neighbor() and obj.ungrouped_left_neighbor().is_leftmost_in_string() and obj.ungrouped_right_neighbor().is_rightmost_in_string()
@@ -112,14 +112,14 @@ plato_group = add_node('group', 80)
 plato_group.description_tester = lambda obj: obj.type_name == 'group'
 
 # Category nodes
-plato_letter_category = add_node('let-c', 30, initially_clamped=True)
+plato_letter_category = add_node('ltr-c', 30, initially_clamped=True)
 plato_string_position_category = add_node('str-c', 70,
                                           ['DescriptionTopDownScout'],
                                           initially_clamped=True)
 plato_alphabetic_position_category = add_node('alph-c', 80,
                                               ['DescriptionTopDownScout'])
 plato_direction_category = add_node('dir-c', 70)
-plato_bond_category = add_node('bond-c', 80)
+plato_bond_category = add_node('bnd-c', 80)
 plato_group_category = add_node('grp-c', 80)
 plato_length = add_node('length', 60, ['DescriptionTopDownScout'])
 plato_object_category = add_node('obj-c', 90)
