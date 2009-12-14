@@ -46,13 +46,13 @@ square.anchor_y = square.height / 2.
 from copycat.run import Run
 
 class Slipnet(object):
-    def __init__(self, slipnet, x, y, w, h):
+    def __init__(self, slipnet, x, y, w, h, batch):
         self.slipnet = slipnet
         self.nodes = []
         self.labels = []
         self.scales = {}
 
-        self.batch = pyglet.graphics.Batch()
+        self.batch = batch
         self.x = x
         self.y = y
         self.w = w
@@ -62,14 +62,14 @@ class Slipnet(object):
         node_h = h / 6.0
 
         index = 0
-        for node_y in range(6):
+        for node_y in range(6, 0, -1):
             for node_x in range(10):
                 if index >= len(slipnet.slipnodes):
                     break
                 node = slipnet.slipnodes[index]
                 self.scales[node] = 0
                 x = node_x * node_w + node_w / 2.0
-                y = node_y * node_h + node_h / 2.0 + 15
+                y = node_y * node_h - 5
                 sprite = pyglet.sprite.Sprite(square, x=x, y=y, batch=self.batch)
                 sprite.opacity = 100
                 sprite.rotation = 10
@@ -97,13 +97,10 @@ class Slipnet(object):
             else:
                 image.color = (20, c * 1.9, c * 2.4)
 
-    def draw(self):
-        self.batch.draw()
-
 class Workspace(object):
-    def __init__(self, workspace, x, y, w, h):
+    def __init__(self, workspace, x, y, w, h, batch):
         self.workspace = workspace
-        self.batch = pyglet.graphics.Batch()
+        self.batch = batch
         self.x = x
         self.y = y
         self.w = w
@@ -149,18 +146,15 @@ class Workspace(object):
             else:
                 label.color = (255, 255, 255, 130)
 
-    def draw(self):
-        self.batch.draw()
-
 class Coderack(object):
-    def __init__(self, coderack, x, y, w, h):
+    def __init__(self, coderack, x, y, w, h, batch):
         self.coderack = coderack
         self.x = x
         self.y = y
         self.w = w
         self.h = h
 
-        self.batch = pyglet.graphics.Batch()
+        self.batch = batch
 
         names = ['BondBottomUpScout', 'BondBuilder', 'BondStrengthTester',
                  'BondTopDownCategoryScout', 'BondTopDownDirectionScout',
@@ -188,13 +182,13 @@ class Coderack(object):
         
         self.codelets = []
         self.counts = []
-        x = self.x + 45
-        y = self.h - 15
+        x = self.x + 43
+        y = self.h - 10
         z = 0
         for name, vname in zip(names, vnames):
             if z == 12:
                 x += 270
-                y = self.h - 15
+                y = self.h - 10
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
                                       color=(255,255,255, 130), batch=self.batch)
             label2 = pyglet.text.Label("00", "EraserDust", 12, x=x - 25, y=y,
@@ -221,25 +215,18 @@ class Coderack(object):
             num = counts[name.name]
             number.text = str(num)
             number.color = (255, 255, 255, min(200, int(num / 2.0 * 80)))
-            
-
-    def draw(self):
-        self.batch.draw()
 
 class Timer(object):
-    def __init__(self, run, x, y):
+    def __init__(self, run, x, y, batch):
         self.run = run
 
-        self.batch = pyglet.graphics.Batch()
+        self.batch = batch
         self.numl = pyglet.text.Label("", "EraserDust", 12, x=x, y=y,
                                       color=(255,255,255, 125), batch=self.batch,
                                       halign="center", anchor_x="center")
 
     def update(self, dt):
         self.numl.text = str(self.run.coderack.time / self.run.timestep)
-
-    def draw(self):
-        self.batch.draw()
 
 class Window(pyglet.window.Window):
     def __init__(self, run):
@@ -254,11 +241,12 @@ class Window(pyglet.window.Window):
         background = pyglet.resource.image("blackboard.png")
         self.background = pyglet.sprite.Sprite(background)
         self.saved_temp = 0
+        self.batch = pyglet.graphics.Batch()
 
-        self.timer = Timer(self.run, 512, 580)
-        self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300)
-        self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300)
-        self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300)
+        self.timer = Timer(self.run, 512, 580, self.batch)
+        self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300, self.batch)
+        self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300, self.batch)
+        self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300, self.batch)
 
         pyglet.clock.schedule(self.update)
 
@@ -271,19 +259,17 @@ class Window(pyglet.window.Window):
         if self.run.workspace.answer_string:
             self.done = True
         self.timer.update(dt)
-
         target_temp = self.run.workspace.temperature * 2.55
         self.saved_temp += (target_temp - self.saved_temp) * dt
-        self.background.color = (255, 255 - self.saved_temp, 255 - self.saved_temp)
+        self.background.color = (240,
+                                 255 - self.saved_temp / 1.5,
+                                 255 - self.saved_temp / 1.25)
         self.run.step()
 
     def on_draw(self):
         self.clear()
         self.background.draw()
-        self.timer.draw()
-        self.slipnet.draw()
-        self.coderack.draw()
-        self.workspace.draw()
+        self.batch.draw()
         self.clock.draw()
 
 class OpenglClient(pyglet.window.Window):
