@@ -71,4 +71,4 @@ class Slipnet(object):
             if node.clamp:
                 image.color = (c * 2, c * 2.55, c * 2.55)
             else:
-                image.color = (20, c * 1.9, c * 2.4)
+                image.color = (20, c * 1.8, c * 2.3)

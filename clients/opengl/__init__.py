@@ -46,17 +46,14 @@ class Button(object):
     """Make this function as a normal os button would.
     
     highlight when hovered.
-    darken when pressed and hovered.
-    normal with pressed and not hovered.
     
-    callback when pressed while hovered and released while hovered.
-
     make the keybinding settable
     """
     def __init__(self, image, x, y, callback, batch):
         self.sprite = pyglet.sprite.Sprite(image, x=x, y=y, batch=batch)
-        self.sprite.opacity = 150
+        self.sprite.opacity = 170
         self.pressed = False
+        self.hovered = False
         self.callback = callback
 
     def update(self, dt):
@@ -71,12 +68,14 @@ class Button(object):
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.contains(x, y):
+            self.sprite.opacity = 100
             self.pressed = True
 
     def on_mouse_release(self, x, y, button, modifiers):
         if self.contains(x, y) and self.pressed:
             self.callback()
         self.pressed = False
+        self.sprite.opacity = 170
 
     def on_key_press(self, symbol, modifiers):
         if symbol == pyglet.window.key.SPACE:
@@ -147,6 +146,8 @@ class Window(pyglet.window.Window):
             self.button.sprite.image = self.play
 
     def update(self, dt):
+        self.button.update(dt) 
+
         if self.done or not self.playing:
             return
 
@@ -154,8 +155,6 @@ class Window(pyglet.window.Window):
         self.slipnet.update(dt)
         self.coderack.update(dt)
         self.workspace.update(dt)
-
-        self.button.update(dt) 
 
         # Check for completion.
         if self.run.workspace.answer_string:
