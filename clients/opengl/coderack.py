@@ -60,14 +60,16 @@ class Coderack(object):
                 x += 270
                 y = self.h - 10
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
-                                      color=(255,255,255, 130), batch=self.batch)
+                                      color=(200, 255, 200, 80),batch=self.batch)
             label2 = pyglet.text.Label("00", "EraserDust", 12, x=x - 25, y=y,
-                                       color=(255,255,255, 130), batch=self.batch)
+                                       color=(255, 255, 255, 0), batch=self.batch)
             label.name = name
             self.codelets.append(label)
             self.counts.append(label2)
             y -= 25
             z += 1
+
+        self.update(0)
 
     def update(self, dt):
         from collections import defaultdict as dd

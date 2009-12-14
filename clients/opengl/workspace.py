@@ -48,6 +48,8 @@ class Workspace(object):
             self.letters.append(label)
             self.wletters.append(letter)
             x -= 50
+            
+        self.update(0)
 
     def update(self, dt):
         if self.workspace.answer_string:

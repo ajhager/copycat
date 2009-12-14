@@ -53,6 +53,8 @@ class Slipnet(object):
                                           y=y-30, anchor_x="center", batch=self.batch)
                 self.labels.append(label)
                 index += 1
+
+        self.update(0)
         
     def update(self, dt):
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):

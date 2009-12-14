@@ -21,7 +21,7 @@
 # make size and shape of each module perfectly customizable
 # Add dedicated scenes for each module that adds full detail
 # Add the ability to type in the problem and seed in client
-# Add play/pause/stop/dump buttons on the top left
+# Add [play/pause]/stop/[speedup/slowdown]/record buttons on the top left
 # Add icons to switch between modules on the top right
 # Add a module for doing bulk runs showing a graph of stats
 # Abstract out theme and add one more amenable to being used in a paper
@@ -42,7 +42,45 @@ from coderack import Coderack
 from slipnet import Slipnet
 from workspace import Workspace
 
+class Button(object):
+    """Make this function as a normal os button would.
+    
+    highlight when hovered.
+    darken when pressed and hovered.
+    normal with pressed and not hovered.
+    
+    callback when pressed while hovered and released while hovered.
+    """
+    def __init__(self, image, x, y, callback, batch):
+        self.sprite = pyglet.sprite.Sprite(image, x=x, y=y, batch=batch)
+        self.sprite.opacity = 150
+        self.pressed = False
+        self.callback = callback
+
+    def update(self, dt):
+        pass
+
+    def contains(self, x, y):
+        my_x = self.sprite.x - self.sprite.width / 2.0
+        my_y = self.sprite.y - self.sprite.height / 2.0
+        my_w = my_x + self.sprite.width
+        my_h = my_y + self.sprite.height
+        return all([x >= my_x, x <= my_w, y >= my_y, y <= my_h])
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        if self.contains(x, y):
+            self.pressed = True
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        if self.contains(x, y) and self.pressed:
+            self.callback()
+        self.pressed = False
+        
 class Window(pyglet.window.Window):
+    """The main window keeps track of what scene is currently being viewed,
+    manages the gui elements that are always on screen, and takes care of
+    updating the simulation."""
+
     def __init__(self, run):
         super(Window, self).__init__(1024, 600, caption="Copycat", vsync=False)
         self.clock = pyglet.clock.ClockDisplay()
@@ -52,6 +90,7 @@ class Window(pyglet.window.Window):
 
         self.time = 0
         self.speed = 20
+        self.playing = False
 
         self.run = run
         
@@ -59,6 +98,12 @@ class Window(pyglet.window.Window):
         self.background = pyglet.sprite.Sprite(background)
         self.saved_temp = 0
         self.batch = pyglet.graphics.Batch()
+
+        play = pyglet.resource.image("play.png")
+        play.anchor_x = play.width / 2.0
+        play.anchor_y = play.height / 2.0
+        self.button = Button(pyglet.resource.image("play.png"), 30, 580,
+                                  self.on_play_button, self.batch)
 
         self.timer = pyglet.text.Label("", "EraserDust", 12, x=512, y=580,
                                        color=(255,255,255, 125), batch=self.batch,
@@ -69,14 +114,25 @@ class Window(pyglet.window.Window):
 
         pyglet.clock.schedule(self.update)
 
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.button.on_mouse_press(x, y, button, modifiers)
+        
+    def on_mouse_release(self, x, y, button, modifiers):
+        self.button.on_mouse_release(x, y, button, modifiers)
+
+    def on_play_button(self):
+        self.playing = not self.playing
+
     def update(self, dt):
-        if self.done:
+        if self.done or not self.playing:
             return
 
         # Update each graphical module.
         self.slipnet.update(dt)
         self.coderack.update(dt)
         self.workspace.update(dt)
+
+        self.button.update(dt) 
 
         # Check for completion.
         if self.run.workspace.answer_string:
