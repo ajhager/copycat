@@ -270,7 +270,7 @@ class Window(pyglet.window.Window):
         self.clear()
         self.background.draw()
         self.batch.draw()
-        self.clock.draw()
+        #self.clock.draw()
 
 class OpenglClient(pyglet.window.Window):
     def __init__(self, initial, modified, target, seed):
