@@ -4,13 +4,13 @@ A translation of Melanie Mitchell's original Copycat project from Lisp to
 Python.
 
 To find the original information and source code for Copycat, see her
-website: [](http://web.cecs.pdx.edu/~mm/)
+[website](http://web.cecs.pdx.edu/~mm/).
 
 ##Status
 
 ![Copycat GUI](http://imgur.com/ixYe9.png)
 
-12/13/09
+###12/13/09
 An initial GUI using the pure python package 'pyglet' has been added.
 For now, to use it you add --mode=opengl to the command line.
 
