@@ -10,7 +10,7 @@ website: http://web.cecs.pdx.edu/~mm/
 Status
 ------
 
-image:: http://i.imgur.com/8Wgkt.png
+![Copycat GUI](http://i.imgur.com/8Wgkt.png)
 
 1000 runs of abc -> abd => ijk -> ?
 
