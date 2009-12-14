@@ -21,7 +21,9 @@
 # make size and shape of each module perfectly customizable
 # Add dedicated scenes for each module that adds full detail
 # Add the ability to type in the problem and seed in client
-# Add [play/pause]/stop/[speedup/slowdown]/record buttons on the top left
+# Add [play/pause]/stop/[speedup/slowdown] buttons on the top left
+#     Make the play button turn into a pause button while playing
+#     Toggle this even if the change doesn't come from the mouse.
 # Add icons to switch between modules on the top right
 # Add a module for doing bulk runs showing a graph of stats
 # Abstract out theme and add one more amenable to being used in a paper
@@ -75,6 +77,10 @@ class Button(object):
         if self.contains(x, y) and self.pressed:
             self.callback()
         self.pressed = False
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol == pyglet.window.key.SPACE:
+            self.callback()
         
 class Window(pyglet.window.Window):
     """The main window keeps track of what scene is currently being viewed,
@@ -99,11 +105,15 @@ class Window(pyglet.window.Window):
         self.saved_temp = 0
         self.batch = pyglet.graphics.Batch()
 
-        play = pyglet.resource.image("play.png")
-        play.anchor_x = play.width / 2.0
-        play.anchor_y = play.height / 2.0
-        self.button = Button(pyglet.resource.image("play.png"), 30, 580,
-                                  self.on_play_button, self.batch)
+        self.play = pyglet.resource.image("play.png")
+        self.pause = pyglet.resource.image("pause.png")
+        self.play.anchor_x = self.play.width / 2.0
+        self.play.anchor_y = self.play.height / 2.0
+        self.pause.anchor_x = self.pause.width / 2.0
+        self.pause.anchor_y = self.pause.height / 2.0
+        self.button = Button(self.play, 30, 580,
+                             self.on_play_button, self.batch)
+
 
         self.timer = pyglet.text.Label("", "EraserDust", 12, x=512, y=580,
                                        color=(255,255,255, 125), batch=self.batch,
@@ -114,6 +124,11 @@ class Window(pyglet.window.Window):
 
         pyglet.clock.schedule(self.update)
 
+    def on_key_press(self, symbol, modifiers):
+        if symbol == pyglet.window.key.ESCAPE:
+            pyglet.app.exit()
+        self.button.on_key_press(symbol, modifiers)
+
     def on_mouse_press(self, x, y, button, modifiers):
         self.button.on_mouse_press(x, y, button, modifiers)
         
@@ -122,6 +137,11 @@ class Window(pyglet.window.Window):
 
     def on_play_button(self):
         self.playing = not self.playing
+        if self.playing:
+            self.button.sprite.image = self.pause
+        else:
+            self.button.sprite.image = self.play
+            
 
     def update(self, dt):
         if self.done or not self.playing:
@@ -145,8 +165,8 @@ class Window(pyglet.window.Window):
         target_temp = self.run.workspace.temperature * 2.55
         self.saved_temp += (target_temp - self.saved_temp) * dt
         self.background.color = (240,
-                                 255 - self.saved_temp / 1.5,
-                                 255 - self.saved_temp / 1.25)
+                                 255 - self.saved_temp / 1.4,
+                                 255 - self.saved_temp / 1.15)
         
         # Update the simulation at the given speed.
         self.time += dt
