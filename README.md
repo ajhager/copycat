@@ -1,28 +1,15 @@
-Copycat
-=======
+#Copycat
+
 
 A translation of Melanie Mitchell's original Copycat project from Lisp to
 Python.
 
 To find the original information and source code for Copycat, see her
-website: http://web.cecs.pdx.edu/~mm/
+website: [](http://web.cecs.pdx.edu/~mm/)
 
-Status
-------
+##Status
 
-![Copycat GUI](http://i.imgur.com/8Wgkt.png)
-
-1000 runs of abc -> abd => ijk -> ?
-
-answer    totals    avgtmp
-------    ------    ------
-  ijl   847   86%     32
-  jjk    94   10%     47
-  ikl    18    2%     53
-  ijd    11    1%     41
-  jkk     5    1%     58
-  djk     4    0%     52
-  ijk     3    0%     52
+![Copycat GUI](http://imgur.com/ixYe9.png)
 
 12/13/09
 An initial GUI using the pure python package 'pyglet' has been added.
@@ -75,8 +62,7 @@ underlying code of each active object. Students of the program will be able
 to see and understand exactly what is going on behind the scenes that allows
 Copycat to work.
 
-Issues
-------
+##Issues
 
 The entire project needs a revamp for consistency and style.
 Having slipnodes in the global slipnet module level ruins enscapulation.
