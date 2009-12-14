@@ -187,7 +187,7 @@ class Slipnode(object):
     def decay(self):
         """Remove 100 - conceptual_depth percent of the node's activation."""
         amount = round(((100 - self.conceptual_depth) / 100.0) * self.activation)
-        self.activation_buffer = max(0, self.activation_buffer - amount)
+        self.activation_buffer = self.activation_buffer - amount
 
     def similar_has_property_links(self):
         """Return a list of has property links that are similar."""
