@@ -68,8 +68,8 @@ Copycat to work.
 
 ##Issues
 
-The entire project needs a revamp for consistency and style.
-Having slipnodes in the global slipnet module level ruins enscapulation.
-Similarly there is a problem with using the default global random instance.
-Need to start thinking about multiplatform packaging.
-Need to create both text and GUI tutorial/overview.
+*  The entire project needs a revamp for consistency and style.
+*  Having slipnodes in the global slipnet module level ruins enscapulation.
+*  Similarly there is a problem with using the default global random instance.
+*  Need to start thinking about multiplatform packaging.
+*  Need to create both text and GUI tutorial/overview.
