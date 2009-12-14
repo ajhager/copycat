@@ -6,9 +6,9 @@ Python.
 To find the original information and source code for Copycat, see her
 [website](http://web.cecs.pdx.edu/~mm/).
 
-##Status
+![Copycat GUI](http://imgur.com/xpFAu.png)
 
-![Copycat GUI](http://imgur.com/ixYe9.png)
+##Status
 
 ###12/13/09
 An initial GUI using the pure python package 'pyglet' has been added.

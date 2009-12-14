@@ -22,8 +22,6 @@
 # Add dedicated scenes for each module that adds full detail
 # Add the ability to type in the problem and seed in client
 # Add [play/pause]/stop/[speedup/slowdown] buttons on the top left
-#     Make the play button turn into a pause button while playing
-#     Toggle this even if the change doesn't come from the mouse.
 # Add icons to switch between modules on the top right
 # Add a module for doing bulk runs showing a graph of stats
 # Abstract out theme and add one more amenable to being used in a paper
@@ -52,6 +50,8 @@ class Button(object):
     normal with pressed and not hovered.
     
     callback when pressed while hovered and released while hovered.
+
+    make the keybinding settable
     """
     def __init__(self, image, x, y, callback, batch):
         self.sprite = pyglet.sprite.Sprite(image, x=x, y=y, batch=batch)
@@ -89,11 +89,13 @@ class Window(pyglet.window.Window):
 
     def __init__(self, run):
         super(Window, self).__init__(1024, 600, caption="Copycat", vsync=False)
-        self.clock = pyglet.clock.ClockDisplay()
-        self.done = False
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+        self.clock = pyglet.clock.ClockDisplay()
+        self.show_fps = False
+
+        self.done = False
         self.time = 0
         self.speed = 20
         self.playing = False
@@ -114,7 +116,6 @@ class Window(pyglet.window.Window):
         self.button = Button(self.play, 30, 580,
                              self.on_play_button, self.batch)
 
-
         self.timer = pyglet.text.Label("", "EraserDust", 12, x=512, y=580,
                                        color=(255,255,255, 125), batch=self.batch,
                                        halign="center", anchor_x="center")
@@ -127,7 +128,10 @@ class Window(pyglet.window.Window):
     def on_key_press(self, symbol, modifiers):
         if symbol == pyglet.window.key.ESCAPE:
             pyglet.app.exit()
-        self.button.on_key_press(symbol, modifiers)
+        elif symbol == pyglet.window.key.F and modifiers == pyglet.window.key.MOD_CTRL:
+            self.show_fps = not self.show_fps
+        else:
+            self.button.on_key_press(symbol, modifiers)
 
     def on_mouse_press(self, x, y, button, modifiers):
         self.button.on_mouse_press(x, y, button, modifiers)
@@ -141,7 +145,6 @@ class Window(pyglet.window.Window):
             self.button.sprite.image = self.pause
         else:
             self.button.sprite.image = self.play
-            
 
     def update(self, dt):
         if self.done or not self.playing:
@@ -178,7 +181,8 @@ class Window(pyglet.window.Window):
         self.clear()
         self.background.draw()
         self.batch.draw()
-        self.clock.draw()
+        if self.show_fps:
+            self.clock.draw()
 
 class OpenglClient(pyglet.window.Window):
     def __init__(self, initial, modified, target, seed):
