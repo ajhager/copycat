@@ -41,40 +41,8 @@
 ; correspondence.add-accessory-concept-mapping
 ;---------------------------------------------
 
-(defun build-correspondence 
-       (c &aux obj1 obj2) 
-  (send c :set-proposal-level %built%)
-  (setq obj1 (send c :obj1))
-  (setq obj2 (send c :obj2))
-  (send obj1 :set-correspondence c)
-  (send obj2 :set-correspondence c)
-  (send *workspace* :add-correspondence c)
-  
-  ; Add some concept mappings to the accessory-concept-mapping-list, as
-  ; follows.  Add any bond-concept-mappings.  Also add the symmetric 
-  ; slippages of the bond-concept-mappings (if they are slippages) and of 
-  ; other relevant, distinguishing slippages.
-  (loop for cm 
-	in (append (send c :relevant-distinguishing-cms)
-	 	   (send c :accessory-concept-mapping-list))
-         when (send cm :slippage?) do 
-	 (send c :add-accessory-concept-mapping (send cm :symmetric-version)))
-  (if* (and (typep obj1 'group) (typep obj2 'group))
-   then (loop for cm in (get-concept-mapping-list obj1 obj2
-			    (send obj1 :bond-descriptions) 
-			    (send obj2 :bond-descriptions)) do
-	      (send c :add-accessory-concept-mapping cm)
-	      (if* (send cm :slippage?)
-               then (send c :add-accessory-concept-mapping 
-			  (send cm :symmetric-version)))))
-
-  ; Activate the correspondence's label.
-  (loop for cm in (send c :concept-mapping-list) do  
-	(if* (send cm :label) 
-         then (send (send cm :label) :activate-from-workspace)))
-  
-  (if* %workspace-graphics% then (send c :draw)))
-
+;---------------------------------------------
+; build-correspondence | Workspace.build_correspondence
 ;---------------------------------------------
 
 (defun break-correspondence (c &aux obj1 obj2)

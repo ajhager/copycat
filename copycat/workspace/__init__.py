@@ -886,6 +886,7 @@ class Workspace(object):
         return [(BondStrengthTester([proposed_bond]), urgency)]
 
     def build_correspondence(self, correspondence):
+        """Build the new correspondence."""
         correspondence.proposal_level = self.built
         object1 = correspondence.object1
         object2 = correspondence.object2
