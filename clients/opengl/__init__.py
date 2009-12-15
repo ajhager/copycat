@@ -21,6 +21,7 @@
 # Add icons to switch between modules on the top right
 # Add a module for doing bulk runs showing a graph of stats
 # Add the ability to type in the problem and seed in client
+# Give slipnodes good default names separte from short names.
 
 import pyglet
 from pyglet.gl import *
@@ -41,6 +42,7 @@ class Button(object):
     
     make the keybinding settable
     """
+
     def __init__(self, image, x, y, callback, batch):
         self.sprite = pyglet.sprite.Sprite(image, x=x, y=y, batch=batch)
         self.sprite.opacity = 170

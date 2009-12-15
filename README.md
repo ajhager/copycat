@@ -6,17 +6,17 @@ Python.
 To find the original information and source code for Copycat, see her
 [website](http://web.cecs.pdx.edu/~mm/).
 
-![Copycat GUI](http://imgur.com/REtAE.png)
+![Copycat GUI](http://imgur.com/78VG8.png)
 
 ##Status
 
 ###12/14/09
 The GUI is able to accurately show the state and dynamic of the slipnet,
-coderack, temperature and timestep. Only the letter strings are shown of
-the workspace, and whether or not a letter has changed. You can also start
-and pause the simulation using the mouse or keyboard. Work is underway to
-create detailed screens for each module showing a deeper and more complete
-view.
+coderack, temperature, timestep and rule translation. Only the letter
+strings are shown of the workspace, and whether or not a letter has changed.
+You can also start and pause the simulation using the mouse or keyboard.
+Work is underway to create detailed screens for each module showing a deeper
+and more complete view.
 
 ###12/13/09
 An initial GUI using the pure python package 'pyglet' has been added.

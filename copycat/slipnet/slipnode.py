@@ -45,7 +45,12 @@ class Slipnode(object):
     def __init__(self, name, depth, codelets=[], intrinsic_link_length=None,
                  initially_clamped=False, directed=False):
         """Initialize Slipnode."""
-        self.name = name
+        if isinstance(name, tuple):
+            self.name = name[0]
+            self.short_name = name[1]
+        else:
+            self.name = name
+            self.short_name = name
         self.conceptual_depth = depth
         self.initially_clamped = initially_clamped
         self.directed = directed

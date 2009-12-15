@@ -60,9 +60,9 @@ for number in range(1, 6):
     slipnet_numbers.append(node)
 
 # String position nodes.
-plato_leftmost = add_node('lmost', 40)
+plato_leftmost = add_node(('leftmost', 'lmost'), 40)
 plato_leftmost.description_tester = lambda obj: not obj.spans_whole_string() and obj.is_leftmost_in_string()
-plato_rightmost = add_node('rmost', 40)
+plato_rightmost = add_node(('rightmost', 'rmost'), 40)
 plato_rightmost.description_tester = lambda obj: not obj.spans_whole_string() and obj.is_rightmost_in_string()
 plato_middle = add_node('middle', 40)
 plato_middle.description_tester = lambda obj: obj.ungrouped_left_neighbor() and obj.ungrouped_right_neighbor() and obj.ungrouped_left_neighbor().is_leftmost_in_string() and obj.ungrouped_right_neighbor().is_rightmost_in_string()
@@ -85,25 +85,26 @@ plato_right = add_node('right', 40, ['BondTopDownDirectionScout',
                                      'GroupTopDownDirectionScout'])
 
 # Bond nodes
-plato_predecessor = add_node('pred', 50, ['BondTopDownCategoryScout'],
+plato_predecessor = add_node(('predecessor', 'pred'), 50, ['BondTopDownCategoryScout'],
                              60, directed=True)
-plato_successor = add_node('succ', 50, ['BondTopDownCategoryScout'],
+plato_successor = add_node(('successor', 'succ'), 50, ['BondTopDownCategoryScout'],
                            60, directed=True)
-plato_sameness = add_node('same', 80, ['BondTopDownCategoryScout'], 0)
+plato_sameness = add_node(('sameness', 'same'), 80, ['BondTopDownCategoryScout'], 0)
 
 # Group nodes
-plato_predecessor_group = add_node('predgr', 50,
+plato_predecessor_group = add_node(('predecessor group', 'predgr'), 50,
                                    ['GroupTopDownCategoryScout'], directed=True)
 plato_predecessor_group.iterate_group = lambda category: get_related_node(category, plato_predecessor)
-plato_successor_group = add_node('succgr', 50, ['GroupTopDownCategoryScout'],
-                                directed=True)
+plato_successor_group = add_node(('succesor group', 'succgr'), 50,
+                                  ['GroupTopDownCategoryScout'], directed=True)
 plato_successor_group.iterate_group = lambda category: get_related_node(category, plato_successor)
-plato_sameness_group = add_node('samegr', 80, ['GroupTopDownCategoryScout'])
+plato_sameness_group = add_node(('sameness group', 'samegr'), 80,
+                                ['GroupTopDownCategoryScout'])
 plato_sameness_group.iterate_group = lambda category: category
 
 # Other relation nodes
-plato_identity = add_node('ident', 90, [], 0)
-plato_opposite = add_node('oppos', 90, [], 80)
+plato_identity = add_node(('identity', 'ident'), 90, [], 0)
+plato_opposite = add_node(('opposite', 'oppos'), 90, [], 80)
 
 # Object nodes
 plato_letter = add_node('letter', 20)
@@ -112,18 +113,20 @@ plato_group = add_node('group', 80)
 plato_group.description_tester = lambda obj: obj.type_name == 'group'
 
 # Category nodes
-plato_letter_category = add_node('ltr-c', 30, initially_clamped=True)
-plato_string_position_category = add_node('str-c', 70,
+plato_letter_category = add_node(('letter category', 'ltr-c'), 30,
+                                 initially_clamped=True)
+plato_string_position_category = add_node(('string category', 'str-c'), 70,
                                           ['DescriptionTopDownScout'],
                                           initially_clamped=True)
-plato_alphabetic_position_category = add_node('alph-c', 80,
+plato_alphabetic_position_category = add_node(('alphabetic position category',
+                                              'alph-c'), 80,
                                               ['DescriptionTopDownScout'])
-plato_direction_category = add_node('dir-c', 70)
-plato_bond_category = add_node('bnd-c', 80)
-plato_group_category = add_node('grp-c', 80)
+plato_direction_category = add_node(('direction category', 'dir-c'), 70)
+plato_bond_category = add_node(('bond category', 'bnd-c'), 80)
+plato_group_category = add_node(('group cagegory', 'grp-c'), 80)
 plato_length = add_node('length', 60, ['DescriptionTopDownScout'])
 plato_object_category = add_node('obj-c', 90)
-plato_bond_facet = add_node('facet', 90)
+plato_bond_facet = add_node(('bond facet', 'facet'), 90)
 
 # Letter links
 for i in range(25):

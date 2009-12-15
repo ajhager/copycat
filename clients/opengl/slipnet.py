@@ -49,7 +49,7 @@ class Slipnet(object):
                 sprite.opacity = 100
                 sprite.rotation = 10
                 self.nodes.append(sprite)
-                label = pyglet.text.Label(node.name[:6], "EraserDust", 12, x=x,
+                label = pyglet.text.Label(node.short_name, "EraserDust", 12, x=x,
                                           y=y-30, anchor_x="center", batch=self.batch)
                 self.labels.append(label)
                 index += 1
