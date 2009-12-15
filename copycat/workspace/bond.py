@@ -155,13 +155,11 @@ class Bond(Structure):
 
     def incompatible_bonds(self):
         """Return the bonds that are incompatible with the bond."""
-        
         return list(set([self.left_object.right_bond,
                          self.right_object.left_bond]) - set([None]))
 
     def incompatible_correspondences(self):
-        '''
-        Return the correspondences that are incompatible with this bond. This
+        """Return the correspondences that are incompatible with this bond. This
         only applies to directed bonds and to correspondences between objects
         at the edges of strings. E.g., in "abc -> abd, pqrs -> ?, if there is
         a correspondence between the "a" and the "p" (with concept mapping
@@ -169,8 +167,7 @@ class Bond(Structure):
         to the "b" in "abc", then the correspondence will be incompatible with
         a left going predecessor bond from the "q" to the "p" in "pqrs",
         because the correspondence would then imply both "leftmost -> leftmost"
-        (the letters) and "right -> left (the bonds.)
-        '''
+        (the letters) and "right -> left (the bonds.)"""
         incompatible_correspondences = []
 
         if self.is_leftmost_in_string():
@@ -188,7 +185,7 @@ class Bond(Structure):
 
         plato_string_position_category = slipnet.plato_string_position_category
         string_position_category_mapping = None
-        for mapping in correspondence.concept_mappings:
+        for mapping in correspondence.get_concept_mappings():
             if mapping.description_type1 == plato_string_position_category:
                 string_position_category_mapping = mapping
         if string_position_category_mapping == None:
