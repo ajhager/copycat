@@ -24,10 +24,9 @@
 ; bond.choose-right-neighbor
 ;---------------------------------------------
 
-(defmethod (bond :bond-members?) (obj1 obj2)
-; Returns t if the two objects are the objects in this bond.    
-  (and (or (eq from-obj obj1) (eq to-obj obj1)) 
-       (or (eq from-obj obj2) (eq to-obj obj2))))
+;---------------------------------------------
+; bond :bond-members? REMOVED
+;---------------------------------------------
 
 ;---------------------------------------------
 ; bond.in-group?
@@ -61,13 +60,9 @@
 ; bond.flipped-version
 ;---------------------------------------------
 
-(defun same-bond? (b1 b2)
-; Returns t if b1 and b2 represent the same bond.    
-  (and b1 b2
-       (eq (send b1 :from-obj) (send b2 :from-obj))
-       (eq (send b1 :to-obj) (send b2 :to-obj))
-       (eq (send b1 :bond-category) (send b2 :bond-category))
-       (eq (send b1 :direction-category) (send b2 :direction-category))))
+;---------------------------------------------
+; same-bond? | Bond.__eq__
+;---------------------------------------------
 
 ;---------------------------------------------
 ; get-bond-category | get_bond_category
