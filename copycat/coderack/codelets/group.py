@@ -250,20 +250,17 @@ class GroupTopDownCategoryScout(Codelet):
         return workspace.propose_group(objects, bonds, category, direction_category)
 
 class GroupTopDownDirectionScout(Codelet):
-    '''
-    Chooses an object, a direction to scan in, and a number of bonds to
+    """Choose an object, a direction to scan in, and a number of bonds to
     scan in that direction. The category of the group is the associated
     group category of the first bond scanned. Scans until no more bonds of
     the necessary type and direction are found. If possible, makes a
     proposed group of the given direction out of the objects scanned and
     posts a group strength tester codelet with urgency a function of the
-    degree of association of bonds of the given bond category.
-    '''
+    degree of association of bonds of the given bond category."""
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
-        direction_category = self.arguments[0]
-
         category = self.arguments[0]
+
         # Choose a string based on local direction category relevance.
         i_string = workspace.initial_string
         i_relevance = i_string.local_direction_category_relevance(category)
@@ -276,33 +273,29 @@ class GroupTopDownDirectionScout(Codelet):
                    round(toolbox.average(t_relevance, t_unhappiness))]
         string = toolbox.weighted_select(weights, choices)
 
-        # Choose an object by intra string salience.
         obj = string.get_random_object('intra_string_salience')
         if obj.spans_whole_string():
-            return
+            return # Fizzle
 
-        # Choose a direction in which to scan.
         if obj.is_leftmost_in_string():
             direction = nodes.plato_right
         elif obj.is_rightmost_in_string():
             direction = nodes.plato_left
         else:
+            choices = [nodes.plato_left, nodes.plato_right]
             activations = [nodes.plato_left.activation,
                            nodes.plato_right.activation]
-            direction = toolbox.weighted_select(activations, [nodes.plato_left,
-                                                              nodes.plato_right])
+            direction = toolbox.weighted_select(activations, choices)
 
-        # Choose the number of bonds to scan.
         number = toolbox.weighted_index(string.bonds_to_scan_distribution)
 
-        # Get the first bond in that direction.
         if direction == nodes.plato_left:
             bond = obj.left_bond
         else:
             bond = obj.right_bond
 
         if not bond or bond.direction_category != category:
-            return
+            return # Fizzle
 
         bond_category = bond.bond_category
         facet = bond.bond_facet
@@ -312,7 +305,6 @@ class GroupTopDownDirectionScout(Codelet):
         opposite_category = nodes.get_related_node(category,
                                                    nodes.plato_opposite)
 
-        # Get objects and bonds.
         objects = [bond.left_object, bond.right_object]
         bonds = [bond]
         next_bond = bond
@@ -331,7 +323,6 @@ class GroupTopDownDirectionScout(Codelet):
                 else:
                     next_object = next_bond.right_object
 
-            # Decide whether or not to add bond.
             if not next_bond:
                 bond_to_add = None
             elif (next_bond.bond_category == bond_category) and \
