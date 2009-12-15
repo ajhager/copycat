@@ -110,7 +110,7 @@ class Window(pyglet.window.Window):
         self.button = Button(self.play, 30, 580,
                              self.on_play_button, self.batch)
 
-        self.timer = pyglet.text.Label("", "EraserDust", 12, x=512, y=580,
+        self.timer = pyglet.text.Label("0", "EraserDust", 14, x=512, y=575,
                                        color=(255,255,255, 125), batch=self.batch,
                                        halign="center", anchor_x="center")
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300, self.batch)

@@ -38,11 +38,11 @@ class Letter(object):
 class String(object):
     def __init__(self, string, x, y, batch):
         self.letters = []
-        t = 50 * len(string.get_letters()) / 2.0
+        t = len(string.get_letters()) * 19
         new_x = x - t
         for letter in string.get_letters():
             self.letters.append(Letter(letter, new_x, y, batch))
-            new_x += 80
+            new_x += 40
 
     def update(self, dt):
         for letter in self.letters:
@@ -56,15 +56,17 @@ class Workspace(object):
         left_x = w / 4.0
         right_x = left_x * 3.0
         bot_y = y + h / 4.0
-        top_y = y + 3 * h / 4.0
+        top_y = y + 3 * h / 4.0 - 35
 
-        self.answer_x = right_x
+        self.answer_x = right_x - 30
         self.answer_y = bot_y
 
-        self.strings = [String(workspace.initial_string, left_x, top_y, self.batch),
-                        String(workspace.modified_string, right_x, top_y, self.batch),
-                        String(workspace.target_string, left_x, bot_y, self.batch)]
-
+        self.strings = [String(workspace.initial_string,
+                               left_x + 30, top_y, self.batch),
+                        String(workspace.modified_string,
+                               right_x - 30, top_y, self.batch),
+                        String(workspace.target_string,
+                               left_x + 30, bot_y, self.batch)]
 
     def update(self, dt):
         if self.workspace.answer_string:
