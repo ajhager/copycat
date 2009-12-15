@@ -1000,10 +1000,8 @@ class Workspace(object):
         return new_values
 
     def post_codelet_probability(self, category):
-        '''
-        Return a probability to use when deciding to post codelets searching
-        for this type of structure.
-        '''
+        """Return a probability to use when deciding to post codelets searching
+        for this type of structure."""
         probability = 0
         if category == 'description':
             probability = math.sqrt(self.temperature)
@@ -1023,10 +1021,8 @@ class Workspace(object):
         return probability / 100.
 
     def post_codelet_number(self, category):
-        '''
-        Return the number of codelets looking for the structure given by
-        category that should be posted.
-        '''
+        """Return the number of codelets looking for the structure given by
+        category that should be posted."""
         number = 0
         case = {'few': 1, 'medium': 2, 'many': 3}
         if category == 'description':
@@ -1047,12 +1043,10 @@ class Workspace(object):
         return number
 
     def get_codelets(self, category, codelet, urgency, args=[]):
-        '''
-        Based on the category sent in, testfor the probability for the
+        """Based on the category sent in, testfor the probability for the
         codelet related to that category to be posted.  If the test does
         succeed, the number of each codelet to return is determined based
-        on category.
-        '''
+        on category."""
         codelets = []
         probability = self.post_codelet_probability(category)
         number = self.post_codelet_number(category)
@@ -1062,10 +1056,8 @@ class Workspace(object):
         return codelets
             
     def bottom_up_codelets(self):
-        '''
-        Returns various bottom up codelets, with urgency and number based on
-        how many of each type of codelet is needed.
-        '''
+        """Returns various bottom up codelets, with urgency and number based on
+        how many of each type of codelet is needed."""
         types = [('description', DescriptionBottomUpScout, 30),
                  ('bond', BondBottomUpScout, 30),
                  ('group', GroupWholeStringScout, 30),
@@ -1073,7 +1065,8 @@ class Workspace(object):
                  ('correspondence', CorrespondenceBottomUpScout, 30),
                  ('correspondence', CorrespondenceImportantObjectScout, 30),
                  ('rule', RuleScout, 30),
-                 ('translator_rule', RuleTranslator, 30 if self.temperature > 25 else 60)]
+                 ('translator_rule', RuleTranslator,
+                  30 if self.temperature > 25 else 60)]
 
         codelets = [(Breaker(), 0)]
         for category, codelet, urgency in types:
