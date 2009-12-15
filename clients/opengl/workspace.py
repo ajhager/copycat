@@ -14,55 +14,63 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+# IDEAS:
+# Add arrows to indicate the flow of the analogy
+# Add drawing routines for workspace structures
+# Add the ability to type in the problem and seed in client
+
+import string
+
 import pyglet
+
+class Letter(object):
+    def __init__(self, letter, x, y, batch):
+        self.letter = letter
+        self.label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
+                                       color=(255,255,255, 100), batch=batch,
+                                       anchor_y="center")
+
+    def update(self, dt):
+        if self.letter.is_changed:
+            self.label.color = (255, 100, 100, 130)
+        else:
+            self.label.color = (255, 255, 255, 100)
+
+class String(object):
+    def __init__(self, string, x, y, batch):
+        self.letters = []
+        t = 50 * len(string.get_letters()) / 2.0
+        new_x = x - t
+        for letter in string.get_letters():
+            self.letters.append(Letter(letter, new_x, y, batch))
+            new_x += 80
+
+    def update(self, dt):
+        for letter in self.letters:
+            letter.update(dt)
 
 class Workspace(object):
     def __init__(self, workspace, x, y, w, h, batch):
         self.workspace = workspace
         self.batch = batch
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
 
-        self.letters = []
-        self.wletters = []
-        x, y = self.w / 2.0 - 100.0, self.h + self.h / 3.0 * 2.0
-        for letter in reversed(workspace.initial_string.get_letters()):
-            label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                      color=(255,255,255, 125), batch=self.batch)
-            self.letters.append(label)
-            self.wletters.append(letter)
-            x -= 50
-        x, y = self.w / 2.0 + 70.0, self.h + self.h / 3.0 * 2.0
-        for letter in workspace.modified_string.get_letters():
-            label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                      color=(255,255,255, 125), batch=self.batch)
-            self.letters.append(label)
-            self.wletters.append(letter)
-            x += 50
-        x, y = self.w / 2.0 - 100.0, self.h + self.h / 4.0
-        for letter in reversed(workspace.target_string.get_letters()):
-            label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                      color=(255,255,255, 125), batch=self.batch)
-            self.letters.append(label)
-            self.wletters.append(letter)
-            x -= 50
-            
-        self.update(0)
+        left_x = w / 4.0
+        right_x = left_x * 3.0
+        bot_y = y + h / 4.0
+        top_y = y + 3 * h / 4.0
+
+        self.answer_x = right_x
+        self.answer_y = bot_y
+
+        self.strings = [String(workspace.initial_string, left_x, top_y, self.batch),
+                        String(workspace.modified_string, right_x, top_y, self.batch),
+                        String(workspace.target_string, left_x, bot_y, self.batch)]
+
 
     def update(self, dt):
         if self.workspace.answer_string:
-            x, y = self.w / 2.0 + 70.0, self.h + self.h / 4.0
-            for letter in self.workspace.answer_string.get_letters():
-                label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                          color=(255,255,255, 125), batch=self.batch)
-                self.letters.append(label)
-                self.wletters.append(letter)
-                x += 50
-                
-        for label, letter in zip(self.letters, self.wletters):
-            if letter.is_changed:
-                label.color = (255, 100, 100, 130)
-            else:
-                label.color = (255, 255, 255, 130)
+            self.strings.append(String(self.workspace.answer_string,
+                                       self.answer_x, self.answer_y, self.batch))
+
+        for string in self.strings:
+            string.update(dt)

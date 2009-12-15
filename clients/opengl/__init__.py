@@ -16,17 +16,12 @@
 
 ### NOTE: This is just a quickly thrown together mockup.
 # Abstraction of check a value for change, if so modify gui (color, scale, etc) 
-# center workspace string vertically with respect to each other
-# Add drawing routines for workspace structures
 # make size and shape of each module perfectly customizable
 # Add dedicated scenes for each module that adds full detail
-# Add the ability to type in the problem and seed in client
-# Add [play/pause]/stop/[speedup/slowdown] buttons on the top left
 # Add icons to switch between modules on the top right
 # Add a module for doing bulk runs showing a graph of stats
 # Abstract out theme and add one more amenable to being used in a paper
 # Consider using audio as cues to building/breaking/chaos/order/pause/end
-# Add arrows to indicate the flow of the analogy
 # graphs in dedicated views showing activites over time.
 # Consider dynamic tooltips that show details of the underlying object.
 
@@ -129,9 +124,9 @@ class Window(pyglet.window.Window):
             pyglet.app.exit()
         elif symbol == pyglet.window.key.F and modifiers == pyglet.window.key.MOD_CTRL:
             self.show_fps = not self.show_fps
-        else:
+        elif symbol == pyglet.window.key.SPACE:
             self.button.on_key_press(symbol, modifiers)
-
+    
     def on_mouse_press(self, x, y, button, modifiers):
         self.button.on_mouse_press(x, y, button, modifiers)
         
