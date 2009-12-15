@@ -326,7 +326,7 @@ class GroupTopDownDirectionScout(Codelet):
             if not next_bond:
                 bond_to_add = None
             elif (next_bond.bond_category == bond_category) and \
-                 (next_bond.direction_category == direction_category) and \
+                 (next_bond.direction_category == category) and \
                  (next_bond.bond_facet == facet):
                 bond_to_add = next_bond
             elif (next_bond.bond_category == opposite_bond_category) and \
