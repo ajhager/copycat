@@ -7,11 +7,9 @@
 ; bond.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (bond :letter-span) ()
-; Returns the number of letters spanned by the bond.  This is 2 if the 
-; objects are not groups; otherwise it is the sum of the lengths of the
-; groups.
-  (+ (send from-obj :letter-span) (send to-obj :letter-span)))
+;---------------------------------------------
+; bond :letter-span
+;---------------------------------------------
 
 ;---------------------------------------------
 ; bond.leftmost-in-string?

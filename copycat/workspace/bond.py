@@ -249,11 +249,9 @@ class Bond(Structure):
         return flipped_bond
 
     def letter_span(self):
-        '''
-        Return the number of letters spanned by the bond. This is 2 if the
-        objects are not groups; otherwise it is the sum of the lengths of
-        the groups.
-        '''
+        """Return the number of letters spanned by the bond. This is 2 if the
+        objects are not groups; otherwise it is the sum of the lengths of the
+        groups."""
         return self.from_object.letter_span() + self.to_object.letter_span()
 
     def local_density(self):
