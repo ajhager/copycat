@@ -1,57 +1,7 @@
-(defflavor bond
-    (left-string-position  
-     right-string-position
-     bond-category ; e.g., plato-successor
-     (direction-category nil) ; e.g., plato-right.
-     from-obj to-obj ; The objects that the bond comes from and goes to.
-     left-obj right-obj ; The leftmost and rightmost objects in the bond.
-     bond-facet ; Which facet of the objects is being related, 
-                    ; e.g., plato-letter-category or plato-length.
-     from-obj-descriptor ; Which descriptor of the from-obj is being 
-                         ; related, e.g., plato-a.
-     to-obj-descriptor)  ; Which descriptor of the to-obj is being related,
-                         ; e.g., plato-b.
-    (workspace-structure)
-
 ;---------------------------------------------
-
-(defun make-bond (from-obj to-obj bond-category bond-facet 
-		  from-obj-descriptor to-obj-descriptor &aux new-bond)
-; This returns a new bond.    
-  (setq new-bond
-       (make-instance 'bond 
-         :from-obj from-obj 
-         :to-obj to-obj
-	 :structure-category 'bond
-	 :bond-category bond-category
-	 :direction-category ; Sameness bonds have no direction; 
-	                     ; other bonds do.
-	 (if* (eq bond-category plato-sameness) 
-          then nil
-          else (if* (< (send from-obj :left-string-position) 
-		       (send to-obj :left-string-position))
-                then plato-right else plato-left))
-         :string (send from-obj :string)
-         :left-string-position 
-	 (min (send from-obj :left-string-position) 
-              (send to-obj :left-string-position))
-         :right-string-position 
-	 (max (send from-obj :right-string-position) 
-              (send to-obj :right-string-position))
-         :bond-facet bond-facet ; For now this is always either 
-                                        ; letter-category or length.
-	 :from-obj-descriptor from-obj-descriptor
-	 :to-obj-descriptor to-obj-descriptor))
-  
-  (if* (< (send from-obj :left-string-position) 
-	  (send to-obj :left-string-position))
-   then (send new-bond :set-left-obj from-obj)
-        (send new-bond :set-right-obj to-obj)
-   else (send new-bond :set-left-obj to-obj)
-        (send new-bond :set-right-obj from-obj))
-  
-  (if* %workspace-graphics% then (send new-bond :init-graphics))
-  new-bond)
+; make-bond | Bond.__init__
+; defflavor bond
+;---------------------------------------------
 
 ;---------------------------------------------
 ; bond.print | REMOVED

@@ -21,8 +21,21 @@ from copycat.workspace import Structure, Mapping
 import copycat.slipnet as slipnet
 
 class Bond(Structure):
+    """Bond
+
+    Attributes:
+        bond_category:
+        direction_category:
+        from_object:
+        to_object:
+        bond_facet: Which facet is being related.
+        from_object_descriptor:
+        to_object_descriptor:
+    """
+        
     def __init__(self, workspace, from_object, to_object, bond_category,
                  bond_facet, from_object_descriptor, to_object_descriptor):
+        """Initialize Bond."""
         super(Bond, self).__init__()
         self.workspace = workspace
 
@@ -39,7 +52,7 @@ class Bond(Structure):
 
         self.left_string_position = min(from_object.left_string_position,
                                         to_object.left_string_position)
-        self.right_string_position = min(from_object.right_string_position,
+        self.right_string_position = max(from_object.right_string_position,
                                          to_object.right_string_position)
 
         self.string = from_object.string
