@@ -27,8 +27,7 @@ class Letter(object):
     def __init__(self, letter, x, y, batch):
         self.letter = letter
         self.label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                       color=(255,255,255, 100), batch=batch,
-                                       anchor_y="center")
+                                       color=(255,255,255, 100), batch=batch)
 
     def update(self, dt):
         if self.letter.is_changed:
