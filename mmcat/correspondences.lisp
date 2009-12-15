@@ -1,3 +1,21 @@
+(defun get-concept-mapping-list (obj1 obj2 descriptions1 descriptions2 
+				 &aux result)
+; Get the list of concept-mappings between the given descriptions of
+; these two objects.  For now, the two descriptors in a concept-mapping have 
+; to be equal or linked by a slip-link in the Slipnet, and have 
+; the same description-type.
+  (loop for d1 in descriptions1 do
+        (loop for d2 in descriptions2 
+  	      when (and (eq (send d1 :description-type)  (send d2 :description-type))
+			(or (eq (send d1 :descriptor) (send d2 :descriptor))
+			    (slip-linked? (send d1 :descriptor) 
+			              (send d2 :descriptor))))
+              do (push (make-concept-mapping 
+			   (send d1 :description-type) (send d2 :description-type) 
+	                   (send d1 :descriptor) (send d2 :descriptor)
+                           obj1 obj2) result)))
+  result)
+
 ;---------------------------------------------
 ; make-correspondence | Correspondence.__init__
 ; defflavor correspondence
@@ -7,30 +25,20 @@
 ; correspondence.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (correspondence :other-obj) (obj)
-; Returns the object that the given object corresponds to.
-  (if* (eq obj obj1) then obj2 else obj1))
-
+;---------------------------------------------
+; correspondence.other-obj
 ;---------------------------------------------
 
-(defmethod (correspondence :other-group) (group)
-; Returns the group on the "other side" of the correspondence
-; from the given group; that is, the group containing the
-; object that corresponds to the object that is a member of
-; this correspondence and of the given group.
-  (if* (memq obj1 (send group :object-list)) 
-   then (send obj2 :group) else (send obj1 :group)))
-
+;---------------------------------------------
+; correspondence.other-group
 ;---------------------------------------------
 
-(defmethod (correspondence :letter-span) ()
-  (+ (send obj1 :letter-span) (send obj2 :letter-span)))
-
+;---------------------------------------------
+; correspondence.letter-span
 ;---------------------------------------------
 
-(defmethod (correspondence :add-accessory-concept-mapping) (cm)
-  (push cm accessory-concept-mapping-list))
-
+;---------------------------------------------
+; correspondence.add-accessory-concept-mapping
 ;---------------------------------------------
 
 (defun build-correspondence 
@@ -731,74 +739,27 @@
   (build-correspondence proposed-correspondence)))
 
 ;---------------------------------------------
-
-(defmethod (correspondence :concept-mapping-present?) 
-           (concept-mapping)
-; Returns t if the correspondence contains this concept-mapping.
-  (loop for cm in concept-mapping-list
-	when (and (eq (send cm :descriptor1) 
-		      (send concept-mapping :descriptor1))
-		  (eq (send cm :descriptor2) 
-		      (send concept-mapping :descriptor2)))
-	return t
-	finally (return nil)))
-
+; correspondence.concept-mapping-present?
 ;---------------------------------------------
 
-(defmethod (correspondence :add-concept-mappings) (new-concept-mappings)
-  (send self :set-concept-mapping-list 
-	     (append concept-mapping-list new-concept-mappings))
-  (loop for cm in new-concept-mappings do 
-	(if* (send cm :label) 
-	 then (send (send cm :label) :activate-from-workspace))))
-
+;---------------------------------------------
+; correspondence.add-concept-mappings
 ;---------------------------------------------
 
-(defmethod (correspondence :slippage-list) ()
-; Returns the list of slippages (non-identity concept-mappings) in 
-; this correspondence.
-  (loop for cm in (append concept-mapping-list accessory-concept-mapping-list)
-	when (send cm :slippage?) collect cm))
-
+;---------------------------------------------
+; correspondence.slippage-list
 ;---------------------------------------------
 
-(defun get-concept-mapping-list (obj1 obj2 descriptions1 descriptions2 
-				 &aux result)
-; Get the list of concept-mappings between the given descriptions of
-; these two objects.  For now, the two descriptors in a concept-mapping have 
-; to be equal or linked by a slip-link in the Slipnet, and have 
-; the same description-type.
-  (loop for d1 in descriptions1 do
-        (loop for d2 in descriptions2 
-  	      when (and (eq (send d1 :description-type)  (send d2 :description-type))
-			(or (eq (send d1 :descriptor) (send d2 :descriptor))
-			    (slip-linked? (send d1 :descriptor) 
-			              (send d2 :descriptor))))
-              do (push (make-concept-mapping 
-			   (send d1 :description-type) (send d2 :description-type) 
-	                   (send d1 :descriptor) (send d2 :descriptor)
-                           obj1 obj2) result)))
-  result)
-
+;---------------------------------------------
+; correspondence.relevant-concept-mappings
 ;---------------------------------------------
 
-(defmethod (correspondence :relevant-concept-mappings) ()
-  (loop for cm in (send self :concept-mapping-list) 
-	when (send cm :relevant?) collect cm))
-
+;---------------------------------------------
+; correspondence.distinguishing-concept-mappings
 ;---------------------------------------------
 
-(defmethod (correspondence :distinguishing-concept-mappings) ()
-  (loop for cm in concept-mapping-list 
-	when (send cm :distinguishing?) collect cm))
-
 ;---------------------------------------------
-
-(defmethod (correspondence :relevant-distinguishing-cms) ()
-  (loop for cm in concept-mapping-list 
-	when (and (send cm :relevant?) (send cm :distinguishing?)) 
-	collect cm))
-
+; correspondence.relevant-distinguishing-cms
 ;---------------------------------------------
 
 (defun get-leftmost-and-rightmost-incompatible-correspondences
@@ -905,12 +866,9 @@
 			  (send *workspace* :slippage-list)))))))
 
 ;-------------------------------------------------------
-
-(defmethod (correspondence :proposed?) ()
-  (< proposal-level %built%))
+; correspondence.proposed? | Correspondence.is_proposed
+;-------------------------------------------------------
 
 ;---------------------------------------------
 ; propose-correspondence | Workspace.propose_correspondence 
 ;---------------------------------------------
-
-

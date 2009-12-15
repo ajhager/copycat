@@ -132,58 +132,60 @@ class Correspondence(Structure):
                             return True
 
     def other_object(self, obj):
-        '''
-        Return the object that the given object corresponds to.
-        '''
+        """Return the object that the given object corresponds to."""
         if obj == self.object1:
             return self.object2
         else:
             return self.object1
 
     def other_group(self, group):
-        '''
-        Return the group on the "other side" of the correspondence from the
-        given group.
-        '''
+        """Return the group on the "other side" of the correspondence from the
+        given group."""
         if self.object1 in group.objects:
             return self.object2.group
         else:
             return self.object1.group
 
     def letter_span(self):
+        """Return the letter span of the correspondence."""
         return self.object1.letter_span() + self.object2.letter_span()
 
     def add_accessory_concept_mapping(self, mapping):
+        """Add an accessory concept mapping."""
         self.accessory_concept_mappings.append(mapping)
 
     def is_concept_mapping_present(self, mapping):
+        """Return True if the correspondence contains the given mapping."""
         for cm in self.concept_mappings:
             if cm.descriptor1 == mapping.descriptor1 and \
                cm.descriptor2 == mapping.descriptor2:
                 return True
+        return False
 
     def add_concept_mappings(self, new_mappings):
+        """Add a list of concept mapping to the correspondence."""
         self.concept_mappings.extend(new_mappings)
         for cm in new_mappings:
             if cm.label:
                 cm.label.activate_from_workspace()
 
     def slippages(self):
-        '''
-        Return the list of slippages in this correspondence.
-        '''
+        """Return the list of slippages in this correspondence."""
         mappings = self.concept_mappings + self.accessory_concept_mappings
         return [cm for cm in mappings if cm.is_slippage()]
 
     def relevant_concept_mappings(self):
+        """Return a list of relevant concept mappings."""
         return [cm for cm in self.concept_mappings if cm.is_relevant()]
 
     def get_distinguishing_mappings(self):
-        return [m for m in self.get_concept_mappings() if m.is_distinguishing()]
+        """Return a list of distinguishing concept mappings."""
+        return [cm for cm in self.concept_mappings if cm.is_distinguishing()]
 
     def relevant_distinguishing_concept_mappings(self):
+        """Return a list of relevant and distinguishing concept mappings."""
         mps = self.concept_mappings
-        return [cm for cm in mps if cm.is_relevant() and cm.is_distinguishing]
+        return [cm for cm in mps if cm.is_relevant() and cm.is_distinguishing()]
 
     def incompatible_correspondences(self):
         """Return a list of all the already existing correspondences that are
@@ -282,4 +284,5 @@ class Correspondence(Structure):
                 descriptor1 not in slipped + slippages
 
     def is_proposed(self):
+        """Return True if the correspondence is still being proposed."""
         return self.proposal_level < self.workspace.built

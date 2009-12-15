@@ -35,7 +35,8 @@ class Group(Object, Structure):
     def __init__(self, workspace, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):
         """Initialize Group."""
-        super(Group, self).__init__()
+        Object.__init__(self)
+        Structure.__init__(self)
         self.type_name = 'group'
         self.workspace = workspace
         self.string = string
