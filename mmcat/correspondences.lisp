@@ -1,34 +1,7 @@
-(defflavor correspondence
-    (obj1 obj2  
-     (concept-mapping-list nil) ; The list of concept mappings underlying the 
-                                ; correspondence
-     (accessory-concept-mapping-list nil)) ; This includes symmetric 
-                                           ; concept-mappings (e.g., if
-                                           ; "rightmost -> leftmost" is in
-					   ; the concept-mapping list, then
-					   ; "leftmost -> rightmost will be
-					   ; in the accessory concept-mapping
-					   ; list.  Also, in the case of
-					   ; correspondences between groups,
-					   ; contains concept-mappings between
-					   ; bond-categories and 
-					   ; bond-facets.
-    (workspace-structure)
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
-
-(defun make-correspondence (obj1 obj2 concept-mapping-list 
-		            &aux new-correspondence)
-; Returns a new correspondence.    
-  (setq new-correspondence
-	(make-instance 'correspondence 
-	    :obj1 obj1 
-	    :obj2 obj2 
-            :structure-category 'correspondence
-            :concept-mapping-list concept-mapping-list))
-  (if* %workspace-graphics% then (send new-correspondence :init-graphics))
-  new-correspondence)
+;---------------------------------------------
+; make-correspondence | Correspondence.__init__
+; defflavor correspondence
+;---------------------------------------------
 
 ;---------------------------------------------
 ; correspondence.print | REMOVED

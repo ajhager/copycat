@@ -1,14 +1,3 @@
-;
-;  COPYSTAT:  This program collects and stores statistical information 
-;             from runs of the Copycat program.
-;---------------------------------------------
-
-(in-package 'user)
-
-(proclaim '(special *run-number* *data-file* *verbose-data-file* 
-	            *random-state-file*))
-;---------------------------------------------
-
 (defun copystat (initial-string modified-string target-string n 
 		 &optional (directory "~/")
 		 &aux universal-time hour minute day month year file-string
@@ -346,12 +335,3 @@
 			     (sqrt (send a :frequency))) 1)))
 
 	   (format verbose-ostream "------------------------------------~&~%")))))
-		   
-;---------------------------------------------
-
-
-
-
-
-
-

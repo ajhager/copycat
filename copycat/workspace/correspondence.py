@@ -19,7 +19,18 @@ from copycat.workspace import Structure, Letter, Group, Mapping
 import copycat.slipnet as slipnet
 
 class Correspondence(Structure):
+    """Correspondence
+
+    Attributes:
+        object1:
+        object2:
+        concept_mappings:
+        accessory_concept_mappings:
+        structure_category:
+    """
+
     def __init__(self, workspace, object1, object2, concept_mappings):
+        """Initialize Correspondence."""
         super(Correspondence, self).__init__()
         self.workspace = workspace
         self.object1 = object1
