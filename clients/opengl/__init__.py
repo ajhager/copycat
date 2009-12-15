@@ -16,14 +16,11 @@
 
 ### NOTE: This is just a quickly thrown together mockup.
 # Abstraction of check a value for change, if so modify gui (color, scale, etc) 
-# make size and shape of each module perfectly customizable
 # Add dedicated scenes for each module that adds full detail
+# graphs in dedicated views showing activites over time.
 # Add icons to switch between modules on the top right
 # Add a module for doing bulk runs showing a graph of stats
-# Abstract out theme and add one more amenable to being used in a paper
-# Consider using audio as cues to building/breaking/chaos/order/pause/end
-# graphs in dedicated views showing activites over time.
-# Consider dynamic tooltips that show details of the underlying object.
+# Add the ability to type in the problem and seed in client
 
 import pyglet
 from pyglet.gl import *

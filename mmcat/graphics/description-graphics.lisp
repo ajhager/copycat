@@ -1,15 +1,6 @@
-;---------------------------------------------
-; DESCRIPTION GRAPHICS:  This file contains graphics functions for descriptions.
-;-------------------------------------------
-
-(in-package 'user)
-
 (defflavor description-graphics-obj 
     (x y obj name parent (previous-font %irrelevant-description-font%))
-    ()    
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
+    ())
 
 ;---------------------------------------------
 
@@ -50,34 +41,3 @@
    then (set-font previous-font)
         (erase-text x y name)
         (set-font %workspace-font%)))
-
-;---------------------------------------------
-
-(defmethod (description :draw) ()
-  (send graphics-obj :draw))
-
-;---------------------------------------------
-
-(defmethod (description :erase) ()
-  (send graphics-obj :erase))
-
-;---------------------------------------------
-
-(defun display-descriptions ()
-  (loop for graphics-obj in *description-graphics-obj-list* do
-        (send graphics-obj :draw)))
-
-;---------------------------------------------
-
-(defun redisplay-descriptions ()
-  (loop for graphics-obj in *description-graphics-obj-list* do
-        (send graphics-obj :draw)))
-
-;---------------------------------------------
-
-(defun erase-descriptions ()
-  (loop for graphics-obj in *description-graphics-obj-list* do
-        (send graphics-obj :erase)))
-
-;---------------------------------------------
-

@@ -14,6 +14,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+# IDEAS:
+# Intensity of the codelet count should be how probable that type is to be chosen
+
 import pyglet
 
 class Coderack(object):

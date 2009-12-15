@@ -1,12 +1,3 @@
-;---------------------------------------------
-; WORKSPACE-GRAPHICS: This file contains graphics functions for the 
-;                      workspace.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defun init-graphics-constants ()
 ; Initializes the various constants used in the graphics routines.
  
@@ -209,7 +200,6 @@
 	(send graphics-obj :draw)
         (send letter :set-graphics-obj graphics-obj))
 
-
 ; Draw arrow.
   (draw-centered-text %arrow-x% %y-top% "--->" %arrow-width%)
 
@@ -352,30 +342,6 @@
 
 ;---------------------------------------------
 
-(defun erase-workspace ()
-; Erases the entire workspace display.
-  (erase-solid-rectangle 0 0 %window-width% 
-                         (- %minimal-coderack-y% 8)))
-
-;---------------------------------------------
-
-(defun display-ccat ()
-; Displays all graphics representing the current state of the program.
-  (clear-window)
-  (if* (and %workspace-graphics% *workspace-initialized*) 
-   then (display-workspace))
-  (if* (and %coderack-graphics% *coderack-initialized*) 
-   then (display-coderack))
-  (if* %minimal-coderack-graphics% 
-   then (display-minimal-coderack))
-  (if* (and %slipnet-graphics% *slipnet-initialized*) 
-   then (display-slipnet))
-  (if* %temperature-graphics% 
-   then (init-temperature-display)
-        (update-temperature-display t)))
-
-;---------------------------------------------
-
 (defun init-answer-graphics (&aux letvec graphics-obj)
 ; Initializes the graphics for displaying the answer string.
   (setq letvec (send *answer-string* :letter-vector))
@@ -392,69 +358,3 @@
 	(send graphics-obj :set-y %y-bottom%)
 	(send graphics-obj :draw)
 	(send letter :set-graphics-obj graphics-obj)))
-      
-;---------------------------------------------
-
-(defun redraw-graphics ()
-  ; Redraw initial-string-graphics.
-  (loop for letter in (send *initial-string* :letter-list) do
-	(send letter :draw))
-
-  (loop for proposed-bond 
-	in (send *initial-string* :proposed-bond-list) do
-	(if* (send proposed-bond :drawn?) 
-	 then (send proposed-bond :draw-proposed)))
-
-  (loop for bond in (send *initial-string* :bond-list) do
-	(if* (send bond :drawn?) then (send bond :draw)))
-
-  (loop for proposed-group 
-	in (send *initial-string* :proposed-group-list) do
-	(if* (send proposed-group :drawn?) 
-	 then (send proposed-group :draw-proposed)))
-
-  (loop for group in (send *initial-string* :group-list) 
-	when group do
-	(if* (send group :drawn?) then (send group :draw)))
-
-  (loop for replacement 
-	in (send *workspace* :replacement-list) do 
-	(send (send replacement :graphics-obj) :draw))
-
-  (loop for proposed-correspondence 
-	in (send *workspace* :proposed-correspondence-list) do
-	(if* (send proposed-correspondence :drawn?) 
-         then (send proposed-correspondence :draw-proposed)))
-
-  (loop for correspondence in (send *workspace* :correspondence-list) 
-	when correspondence do
-	(if* (send correspondence :drawn?) 
-         then (send correspondence :draw)))
-
-  ; Redraw target-string-graphics.
-  (loop for letter in (send *target-string* :letter-list) do
-	(send letter :draw))
-
-  (loop for proposed-bond 
-	in (send *target-string* :proposed-bond-list) do
-	(if* (send proposed-bond :drawn?) 
-         then (send proposed-bond :draw-proposed)))
-
-  (loop for bond in (send *target-string* :bond-list) do
-	(if* (send bond :drawn?) then (send bond :draw)))
-
-  (loop for proposed-group 
-	in (send *target-string* :proposed-group-list) do
-	(if* (send proposed-group :drawn?) 
-         then (send proposed-group :draw-proposed)))
-
-  (loop for group in (send *target-string* :group-list) 
-	when group do
-	(if* (send group :drawn?) then (send group :draw)))
-
-  ; Redraw descriptions.
-  (if* %description-graphics% then (redisplay-descriptions)))
-
-;---------------------------------------------
-
-

@@ -1,19 +1,5 @@
-;---------------------------------------------
-; BOND GRAPHICS:  This file contains graphics functions for bonds.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defflavor bond-graphics-obj (from-obj to-obj string (drawn? nil) 
-                              left-obj right-obj x1 y1 x2 y2 x3 y3 parent)
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
-
-;---------------------------------------------
+                              left-obj right-obj x1 y1 x2 y2 x3 y3 parent))
 
 (defmethod (bond-graphics-obj :proposed?) ()
 ; Returns t if the bond is proposed, rather than built.
@@ -56,7 +42,6 @@
         (xor-jagged-line x2 y2 (+ x-mid 1) y-mid %jag-length%)
         (cond ((eq %graphics-rate% 'medium) (medium-pause))
 	      ((eq %graphics-rate% 'slow) (long-pause)))))
-
 
 ;---------------------------------------------
 
@@ -115,51 +100,10 @@
 
 ;---------------------------------------------
 
-(defmethod (bond-graphics-obj :erase-spline) ()
-; Erases the parabola representing this bond.
-  (if* (< (send parent :proposal-level) %built%)
-   then (erase-dashed-parabola x1 y1 x2 y2 x3 y3 1 
-	                       (send self :get-dash-length)
-			       (send self :get-space-length))
-   else (erase-parabola x1 y1 x2 y2 x3 y3  (send self :intensity)))
-   (cond ((eq (send parent :direction-category) plato-left)
-          (erase-bond-arrow x2 y2 'left (send parent :proposal-level)))
-         ((eq (send parent :direction-category) plato-right) 
-          (erase-bond-arrow 
-	      (+ x2 5) y2 'right (send parent :proposal-level))))
-  (send self :set-drawn? nil))
-
-;---------------------------------------------
-
 (defmethod (bond-graphics-obj :draw) ()
 ; If the bond is not in a group, draw it.
   (if* (not (in-group? from-obj to-obj)) then (send self :draw-spline)))
 
-;---------------------------------------------
-
-(defmethod (bond-graphics-obj :erase) (&aux other-proposed-bonds 
-		                            highest-level-proposed-bond)
-; Erase only if already drawn.
-  (if* drawn? 
-   then (send self :erase-spline)
-        ; Now draw in the next-highest-level proposed bond.
-        (setq other-proposed-bonds
-	      (remove parent 
-		      (aref (send string :proposed-bond-array) 
-	                     (send from-obj :string-number)
-			     (send to-obj :string-number))))
-        ; If there is still at least one proposed bond pending,
-        ; draw the one with the highest proposal level.
-        (if* other-proposed-bonds  
-         then (setq highest-level-proposed-bond
-	           (nth (list-max-position 
-			    (send-method-to-list 
-				other-proposed-bonds 
-				:proposal-level))
-   		        other-proposed-bonds))
-              (send (send highest-level-proposed-bond 
-			  :graphics-obj) :draw-spline))))
-	  
 ;---------------------------------------------
 
 (defmethod (bond-graphics-obj :draw-proposed) ()
@@ -182,35 +126,6 @@
 
 ;---------------------------------------------
 
-(defmethod (bond-graphics-obj :erase-proposed) 
-           (&aux other-proposed-bonds highest-level-proposed-bond)
-; Only erase if proposed, already drawn, if there isn't a built
-; bond present and there isn't a higher-level bond present. 
-  (if* (and (send self :proposed?) drawn?
-    	    (not (or (send string :bond-present? parent)
-	             (send string :higher-proposed-bond-drawn? 
-		                  parent))))
-   then (send self :erase-spline)
-        ; Now draw in the next-highest-level proposed bond.
-        (setq other-proposed-bonds
-	      (remove parent 
-		      (aref (send string :proposed-bond-array) 
-                      (send from-obj :string-number)
-                      (send to-obj :string-number))))
-        ; If there is still at least one proposed bond pending,
-        ; draw the one with the highest proposal level.
-        (if* other-proposed-bonds  
-         then (setq highest-level-proposed-bond
-	            (nth (list-max-position 
-			     (send-method-to-list 
-				 other-proposed-bonds 
-				 :proposal-level))
-   		         other-proposed-bonds))
-              (send (send highest-level-proposed-bond 
-			  :graphics-obj) :draw-spline))))
-	  
-;---------------------------------------------
-
 (defmethod (bond-graphics-obj :flash) (&aux num-of-flashes)
   (if* (eq %graphics-rate% 'fast) 
    then (setq num-of-flashes 6)
@@ -224,7 +139,6 @@
         (cond ((eq %graphics-rate% 'fast) (quick-pause))
 	      ((eq %graphics-rate% 'medium) (medium-pause))
 	      ((eq %graphics-rate% 'slow) (medium-pause)))))
-	
 
 ;---------------------------------------------
 
@@ -296,57 +210,3 @@
   (if* (< proposal-level %built%)
    then (draw-arrow x y direction)
    else (draw-bold-arrow x y direction)))
-
-;---------------------------------------------
-
-(defun erase-bond-arrow (x y direction proposal-level)
-  (if* (< proposal-level %built%)
-   then (erase-arrow x y direction)
-   else (erase-bold-arrow x y direction)))
-
-;---------------------------------------------
-
-(defmethod (bond :drawn?) ()
-  (send graphics-obj :drawn?))
-
-;---------------------------------------------
-
-(defmethod (bond :flash) ()
-  (send graphics-obj :flash))
-
-;---------------------------------------------
-
-(defmethod (bond :flash-proposed) ()
-  (send graphics-obj :flash-proposed))
-
-;---------------------------------------------
-
-(defmethod (bond :draw-spline) ()
-  (send graphics-obj :draw-spline))
-
-;---------------------------------------------
-
-(defmethod (bond :erase-spline) ()
-  (send graphics-obj :erase-spline))
-
-;---------------------------------------------
-
-(defmethod (bond :draw) ()
-  (send graphics-obj :draw))
-
-;---------------------------------------------
-
-(defmethod (bond :erase) ()
-  (send graphics-obj :erase))
-
-;---------------------------------------------
-
-(defmethod (bond :draw-proposed) ()
-  (send graphics-obj :draw-proposed))
-
-;---------------------------------------------
-
-(defmethod (bond :erase-proposed) ()
-  (send graphics-obj :erase-proposed))
-
-;---------------------------------------------

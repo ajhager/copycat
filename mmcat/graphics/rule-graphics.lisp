@@ -1,9 +1,3 @@
-;---------------------------------------------
-; BOND GRAPHICS:  This file contains graphics functions for rules.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defmethod (rule :rule-string) (&aux part1 part2 )
 ; Returns a string corresponding to the rule.
 (block nil
@@ -52,23 +46,6 @@
 
 ;---------------------------------------------
 
-(defmethod (rule :erase) (mode &aux rule-string rule-string-width 
-			            rule-x rule-y)
-  (setq rule-string (send self :rule-string))
-  (set-font %rule-font%)
-  (setq rule-string-width (text-length rule-string))
-  (if* (= mode %rule-mode%) 
-   then (setq rule-x %rule-x%)
-        (setq rule-y %rule-y%) 
-   else (setq rule-x %translated-rule-x%)
-        (setq rule-y %translated-rule-y%))
-  (erase-unfilled-rectangle 
-      (- rule-x 8) (- rule-y 14) (+ rule-x rule-string-width 8) (+ rule-y 8))
-  (erase-text rule-x rule-y rule-string)
-  (set-font %workspace-font%))
-
-;---------------------------------------------
-
 (defmethod (rule :flash) (mode)
   (loop for i from 1 to 15 do 
 	(send self :erase mode)
@@ -91,6 +68,5 @@
 ; This is used for displaying the rule.
   (or (eq (send self :category) plato-string-position-category)
       (eq (send self :category) plato-alphabetic-position-category)))
-		       
-;---------------------------------------------
+
 

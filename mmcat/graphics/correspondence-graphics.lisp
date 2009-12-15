@@ -1,25 +1,8 @@
-;---------------------------------------------
-; CORRESPONDENCE GRAPHICS:  This file contains graphics functions for 
-;                           correspondences.
-;---------------------------------------------
-
-(in-package 'user)
-
-;---------------------------------------------
-
 (defflavor correspondence-graphics-obj (obj1 obj2 x1 y1 x2 y2 
 					concept-mapping-x concept-mapping-y 
 					parent (drawn? nil))
    ; The parent is the correspondence whose graphics-obj this is.
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
-
-;---------------------------------------------
-
-(defmethod (correspondence-graphics-obj :proposed?) ()
-  (send parent :proposed?))
+  ())
 
 ;---------------------------------------------
 
@@ -105,7 +88,6 @@
 		      (send proposed-correspondence :proposal-level)))
 	return t
 	finally (return nil)))
-							   
 
 ;---------------------------------------------
 
@@ -210,25 +192,6 @@
 
 ;---------------------------------------------
 
-(defmethod (correspondence-graphics-obj :erase-line) ()
-; Erases the line (dashed for proposed correspondences, jagged for built
-; correspondences) between the two objects.
-  (if* (and (send obj1 :string-spanning-group?) 
-	    (send obj2 :string-spanning-group?))
-   then (send self :erase-string-spanning-group-line)
-   else (if* (= (send parent :proposal-level) %built%)
-         then (if* (< (abs (- x1 x2)) 10) ; Slope is infinity
-               then (erase-vertical-jagged-line x1 y1 x2 y2 
-			                        %vertical-jag-length%)
-               else (erase-jagged-line x1 y1 x2 y2 %jag-length%))
-         else (erase-dashed-line x1 y1 x2 y2 
-		                (send self :get-dash-length)
-		                (send self :get-space-length))))
-  (send self :set-drawn? nil))
-  
-
-;---------------------------------------------
-
 (defmethod (correspondence-graphics-obj :draw-string-spanning-group-line) 
            (&aux dash-length space-length x-middle)
 ; Draws the line (dashed for proposed correspondences, jagged for built
@@ -246,23 +209,6 @@
 
 ;---------------------------------------------
 
-(defmethod (correspondence-graphics-obj :erase-string-spanning-group-line) 
-           (&aux dash-length space-length x-middle)
-; Erases the line (dashed for proposed correspondences, jagged for built
-; correspondences) between the two string-spanning objects.
-  (if* (= (send parent :proposal-level) %built%)
-   then (erase-string-spanning-group-correspondence x1 y1 x2 y2)
-   else (setq dash-length (send self :get-dash-length))
-        (setq space-length (send self :get-space-length))
-        (if* %demo-graphics%
-	 then (setq x-middle (+ %arrow-x% 40))
-	 else (setq x-middle %arrow-x%))
-        (erase-dashed-line x1 y1 x-middle y1 dash-length space-length)
-        (erase-dashed-line x-middle y1 x-middle y2 dash-length space-length)
-        (erase-dashed-line x2 y2 x-middle y2 dash-length space-length)))
-
-;---------------------------------------------
-
 (defmethod (correspondence-graphics-obj :draw) ()
   ; If there is any proposed-correspondence drawn in this position, erase it.
   (loop for proposed-correspondence 
@@ -276,31 +222,6 @@
   (send self :erase-concept-mappings) ; Erase old display because fonts
                                       ; might have changed.
   (send self :draw-concept-mappings))
-
-;---------------------------------------------
-
-(defmethod (correspondence-graphics-obj :erase) 
-           (&aux other-proposed-correspondences
-		 highest-level-proposed-correspondence)
-  (if* drawn?
-   then (send self :erase-line)
-        (send self :erase-concept-mappings)
-	(setq other-proposed-correspondences
-	      (remove parent 
-		      (aref (send *workspace* :proposed-correspondence-array) 
-                            (send (send parent :obj1) :string-number)
-                            (send (send parent :obj2) :string-number))))
-        ; If there is still at least one proposed correspondence pending. 
-	; Draw the one with the highest proposal level.
-        (if* other-proposed-correspondences 
-         then (setq highest-level-proposed-correspondence
-	            (nth (list-max-position 
-			     (send-method-to-list 
-				 other-proposed-correspondences 
-				 :proposal-level))
- 		         other-proposed-correspondences))
-              (send (send highest-level-proposed-correspondence :graphics-obj) 
-		    :draw-line))))
 
 ;---------------------------------------------
 
@@ -333,33 +254,6 @@
         (send self :draw-line)))
 
 ;---------------------------------------------
-
-(defmethod (correspondence-graphics-obj :erase-proposed) 
-           (&aux other-proposed-correspondences
-		 highest-level-proposed-correspondence)
-  ; Only erase if proposed and already drawn. 
-  (if* (and (send self :proposed?) drawn?)
-   then (send self :erase-line)
-        ; Now draw in the next-highest-level proposed correspondence.
-        (setq other-proposed-correspondences
-	      (remove parent 
-		      (aref (send *workspace* :proposed-correspondence-array) 
-	   	            (send obj1 :string-number)
-		            (send obj2 :string-number))))
-        ; If there is still at least one proposed correspondence pending,  
-	; draw the one with the highest proposal-level.
-        (if* other-proposed-correspondences  
-         then (setq highest-level-proposed-correspondence
-	           (nth (list-max-position 
-			    (send-method-to-list 
-				other-proposed-correspondences 
-				:proposal-level))
- 		        other-proposed-correspondences))
-              (send (send highest-level-proposed-correspondence
-                          :graphics-obj) :draw-line))))
-	  
-;---------------------------------------------
-
 
 (defmethod (correspondence-graphics-obj :flash) (&aux num-of-flashes)
   (if* (eq %graphics-rate% 'fast) 
@@ -425,23 +319,6 @@
 
 ;---------------------------------------------
 
-(defmethod (correspondence-graphics-obj :erase-concept-mappings) 
-           (&aux (concept-mapping-count 0))
-  (loop for concept-mapping 
-	in (append (send parent :concept-mapping-list)
-		   (send parent :bond-concept-mapping-list)) do
-         (set-font (send concept-mapping :previous-font))
-         (erase-centered-text 
-	     concept-mapping-x 
-	     (+ concept-mapping-y (* concept-mapping-count 
-		  	             %space-between-concept-mappings%))
-             (send concept-mapping :text) %concept-mapping-text-width%)
-         (incf concept-mapping-count))
-  
-  (set-font %workspace-font%))
-
-;---------------------------------------------
-
 (defun draw-string-spanning-group-correspondence (x1 y1 x2 y2 
 					&aux x-middle pair old-x old-y)
   (if* %demo-graphics%
@@ -457,25 +334,6 @@
 	                                  %vertical-jag-length%))
   (setq old-x (car pair) old-y (cdr pair))
   (draw-line old-x old-y x-middle y2))
-
-;---------------------------------------------
-
-(defun erase-string-spanning-group-correspondence (x1 y1 x2 y2 
-					 &aux x-middle pair old-x old-y)
-
-  (if* %demo-graphics%
-   then (setq x-middle (+ %arrow-x% 40))
-   else (setq x-middle %arrow-x%))
-  (setq pair (erase-horizontal-jagged-line (+ x1 2) y1 x-middle y1 
-	                                  %vertical-jag-length%))
-  (setq old-x (car pair) old-y (cdr pair))
-  (setq pair (erase-vertical-jagged-line old-x old-y x-middle y2
-                                        %vertical-jag-length%))
-  (setq old-x (car pair) old-y (cdr pair))
-  (setq pair (erase-horizontal-jagged-line (+ x2 2) y2 old-x old-y 
-	                                  %vertical-jag-length%))
-  (setq old-x (car pair) old-y (cdr pair))
-  (erase-line old-x old-y x-middle y2))
 
 ;---------------------------------------------
 
@@ -496,62 +354,6 @@
   (setq old-x (car pair) old-y (cdr pair))
   (xor-line old-x old-y x-middle y2))
 
-
-;---------------------------------------------
-
-(defmethod (correspondence :drawn?) ()
-  (send graphics-obj :drawn?))
-
-;---------------------------------------------
-
-(defmethod (correspondence :flash) ()
-  (send graphics-obj :flash))
-
-;---------------------------------------------
-
-(defmethod (correspondence :flash-proposed) ()
-  (send graphics-obj :flash-proposed))
-
-;---------------------------------------------
-
-(defmethod (correspondence :draw-line) ()
-  (send graphics-obj :draw-line))
-
-;---------------------------------------------
-
-(defmethod (correspondence :erase-line) ()
-  (send graphics-obj :erase-line))
-
-;---------------------------------------------
-
-(defmethod (correspondence :draw-concept-mappings) ()
-  (send graphics-obj :draw-concept-mappings))
-
-;---------------------------------------------
-
-(defmethod (correspondence :erase-concept-mappings) ()
-  (send graphics-obj :erase-concept-mappings))
-
-;---------------------------------------------
-
-(defmethod (correspondence :draw) ()
-  (send graphics-obj :draw))
-
-;---------------------------------------------
-
-(defmethod (correspondence :erase) ()
-  (send graphics-obj :erase))
-
-;---------------------------------------------
-
-(defmethod (correspondence :draw-proposed) ()
-  (send graphics-obj :draw-proposed))
-
-;---------------------------------------------
-
-(defmethod (correspondence :erase-proposed) ()
-  (send graphics-obj :erase-proposed))
-
 ;---------------------------------------------
 
 (defmethod (correspondence :cm-graphics-height) ()
@@ -566,5 +368,3 @@
 ; Returns the text to be displayed for this concept-mapping.
   (format nil "~a->~a" (send descriptor1 :cm-name) 
 	               (send descriptor2 :cm-name)))
-	               
-;---------------------------------------------

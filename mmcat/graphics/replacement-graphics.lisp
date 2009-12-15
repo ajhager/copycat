@@ -1,9 +1,3 @@
-;---------------------------------------------
-; REPLACEMENT GRAPHICS: This file contains graphics functions for replacements.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defflavor replacement-graphics-obj
   (obj1 obj2)
   (bond-graphics-obj)
@@ -21,11 +15,6 @@
 
 (defmethod (replacement-graphics-obj :draw) ()
   (draw-parabola x1 y1 x2 y2 x3 y3 (send self :intensity)))
-
-;---------------------------------------------
-
-(defmethod (replacement-graphics-obj :erase) ()
-  (erase-parabola x1 y1 x2 y2 x3 y3 (send self :intensity)))
 
 ;---------------------------------------------
 
@@ -60,15 +49,4 @@
 
   (send self :set-graphics-obj new-replacement-graphics-obj))
 
-;---------------------------------------------
-
-(defmethod (replacement :draw) ()
-  (send graphics-obj :draw))
-
-;---------------------------------------------
-
-(defmethod (replacement :erase) ()
-  (send graphics-obj :erase))
-
-;---------------------------------------------
 

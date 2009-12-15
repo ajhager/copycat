@@ -1,9 +1,3 @@
-;---------------------------------------------
-; GROUP GRAPHICS:  This file contains graphics functions for groups.
-;---------------------------------------------
-
-(in-package 'user)
-
 (defflavor group-graphics-obj 
   (string  ; The string the group is in.
    left-obj right-obj  ; The left and right objects in the group.
@@ -11,13 +5,7 @@
    x1 y1 x2 y2 ; The coordinates of the graphics object.
    parent  ; The group represented by this graphics object.
    (drawn? nil) ; T if the group is currently drawn.
-  ) 
-  ()
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
-
-;---------------------------------------------
+  ))
 
 (defmethod (group :init-graphics) 
            (&aux new-group-graphics-obj leftmost-letter rightmost-letter 
@@ -63,11 +51,6 @@
 
 ;---------------------------------------------
 
-(defmethod (group-graphics-obj :proposed?) ()
-  (send parent :proposed?))
-
-;---------------------------------------------
-
 (defmethod (group-graphics-obj :intensity) ()
 ; Returns the thickness of the line with which the group should be drawn.
   (if* (= (send parent :proposal-level) 1)
@@ -75,7 +58,6 @@
    else (if* (eq (send parent :group-category) :samegrp)
          then %medium-intensity%
          else %light-intensity%)))
-
 
 ;---------------------------------------------
 
@@ -108,7 +90,6 @@
 		      (send proposed-group :proposal-level)))
 	return t
 	finally (return nil)))
-							   
 
 (defmethod (workspace-string :higher-proposed-group-drawn?) (proposed-group)
 ; Returns t if there is already a proposed group drawn whose proposal-level is 
@@ -169,52 +150,10 @@
 
 ;---------------------------------------------
 
-(defmethod (group-graphics-obj :erase-rectangle) (&aux x-center)
-; Draws the rectangle that represents the group.
-  (if* (< (send parent :proposal-level) %built%)
-   then (erase-dashed-rectangle x1 y1 x2 y2 
-	                       (send self :get-dash-length)
-	                       (send self :get-space-length))
-   else (erase-unfilled-rectangle x1 y1 x2 y2))
-  (setq x-center (round (/ (+ x1 x2) 2)))
-  (cond ((eq (send parent :direction-category) plato-left)
-         (erase-group-arrow (- x-center 10) y1 'left 
-	                    (send parent :proposal-level)))
-        ((eq (send parent :direction-category) plato-right)
-	 (erase-group-arrow (+ x-center 10) y1 'right 
-		           (send parent :proposal-level))))
-  (send self :set-drawn? nil))
-	 
-
-;---------------------------------------------
-
 (defmethod (group-graphics-obj :draw) ()
   (send self :draw-rectangle)
   (send parent :draw-parameter))
 
-;---------------------------------------------
-
-(defmethod (group-graphics-obj :erase) 
-           (&aux other-proposed-groups highest-level-proposed-group)
-  (send self :erase-rectangle)
-  (send parent :erase-parameter)
-  (setq other-proposed-groups 
-	(remove parent 
-		(aref (send string :proposed-group-array) 
-                      (send left-obj :string-number)
-                      (send right-obj :string-number))))
-  ; If there is still at least one proposed group pending,
-  ; draw the one with the highest proposal level.
-  (if* other-proposed-groups  
-   then (setq highest-level-proposed-group
-	      (nth (list-max-position 
-		       (send-method-to-list 
-			   other-proposed-groups 
-			   :proposal-level))
- 		   other-proposed-groups))
-        (send (send highest-level-proposed-group :structure-graphics-obj) 
-	      :draw-rectangle)))
-	  
 ;---------------------------------------------
 
 (defmethod (group-graphics-obj :draw-proposed) ()
@@ -237,38 +176,6 @@
 
 ;---------------------------------------------
 
-(defmethod (group-graphics-obj :erase-proposed) 
-           (&aux other-proposed-groups highest-level-proposed-group)
-  ; Only erase if proposed and already drawn.
-  (if* (and (send self :proposed?) drawn? 
-	    (not (send string :group-present? parent)))
-   then (send self :erase-rectangle)
-
-        ; Now draw in the next-highest-level proposed group.
-        (setq other-proposed-groups
-	      (remove parent 
-		      (aref (send string 
-				  :proposed-group-array) 
-                            (send left-obj 
-				  :string-number)
-                            (send right-obj 
-				  :string-number))))
-        ; If there is still at least one proposed group 
-	; pending, draw the one with the highest proposal 
-	; level.
-        (if* other-proposed-groups
-         then (setq highest-level-proposed-group
-	            (nth (list-max-position 
-			     (send-method-to-list 
-				 other-proposed-groups
-				 :proposal-level))
-   		         other-proposed-groups))
-              (send (send highest-level-proposed-group 
-			  :structure-graphics-obj) :draw-rectangle))))
- 
-
-;---------------------------------------------
-
 (defmethod (group-graphics-obj :flash) (&aux num-of-flashes)
   (setq num-of-flashes 4)
   (loop for i from 1 to num-of-flashes do 
@@ -281,8 +188,6 @@
 	      ((eq %graphics-rate% 'medium) (medium-pause))
 	      ((eq %graphics-rate% 'slow) (medium-pause)))))
 	
-
-
 ;---------------------------------------------
 
 (defmethod (group-graphics-obj :flash-proposed) ()
@@ -301,94 +206,14 @@
    else (draw-big-bold-arrow x y direction)))
 
 ;---------------------------------------------
-
-(defun erase-group-arrow (x y direction proposal-level)
-  (if* (< proposal-level %built%)
-   then (erase-big-arrow x y direction)
-   else (erase-big-bold-arrow x y direction)))
-
-;---------------------------------------------
-
-(defmethod (group :x1) ()
-  (send structure-graphics-obj :x1))
-
-;---------------------------------------------
-
-(defmethod (group :y1) ()
-  (send structure-graphics-obj :y1))
-
-;---------------------------------------------
-
-(defmethod (group :x2) ()
-  (send structure-graphics-obj :x2))
-
-;---------------------------------------------
-
-(defmethod (group :y2) ()
-  (send structure-graphics-obj :y2))
-
-;---------------------------------------------
-
-(defmethod (group :drawn?) ()
-  (send structure-graphics-obj :drawn?))
-
-;---------------------------------------------
-
-(defmethod (group :flash) ()
-  (send structure-graphics-obj :flash))
-
-;---------------------------------------------
-
-(defmethod (group :flash-proposed) ()
-  (send structure-graphics-obj :flash-proposed))
-
-;---------------------------------------------
-
-(defmethod (group :draw) ()
-  (send structure-graphics-obj :draw))
-
-;---------------------------------------------
-
-(defmethod (group :erase) ()
-  (send structure-graphics-obj :erase))
-
-;---------------------------------------------
-
-(defmethod (group :draw-proposed) ()
-  (send structure-graphics-obj :draw-proposed))
-
-;---------------------------------------------
-
-(defmethod (group :erase-proposed) ()
-  (send structure-graphics-obj :erase-proposed))
-
-;---------------------------------------------
-
-(defmethod (group :draw-rectangle) ()
-  (send structure-graphics-obj :draw-rectangle))
-
-;---------------------------------------------
-
-(defmethod (group :erase-rectangle) ()
-  (send structure-graphics-obj :erase-rectangle))
-
-;---------------------------------------------
-
-
-;---------------------------------------------
 ; GROUP-PARAMETER-GRAPHICS
 ;---------------------------------------------
-
-(in-package 'user)
 
 (defflavor group-parameter-graphics-obj 
     (graphics-name graphics-length string-spanning-group-correspondence-x 
      string-spanning-group-correspondence-y length-x length-y 
      length-bond-right-x length-bond-left-x length-bond-y)
-    (letter-graphics-obj)    
-    :gettable-instance-variables
-    :settable-instance-variables
-    :initable-instance-variables)
+    (letter-graphics-obj))
 
 ;---------------------------------------------
 
@@ -475,15 +300,6 @@
 
 ;----------------------------------------------
 
-(defmethod (group-parameter-graphics-obj :erase-length) ()
-  (if* (send plato-length :active?)
-   then (set-font %relevant-length-font%)
-   else (set-font %irrelevant-length-font%))
-  (erase-text length-x length-y graphics-length)
-  (set-font %workspace-font%))
-
-;----------------------------------------------
-
 (defmethod (group-parameter-graphics-obj :draw) ()
   (if* graphics-name
    then (set-font %group-font%)
@@ -493,62 +309,6 @@
 
 ;----------------------------------------------
 
-(defmethod (group-parameter-graphics-obj :erase) ()
-  (if* graphics-name 
-   then (set-font %group-font%)
-        (erase-text x y graphics-name)
-        (set-font %workspace-font%))
-  (if* graphics-length then (send self :erase-length)))
-
-;----------------------------------------------
-
 (defmethod (group-parameter-graphics-obj :drawn?) ()
   (send (send parent :structure-graphics-obj) :drawn?))
-
-;----------------------------------------------
-
-(defmethod (group :x) ()
-  (send graphics-obj :x))  
-
-;----------------------------------------------
-
-(defmethod (group :y) ()
-  (send graphics-obj :y))  
-
-;----------------------------------------------
-
-(defmethod (group :draw-parameter) ()
-  (send graphics-obj :draw))  
-
-;----------------------------------------------
-
-(defmethod (group :erase-parameter) ()
-  (send graphics-obj :erase))  
-
-;----------------------------------------------
-
-(defmethod (group :graphics-name) ()
-  (send graphics-obj :graphics-name))
-
-;----------------------------------------------
-
-(defmethod (group :graphics-length) ()
-  (send graphics-obj :graphics-length))
-
-;----------------------------------------------
-
-(defmethod (group :init-length-graphics) ()
-  (send graphics-obj :init-length-graphics))
-
-;----------------------------------------------
-
-(defmethod (group :draw-length) ()
-  (send graphics-obj :draw-length))  
-
-;----------------------------------------------
-
-(defmethod (group :erase-length) ()
-  (send graphics-obj :erase-length))  
-
-;----------------------------------------------
 

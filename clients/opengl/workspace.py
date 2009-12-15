@@ -17,7 +17,6 @@
 # IDEAS:
 # Add arrows to indicate the flow of the analogy
 # Add drawing routines for workspace structures
-# Add the ability to type in the problem and seed in client
 
 import string
 
@@ -58,15 +57,12 @@ class Workspace(object):
         bot_y = y + h / 4.0
         top_y = y + 3 * h / 4.0 - 35
 
-        self.answer_x = right_x - 30
+        self.answer_x = right_x
         self.answer_y = bot_y
 
-        self.strings = [String(workspace.initial_string,
-                               left_x + 30, top_y, self.batch),
-                        String(workspace.modified_string,
-                               right_x - 30, top_y, self.batch),
-                        String(workspace.target_string,
-                               left_x + 30, bot_y, self.batch)]
+        self.strings = [String(workspace.initial_string, left_x, top_y, self.batch),
+                        String(workspace.modified_string, right_x, top_y, self.batch),
+                        String(workspace.target_string, left_x, bot_y, self.batch)]
 
     def update(self, dt):
         if self.workspace.answer_string:
