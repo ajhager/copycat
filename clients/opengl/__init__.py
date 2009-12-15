@@ -110,6 +110,11 @@ class Window(pyglet.window.Window):
         self.timer = pyglet.text.Label("0", "EraserDust", 14, x=512, y=575,
                                        color=(255,255,255, 125), batch=self.batch,
                                        halign="center", anchor_x="center")
+
+        self.rule = pyglet.text.Label("", "EraserDust", 16, x=512, y=445,
+                                      color=(255,255,255, 190), batch=self.batch,
+                                      halign="center", anchor_x="center")
+
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300, self.batch)
         self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300, self.batch)
         self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300, self.batch)
@@ -137,9 +142,6 @@ class Window(pyglet.window.Window):
         else:
             self.button.sprite.image = self.play
 
-    def on_stop_button(self):
-        print "Stop"
-
     def update(self, dt):
         self.button.update(dt) 
 
@@ -153,6 +155,7 @@ class Window(pyglet.window.Window):
 
         # Check for completion.
         if self.run.workspace.answer_string:
+            self.rule.text = self.run.workspace.rule.to_string()
             self.done = True
 
         # Update the timestep display.

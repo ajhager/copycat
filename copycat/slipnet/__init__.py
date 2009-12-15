@@ -353,6 +353,10 @@ def are_all_opposite_concept_mappings(concept_mappings):
             return False
     return True
 
+def is_adjective(node):
+    """Used for converting a rule to a sentence."""
+    return any([node.category == plato_string_position_category,
+                node.category == plato_alphabetic_position_category])
 
 class Slipnet(object):
     """Slipnet contains nodes and the links between them.

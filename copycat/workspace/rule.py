@@ -16,6 +16,7 @@
 
 from copycat.workspace import Structure
 import copycat.toolbox as toolbox
+import copycat.slipnet as nodes
 
 class Rule(Structure):
     def __init__(self, workspace, object_category1, descriptor1_facet,
@@ -40,6 +41,35 @@ class Rule(Structure):
                 self.descriptor2 == other.descriptor2 and \
                 self.relation == other.relation and \
                 self.replaced_description_type == other.replaced_description_type
+
+    def to_string(self):
+        """Convert the rule to a human readable sentence."""
+        if self.has_no_change():
+            return "Don't replace anything."
+
+        if nodes.is_adjective(self.descriptor1):
+            part1 = "%s of %s %s" % (self.replaced_description_type.name,
+                                     self.descriptor1.name,
+                                     self.object_cateogry1.name)
+        else:
+            if self.object_category1 == None:
+                part1 = descriptor1.name
+            else:
+                part1 = "%s of %s '%s'" % (self.replaced_description_type.name,
+                                           self.object_category1.name,
+                                           self.descriptor1.name)
+                
+        if self.relation != None:
+            part2 = self.relation.name
+        else:
+            if nodes.is_adjective(self.descriptor2):
+                part2 = "%s of %s %s" % (self.replaced_description_type.name,
+                                         self.descriptor2.name,
+                                         self.object_category2.name)
+            else:
+                part2 = "'%s'" % self.descriptor2.name
+
+        return "Replace %s by %s." % (part1, part2)
 
     def expresses_relation(self):
         return self.relation
