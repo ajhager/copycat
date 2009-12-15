@@ -25,90 +25,105 @@ class Group(Object, Structure):
 
     Attributes:
         string: The string the group is in.
+        bond_facet: the description type upon which the group's bonds are based.
+        bonds: A list of bonds in the group.
+        objects: A list of objects in the group.
+        bond_category: The category associated with the group category.
+        bond_descriptions: Descriptions involving the bonds in the group.
     """
 
     def __init__(self, workspace, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):
         """Initialize Group."""
         super(Group, self).__init__()
-        self.workspace = workspace
         self.type_name = 'group'
+        self.workspace = workspace
         self.string = string
         self.structure_category = Group
         self.group_category = group_category
         self.direction_category = direction_category
         self.left_object = left_object
         self.right_object = right_object
+        self.objects = objects
+        self.bonds = bonds
+
         self.middle_object = None
-        category = nodes.plato_string_position_category
         for obj in objects:
-            if obj.get_descriptor(category) == nodes.plato_middle:
+            if obj.get_descriptor(nodes.plato_string_position_category) == \
+                    nodes.plato_middle:
                 self.middle_object = obj
                 break
+
         self.left_object_position = left_object.left_string_position
         self.right_object_position = right_object.right_string_position
         self.left_string_position = self.left_object_position
         self.right_string_position = self.right_object_position
-        self.objects = objects
-        self.bonds = bonds
-        category = nodes.plato_bond_category
-        self.bond_category = nodes.get_related_node(group_category, category)
+
+        self.bond_category = nodes.get_related_node(group_category,
+                                                    nodes.plato_bond_category)
         self.bond_facet = None
         self.bond_descriptions = []
 
         if self.spans_whole_string():
-            object_category = nodes.plato_object_category
-            group = nodes.plato_group
-            description = Description(self, object_category, group)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             nodes.plato_object_category,
+                                             nodes.plato_whole))
+
+        self.add_description(Description(self,
+                                         nodes.plato_object_category,
+                                         nodes.plato_group))
 
         category = nodes.plato_string_position_category
         if self.is_leftmost_in_string() and not self.spans_whole_string():
-            leftmost = nodes.plato_leftmost
-            description = Description(self, category, leftmost)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             nodes.plato_string_position_category,
+                                             nodes.plato_leftmost))
         elif self.is_middle_in_string():
-            middle = nodes.plato_middle
-            description = Description(self, category, middle)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             nodes.plato_string_position_category,
+                                             nodes.plato_middle))
         elif self.is_rightmost_in_string() and not self.spans_whole_string():
-            rightmost = nodes.plato_rightmost
-            description = Description(self, category, rightmost)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             nodes.plato_string_position_category,
+                                             nodes.plato_rightmost))
 
         if group_category == nodes.plato_sameness_group and \
-           (bonds == [] or \
-            bonds[0].bond_facet == nodes.plato_letter_category):
+                (bonds == [] or \
+                    bonds[0].bond_facet == nodes.plato_letter_category):
             category = nodes.plato_letter_category
             new_group_letter_category = left_object.get_descriptor(category)
-            description = Description(self, category, new_group_letter_category)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             category,
+                                             new_group_letter_category))
 
         category = nodes.plato_group_category
-        description = Description(self, category, group_category)
-        self.add_description(description)
+        self.add_description(Description(self,
+                                         nodes.plato_group_category,
+                                         group_category))
+
         if direction_category:
-            category = nodes.plato_direction_category
-            description = Description(self, category, direction_category)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             nodes.plato_direction_category,
+                                             direction_category))
 
         if bonds:
             new_bond_facet = bonds[0].bond_facet
             self.bond_facet = new_bond_facet
             category = nodes.plato_bond_facet
-            description = Description(self, category, new_bond_facet)
-            self.add_bond_description(description)
+            self.add_bond_description(Description(self,
+                                                  nodes.plato_bond_facet,
+                                                  new_bond_facet))
 
-        category = nodes.plato_bond_category
-        description = Description(self, category, self.bond_category)
-        self.add_bond_description(description)
+        self.add_bond_description(Description(self,
+                                              nodes.plato_bond_category,
+                                              self.bond_category))
 
-        length_description_probability = self.length_description_probability()
-        if toolbox.flip_coin(length_description_probability):
+        if toolbox.flip_coin(self.length_description_probability()):
             category = nodes.plato_length
             plato_number = nodes.get_plato_number(self.length())
-            description = Description(self, category, plato_number)
-            self.add_description(description)
+            self.add_description(Description(self,
+                                             nodes.plato_length,
+                                             nodes.get_plato_number(self.length())))
 
     def __eq__(self, other):
         """Return True if the given object is equal to this group."""

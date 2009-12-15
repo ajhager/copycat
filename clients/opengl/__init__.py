@@ -14,14 +14,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-### NOTE: This is just a quickly thrown together mockup.
-# Abstraction of check a value for change, if so modify gui (color, scale, etc) 
+### NOTE: This is just quickly thrown together and needs more work.
 # Add dedicated scenes for each module that adds full detail
-# graphs in dedicated views showing activites over time.
 # Add icons to switch between modules on the top right
-# Add a module for doing bulk runs showing a graph of stats
+# graphs in dedicated views showing activites over time.
 # Add the ability to type in the problem and seed in client
-# Give slipnodes good default names separte from short names.
+# Add a module for doing bulk runs showing a graph of stats
 
 import pyglet
 from pyglet.gl import *
