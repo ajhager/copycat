@@ -914,6 +914,7 @@ class Workspace(object):
                 cm.label.activation_buffer += self.activation
 
     def break_correspondence(self, correspondence):
+        """Break a correspondence in the workspace."""
         correspondence.object1.correspondence = None
         correspondence.object2.correspondence = None
         self.delete_correspondence(correspondence)

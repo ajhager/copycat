@@ -45,14 +45,8 @@
 ; build-correspondence | Workspace.build_correspondence
 ;---------------------------------------------
 
-(defun break-correspondence (c &aux obj1 obj2)
-  (setq obj1 (send c :obj1))
-  (setq obj2 (send c :obj2))
-  (send obj1 :set-correspondence nil)
-  (send obj2 :set-correspondence nil)
-  (send *workspace* :delete-correspondence c)
-  (if* %workspace-graphics% then (send c :erase)))
-	
+;---------------------------------------------
+; break-correspondence | Workspace.break_correspondence
 ;---------------------------------------------
 
 (defun bottom-up-correspondence-scout 
