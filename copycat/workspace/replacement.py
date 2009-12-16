@@ -17,7 +17,15 @@
 from copycat.workspace import Structure
 
 class Replacement(Structure):
+    """Replacement
+
+    Attributes:
+        object1: The object to replace.
+        object2: The object replaced with.
+    """
+
     def __init__(self, object1, object2):
+        """Initialize Replacement."""
         super(Replacement, self).__init__()
         self.object1 = object1
         self.object2 = object2
