@@ -167,7 +167,7 @@ class Correspondence(Structure):
         self.concept_mappings.extend(new_mappings)
         for cm in new_mappings:
             if cm.label:
-                cm.label.activate_from_workspace()
+                cm.label.activation_buffer += self.workspace.activation
 
     def slippages(self):
         """Return the list of slippages in this correspondence."""

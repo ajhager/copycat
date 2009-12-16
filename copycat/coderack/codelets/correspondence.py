@@ -75,10 +75,8 @@ class CorrespondenceBottomUpScout(Codelet):
         return workspace.propose_correspondence(object1, object2, mappings, True)
 
 class CorrespondenceBuilder(Codelet):
-    '''
-    Attempts to build the proposed correspondence, fighting it out with
-    competitors if necessary.
-    '''
+    """Attempt to build the proposed correspondence, fighting it out with
+    competitors if necessary."""
     def run(self, coderack, slipnet, workspace):
         correspondence = self.arguments[0]
         flip_obj2 = self.arguments[1]
@@ -86,10 +84,10 @@ class CorrespondenceBuilder(Codelet):
         object1 = correspondence.object1
         object2 = correspondence.object2
 
-        # If the objects do not exist anymore, then fizzle.
+        # LEFT OFF HERE
         objects = workspace.objects()
         if object1 not in objects:
-            return
+            return # Fizzle
         obj2_present = object2 in objects
         flipped = False
         if flip_obj2:
@@ -98,9 +96,8 @@ class CorrespondenceBuilder(Codelet):
                 flipped = workspace.target_string.get_existing_group(flipv)
 
         if not obj2_present and not flipped:
-            return
+            return # Fizzle
 
-        # If the correspondence exists, add and activiate concept mappings.
         existing_correspondence = workspace.is_correspondence_present(correspondence)
         if existing_correspondence:
             workspace.remove_proposed_correspondence(correspondence)
@@ -109,59 +106,51 @@ class CorrespondenceBuilder(Codelet):
                 if label:
                     label.activation_buffer += workspace.activation
             mappings_to_add = []
-            for mapping in correspondence.concept_mappings:
-                if not correspondence.is_concept_mapping_present(mapping):
+            for mapping in correspondence.get_concept_mappings():
+                if not existing_correspondence.is_concept_mapping_present(mapping):
                     mappings_to_add.append(mapping)
             existing_correspondence.add_concept_mappings(mappings_to_add)
-            return
+            return # Fizzle
 
-        # If any concept mappings are no longer relevant, then fizzle.
-        for mapping in correspondence.concept_mappings:
+        for mapping in correspondence.get_concept_mappings():
             if not mapping.is_relevant():
-                return
+                workspace.remove_proposed_correspondence(correspondence)
+                return # Fizzle
 
-        # Remove the proposed correpondence from proposed correspondences.
         workspace.remove_proposed_correspondence(correspondence)
 
-        # The proposed correspondence must win against all incompatible ones.
         incompatible_correspondences = correspondence.incompatible_correspondences()
         for incompatible_correspondence in incompatible_correspondences:
             if not workspace.fight_it_out(correspondence,
                                           correspondence.letter_span(),
                                           [incompatible_correspondence],
                                           incompatible_correspondence.letter_span()):
-                return
+                return # Fizzle
         
         incompatible_bond = None
         incompatible_group = None
-        
-        # The proposed correspondence must win against any incompatible bond.
         if (object1.is_leftmost_in_string() or object1.is_rightmost_in_string()) and \
                (object2.is_leftmost_in_string() or object2.is_rightmost_in_string()):
             incompatible_bond = correspondence.incompatible_bond()
             if incompatible_bond:
                 if not workspace.fight_it_out(correspondence, 3,
                                               [incompatible_bond], 2):
-                    return
-                # If the bond is in a group, fight against it as well.
+                    return # Fizzle
                 incompatible_group = incompatible_bond.group
                 if incompatible_group:
                     if not workspace.fight_it_out(correspondence, 1,
                                                   [incompatible_group], 1):
-                        return
+                        return # Fizzle
 
-        # If the desired object2 is flipped its existing group.
         if flip_obj2:
             if not workspace.fight_it_out(correspondence, 1, [flipped], 1):
-                return
+                return # Fizzle
 
-        # The proposed corresondence must win against an incompatible rule.
         incompatible_rule = correspondence.is_incompatible_rule()
         if incompatible_rule:
             if not workspace.fight_it_out(correspondence, 1, [workspace.rule], 1):
-                return
+                return # Fizzle
 
-        # Break all incompatible structures.
         if incompatible_correspondences:
             for incompatible_correspondence in incompatible_correspondences:
                 workspace.break_correspondence(incompatible_correspondence)
@@ -184,7 +173,6 @@ class CorrespondenceBuilder(Codelet):
         if incompatible_rule:
             workspace.break_rule(workspace.rule)
 
-        # Build the correspondence.
         workspace.build_correspondence(correspondence)
 
 class CorrespondenceImportantObjectScout(Codelet):
