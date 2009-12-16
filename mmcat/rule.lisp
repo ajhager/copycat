@@ -133,51 +133,8 @@
   (build-translated-rule new-translated-rule)))    
 
 ;---------------------------------------------
-
-(defun propose-rule (i-obj i-description m-obj m-description
-	             &aux proposed-rule urgency)
-; Creates a proposed rule, and posts a rule-strength-tester codelet with 
-; urgency a function of the degree of conceptual-depth of the descriptions in the 
-; rule.
-
-  (if* (null i-obj)
-   then (setq proposed-rule (make-non-relation-rule nil nil nil nil nil nil))
-   else (if* (typep m-description 'extrinsic-description)
-         then (setq proposed-rule 
-	            (make-relation-rule 
-		       (send i-obj :get-descriptor plato-object-category)
-                       (send i-description :description-type)
-                       (send i-description :descriptor)
-		       (send m-obj :get-descriptor plato-object-category)
- 	               (send m-description :description-type-related)
-	               (send m-description :relation)))
-         else (setq proposed-rule 
-	            (make-non-relation-rule 
-                        (send i-obj :get-descriptor plato-object-category)
-                        (send i-description :description-type)
- 	                (send i-description :descriptor)
-		        (send m-obj :get-descriptor plato-object-category)
-	                (send m-description :description-type)
-	                (send m-description :descriptor)))))
-
-  (if* %verbose% 
-   then (format t "The proposed rule is:~&") (send proposed-rule :print) 
-        (format t "~%"))
-
-  (if* (null i-description)
-   then (setq urgency 100)
-   else ; The average alone is too low for low-conceptual-depth rules.
-        (setq urgency 
-	      (* 100 (sqrt (/ (average (send i-description :conceptual-depth)
-		                       (send m-description :conceptual-depth))
-  			      100)))))
-
-  (if* %verbose% 
-   then (format t "Posting a rule-strength-tester with urgency ~a~&" 
-		(get-urgency-bin urgency)))
-  (send *coderack* :post 
-        (make-codelet 'rule-strength-tester (list proposed-rule)
-	              (get-urgency-bin urgency))))
+; propose-rule | Workspace.propose_rule
+;---------------------------------------------
 
 ;---------------------------------------------
 ; activate-from-workspace-rule-descriptions | Workspace.activate_from_workspace_rule_descriptions

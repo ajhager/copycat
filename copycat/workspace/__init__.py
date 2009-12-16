@@ -1211,11 +1211,9 @@ class Workspace(object):
         self.rule = None
 
     def propose_rule(self, i_object, i_description, m_object, m_description):
-        '''
-        Create a proposed rule and post a rule strength tester codelet with
-        urgency a function of the degree of conceptual depth of the
-        descriptions in the rule.
-        '''
+        """Create a proposed rule and post a rule strength tester codelet with
+        urgency a function of the degree of conceptual depth of descriptions
+        in the rule."""
         if not i_object:
             proposed_rule = Rule(self, None, None, None, None, None, None)
         else:
@@ -1227,7 +1225,7 @@ class Workspace(object):
                                      i_description.descriptor,
                                      m_object.get_descriptor(obj_category),
                                      m_description.description_type_related,
-                                     m_description.relation)
+                                     None)
                 proposed_rule.relation = m_description.relation
             else:
                 proposed_rule = Rule(self,
@@ -1241,10 +1239,9 @@ class Workspace(object):
         if not i_description:
             urgency = 100
         else:
-            a = toolbox.average(i_description.conceptual_depth(),
-                                 m_description.conceptual_depth())
-            b = a / 100.0
-            urgency = math.sqrt(b) * 100
+            value = toolbox.average(i_description.conceptual_depth(),
+                                    m_description.conceptual_depth()) / 100.0
+            urgency = math.sqrt(value) * 100
 
         return [(RuleStrengthTester([proposed_rule]), urgency)]
 
