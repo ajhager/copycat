@@ -590,70 +590,42 @@ class Workspace(object):
         self.replacements.append(replacement)
 
     def add_correspondence(self, correspondence):
-        '''
-        Add a correspondence to the workspace's array of built corresondence
-        using the string number of the inital string object as an index.
-        Each object can have at most one built correspondence.
-        '''
+        """Add a correspondence to the workspace."""
         i = correspondence.object1.string_number
         self._correspondences[i] = correspondence
 
     def delete_correspondence(self, correspondence):
-        '''
-        Delete a correspondence from the workpace's array of built
-        correspondences.
-        '''
+        """Delete a correspondence from the workpace."""
         i = correspondence.object1.string_number
         del(self._correspondences[i])
 
     def is_correspondence_present(self, correspondence):
-        '''
-        Return True if the given correspondence exists on the workspace.
-        '''
+        """Return True if the given correspondence exists on the workspace."""
         if correspondence.object1.correspondence:
             existing_correspondence = correspondence.object1.correspondence
             if existing_correspondence.object2 == correspondence.object2:
                 return existing_correspondence
 
-    def is_slippage_present(self, slippage):
-        '''
-        Return True if the given slippage exists on the workspace.
-        '''
-        for s in self.slippages:
-            if slippage.descriptor1 == s.descriptor1 and \
-               slippage.descriptor2 == s.descriptor2:
-                return True
-
     def letters(self):
-        '''
-        Return a list of all the letters on the workspace.
-        '''
+        """Return a list of all the letters on the workspace."""
         return self.initial_string.get_letters() + \
                 self.target_string.get_letters()
 
     def random_string(self):
-        '''
-        Return either the initial string or the target string chosen
-        at random.
-        '''
+        """Return either the initial string or the target string chosen
+        at random."""
         return random.choice([self.initial_string, self.target_string])
 
     def random_object(self):
-        '''
-        Return a random object on the workspace.
-        '''
+        """Return a random object on the workspace."""
         return random.choice(self.objects())
 
     def random_group(self):
-        '''
-        Return a random group on the workspace.
-        '''
+        """Return a random group on the workspace."""
         return random.choice(self.groups())
 
     def random_correspondence(self):
-        '''
-        Return a random correspondence on the workspace.
-        '''
+        """Return a random correspondence on the workspace."""
         return random.choice(self.correspondences())
 
     def choose_object(self, method):
@@ -664,13 +636,12 @@ class Workspace(object):
         return toolbox.weighted_select(adjusted_values, self.objects())
 
     def has_null_replacement(self):
-        '''
-        Return True if there is at least one letter in the initial string
-        that deson't yet have a replacement.
-        '''
+        """Return True if there is at least one letter in the initial string
+        that deson't yet have a replacement."""
         for letter in self.initial_string.get_letters():
             if not letter.replacement:
                 return True
+        return False
 
     def rough_importance_of_uncorresponding_objects(self):
         '''

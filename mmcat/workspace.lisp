@@ -41,45 +41,20 @@
 ; delete-proposed-corresponence | remove_proposed_correspondence
 ;---------------------------------------------
 
-(defmethod (workspace :add-correspondence) (c)
-; Adds a correspondence to the workspace's vector of
-; built correspondences, using the string-number of the initial-string
-; object as an index.  Each object can have at most one built 
-; correspondence (though more than one proposed correspondences) so it is not 
-; necessary to store the built correspondences in an array.
-  (vset (send self :correspondence-vector) 
-	(send (send c :obj1) :string-number) c))
-
+;---------------------------------------------
+; workspace.add-correspondence
 ;---------------------------------------------
 
-(defmethod (workspace :delete-correspondence) (c)
-; Deletes a correspondence from the workspace's vector of
-; built correspondences.
-  (vset (send self :correspondence-vector) 
-	(send (send c :obj1) :string-number) nil))
-
+;---------------------------------------------
+; workspace.delete-correspondence
 ;---------------------------------------------
 
-(defmethod (workspace :correspondence-present?) 
-                      (c &aux existing-correspondence)
-; Returns t if the given correspondence exists on the workspace.
-  (if* (not (null (send (send c :obj1) :correspondence)))
-   then (setq existing-correspondence (send (send c :obj1) :correspondence))
-        (if* (eq (send existing-correspondence :obj2) (send c :obj2))
-	 then existing-correspondence
-	 else nil)
-   else nil))
-
+;---------------------------------------------
+; workspace.correspondence-present?
 ;---------------------------------------------
 
-(defmethod (workspace :slippage-present?) (s)
-; Returns t if the given slippage exists on the workspace.
-  (loop for slippage in (send self :slippage-list)
-	when (and (eq (send s :descriptor1) (send slippage :descriptor1))
-		  (eq (send s :descriptor2) (send slippage :descriptor2)))
-	return t
-	finally (return nil)))
-
+;---------------------------------------------
+; workspace.slippage-present? | REMOVED
 ;---------------------------------------------
 
 (defmethod (workspace :object-list) ()
@@ -88,13 +63,9 @@
   (append (send *initial-string* :object-list)
 	  (send *target-string* :object-list)))
 
+
 ;---------------------------------------------
-
-(defmethod (workspace :letter-list) ()
-; Returns a list of all the letters on the workspace.
-  (append (send *initial-string* :letter-list)
-	  (send *target-string* :letter-list)))
-
+; workspace.letter-list
 ;---------------------------------------------
 
 (defmethod (workspace :structure-list) ()
@@ -153,41 +124,29 @@
 	       when (typep structure 'rule)
 	       return (rule-equal? structure s)))))
 	
-;---------------------------------------------
-
-(defmethod (workspace :random-string) ()
-; Returns either the initial-string or the target string, chosen at random.
-  (random-list-item (list *initial-string* *target-string*)))
 
 ;---------------------------------------------
-
-(defmethod (workspace :random-object) ()
-; Returns a random object on the workspace.
-  (random-list-item (send self :object-list)))
-	  
+; workspace.random-string
 ;---------------------------------------------
 
-(defmethod (workspace :random-group) ()
-; Returns a random group on the workspace.
-  (random-list-item (send self :group-list)))
-
+;---------------------------------------------
+; workspace.random-object
 ;---------------------------------------------
 
-(defmethod (workspace :random-correspondence) ()
-; Returns a random correspondence on the workspace.
-  (random-list-item (send self :correspondence-list)))
+;---------------------------------------------
+; workspace.random-group
+;---------------------------------------------
+
+;---------------------------------------------
+; workspace.random-correspondence
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace.choose-object | Workspace.choose_object
 ;---------------------------------------------
 
-(defmethod (workspace :null-replacement?) ()
-; Returns t if there is at least one letter in the initial string
-; that doesn't yet have a replacement.
-  (loop for letter in (send *initial-string* :letter-list)
-	when (null (send letter :replacement)) return t
-	finally (return nil)))
-
+;---------------------------------------------
+; workspace.null-replacement?
 ;---------------------------------------------
 
 (defmethod (workspace :unrelated-objects) (&aux num-of-bonds result)    
