@@ -120,39 +120,31 @@ class RuleStrengthTester(Codelet):
         return [(RuleBuilder([rule]), strength)]
 
 class RuleTranslator(Codelet):
-    '''
-    Translate the rule according to the translation rules given in the
-    slippages on the workspace.
-    '''
+    """Translate the rule according to the translation rules given in the
+    slippages on the workspace."""
     def run(self, coderack, slipnet, workspace):
-        # Make sure there is a rule.
         workspace_rule = workspace.rule
         if not workspace_rule:
-            return
+            return # Fizzle
         if workspace_rule.has_no_change():
             workspace.translated_rule = Rule(workspace, None, None, None,
                                              None, None, None)
-            return
+            return # Fizzle
 
-        # If the temperature is too high, fizzle.
         threshold = workspace.answer_temperature_threshold_distribution().choose()
         if workspace.temperature > threshold:
-            return
+            return # Fizzle
 
-        # Build the translation of the rule.
         changed_object = None
         for obj in workspace.initial_string.get_objects():
-            if not obj:
-                continue
             if obj.is_changed:
                 changed_object = obj
                 break
         if not changed_object:
-            return
+            return # Fizzle
 
         changed_object_correspondence = changed_object.correspondence
 
-        # Get the slippages to use.
         slippages = workspace.slippages()
         if changed_object_correspondence:
             for slippage in workspace.slippages():
@@ -161,7 +153,7 @@ class RuleTranslator(Codelet):
                         slippages.remove(slippage)
 
         rule = workspace_rule
-        if rule.relation:
+        if rule.expresses_relation():
             args = []
             for arg in [rule.object_category1, rule.descriptor1_facet,
                         rule.descriptor1, rule.object_category2,
@@ -169,7 +161,7 @@ class RuleTranslator(Codelet):
                 args.append(arg.apply_slippages(slippages))
             args.append(None)
             translated_rule = Rule(workspace, *args)
-            translated_rule.relation = rule.relation
+            translated_rule.relation = rule.relation.apply_slippages(slippages)
         else:
             args = []
             for arg in [rule.object_category1, rule.descriptor1_facet,
@@ -178,4 +170,4 @@ class RuleTranslator(Codelet):
                 args.append(arg.apply_slippages(slippages))
             translated_rule = Rule(workspace, *args)
 
-        workspace.build_translated_rule(translated_rule)
+        return workspace.build_translated_rule(translated_rule)
