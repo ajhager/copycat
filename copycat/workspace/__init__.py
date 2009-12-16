@@ -968,25 +968,22 @@ class Workspace(object):
             return very_high_distribution
 
     def temperature_adjusted_probability(self, probability):
+        """Takes a probability and returns a new probability from 0 to 1 based
+        on that value and the temperature."""
         if probability == 0:
             return 0
         elif probability <= .5:
-            value = int(abs(math.log(probability, 10)))
-            low_probability_factor = max(1, value)
-            a = 10 - math.sqrt(100 - self.temperature)
-            b = a / 100.0
-            c = 10 ^ abs(1 - low_probability_factor)
-            d = c - probability
-            return min(.5, d)
+            prob_factor = max(1, int(abs(math.log(probability, 10))))
+            value1 = (10 - math.sqrt(100 - self.temperature)) / 100.0
+            value2 = 10 ** -(prob_factor - 1) - probability
+            return min(.5, probability + value1 * value2)
         elif probability == .5:
             return .5
         elif probability > .5:
-            a = 10 - math.sqrt(100 - self.temperature)
-            b = a / 100.0
-            c = (probability - 1) - 1
-            d = b * c
-            e = (probability - 1) + d
-            return max(.5, e)
+            value1 = 1 - probability
+            value2 = (10 - math.sqrt(100 - self.temperature)) / 100.0
+            value3 = 1 - (1 - probability)
+            return max(.5, 1 - value1 + (value2 * value3))
 
     def temperature_adjusted_values(self, values):
         '''
