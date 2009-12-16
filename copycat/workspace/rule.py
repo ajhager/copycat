@@ -19,9 +19,23 @@ import copycat.toolbox as toolbox
 import copycat.slipnet as nodes
 
 class Rule(Structure):
+    """Rule
+    
+    Attributes:
+        object_category1:
+        object_category2:
+        descriptor1:
+        descriptor2:
+        descriptor1_facet:
+        replace_description_type:
+        relation:
+        structure_category:
+    """
+
     def __init__(self, workspace, object_category1, descriptor1_facet,
                  descriptor1, object_category2, replaced_description_type,
                  descriptor2):
+        """Initializes Rule."""
         super(Rule, self).__init__()
         self.workspace = workspace
         self.object_category1 = object_category1
@@ -31,16 +45,18 @@ class Rule(Structure):
         self.object_category2 = object_category2
         self.replaced_description_type = replaced_description_type
         self.relation = None
-        self.structure_category = 'rule'
+        self.structure_category = Rule
 
     def __eq__(self, other):
-        return self.object_category1 == other.object_category1 and \
-                self.descriptor1_facet == other.descriptor1_facet and \
-                self.descriptor1 == other.descriptor1 and \
-                self.object_category2 == other.object_category2 and \
-                self.descriptor2 == other.descriptor2 and \
-                self.relation == other.relation and \
-                self.replaced_description_type == other.replaced_description_type
+        """Return True if the two rules are equal."""
+        return all([self.object_category1 == other.object_category1,
+                    self.descriptor1_facet == other.descriptor1_facet,
+                    self.descriptor1 == other.descriptor1,
+                    self.object_category2 == other.object_category2,
+                    self.descriptor2 == other.descriptor2,
+                    self.relation == other.relation,
+                    self.replaced_description_type == \
+                        other.replaced_description_type])
 
     def to_string(self):
         """Convert the rule to a human readable sentence."""
@@ -72,9 +88,12 @@ class Rule(Structure):
         return "Replace %s by %s." % (part1, part2)
 
     def expresses_relation(self):
+        """Return True if the rule expresses a relation between the modified
+        string and the initial string."""
         return self.relation
 
     def has_no_change(self):
+        """Return True if the rule specifies no changes are to be made."""
         return self.descriptor1 == None
 
     def calculate_internal_strength(self):

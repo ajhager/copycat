@@ -1,115 +1,24 @@
-(defflavor rule
-  (object-category1 descriptor1-facet descriptor1 
-  (object-category2 nil) (descriptor2 nil)
-  (replaced-description-type nil) (relation nil))
-  (workspace-structure)
-  :gettable-instance-variables
-  :settable-instance-variables
-  :initable-instance-variables)
-
-; Here are two examples of how the rule instance can be set up:
-
-; Example 1: for the rule "Replace rightmost letter by successor": 
-; OBJECT-CATEGORY1 = plato-letter 
-; (The object-category of the initial-string object that changed.)
-; DESCRIPTOR1 = "rightmost".
-; DESCRIPTOR1-FACET = plato-string-position-category 
-; (This is the facet of the letter that's being described by descriptor1 
-; in the rule, not its letter-category or its length or anything 
-; else.)
-; REPLACED-DESCRIPTION-TYPE = letter-category 
-; (This  means that the rule is saying that "successor" refers to 
-; letter-category, not to any other facet of the two letters being 
-; related.)
-; RELATION = plato-successor.  
-; (Since this is a "relation-rule", the other instance variables are 
-; ignored.)
-
-; Example 2: for the rule "Replace C by D":
-; OBJECT-CATEGORY1 = plato-letter
-; DESCRIPTOR1-FACET = plato-letter-category
-; DESCRIPTOR1 = plato-c
-; OBJECT-CATEGORY2 = plato-letter
-; REPLACED-DESCRIPTION-TYPE = plato-letter-category
-; DESCRIPTOR2 = plato-d
-
+;---------------------------------------------
+; defflavor rule
+; defun make-relation-rule
+; defun make-non-relation-rule
 ;---------------------------------------------
 
-(defun make-relation-rule (object-category1 descriptor1-facet descriptor1 
-		           object-category2 replaced-description-type relation)
-; Returns a new relation rule.
-  (make-instance 'rule :object-category1 object-category1
-                       :descriptor1-facet descriptor1-facet 
-                       :descriptor1 descriptor1 
-                       :object-category2 object-category2
-                       :replaced-description-type replaced-description-type
-                       :relation relation
-		       :structure-category 'rule))
-
+;---------------------------------------------
+; rule.relation?
 ;---------------------------------------------
 
-(defun make-non-relation-rule (object-category1 descriptor1-facet descriptor1 
- 		               object-category2 replaced-description-type 
-			       descriptor2)
-; Returns a new non-relation rule.
-  (make-instance 'rule :object-category1 object-category1
-                       :descriptor1-facet descriptor1-facet 
-                       :descriptor1 descriptor1 
-                       :object-category2 object-category2
-                       :replaced-description-type replaced-description-type
-                       :descriptor2 descriptor2
-		       :structure-category 'rule))
-
+;---------------------------------------------
+; rule.no-change?
 ;---------------------------------------------
 
-(defmethod (rule :relation?) ()
-; Returns t if the rule expresses a relation between the modified-string 
-; object and the initial-string object.
-  relation)
-
+;---------------------------------------------
+; rule.print | REMOVED
 ;---------------------------------------------
 
-(defmethod (rule :no-change?) ()
-; Returns t if the rule specifies that no changes are to be made.
-  (null descriptor1))
-
 ;---------------------------------------------
-
-(defmethod (rule :print) ()
-  (if* (send self :no-change?)
-   then (format t "Don't replace anything~&")
-   else (if* (send self :relation?)
-         then (format t "Replace ~a with ~a \"~a\" "
-		        (send object-category1 :pname)
-	                (send descriptor1-facet :pname)
-	                (send descriptor1 :pname))
-              (format t "by ~a with ~a: ~a of ~a of ~a with ~a: ~a~&"
-  	              (send object-category2 :pname)
-	              (send replaced-description-type :pname)
-	              (send relation :pname)
-	              (send replaced-description-type :pname)
-	              (send object-category1 :pname)
-	              (send descriptor1-facet :pname)
-	              (send descriptor1 :pname))
-         else (format t "Replace ~a with ~a \"~a\" by ~a with ~a \"~a\"~&"
-	   	      (send object-category1 :pname)
-		      (send descriptor1-facet :pname)
-		      (send descriptor1 :pname)
-		      (send object-category2 :pname)
-	              (send replaced-description-type :pname)
-		      (send descriptor2 :pname)))))
-
+; rule-equal? | Rule.__eq__
 ;---------------------------------------------
-
-(defun rule-equal? (r1 r2)
-; Returns t if the two rules are the same.
-  (and (eq (send r1 :object-category1) (send r2 :object-category1))
-       (eq (send r1 :descriptor1-facet) (send r2 :descriptor1-facet))
-       (eq (send r1 :descriptor1) (send r2 :descriptor1))
-       (eq (send r1 :object-category2) (send r2 :object-category2))
-       (eq (send r1 :descriptor2) (send r2 :descriptor2))
-       (eq (send r1 :replaced-description-type) (send r2 :replaced-description-type))
-       (eq (send r1 :relation) (send r2 :relation))))
  
 ;---------------------------------------------
 ; rule-scout | RuleScout
@@ -349,5 +258,4 @@
    else (if* (send rule :descriptor2)
 	 then (send (send rule :descriptor2) :activate-from-workspace))))
 
-;---------------------------------------------
 
