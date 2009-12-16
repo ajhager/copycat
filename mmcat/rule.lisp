@@ -24,34 +24,8 @@
 ; rule-scout | RuleScout
 ;---------------------------------------------
 
-(defun rule-strength-tester (proposed-rule &aux proposed-rule-strength
-				                build-probability urgency)
-  (send proposed-rule :update-strength-values)
-  (setq proposed-rule-strength (send proposed-rule :total-strength))
-  (if* %verbose% 
-   then (format t "Proposed-rule strength is ~a~&" proposed-rule-strength))
-
-  ; Decide whether or not to post a rule-builder codelet, based on the 
-  ; strength of the proposed-rule.
-  (setq build-probability 
-	(get-temperature-adjusted-probability 
-	    (/ proposed-rule-strength 100)))
-  (if* %verbose% 
-   then (format t "Build-probability: ~a~&" build-probability))
-  (if* (eq (flip-coin build-probability) 'tails)
-   then (if* %verbose% 
-	 then (format t "Rule not strong enough.  Fizzling.~&"))
-        (return))
-        
-  (setq urgency proposed-rule-strength)
-  (if* %verbose% 
-   then (format t "Strong enough! Posting rule-builder with urgency ~a~&"
-		(get-urgency-bin urgency)))
-
-  (send *coderack* :post 
-        (make-codelet 'rule-builder (list proposed-rule) 
-                      (get-urgency-bin urgency)))))
-
+;---------------------------------------------
+; rule-strength-tester | RuleStrengthTester
 ;---------------------------------------------
 
 (defun rule-builder (proposed-rule)

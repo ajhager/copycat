@@ -119,14 +119,14 @@ class RuleStrengthTester(Codelet):
     for its strength."""
     def run(self, coderack, slipnet, workspace):
         rule = self.arguments[0]
+
         rule.update_strengths()
         strength = rule.total_strength
 
-        # Decide whether or not to post a rule builder codelet.
         probability = strength / 100.0
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
-            return
+            return # fizzle
         return [(RuleBuilder([rule]), strength)]
 
 class RuleTranslator(Codelet):
