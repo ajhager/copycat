@@ -946,6 +946,9 @@ class Workspace(object):
         return new_bonds
 
     def answer_temperature_threshold_distribution(self):
+        """Return the probability distribution from which to choose a
+        temperature threshold, used by rule-translator codelets in deciding
+        whether or not to try to translate the rule and create an answer."""
         if self.initial_string.length == 1 and \
            self.target_string.length == 1:
             bond_density = 1
@@ -986,17 +989,12 @@ class Workspace(object):
             return max(.5, 1 - value1 + (value2 * value3))
 
     def temperature_adjusted_values(self, values):
-        '''
-        Return a list with values that are exponential functins of the original
-        values, with the exponent being a funtion of the temperature. The
-        higher the temperature, the bigger the difference between unequal
-        values.
-        '''
+        """Return a list with values that are exponential functins of the
+        original values, with the exponent being a funtion of the temperature.
+        The higher the temperature, the bigger the difference between unequal
+        values."""
         exponent = ((100 - self.temperature) / 30.0) + .5
-        new_values = []
-        for value in values:
-            new_values.append(round(value ** exponent))
-        return new_values
+        return [round(val ** exponent) for val in values]
 
     def post_codelet_probability(self, category):
         """Return a probability to use when deciding to post codelets searching
