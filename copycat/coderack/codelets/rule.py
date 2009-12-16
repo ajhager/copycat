@@ -22,28 +22,18 @@ from copycat.workspace import Rule, ExtrinsicDescription
 import copycat.slipnet as nodes
 
 class RuleBuilder(Codelet):
-    '''
-    Tries to build the proposed rule, fighting with competitors as needed.
-    '''
+    """Try to build the proposed rule, fighting with competitors as needed."""
     def run(self, coderack, slipnet, workspace):
-        # Make sure this rule doesn't already exist.
         rule = self.arguments[0]
-        workspace_rule = workspace.rule
-        if workspace_rule:
-            if workspace_rule == rule:
+
+        if workspace.rule:
+            if workspace.rule == rule:
                 workspace.activate_from_workspace_rule_descriptions(rule)
-                return
-
-        # Fight an existing rule.
-        if workspace_rule:
-            result = workspace.fight_it_out(rule, 1, [workspace_rule], 1)
-            if not result:
-                return
-
-        # Build the rule.
-        if workspace_rule:
-            workspace.break_rule(workspace_rule)
-        workspace.build_rule(rule)
+                return # Fizzle
+            if not workspace.fight_it_out(rule, 1, [workspace.rule], 1):
+                return # Fizzle
+            workspace.break_rule(workspace.rule)
+        return workspace.build_rule(rule)
 
 class RuleScout(Codelet):
     """Fills in the rule template, 'Replace _____ by _____'.

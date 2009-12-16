@@ -28,62 +28,20 @@
 ; rule-strength-tester | RuleStrengthTester
 ;---------------------------------------------
 
-(defun rule-builder (proposed-rule)
-; Tries to build the proposed rule, fighting with competitors if necessary.  
- 
-(block nil
-  (if* %verbose% 
-   then (format t "In rule builder with proposed rule: ") 
-        (send proposed-rule :print))
-  
-  ; If this rule already exists, then fizzle.  
-  (if* *rule*
-   then (if* (rule-equal? *rule* proposed-rule)
-         then (if* %verbose% 
-	       then (format t "This rule already exists.  Fizzling.~&"))
-              (activate-from-workspace-rule-descriptions proposed-rule)
-	      (return)))
-
-  ; If a different rule already exists, then fight.
-  (if* *rule*
-   then (if* %verbose% 
-	 then (format t "About to fight with old rule.~&"))
-	(if* (not (fight-it-out proposed-rule 1 (list *rule*) 1))
-	 then (if* %verbose% 
-	       then (format t "Lost.  Fizzling.~&"))
-	      (return)
-	 else (if* %verbose% 
-               then (format t "Won against old rule!~&"))))
-
-  ; Build this rule.
-  (if* *rule* then (break-rule *rule*))
-  (build-rule proposed-rule)))
-  
+;---------------------------------------------
+; rule-builder | RuleBuilder
 ;---------------------------------------------
 
-(defun build-rule (new-rule)
-; This function actually builds the new rule.
-  (setq *rule* new-rule)
-  (activate-from-workspace-rule-descriptions new-rule)
-  (if* %workspace-graphics% then (send *rule* :draw %rule-mode%)))
-
+;---------------------------------------------
+; build-rule | Workspace.build_rule
 ;---------------------------------------------
 
-(defun build-translated-rule (new-translated-rule)
-; This function builds the translated rule.
-  (setq *translated-rule* new-translated-rule)
-  (if* %workspace-graphics% 
-   then (send *translated-rule* :draw %translated-rule-mode%)))
-
+;---------------------------------------------
+; build-translated-rule | Workspace.build_translated_rule
 ;---------------------------------------------
 
-(defun break-rule (rule)
-; Breaks the rule.  The only reason this function has argument "rule" is so 
-; that it matchs the form of the other "break" functions, and thus the breaker 
-; codelets can call it.
-  (if* %workspace-graphics% then (send *rule* :erase %rule-mode%))
-  (setq *rule* nil))
-
+;---------------------------------------------
+; break-rule | Workspace.break_rule
 ;---------------------------------------------
 
 (defun rule-translator (&aux slippage-list answer-temperature-threshold 
@@ -222,14 +180,7 @@
 	              (get-urgency-bin urgency))))
 
 ;---------------------------------------------
-
-(defun activate-from-workspace-rule-descriptions (rule)
-; Activate the nodes corresponding to the descriptions in the rule.
-  (if* (send rule :descriptor1)
-   then (send (send rule :descriptor1) :activate-from-workspace))
-  (if* (send rule :relation?)
-   then (send (send rule :relation) :activate-from-workspace)
-   else (if* (send rule :descriptor2)
-	 then (send (send rule :descriptor2) :activate-from-workspace))))
+; activate-from-workspace-rule-descriptions | Workspace.activate_from_workspace_rule_descriptions
+;---------------------------------------------
 
 

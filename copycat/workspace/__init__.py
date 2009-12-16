@@ -1196,18 +1196,18 @@ class Workspace(object):
         return True
 
     def build_rule(self, rule):
+        """Build the new rule."""
         self.rule = rule
         self.activate_from_workspace_rule_descriptions(rule)
 
     def build_translated_rule(self, translated_rule):
+        """Build the translated rule."""
         self.translated_rule = translated_rule
 
     def break_rule(self, rule):
-        '''
-        Break the rule. The only reason this function has an argument is so
+        """Break the rule. The only reason this function has an argument is so
         that it matchs the form of the other "break" functions and thus the
-        break codelets that call it.
-        '''
+        break codelets that call it."""
         self.rule = None
 
     def propose_rule(self, i_object, i_description, m_object, m_description):
@@ -1249,6 +1249,7 @@ class Workspace(object):
         return [(RuleStrengthTester([proposed_rule]), urgency)]
 
     def activate_from_workspace_rule_descriptions(self, rule):
+        """Activate the nodes corresponding to the descriptions in the rule."""
         if rule.descriptor1:
             rule.descriptor1.activation_buffer += self.activation
         if rule.expresses_relation():
