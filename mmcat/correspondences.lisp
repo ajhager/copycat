@@ -235,93 +235,10 @@
 	
   (propose-correspondence obj1 obj2 concept-mapping-list flip-obj2?)))
 
+
 ;---------------------------------------------
-
-(defun correspondence-strength-tester 
-       (proposed-correspondence flip-obj2?
-        &aux obj1 obj2 proposed-correspondence-strength build-probability 
-	     urgency)
-; Calculates the proposed-correspondence's strength, and probabilistically 
-; decides whether or not to post a correspondence-builder codelet.  If so, 
-; the urgency of the correspondence-builder codelet is a function of the 
-; strength.
-(block nil      
-  (if* %verbose% 
-   then (format t "In correspondence-strength-tester with correspondence ")
-        (send proposed-correspondence :print))
-
-  (setq obj1 (send proposed-correspondence :obj1))
-  (setq obj2 (send proposed-correspondence :obj2))
-
-  ; If either of the two objects (or possibly a flipped version) no longer 
-  ; exist, then fizzle.
-  (if* (or (not (memq obj1 (send *workspace* :object-list)))
-  	   (and (not (memq obj2 (send *workspace* :object-list)))
-		(not (and flip-obj2? 
-			  (send *target-string* :group-present? 
-				(send obj2 :flipped-version))))))
-   then (if* %verbose% 
-	 then (format t "One or both of the objs no longer exist. ")
-              (format t "Fizzling.~&"))
-        (return))
-
-  (if* %workspace-graphics% 
-   then (send proposed-correspondence :flash-proposed))
-
-  ; Calculate the proposed-correspondence's strength.
-  (send proposed-correspondence :update-strength-values)
-  (setq proposed-correspondence-strength 
-	(send proposed-correspondence :total-strength))
-
-  (if* %verbose% 
-   then (format t "Proposed correspondence's strength: ~a~&" 
-	          proposed-correspondence-strength))
-
-  ; Decide whether or not to post a correspondence-builder codelet, based 
-  ; on the strength of the proposed-correspondence.  This also depends on 
-  ; temperature.  
-
-  (setq build-probability 
-	(get-temperature-adjusted-probability 
-	    (/ proposed-correspondence-strength 100)))
-
-  (if* %verbose% 
-   then (format t "Build-probability: ~a~&" build-probability))
-
-  (if* (eq (flip-coin build-probability) 'tails)
-   then (if* %verbose% 
-	 then (format t "Correspondence not strong enough.  Fizzling.~&"))
-        (send *workspace*
-	      :delete-proposed-correspondence proposed-correspondence)
-        (if* %workspace-graphics% 
-	 then (send proposed-correspondence :erase-proposed))
-        (return))
-        
-  ; Activate-from-workspace some descriptions.
-  (loop for cm in (send proposed-correspondence :concept-mapping-list) do
-	(send (send cm :description-type1) :activate-from-workspace)
-	(send (send cm :descriptor1) :activate-from-workspace)
-	(send (send cm :description-type2) :activate-from-workspace)
-	(send (send cm :descriptor2) :activate-from-workspace))
-
-  (if* %workspace-graphics% 
-   then (send proposed-correspondence :erase-proposed))
-  (send proposed-correspondence :set-proposal-level 2)
-  (setq urgency proposed-correspondence-strength)
-  (if* %verbose% 
-   then (format t "Strong enough. ")
-        (format t "Posting correspondence-builder with urg: ~a~&"
-		(get-urgency-bin urgency)))
-
-  ; Post the correspondence-builder codelet.  If "flip-obj2?" is t, then
-  ; the proposed correspondence proposes a flipped version of obj2 rather
-  ; than obj2 itself.
-  (send *coderack* :post 
-	(make-codelet 'correspondence-builder 
-	    (list proposed-correspondence ':flip-obj2? flip-obj2?)
-            (get-urgency-bin urgency)))
-  (if* %workspace-graphics% 
-   then (send proposed-correspondence :draw-proposed))))
+; correspondence-strength-tester | CorrespondenceStrengthTester
+;---------------------------------------------
 
 ;---------------------------------------------
 ; correspondence-builder | CorrespondenceBuilder

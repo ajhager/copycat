@@ -265,11 +265,9 @@ class CorrespondenceImportantObjectScout(Codelet):
         return workspace.propose_correspondence(object1, object2, mappings, True)
 
 class CorrespondenceStrengthTester(Codelet):
-    '''
-    Calculate the proposed correspondence's strength and probabilistically
+    """Calculate the proposed correspondence's strength and probabilistically
     decides whether or not to post a correspondence builder codelt with
-    urgency a function of the strength.
-    '''
+    urgency a function of the strength."""
     def run(self, coderack, slipnet, workspace):
         correspondence = self.arguments[0]
         flip_object2 = self.arguments[1]
@@ -278,33 +276,30 @@ class CorrespondenceStrengthTester(Codelet):
         object2 = correspondence.object2
         flipped = object2.flipped_version()
 
-        # If the objects do not exist anymore, then fizzle.
         objects = workspace.objects()
         if (object1 not in objects) or \
             ((object2 not in objects) and \
-            (not (flip_object2 and workspace.target_string.get_existing_group(flipped)))):
-            return
+            (not (flip_object2 and
+                  workspace.target_string.get_existing_group(flipped)))):
+            return # Fizzle
 
-        # Calculate the proposed correspondence's strength.
         correspondence.update_strengths()
         strength = correspondence.total_strength
 
-        # Decide whether to post a corresondpondence builder codelet or not.
         probability = strength / 100.0
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
             workspace.remove_proposed_correspondence(correspondence)
-            return
+            return # Fizzle
 
-        # Add some activation to some descriptions.
-        for mapping in correspondence.concept_mappings:
+        for mapping in correspondence.get_concept_mappings():
             mapping.description_type1.activation_buffer += workspace.activation
             mapping.descriptor1.activation_buffer += workspace.activation
             mapping.description_type2.activation_buffer += workspace.activation
             mapping.descriptor2.activation_buffer += workspace.activation
 
-        # Set correspondence proposal level.
         correspondence.proposal_level = 2
 
         # Post the correspondence builder codelet.
-        return [(CorrespondenceBuilder((correspondence, flip_object2)), strength)]
+        return [(CorrespondenceBuilder([correspondence, flip_object2]),
+                 strength)]
