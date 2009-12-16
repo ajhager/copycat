@@ -19,60 +19,51 @@ from copycat.coderack import Codelet
 import copycat.slipnet as nodes
 
 class CorrespondenceBottomUpScout(Codelet):
-    '''
-    Chooses two objects, one from the initial string and one from the
+    """Choose two objects, one from the initial string and one from the
     target string, probabilistically by inter string salience. Finds all
     concept mappings between nodes at most one link away. If any concept
     mappings can be made between distinguishing descriptors, propoes a
     correspondence between the two objects, including all the concept
     mappings. Posts a correspondence strength tester codelet with urgency
     a funcion of the average strength of the distinguishing concept
-    mappings.
-    '''
+    mappings."""
     def run(self, coderack, slipnet, workspace):
-        # Choose two objects.
         object1 = workspace.initial_string.get_random_object('inter_string_salience')
         object2 = workspace.target_string.get_random_object('inter_string_salience')
 
-        # If one object spans the whole string and the other does not, fizzle.
         if object1.spans_whole_string() != object2.spans_whole_string():
-            return
+            return # Fizzle
 
-        # Get the possible concept mappings.
         mappings = workspace.get_concept_mappings(object1, object2,
                                                   object1.relevant_descriptions(),
                                                   object2.relevant_descriptions())
-        if not mappings:
-            return
 
-        # Decide whether or not to continue based on slippability.
         possible = False
         for mapping in mappings:
             probability = mapping.slippability() / 100.0
             probability = workspace.temperature_adjusted_probability(probability)
             if toolbox.flip_coin(probability):
                 possible = True
-        if not possible:
-            return
 
-        # Check if there are any distinguishing mappings.
+        if not possible:
+            return # Fizzle
+
         distinguished_mappings = [m for m in mappings if m.is_distinguishing()]
         if not distinguished_mappings:
-            return
+            return # Fizzle
 
-        # If both objects span the strings, check if description needs flipped.
-        possible_opposite_mappings = []
+        opposite_mappings = []
         for mapping in distinguished_mappings:
             description_type = mapping.description_type1
-            if description_type != 'plato_string_position_category' and \
-               description_type != 'plato_bond_facet':
-                   possible_opposite_mappings.append(mapping)
+            if description_type != nodes.plato_string_position_category and \
+               description_type != nodes.plato_bond_facet:
+                   opposite_mappings.append(mapping)
 
-        opposite_descriptions = [m.description_type1 for m in mappings]
+        opposite_descriptions = [m.description_type1 for m in opposite_mappings]
         if all([object1.is_string_spanning_group(),
                 object2.is_string_spanning_group(),
                 not nodes.plato_opposite.is_active(),
-                nodes.are_all_opposite_concept_mappings(possible_opposite_mappings),
+                nodes.are_all_opposite_concept_mappings(opposite_mappings),
                 nodes.plato_direction_category in opposite_descriptions]):
             old_object2_string_number = object2.string_number
             object2 = object2.flipped_version()
