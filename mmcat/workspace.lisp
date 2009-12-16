@@ -312,16 +312,9 @@
 	      ((< n (blur 40)) 'medium)
 	      (t 'high))))
 	
+
 ;---------------------------------------------
-
-(defmethod (workspace :delete-proposed-structure) (s)
-; Deletes the given proposed structure from the workspace.
-  (cond ((typep s 'bond) 
-	 (send (send s :string) :delete-proposed-bond s))    
-	((typep s 'group) (send (send s :string) :delete-proposed-group s))
-	((typep s 'correspondence) 
-	 (send self :delete-proposed-correspondence s))))
-
+; workspace.delete-proposed-structure | Workspace.remove_proposed_structure
 ;---------------------------------------------
 
 (defmethod (workspace :slippage-list) ()

@@ -51,7 +51,8 @@ class Run(object):
             for codelet, urgency in codelets:
                 deleted = self.coderack.post(codelet, urgency)
                 if deleted:
-                    self.workspace.delete_proposed_structure(deleted.arguments)
+                    for structure in deleted.arguments:
+                        self.workspace.remove_proposed_structure(structure)
 
         self.run_codelet(self.coderack.choose())
 
@@ -67,7 +68,8 @@ class Run(object):
         for codelet, urgency in codelets:
             deleted = self.coderack.post(codelet, urgency)
             if deleted:
-                self.workspace.delete_proposed_structure(deleted.arguments)
+                for structure in deleted.agruments:
+                    self.workspace.remove_proposed_structure(structure)
 
     def update(self):
         """Update everything."""
@@ -87,7 +89,8 @@ class Run(object):
         for (codelet, urgency) in codelets:
             deleted = self.coderack.post(codelet, urgency)
             if deleted != None:
-                self.workspace.delete_proposed_structure(deleted.arguments)
+                for structure in deleted.arguments:
+                    self.workspace.remove_proposed_structure(structure)
 
         self.slipnet.update()
 

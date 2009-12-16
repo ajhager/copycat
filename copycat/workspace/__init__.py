@@ -381,16 +381,14 @@ class Workspace(object):
         else:
             return self.translated_rule.descriptor2
 
-    def delete_proposed_structure(self, structure):
-        '''
-        Delete the given proposed structure from the workspace.
-        '''
+    def remove_proposed_structure(self, structure):
+        """Remove the given proposed structure from the workspace."""
         if isinstance(structure, Bond):
-            structure.string.delete_proposed_bond(structure)
+            structure.string.remove_proposed_bond(structure)
         elif isinstance(structure, Group):
-            structure.string.delete_proposed_group(structure)
+            structure.string.remove_proposed_group(structure)
         elif isinstance(structure, Correspondence):
-            self.delete_propsed_correspondence(structure)
+            self.remove_proposed_correspondence(structure)
 
     def slippages(self):
         '''
