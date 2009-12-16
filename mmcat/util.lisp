@@ -36,12 +36,6 @@
 
 ;---------------------------------------------
 
-(defun random-list-item (list)
-; Returns a randomly chosen item in the list.
-  (if* list then (nth (random (length list)) list) else nil))
- 
-;---------------------------------------------
-
 (defun select-list-item-by-method (list method &optional argument)
 ; Applies the method to the list to get a list of numbers.
 ; Probabilisticallly selects a position in the list of numbers
@@ -105,85 +99,6 @@
 
 ;---------------------------------------------
 
-; VECTOR AND ARRAY FUNCTIONS
-
-;---------------------------------------------
-
-(defun make-vector (size &key initial-element)
-  (make-array (list size) :adjustable t :initial-element initial-element))
-
-;---------------------------------------------
-
-(defun make-bin-vector (size)
-  (make-array (list size) :initial-element nil :adjustable t :fill-pointer 0))
-
-;---------------------------------------------
-
-(defun vref (vector index)
-  (aref vector index))
-
-;---------------------------------------------
-
-(defun vset (vector index item)
-  (setf (aref vector index) item))
-
-;---------------------------------------------
-
-(defun vsize (vector)
-  (array-total-size vector))
-
-;---------------------------------------------
-
-(defun aset (array &rest args &aux indices item)
-  (setq indices (butlast args))
-  (setq item (car (last args)))    
-  (setf (apply #'aref array indices) item))
-
-;---------------------------------------------
-
-(defun array-rows (array)
-  (car (array-dimensions array)))
-
-;---------------------------------------------
-
-(defun array-columns (array)
-  (cadr (array-dimensions array)))
-
-;---------------------------------------------
-
-(defun vector-to-list (v)
-  (coerce v 'list))
-
-;---------------------------------------------
-
-(defun list-to-vector (l)
-  (coerce l 'vector))
-
-;---------------------------------------------
-
-(defun array-to-list (a &aux l)
-  (loop for i from (1- (array-rows a))  downto 0 do
-	(loop for j from (1- (array-columns a)) downto 0 do
-	      (push (aref a i j) l)))
-  l)
-	      
-;---------------------------------------------
-
-(defun vector-sum (v)
-  (reduce #'+ v))
-
-;---------------------------------------------
-
-; OTHER FUNCTIONS
-
-;---------------------------------------------
-
-(defun endcons (obj list)
-; Conses the given object to the end of the given list.
-   (append list (list obj)))
-
-;---------------------------------------------
-
 (defun flip-coin (&optional (prob-of-heads .5))
 ; Returns heads or tails.  If no argument, probability of each is .5, 
 ; otherwise, probability of heads is equal to the argument (which is 
@@ -192,98 +107,6 @@
    then 'heads
    else (select-assoc `((heads . ,(round (* prob-of-heads 1000)))
 	   	        (tails . ,(round (* (- 1 prob-of-heads) 1000)))))))
-
-;---------------------------------------------
-
-(defun get-letter (string position)
-; Returns the requested letter.
-   (case string
-     (i (send *initial-string* :get-letter position))
-     (m (send *modified-string* :get-letter position))
-     (a (send *answer-string* :get-letter position))
-     (t (send *target-string* :get-letter position))))
-
-;---------------------------------------------
-
-(defun get-group (string position)
-; Returns the requested group.
-   (case string
-     (i (send *initial-string* :get-group position))
-     (m (send *modified-string* :get-group position))
-     (a (send *answer-string* :get-group position))
-     (t (send *target-string* :get-group position))))
-
-;---------------------------------------------
-
-(defun initial (position)
-; Returns the initial-string letter at the given position.
-  (send *initial-string* :get-letter position))
-
-;---------------------------------------------
-
-(defun modified (position)
-; Returns the modified-string letter at the given position.
-  (send *modified-string* :get-letter position))
-
-;---------------------------------------------
-
-(defun target (position)
-; Returns the target-string letter at the given position.
-  (send *target-string* :get-letter position))
-
-;---------------------------------------------
-
-(defun answer (position)
-; Returns the answer-string letter at the given position.
-  (send *answer-string* :get-letter position))
-
-;---------------------------------------------
-
-(defun initial-group (position)
-; Returns the initial-string group at the given position.
-  (send (initial position) :group))
-
-;---------------------------------------------
-
-(defun modified-group (position)
-; Returns the modified-string group at the given position.
-  (send (modified position) :group))
-
-;---------------------------------------------
-
-(defun target-group (position)
-; Returns the target-string group at the given position.
-  (send (target position) :group))
-
-;---------------------------------------------
-
-(defun list-max (list)
-; Returns the maximum integer in a list of integers.
-  (reduce #'max list))
-
-;---------------------------------------------
-
-(defun list-max-position (list)
-; Returns the list-position of the maximum integer in a list of integers.
-  (position (list-max list) list))
-
-;---------------------------------------------
-
-(defun list-min (list)
-; Returns the minimum integer in a list of integers.
-  (reduce #'min list))
-
-;---------------------------------------------
-
-(defun list-min-position (list)
-; Returns the list-position of the minimum integer in a list of integers.
-  (position (list-min list) list))
-;---------------------------------------------
-
-(defun list-eq (l1 l2)
-; Returns t if the two lists are (in order) pairwise eq. Returns nil 
-; otherwise.
-  (not (mismatch l1 l2)))
 
 ;---------------------------------------------
 
@@ -304,46 +127,6 @@
 
 ;---------------------------------------------
 
-(defun send-method-to-list (list method &rest arg)
-; Sends the given method to each item on the list and returns a list of the 
-; results.  (Note that at present, this only works for methods with at most 1 
-; argument.)
-  (if* arg
-   then 
-        (loop for item in list 
-	      if (null item) collect nil into value-list
-	      else collect (send item (eval method) (car arg)) 
-	           into value-list
-	      finally (return value-list))
-   else
-        (loop for item in list 
-	      if (null item) collect nil into value-list
-	      else collect (send item (eval method)) into value-list
-	      finally (return value-list))))
-    
-
-;---------------------------------------------
-
-(defun quick-pause ()
-    (loop for i from 1 to 1000 do ()))
-
-;---------------------------------------------
-
-(defun medium-pause ()
-    (loop for i from 1 to 100000 do ()))
-
-;---------------------------------------------
-
-(defun long-pause ()
-    (loop for i from 1 to 200000 do ()))
-
-;---------------------------------------------
-
-(defun very-long-pause ()
-    (loop for i from 1 to 10 do (long-pause)))
-
-;---------------------------------------------
-
 (defun same-letter-category? (obj1 obj2)
   (string-equal (send obj1 :pname) (send obj2 :pname)))
 
@@ -356,11 +139,6 @@
         ((not (listp (car l)))
 	 (cons (car l) (flatten (cdr l))))
         (t (append (flatten (car l)) (flatten (cdr l))))))
-
-;---------------------------------------------
-
-(defun list-sum (l)
-  (reduce #'+ l))
 
 ;---------------------------------------------
 
@@ -386,65 +164,6 @@
 
 ;---------------------------------------------
 
-(defun list-multiply (l1 l2)
-  (loop for i in l1
-        for j in l2
-        collect (* i j) into result
-        finally (return result)))
-
-;---------------------------------------------
-
-(defun cube (x)
-  (* x x x))
-
-;---------------------------------------------
-
-(defun fake-reciprocal (n)
-  (- 100 n))
-
-;---------------------------------------------
-
-(defun fix-to-string (fix)
-; Returns a string representing the given fixnum.
-  (format nil "~d" fix))
-
-;---------------------------------------------
-
-(defun flavor-type (instance)
-  (flavors::flavor-type-of instance))
-
-;---------------------------------------------
-
-(defun xor (p q)
-  (and (or p q) (not (and p q))))
-
-;---------------------------------------------
-
-(defun get-plato-letter (letter-name)
-; Returns the slipnode corresponding to the given letter name.
-  (eval (append-symbols 'plato- letter-name)))
-
-;---------------------------------------------
-
-(defun get-plato-number (n)
-  (case n
-      (1 plato-one)      
-      (2 plato-two)      
-      (3 plato-three)      
-      (4 plato-four)      
-      (5 plato-five)))
-
-;---------------------------------------------
-
-(defun node-to-number (node)
-  (cond ((eq node plato-one) 1)
-        ((eq node plato-two) 2)      
-        ((eq node plato-three) 3)      
-        ((eq node plato-four) 4)      
-        ((eq node plato-five) 5)))
-
-;---------------------------------------------
-
 (defun blur (n &aux blur-amount)
 ; Returns a number close to n (i.e., within (sqrt n) of n).
 ; This function will return n twice as often as it returns
@@ -453,58 +172,3 @@
 ; purpose.
   (setq blur-amount (round (sqrt n)))
   (funcall (random-list-item '(+ -)) n (random (1+ blur-amount))))
-
-
-;---------------------------------------------
-
-(defun ibond (left-position right-position)
-  (aref (send *initial-string* :left-right-bond-array)
-	      left-position right-position))
-
-;---------------------------------------------
-
-(defun tbond (left-position right-position)
-  (aref (send *target-string* :left-right-bond-array)
-	      left-position right-position))
-
-;---------------------------------------------
-
-(defun send-iobjs (message &optional arg)
-  (if* arg 
-   then (send-method-to-list (send *initial-string* :object-list) message arg)
-   else (send-method-to-list (send *initial-string* :object-list) message)))
-
-;---------------------------------------------
-
-(defun send-tobjs (message &optional arg)
-  (if* arg 
-   then (send-method-to-list (send *target-string* :object-list) message arg)
-   else (send-method-to-list (send *target-string* :object-list) message)))
-
-;---------------------------------------------
-
-(defun sml (list method &optional arg)
-  (if* arg 
-   then (send-method-to-list list method arg)   
-   else (send-method-to-list list method)))
-
-;---------------------------------------------
-
-(defun reduce-decimal (flonum num-of-decimal-places &aux multiplier)
-; Reduces the given flonum to the given number of decimal places.
-  (if* (= num-of-decimal-places 0)
-   then (round flonum)
-   else (setf multiplier (expt 10 num-of-decimal-places))
-        (float (/ (round (* flonum multiplier)) multiplier))))
-
-;---------------------------------------------
-
-(defun get-random-state (n input-file
-			     &optional (directory "~/")
-                             &aux random-state-file random-state-list)
-  (setq random-state-file
-	(string-append directory input-file ".random-state"))
-  (with-open-file (istream random-state-file  :direction :input)
-      (setq random-state-list (read istream)))
-  (nth n random-state-list))
-
