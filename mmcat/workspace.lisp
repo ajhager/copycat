@@ -2,11 +2,8 @@
 ; defflavor workspace | Workspace.__init__
 ;---------------------------------------------
 
-(defmethod (workspace :proposed-bond-list) ()
-; Returns a list of the proposed bonds on the workspace.
-  (append (send *initial-string* :proposed-bond-list)
-	  (send *target-string* :proposed-bond-list)))
-
+;---------------------------------------------
+; workspace.proposed-bond-list
 ;---------------------------------------------
 
 (defmethod (workspace :bond-list) ()
@@ -14,13 +11,9 @@
   (append (send *initial-string* :bond-list)
 	  (send *target-string* :bond-list)))
 
+
 ;---------------------------------------------
-
-(defmethod (workspace :proposed-group-list) ()
-; Returns a list of the proposed groups on the workspace.
-  (append (send *initial-string* :proposed-group-list)
-	  (send *target-string* :proposed-group-list)))
-
+; workspace.proposed-group-list
 ;---------------------------------------------
 
 (defmethod (workspace :group-list) ()
@@ -32,15 +25,13 @@
 ; proposed-correspondence-list
 ;---------------------------------------------
 
-(defmethod (workspace :correspondence-list) ()
-; Returns a list of the built correspondences on the workspace.
-  (flatten (vector-to-list correspondence-vector)))
-
+;---------------------------------------------
+; workspace :correspondence-list
 ;---------------------------------------------
 
-(defmethod (workspace :add-replacement) (r)
-; Adds a replacement to the workspace's list of replacements.
-  (push r replacement-list))
+;---------------------------------------------
+; workspace.add-replacement
+;---------------------------------------------
 
 ;---------------------------------------------
 ; add-proposed-correspondence
@@ -317,30 +308,17 @@
 ; workspace.delete-proposed-structure | Workspace.remove_proposed_structure
 ;---------------------------------------------
 
-(defmethod (workspace :slippage-list) ()
-; Returns a list of all the slippages in all the correspondences.
-  (flatten (send-method-to-list (send self :correspondence-list)
-	                        :slippage-list)))
-	
+;---------------------------------------------
+; workspace.slippage-list | Workspace.slippages()
 ;---------------------------------------------
 
-(defmethod (workspace :intra-string-unhappiness) ()
-; Returns a weighted average of the intra-string unhappiness of objects
-; on the workspace (weighted by each object's relative importance in the 
-; string.
-  (min 100 (/ (loop for obj in (send self :object-list)
-                    sum (* (send obj :relative-importance)
-		           (send obj :intra-string-unhappiness))) 200)))
-
+;---------------------------------------------
+; workspace.intra-string-unhappiness
 ;---------------------------------------------
 
-(defmethod (workspace :inter-string-unhappiness) ()
-; Returns a weighted average of the inter-string unhappiness of objects
-; on the workspace (weighted by each object's relative importance in the 
-; string.
-  (min 100 (/ (loop for obj in (send self :object-list)
-                    sum (* (send obj :relative-importance)
-		           (send obj :inter-string-unhappiness))) 200)))
+;---------------------------------------------
+; workspace.inter-string-unhappiness
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace.total-unhappiness

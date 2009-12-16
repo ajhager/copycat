@@ -391,27 +391,21 @@ class Workspace(object):
             self.remove_proposed_correspondence(structure)
 
     def slippages(self):
-        '''
-        Return a list of slippages in all correspondences.
-        '''
+        """Return a list of slippages in all correspondences."""
         return toolbox.flatten([c.slippages() for c in self.correspondences()])
 
     def intra_string_unhappiness(self):
-        '''
-        Return the weighted average of the intra string unhappiness of objects
-        on the workspace, weighted by each object's relative imoprtance in
-        the string.
-        '''
+        """Return the weighted average of the intra string unhappiness of
+        objects on the workspace, weighted by each object's relative imoprtance
+        in the string."""
         s = sum([obj.relative_importance * obj.intra_string_unhappiness
                  for obj in self.objects()])
         return min(100, s / 200.0)
 
     def inter_string_unhappiness(self):
-        '''
-        Return a weighted average of the inter string unhappiness of ojbects
-        on the workspace, weighted by each object's relative importnace in
-        the string.
-        '''
+        """Return a weighted average of the inter string unhappiness of ojbects
+        on the workspace, weighted by each object's relative importnace in the
+        string."""
         s = sum([obj.relative_importance * obj.inter_string_unhappiness
                  for obj in self.objects()])
         return min(100, s / 200.0)
@@ -552,16 +546,12 @@ class Workspace(object):
         return common_groups
 
     def proposed_bonds(self):
-        '''
-        Return a list of the proposed bonds on the workspace.
-        '''
+        """Return a list of the proposed bonds on the workspace."""
         return self.initial_string.get_proposed_bonds() + \
                 self.target_string.get_proposed_bonds()
 
     def proposed_groups(self):
-        '''
-        Return a list of the proposed groups on the workspace.
-        '''
+        """Return a list of the proposed groups on the workspace."""
         return self.initial_string.get_proposed_groups() + \
                 self.target_string.get_proposed_groups()
 
@@ -592,15 +582,11 @@ class Workspace(object):
         return self.proposed_correspondences.get((first, second))
 
     def correspondences(self):
-        '''
-        Return a list of the built correspondences on the workspace.
-        '''
+        """Return a list of the built correspondences on the workspace."""
         return self._correspondences.values()
 
     def add_replacement(self, replacement):
-        '''
-        Add a replacement to the workspace's list of replacements.
-        '''
+        """Add a replacement to the workspace's list of replacements."""
         self.replacements.append(replacement)
 
     def add_correspondence(self, correspondence):
