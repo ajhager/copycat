@@ -455,31 +455,10 @@ class Workspace(object):
                     return struct == structure
         return False
 
-    def prosose_correspondence(self, object1, object2, concept_mappings,
-                               should_flip_object):
-        '''
-        Create a proposed correspondence and post a correspondence strength
-        tester codelet with urgnecy a function of the distinguishing condept
-        mappings underlying the proposed correspondence.
-        '''
-        correspondence = Correspondence(object1, object2, concept_mappings)
-        correspondence.proposal_level = 1
-        for cm in correspondence.concept_mappings:
-            cm.descripion_type1.activate_from_workspace()
-            cm.descriptor1.activate_from_workspace()
-            cm.description_type2.activate_from_workspace()
-            cm.descriptor2.activate_from_workspace()
-        self.add_proposed_correspondence(correspondence)
-        urgency = util.average([cm.strength for cm in correspondence.distinguishing_concept_mappings()])
-        return Codelet('correspondence_strength_tester', (correspdonence,
-                                                          should_flip_object2,
-                                                          urgency))
-
-    def get_concept_mappings(self, object1, object2, descriptions1, descriptions2):
-        '''
-        Return the list of concept mappings between the given descriptions of
-        these two objects.
-        '''
+    def get_concept_mappings(self, object1, object2,
+                             descriptions1, descriptions2):
+        """Return the list of concept mappings between the given descriptions of
+        these two objects."""
         concept_mappings = []
         for d1 in descriptions1:
             for d2 in descriptions2:

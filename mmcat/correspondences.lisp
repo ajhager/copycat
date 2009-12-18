@@ -77,23 +77,9 @@
 			 (return))))
   result)
 
-(defun get-concept-mapping-list (obj1 obj2 descriptions1 descriptions2 
-				 &aux result)
-; Get the list of concept-mappings between the given descriptions of
-; these two objects.  For now, the two descriptors in a concept-mapping have 
-; to be equal or linked by a slip-link in the Slipnet, and have 
-; the same description-type.
-  (loop for d1 in descriptions1 do
-        (loop for d2 in descriptions2 
-  	      when (and (eq (send d1 :description-type)  (send d2 :description-type))
-			(or (eq (send d1 :descriptor) (send d2 :descriptor))
-			    (slip-linked? (send d1 :descriptor) 
-			              (send d2 :descriptor))))
-              do (push (make-concept-mapping 
-			   (send d1 :description-type) (send d2 :description-type) 
-	                   (send d1 :descriptor) (send d2 :descriptor)
-                           obj1 obj2) result)))
-  result)
+;---------------------------------------------
+; get-concept-mapping-list | Workspace.get_concept_mappings
+;---------------------------------------------
 
 ;---------------------------------------------
 ; make-correspondence | Correspondence.__init__
