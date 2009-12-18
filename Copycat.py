@@ -22,40 +22,12 @@ import optparse
 
 from copycat.run import Run
 
-# TRACE: http://www.dalkescientific.com/
-import linecache
-import inspect
-
-def traceit(frame, event, arg):
-    if event == 'line':
-        lineno = frame.f_lineno
-        if '__file__' in frame.f_globals:
-            filename = frame.f_globals['__file__']
-            if (filename.endswith('.pyc') or
-                filename.endswith('.pyo')):
-                filename = filename[:-1]
-            name = frame.f_globals['__name__']
-            line = linecache.getline(filename, lineno)
-        else:
-            name = '[unknown]'
-            try:
-                src = inspect.getsourcelines(frame)
-                line = src[lineno]
-            except IOError:
-                line = 'Unknown code named [%s].  VM instruction #%d' % \
-                    (frame.f_code.co_name, frame.f_lasti)
-        print '%s:%s: %s' % (name, lineno, line.rstrip())
-    return traceit
-# TRACE END
-
 usage = '%prog [OPTIONS] [INITIAL MODIFIED TARGET SEED]'
 version = '%prog 0.1 - (c) 2007-2009 Joseph Hager.\nReleased under the GPLv2'
 parser = optparse.OptionParser(usage=usage, version=version)
-parser.add_option('-m', '--mode', dest='mode', default='headless',
-                  help='interaction mode: curses, opengl')
-parser.add_option("-t", "--trace",
-                  action="store_true", dest="trace", default=False,
-                  help="generate a execution trace")
+parser.add_option("-q", "--quiet",
+                  action="store_true", dest="quiet", default=False,
+                  help="run in headless mode")
 (options, args) = parser.parse_args()
 
 if len(args) == 0:
@@ -71,10 +43,7 @@ elif len(args) == 4:
 else:
     parser.error('must supply all three strings and a seed')
 
-if options.trace:
-    sys.settrace(traceit)
-
-if options.mode == 'headless':
+if options.quiet:
     if not initial:
         initial = raw_input('Initial: ')
         modified = raw_input('Modified: ')
@@ -83,13 +52,10 @@ if options.mode == 'headless':
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:
         run.step()
-    print "%5s %s %s %s" % (seed,
-                            str(run.workspace.answer_string.name),
-                            run.workspace.temperature,
-                            run.coderack.time)
-elif options.mode == 'curses':
-    from clients import CursesClient
-    CursesClient(initial, modified, target, seed)
-elif options.mode == 'opengl':
+    print run.workspace.rule.to_string()
+    print "Answer: " + run.workspace.answer_string.name
+    print "Temperature: " + str(run.workspace.temperature)
+    print "Steps: " + str(run.coderack.time)
+else:
     from clients import OpenglClient
     OpenglClient(initial, modified, target, seed)

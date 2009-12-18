@@ -183,6 +183,9 @@ class Window(pyglet.window.Window):
 
 class OpenglClient(pyglet.window.Window):
     def __init__(self, initial, modified, target, seed):
+        initial = initial or "abc"
+        modified = modified or "abd"
+        target = target or "ijk"
         run = Run(initial, modified, target, seed)
         window = Window(run)
         pyglet.app.run()
