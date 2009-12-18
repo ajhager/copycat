@@ -1,3 +1,7 @@
+(defun in-group? (obj1 obj2)
+; Returns t if the two objects are in a group.
+ (and (send obj1 :group) (eq (send obj1 :group) (send obj2 :group))))
+
 ;---------------------------------------------
 ; defflavor workspace | Workspace.__init__
 ;---------------------------------------------

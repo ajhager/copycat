@@ -53,5 +53,3 @@
 ;---------------------------------------------
 ; activate-from-workspace-rule-descriptions | Workspace.activate_from_workspace_rule_descriptions
 ;---------------------------------------------
-
-

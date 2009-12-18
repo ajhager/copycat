@@ -1,119 +1,147 @@
-(defun in-group? (obj1 obj2)
-; Returns t if the two objects are in a group.
- (and (send obj1 :group) (eq (send obj1 :group) (send obj2 :group))))
-
 ;---------------------------------------------
-; make-group | Group.__init__ 
-; defflavor group
+; workspace-structure.update_strengths
 ;---------------------------------------------
 
 ;---------------------------------------------
-; subgroup? | Group.is_subgroup_of
+; description.calculate-internal-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; overlaps? | Group.overlaps
+; description.calculate-external-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; get-incompatible-groups
+; bond.calculate-internal-strength
+; bond.calculate-external-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; get-incompatible-correspondences
+; group.calculate-internal-strength
+;---------------------------------------------
+    
+;---------------------------------------------
+; group.calculate-external-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group.incompatible-correspondence?
+; correspondence.calculate-internal-strength
+; correspondence.calculate-external-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group.get-bonds-to-be-flipped | Group.get_bonds_to_be_flipped
+; correspondence.internally-coherent?
+;---------------------------------------------
+	      
+;---------------------------------------------
+; rule.calculate-internal-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; spans-whole-string?
+; rule.calculate-external-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; proposed?
+; workspace-structure.calculate-total-strength
 ;---------------------------------------------
 
 ;---------------------------------------------
-; propose-group | Workspace.propose_group
+; workspace-structure.total-weakness
+;---------------------------------------------
+
+;---------------------------------------------
+; concept-mapping.slippability
+;---------------------------------------------
+
+;---------------------------------------------
+; supporting-concept-mappings? | Mapping.is_supporting_concept_mapping
+;---------------------------------------------
+
+;---------------------------------------------
+; incompatible-concept-mappings? | Mapping.is_incompatible_concept_mapping
+; incompatible-concept-mapping-lists?
+;---------------------------------------------
+
+;---------------------------------------------
+; related? | slipnode.are_related
+;---------------------------------------------
+
+;---------------------------------------------
+; linked? | slipnode.are_linked
+;---------------------------------------------
+
+;---------------------------------------------
+; slip-linked? | slipnode.are_slip_linked
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.bond-degree-of-association | slipnode.bond_degree_of_association
+;---------------------------------------------
+
+;---------------------------------------------
+; bond.importance
+;---------------------------------------------
+
+;---------------------------------------------
+; bond.happiness
+; bond.unhappiness
+;---------------------------------------------
+
+;---------------------------------------------
+; bond.salience
+;---------------------------------------------
+
+;---------------------------------------------
+; slipnode.local-descriptor-support | slipnode.local_descriptor_support
 ;---------------------------------------------
   
 ;---------------------------------------------
-; single-letter-group-probability
+; slipnode.local-description-type-support | slipnode.local_description_type_support
 ;---------------------------------------------
 
 ;---------------------------------------------
-; length-description-probability
-;---------------------------------------------
-
-;----------------------------------------------
-; group.print | REMOVED
+; slipnode.total-description-type-support | slipnode.total_desription_type_support
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group.add-bond-description | Group.add_bond_description
+; description.local-support
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group.length | Group.length
+; bond.number-of-local-supporting-bonds
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group.leftmost-letter | Group.leftmost_letter
-; group.rightmost-letter | Group.rightmost_letter
+; bond.local-density
 ;---------------------------------------------
 
 ;---------------------------------------------
-; leftmost-in-string?
-; rightmost-in-string?
+; bond.local-support
 ;---------------------------------------------
 
 ;---------------------------------------------
-; left-neighbor | Group.get_left_neighbor
-; right-neighbor | Group.get_right_neighbor
+; group.number-of-local-supporting-groups
 ;---------------------------------------------
 
 ;---------------------------------------------
-; build-group | Workspace.build_group
+; group.local-density
 ;---------------------------------------------
 
 ;---------------------------------------------
-; break-group | Workspace.break_group
+; group.local-support
+;---------------------------------------------
+	   
+;---------------------------------------------
+; correspondence.support | Correspondence.support
 ;---------------------------------------------
 
 ;---------------------------------------------
-; top-down-group-scout--category | GroupTopDownCategoryScout
-;---------------------------------------------
- 
-;---------------------------------------------
-; top-down-group-scout--direction | GroupTopDownDirectionScout
+; local-bond-category-relevance
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group-scout--whole-string | GroupWholeStringScout
+; local-direction-category-relevance
 ;---------------------------------------------
 
 ;---------------------------------------------
-; group-strength-tester | GroupStrengthTester
-;---------------------------------------------
-
-;---------------------------------------------
-; group-builder | GroupBuilder
-;---------------------------------------------
-
-;---------------------------------------------
-; flipped-version
-;---------------------------------------------
-
-;---------------------------------------------
-; get-possible-group-bonds | Workspace.possible_group_bonds
-;---------------------------------------------
-
-;---------------------------------------------
-; group-equal? | Group.__eq__
+; recursive-group-member? | Gropu.is_recursive_member
 ;---------------------------------------------
