@@ -473,11 +473,9 @@ class Workspace(object):
 
     def get_leftmost_and_rightmost_incompatible_correspondences(self, group1, group2,
                                                                 direction_category_cm):
-        '''
-        Return any correspondences between leftmost and rightmost objects in
+        """Return any correspondences between leftmost and rightmost objects in
         group1 and group2 that are incompatible with a correspondence between
-        the groups.
-        '''
+        the groups."""
         incompatible_correspondences = []
 
         leftmost_object1 = group1.left_object
@@ -487,18 +485,22 @@ class Workspace(object):
 
         if direction_category_cm.label == slipnet.plato_identity:
             leftmost_correspondence = leftmost_object1.correspondence
-            if leftmost_correspondence and leftmost_correspondence != leftmost_object2:
+            if leftmost_correspondence and \
+                    leftmost_correspondence != leftmost_object2:
                 incompatible_correspondences.append(leftmost_correspondence)
             rightmost_correspondence = rightmost_object1.correspondence
-            if rightmost_correspondence and rightmost_correspondence != rightmost_object2:
+            if rightmost_correspondence and \
+                    rightmost_correspondence != rightmost_object2:
                 incompatible_correspondences.append(rightmost_correspondence)
 
         if direction_category_cm.label == slipnet.plato_opposite:
             leftmost_correspondence = leftmost_object1.correspondence
-            if leftmost_correspondence and leftmost_correspondence.object2 != rightmost_object2:
+            if leftmost_correspondence and \
+                    leftmost_correspondence.object2 != rightmost_object2:
                 incompatible_correspondences.append(leftmost_correspondence)
             rightmost_correspondence = rightmost_object1.correspondence
-            if rightmost_correspondence and rightmost_correspondence.object2 != leftmost_object2:
+            if rightmost_correspondence and \
+                    rightmost_correspondence.object2 != leftmost_object2:
                 incompatible_correspondences.append(rightmost_correspondence)
 
         return incompatible_correspondences

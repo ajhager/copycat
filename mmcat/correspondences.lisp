@@ -1,44 +1,6 @@
-(defun get-leftmost-and-rightmost-incompatible-correspondences
-         (group1 group2 direction-category-cm
-          &aux leftmost-obj1 rightmost-obj1 
-  	       leftmost-obj2 rightmost-obj2 
-	       leftmost-correspondence rightmost-correspondence 
-	       incompatible-correspondences)
-	 
-; This function returns any correspondences 
-; between leftmost and rightmost objects in group1 and group2 that are 
-; incompatible with a correspondence between the groups.
-  (setq leftmost-obj1 (send group1 :left-obj) rightmost-obj1 
-	              (send group1 :right-obj))
-  (setq leftmost-obj2 (send group2 :left-obj) rightmost-obj2 
-	              (send group2 :right-obj))
-
-  (if* (eq (send direction-category-cm :label) plato-identity)
-   then (if* (and (setq leftmost-correspondence 
-			(send leftmost-obj1 :correspondence))
-		 (not (eq (send leftmost-correspondence :obj2) 
-			  leftmost-obj2)))
-	 then (push leftmost-correspondence incompatible-correspondences))
-  
-        (if* (and (setq rightmost-correspondence 
-			(send rightmost-obj1 :correspondence))
-		 (not (eq (send rightmost-correspondence :obj2) 
-			  rightmost-obj2)))
-	 then (push rightmost-correspondence incompatible-correspondences)))
-  
-  (if* (eq (send direction-category-cm :label) plato-opposite)
-   then (if* (and (setq leftmost-correspondence 
-			(send leftmost-obj1 :correspondence))
-		 (not (eq (send leftmost-correspondence :obj2) 
-			  rightmost-obj2)))
-	 then (push leftmost-correspondence incompatible-correspondences))
-  
-        (if* (and (setq rightmost-correspondence 
-			(send rightmost-obj1 :correspondence))
-		 (not (eq (send rightmost-correspondence :obj2) 
-			  leftmost-obj2)))
-	 then (push rightmost-correspondence incompatible-correspondences)))
-  incompatible-correspondences)
+;---------------------------------------------
+; get-leftmost-and-rightmost-incompatible-correspondences
+;---------------------------------------------
 
 ;---------------------------------------------
 ; supporting-correspondences?
