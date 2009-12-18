@@ -263,23 +263,21 @@ class Correspondence(Structure):
                         return bond2
 
     def is_incompatible_rule(self):
-        '''
-        A rule is incompatible with this correspondence if object1 is the
+        """A rule is incompatible with this correspondence if object1 is the
         changed object and object2 doesn't have the rule's descriptor1 in
-        its relevant_descriptions.
-        '''
+        its relevant_descriptions."""
         rule = self.workspace.rule
         if not rule:
             return False
         descriptor1 = rule.descriptor1
-        descriptors = [cm.descriptor1 for cm in self.concept_mappings]
+        descriptors = [cm.descriptor1 for cm in self.get_concept_mappings()]
         slippages = self.workspace.slippages()
         descriptions = self.object2.relevant_descriptions()
         relevant_descriptors = [d.descriptor for d in descriptions]
         slipped = [d.apply_slippages(slippages) for d in relevant_descriptors]
         return self.object1.is_changed and \
                 descriptor1 not in descriptors and \
-                descriptor1 not in slipped + slippages
+                descriptor1 not in slipped
 
     def is_proposed(self):
         """Return True if the correspondence is still being proposed."""

@@ -139,28 +139,9 @@
 ; correspondence.get-incompatible-bond
 ;---------------------------------------------
 
-(defmethod (correspondence :incompatible-rule?) ()
-; A rule is incompatible with this correspondence 
-; if obj1 is the changed object, and obj2 doesn't have the rule's descriptor1 
-; (possibly modulo slippages in this correspondence or other already-existing 
-; slippages) in its relevant-descriptions.
-; For example, if the problem is abc -> abd, bcd -> ? and the rule is 
-; "Replace rightmost letter by successor", if a correspondence is built 
-; between the two C's, then the rule is incompatible with that correspondence,
-; because the C in the target string doesn't have the description "rightmost" 
-; (or a slipped version of it).  
-  (and (send obj1 :changed?) *rule*
-       (and 
-           ; Not a member of this correspondence's concept-mapping-list.
-	   (not (memq (send *rule* :descriptor1) 
-		      (send-method-to-list concept-mapping-list :descriptor1)))
-           ; Not already a member of a slippage in the workspace.
-           (not (memq (send *rule* :descriptor1) 
-		      (send-method-to-list
-		          (send-method-to-list 
-			      (send obj2 :relevant-descriptions) :descriptor) 
-			  :apply-slippages 
-			  (send *workspace* :slippage-list)))))))
+;---------------------------------------------
+; correspondence.incompatible-rule?
+;---------------------------------------------
 
 ;-------------------------------------------------------
 ; correspondence.proposed? | Correspondence.is_proposed
