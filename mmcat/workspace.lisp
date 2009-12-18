@@ -142,57 +142,24 @@
 ; workspace.null-replacement?
 ;---------------------------------------------
 
-(defmethod (workspace :unrelated-objects) (&aux num-of-bonds result)    
-; Returns a list of all the objects on the workspace that have at least one 
-; bond-slot open. Leftmost and rightmost objects have one bond-slot, 
-; and other objects have two bond-slots (one on the left and one on the 
-; right).
-  (loop for object in (send self :object-list) do
-        (if* (and (not (send object :spans-whole-string?)) 
-		  (null (send object :group)))
-         then (setq num-of-bonds 
-	            (length (append (send object :incoming-bonds) 
-		                    (send object :outgoing-bonds))))
-              (if* (or (send object :leftmost-in-string?)
-	               (send object :rightmost-in-string?))
-               then (if* (= num-of-bonds 0) then (push object result))
-    	       else (if* (< num-of-bonds 2) then (push object result)))))
-  result)
+;---------------------------------------------
+; workspace.unrelated-objects
 ;---------------------------------------------
 
-(defmethod (workspace :ungrouped-objects) ()    
-; Returns a list of all the objects on the workspace that are not in a group.
-  (loop for object in (send self :object-list)
-	when (and (not (send object :spans-whole-string?))
-		  (null (send object :group))) collect object))
-
+;---------------------------------------------
+; workspace.ungrouped-objects
 ;---------------------------------------------
 
-(defmethod (workspace :ungrouped-bonds) ()    
-; Returns a list of all the bonds on the workspace that are not in groups.
-; A bond which is not in a group but both of whose objects are in groups
-; is considered to be grouped.
-  (loop for bond in (send self :bond-list)
-	when (or (null (send (send bond :from-obj) :group))
-		 (null (send (send bond :to-obj) :group)))
-        collect bond))
-
+;---------------------------------------------
+; workspace.ungrouped-bonds
 ;---------------------------------------------
 
-(defmethod (workspace :unreplaced-objects) ()    
-; Returns a list of all the objects on the initial-string that 
-; don't have a replacement.
-  (loop for letter in (send *initial-string* :letter-list)
-	when (null (send letter :replacement)) collect letter))
-
+;---------------------------------------------
+; workspace.unreplaced-objects
 ;---------------------------------------------
 
-(defmethod (workspace :uncorresponding-objects) ()    
-; Returns a list of all the objects on the workspace that 
-; don't have a correspondence.
-  (loop for object in (send self :object-list)
-	when (null (send object :correspondence)) collect object))
-
+;---------------------------------------------
+; workspace.uncorresponding-objects
 ;---------------------------------------------
 
 (defmethod (workspace :rough-num-of-unrelated-objects) (&aux n)

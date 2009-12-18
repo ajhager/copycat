@@ -1047,49 +1047,46 @@ class Workspace(object):
         return self.initial_string.get_groups() + self.target_string.get_groups()
 
     def unrelated_objects(self):
+        """Return a list of all objects in the workspace that have at least one
+        bond slot open."""
         unrelated_objects = []
         for obj in self.objects():
-            if not obj:
-                continue
-            if not obj.spans_whole_string() and obj.group == None:
+            if not obj.spans_whole_string() and not obj.group:
                 number_of_bonds = len(obj.incoming_bonds) + len(obj.outgoing_bonds)
                 if obj.is_leftmost_in_string() or obj.is_rightmost_in_string():
-                    if number_of_bonds == 0: unrelated_objects.append(obj)
+                    if number_of_bonds == 0:
+                        unrelated_objects.append(obj)
                 else:
-                    if number_of_bonds < 2: unrelated_objects.append(object)
+                    if number_of_bonds < 2:
+                        unrelated_objects.append(obj)
         return unrelated_objects
 
     def ungrouped_objects(self):
+        """Return a list of all objects in the workspace not in a group."""
         ungrouped_objects = []
         for obj in self.objects():
-            if not obj:
-                continue
-            if not obj.spans_whole_string() and obj.group == None:
+            if not obj.spans_whole_string() and not obj.group:
                 ungrouped_objects.append(obj)
         return ungrouped_objects
 
     def ungrouped_bonds(self):
+        """Return a list of all bonds in the workspace not in groups."""
         ungrouped_bonds = []
         for bond in self.bonds():
-            if bond.from_object.group == None or bond.to_object.group == None:
+            if not bond.from_object.group or not bond.to_object.group:
                 ungrouped_bonds.append(bond)
         return ungrouped_bonds
 
     def unreplaced_objects(self):
-        unreplaced_objects = []
-        for letter in self.initial_string.get_letters():
-            if letter.replacement == None:
-                unreplaced_objects.append(letter)
-        return unreplaced_objects
+        """Return a list of all objects in the initial string that do not
+        have a replacement."""
+        letters = self.initial_string.get_letters()
+        return [letter for letter in letters if not letter.replacment]
 
     def uncorresponding_objects(self):
-        uncorresponding_objects = []
-        for obj in self.objects():
-            if not obj:
-                continue
-            if obj.correspondence == None:
-                uncorresponding_objects.append(obj)
-        return uncorresponding_objects
+        """Return a list of all objects in the workspace that don't have a
+        correspondence."""
+        return [obj for obj in self.objects() if not obj.correspondence]
 
     def rough_number_of_unrelated_objects(self):
         number_of_unrelated_objects = len(self.unrelated_objects())
