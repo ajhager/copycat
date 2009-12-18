@@ -82,7 +82,7 @@ class Object(object):
         self.is_changed = False
         self.is_new_answer_letter = False
         self.clamp_salience = False
-
+        
     def flipped_version(self):
         """Return the default flipped version of an object, itself."""
         return self
