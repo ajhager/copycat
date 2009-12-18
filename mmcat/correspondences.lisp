@@ -135,38 +135,8 @@
 ; correspondence.get-incompatible-correspondences | ditto
 ;---------------------------------------------
 
-(defmethod (correspondence :get-incompatible-bond)
-           (&aux bond1 bond2 bond-concept-mapping-list 
-		 incompatible-bond)
-            
-; Returns the bond that is incompatible with this correspondence, if any.
-; E.g., consider the problem "abc -> abd, srqp -> ?"  If there is a 
-; left-to-right bond from the A to the B in "abc" and a right-to-left 
-; bond from the P to the Q in "srqp", then the P-Q bond is 
-; incompatible with a correspondence between the C and the P.
-
-  (if* (send obj1 :leftmost-in-string?)
-   then (setq bond1 (send obj1 :right-bond))
-   else (setq bond1 (send obj1 :left-bond)))
-
-  (if* (send obj2 :leftmost-in-string?)
-   then (setq bond2 (send obj2 :right-bond))
-   else (setq bond2 (send obj2 :left-bond)))
-
-  (if* (and bond1 bond2 (send bond1 :direction-category) 
-	                (send bond2 :direction-category))
-   then (setq bond-concept-mapping-list
-	      (list (make-concept-mapping 
-			plato-direction-category plato-direction-category
-		        (send bond1 :direction-category)
-			(send bond2 :direction-category)
-			nil nil)))
-        (if* (incompatible-concept-mapping-lists? 
-		 bond-concept-mapping-list
-                 concept-mapping-list)
-         then (setq incompatible-bond bond2)))
-  incompatible-bond)
-
+;---------------------------------------------
+; correspondence.get-incompatible-bond
 ;---------------------------------------------
 
 (defmethod (correspondence :incompatible-rule?) ()

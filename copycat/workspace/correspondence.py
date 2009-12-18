@@ -238,9 +238,7 @@ class Correspondence(Structure):
         return list(set(incomp))
 
     def incompatible_bond(self):
-        '''
-        Return the bond that is incompatible with this correspondence.
-        '''
+        """Return the bond that is incompatible with this correspondence."""
         if self.object1.is_leftmost_in_string():
             bond1 = self.object1.right_bond
         else:
@@ -254,13 +252,13 @@ class Correspondence(Structure):
         if bond1 and bond2 and \
            bond1.direction_category and bond2.direction_category:
             plato_direction_category = slipnet.plato_direction_category
-            bond_concept_mappings = [Mapping(plato_direction_category,
-                                             plato_direction_category,
+            bond_concept_mappings = [Mapping(slipnet.plato_direction_category,
+                                             slipnet.plato_direction_category,
                                              bond1.direction_category,
                                              bond2.direction_category,
                                              None, None)]
             for m1 in bond_concept_mappings:
-                for m2 in self.concept_mappings:
+                for m2 in self.get_concept_mappings():
                     if m1.is_incompatible_concept_mapping(m2):
                         return bond2
 
