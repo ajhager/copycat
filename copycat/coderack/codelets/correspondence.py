@@ -176,8 +176,7 @@ class CorrespondenceBuilder(Codelet):
         workspace.build_correspondence(correspondence)
 
 class CorrespondenceImportantObjectScout(Codelet):
-    '''
-    Chooses an object from the initial string probabilistically based on
+    """Choose an object from the initial string probabilistically based on
     importance. Picks a description of the object probabilistically and
     looks for an object in the target string with the same description,
     modulo the appropriate slippage, if any of the slippages currently in
@@ -185,84 +184,79 @@ class CorrespondenceImportantObjectScout(Codelet):
     most one link away. Makes a proposed correspondence between the two
     objects, including all the concept mappings. Posts a correspondence
     strength tester codelet with urgency a function of the average
-    strength of the distinguishing concept mappings.
-    '''
+    strength of the distinguishing concept mappings."""
     def run(self, coderack, slipnet, workspace):
-        # Choose an object.
+        flip_obj2 = False
+
         object1 = workspace.initial_string.get_random_object('relative_importance')
 
-        # Choose a description by conceptual depth.
         object1_description = object1.choose_relevant_distinguishing_description_by_conceptual_depth()
         if not object1_description:
-            return
+            return # Fizzle
         object1_descriptor = object1_description.descriptor
 
-        # Find the corresponding object2_descriptor.
         object2_descriptor = object1_descriptor
         for slippage in workspace.slippages():
             if slippage.descriptor1 == object1_descriptor:
                 object2_descriptor = slippage.descriptor2
+                break
 
-        # Find an object with that descriptor in the target string.
         object2_candidates = []
-        for object in workspace.target_string.get_objects():
-            for description in object.relevant_descriptions():
+        for obj in workspace.target_string.get_objects():
+            for description in obj.relevant_descriptions():
                 if description.descriptor == object2_descriptor:
-                    object2_candidates.append(object)
+                    object2_candidates.append(obj)
         if not object2_candidates:
-            return
-        values = [obj.inter_string_salience for obj in object2_candidates]
-        index = toolbox.weighted_index(values)
-        object2 = object2_candidates[index]
+            return # Fizzle
 
-        # If one object spans the whole string and the other does not, fizzle.
+        weights = [obj.inter_string_salience for obj in object2_candidates]
+        object2 = toolbox.weighted_select(weights, object2_candidates)
+
         if object1.spans_whole_string() != object2.spans_whole_string():
-            return
+            return # Fizzle
 
-        # Get the possible concept mappings.
         mappings = workspace.get_concept_mappings(object1, object2,
                                                   object1.relevant_descriptions(),
                                                   object2.relevant_descriptions())
         if not mappings:
             return
 
-        # Decide whether or not to continue based on slippability.
         possible = False
         for mapping in mappings:
             probability = mapping.slippability() / 100.0
             probability = workspace.temperature_adjusted_probability(probability)
             if toolbox.flip_coin(probability):
                 possible = True
+                break
         if not possible:
-            return
+            return # Fizzle
 
-        # Check if there are any distinguishing mappings.
         distinguished_mappings = [m for m in mappings if m.is_distinguishing()]
         if not distinguished_mappings:
-            return
+            return # Fizzle
 
-        # If both objects span the strings, check if description needs flipped.
         possible_opposite_mappings = []
         for mapping in distinguished_mappings:
             description_type = mapping.description_type1
-            if description_type != 'plato_string_position_category' and \
-               description_type != 'plato_bond_facet':
-                   possible_opposite_mappings.append(mapping)
+            if description_type != nodes.plato_string_position_category and \
+               description_type != nodes.plato_bond_facet:
+                possible_opposite_mappings.append(mapping)
 
         opposite_descriptions = [m.description_type1 for m in mappings]
         if all([object1.is_string_spanning_group(),
                 object2.is_string_spanning_group(),
                 not nodes.plato_opposite.is_active(),
                 nodes.are_all_opposite_concept_mappings(possible_opposite_mappings),
-                'plato_direction_category' in opposite_descriptions]):
+                nodes.plato_direction_category in opposite_descriptions]):
             old_object2_string_number = object2.string_number
             object2 = object2.flipped_version()
             object2.string_number = old_object2_string_number
-            mappings = self.concept_mappings(object1, object2,
-                                             object1.relevant_descriptions(),
-                                             object2.relevant_descriptions())
+            mappings = workspace.get_concept_mappings(object1, object2,
+                                                      object1.relevant_descriptions(),
+                                                      object2.relevant_descriptions())
+            flip_obj2 = True
 
-        return workspace.propose_correspondence(object1, object2, mappings, True)
+        return workspace.propose_correspondence(object1, object2, mappings, flip_obj2)
 
 class CorrespondenceStrengthTester(Codelet):
     """Calculate the proposed correspondence's strength and probabilistically
