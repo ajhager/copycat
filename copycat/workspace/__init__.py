@@ -419,20 +419,19 @@ class Workspace(object):
         return min(100, s / 200.0)
 
     def is_structure_in_snag_structures(self, structure):
-        '''
-        This method is used after a snag has been hit and the temperature has
+        """This method is used after a snag has been hit and the temperature has
         been clamped, to determine whether or not to release the temperature
         clamp.  Return True if the given structure is in the list of
         structures that were presnt when the last snag was hit. If the given
         structure was built since the snag was hit then there is some change
-        that the temperature clamp with be released.
-        '''
+        that the temperature clamp with be released."""
         if isinstance(structure, Bond):
             for struct in self.snag_structures:
                 if isinstance(struct, Bond):
                     if struct.from_object == structure.from_object and \
+                       struct.to_object == structure.to_object and \
                        struct.bond_category == structure.bond_category and \
-                       struct.direction_catogory == strucutre.direction_category:
+                       struct.direction_category ==   structure.direction_category:
                         return True
         elif isinstance(structure, Group):
             for struct in self.snag_structures:
@@ -454,6 +453,7 @@ class Workspace(object):
             for struct in self.snag_structures:
                 if isinstance(struct, Rule):
                     return struct == structure
+        return False
 
     def prosose_correspondence(self, object1, object2, concept_mappings,
                                should_flip_object):
@@ -1198,4 +1198,3 @@ class Workspace(object):
         else:
             if rule.descriptor2:
                 rule.descriptor2.activation_buffer += self.activation
-
