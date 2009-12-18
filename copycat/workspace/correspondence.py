@@ -58,16 +58,14 @@ class Correspondence(Structure):
                         return True
 
     def is_incompatible_correspondence(self, other):
-        '''
-        Return True if this correspondence is incompatible with the given
-        correspondence.
-        '''
+        """Return True if this correspondence is incompatible with the given
+        correspondence."""
         if self.object1 == other.object1 or \
            self.object2 == other.object2:
             return True
         else:
-            for cm1 in self.concept_mappings:
-                for cm2 in other.concept_mappings:
+            for cm1 in self.get_concept_mappings():
+                for cm2 in other.get_concept_mappings():
                     if cm1.is_incompatible_concept_mapping(cm2):
                         return True
 
@@ -232,8 +230,7 @@ class Correspondence(Structure):
         if self.object1.is_string_spanning_group() and \
            self.object2.is_string_spanning_group() and \
            direction_category_cm:
-            incomp.extend(self.workspace.get_leftmost_and_rightmost_incompatible_correspondences(
-                self.object1, self.object2, direction_category_cm))
+            incomp.extend(self.workspace.get_leftmost_and_rightmost_incompatible_correspondences(self.object1, self.object2, direction_category_cm))
 
         return list(set(incomp))
 

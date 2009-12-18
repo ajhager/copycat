@@ -60,22 +60,8 @@
   result)
 
 ;---------------------------------------------
-
-(defun incompatible-correspondences? (c1 c2 &aux (result nil))
-; returns t if c1 is incompatible with c2, nil otherwise.  for now, c1 is 
-; defined to be incompatible with c2 if c1 and c2 share objects, or c1 has a 
-; concept-mapping incompatible with the concept-mappings of c2.
-
-
-  (if* (or (eq (send c1 :obj1) (send c2 :obj1))	
-	  (eq (send c1 :obj2) (send c2 :obj2)))
-   then (setq result t)
-   else (loop for cm1 in (send c1 :concept-mapping-list) until result do
-              (loop for cm2 in (send c2 :concept-mapping-list) 
-		    when (incompatible-concept-mappings? cm1 cm2) do
-                         (setq result t)
-			 (return))))
-  result)
+; incompatible-correspondences?
+;---------------------------------------------
 
 ;---------------------------------------------
 ; get-concept-mapping-list | Workspace.get_concept_mappings
