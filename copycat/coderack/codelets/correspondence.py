@@ -28,6 +28,8 @@ class CorrespondenceBottomUpScout(Codelet):
     a funcion of the average strength of the distinguishing concept
     mappings."""
     def run(self, coderack, slipnet, workspace):
+        flip_obj2 = False
+
         object1 = workspace.initial_string.get_random_object('inter_string_salience')
         object2 = workspace.target_string.get_random_object('inter_string_salience')
 
@@ -71,8 +73,9 @@ class CorrespondenceBottomUpScout(Codelet):
             mappings = workspace.get_concept_mappings(object1, object2,
                                                       object1.relevant_descriptions(),
                                                       object2.relevant_descriptions())
+            flip_obj2 = True
 
-        return workspace.propose_correspondence(object1, object2, mappings, True)
+        return workspace.propose_correspondence(object1, object2, mappings, flip_obj2)
 
 class CorrespondenceBuilder(Codelet):
     """Attempt to build the proposed correspondence, fighting it out with
@@ -84,18 +87,17 @@ class CorrespondenceBuilder(Codelet):
         object1 = correspondence.object1
         object2 = correspondence.object2
 
-        # LEFT OFF HERE
         objects = workspace.objects()
-        if object1 not in objects:
-            return # Fizzle
+        obj1_present = object1 in objects
         obj2_present = object2 in objects
-        flipped = False
+        existing_obj2_group = None
         if flip_obj2:
-            flipv = object2.flipped_version()
-            if flipv.type_name == 'group':
-                flipped = workspace.target_string.get_existing_group(flipv)
+            flip = object2.flipped_version()
+            existing_obj2_group = workspace.target_string.get_existing_group(flip)
 
-        if not obj2_present and not flipped:
+        if all([not obj1_present,
+                not obj2_present,
+                (flip_obj2 and not existing_obj2_group)]):
             return # Fizzle
 
         existing_correspondence = workspace.is_correspondence_present(correspondence)
@@ -143,7 +145,8 @@ class CorrespondenceBuilder(Codelet):
                         return # Fizzle
 
         if flip_obj2:
-            if not workspace.fight_it_out(correspondence, 1, [flipped], 1):
+            if not workspace.fight_it_out(correspondence, 1,
+                                          [existing_obj2_group], 1):
                 return # Fizzle
 
         incompatible_rule = correspondence.is_incompatible_rule()
@@ -161,10 +164,9 @@ class CorrespondenceBuilder(Codelet):
         if incompatible_group:
             workspace.break_group(incompatible_group)
         
-        existing_object2_group = flipped
-        if existing_object2_group:
-            workspace.break_group(existing_object2_group)
-            for bond in existing_object2_group.bonds:
+        if existing_obj2_group:
+            workspace.break_group(existing_obj2_group)
+            for bond in existing_obj2_group.bonds:
                 workspace.break_bond(bond)
             for bond in object2.bonds:
                 workspace.build_bond(bond)

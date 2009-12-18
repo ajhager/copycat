@@ -1113,27 +1113,21 @@ class Workspace(object):
         return self.rough_indication(len(self.uncorresponding_objects()))
 
     def structure_vs_structure(self, structure1, weight1, structure2, weight2):
-        '''
-        Choose probabilistically between the two structures based on strengths
-        and the given weights.  Return True if structure1 wins and False if
-        structure2 wins.
-        '''
+        """Choose probabilistically between the two structures based on strength
+        and the given weights. Return True if structure1 wins and False if
+        structure2 wins."""
         structure1.update_strengths()
         structure2.update_strengths()
         strengths = [structure1.total_strength * weight1,
                      structure2.total_strength * weight2]
         adjusted_strengths = self.temperature_adjusted_values(strengths)
-        return [True, False][toolbox.weighted_index(adjusted_strengths)]
+        return toolbox.weighted_select(adjusted_strengths, [True, False])
 
     def fight_it_out(self, structure, structure_weight, others, others_weight):
-        '''
-        Choose probabilistically between the structure and the other structures
-        using the method structure_vs_structure.  Return True if the structure
-        wins.
-        '''
+        """Choose probabilistically between the structure and the other
+        structures using the method structure_vs_structure. Return True if the
+        structure wins."""
         for competition in others:
-            if not competition:
-                continue
             if not self.structure_vs_structure(structure, structure_weight,
                                                competition, others_weight):
                 return False

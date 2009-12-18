@@ -63,40 +63,12 @@
 ; probability-distribution.choose | Distribution.choose
 ;---------------------------------------------
 
-(defun structure-vs-structure (structure1 weight1 structure2 weight2 
-			       &aux strength-list adjusted-strength-list)
-; Chooses probabilistically between the two structures, based on their
-; strengths and the given weights.  Returns t if structure1 wins, nil if 
-; structure2 wins.
-  (if* %verbose% 
-   then (format t "In structure-vs-structure with structures:  ")
-        (send structure1 :print) (send structure2 :print)
-	(format t "and weights ~a and ~a~&" weight1 weight2))
-  (send structure1 :update-strength-values)
-  (send structure2 :update-strength-values)
-  (setq strength-list (list (* (send structure1 :total-strength) weight1)
-			    (* (send structure2 :total-strength) weight2)))
-  (setq adjusted-strength-list 
-	(get-temperature-adjusted-value-list strength-list))
-  (if* %verbose% 
-   then (format t "Strength-list: ~a; adjusted-strength-list: ~a~&" 
-	        strength-list adjusted-strength-list))
-
-  (nth (select-list-position adjusted-strength-list) '(t nil)))
-  
+;---------------------------------------------
+; structure-vs-structure
 ;---------------------------------------------
 
-(defun fight-it-out (structure structure-weight structure-list list-weight)
-; Chooses probabilistically between the structure and the list of
-; structures, using the function "structure-vs-structure".
-; Returns t if the structure wins over all the structures in structure-list.
-; Otherwise, returns nil.
-  (loop for competing-structure in structure-list
-        when (null (structure-vs-structure structure structure-weight 
-		                           competing-structure list-weight))
-        return nil
-  	finally (return t)))
-
+;---------------------------------------------
+; fight-it-out
 ;---------------------------------------------
 
 (defun flip-coin (&optional (prob-of-heads .5))
