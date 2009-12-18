@@ -44,13 +44,12 @@ class Correspondence(Structure):
         return self.concept_mappings
 
     def is_supporting_correspondence(self, other):
-        '''
-        Return True if this correspondence supports the given correspondence.
-        '''
+        """Return True if this correspondence supports the given
+        correspondence."""
         if self.object1 == other.object1 or \
            self.object2 == other.object2 or \
            self.is_incompatible_correspondence(other):
-            return
+            return False
         else:
             for cm1 in self.get_distinguishing_mappings():
                 for cm2 in other.get_distinguishing_mappings():

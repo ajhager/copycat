@@ -41,23 +41,8 @@
   incompatible-correspondences)
 
 ;---------------------------------------------
-
-(defun supporting-correspondences? (c1 c2 &aux (result nil))
-; returns t if c1 supports c2, nil otherwise.  for now, c1 is 
-; defined to support c2 if c1 is not incompatible with c2, and 
-; has a concept-mapping that supports the concept-mappings of c2.
-
-  (cond ((or (eq (send c1 :obj1) (send c2 :obj1))	
-	     (eq (send c1 :obj2) (send c2 :obj2)))
-         (setq result nil))
-	((incompatible-correspondences? c1 c2) (setq result nil))
-        (t (loop for cm1 in (send c1 :distinguishing-concept-mappings) 
-		 until result do
-                  (loop for cm2 in (send c2 :distinguishing-concept-mappings)
-		        when (supporting-concept-mappings? cm1 cm2) 
-			do (setq result t)
-			   (return)))))
-  result)
+; supporting-correspondences?
+;---------------------------------------------
 
 ;---------------------------------------------
 ; incompatible-correspondences?
