@@ -18,17 +18,14 @@ import math
 import random
 
 def weighted_average(weights, values):
-    '''
-    Return the weighted arithmetic mean of arguments.
-    '''
+    """Return the weighted arithmetic mean of arguments."""
     weight_sum = sum(weights)
     value_sum = sum(map(lambda a, b: a * b, weights, values))
     return int(value_sum / float(weight_sum))
 
 def weighted_index(weights):
-    ''' 
-    Probabilistically chooses one of the weights by value, returning its index.
-    '''
+    """Probabilistically chooses one of the weights by value, returning its
+    index."""
     total = sum(weights)
     if total <= 0:
         return random.randint(0, len(weights) - 1)
@@ -42,18 +39,15 @@ def weighted_index(weights):
             return index - 1
 
 def weighted_select(weights, items):
-    '''
-    Returns one of the items probabilistically by weight.
-    '''
+    """Return one of the items probabilistically by weight."""
     if items:
         return items[weighted_index(weights)]
 
 def select_assoc(assoc_list):
-    '''
-    assoc_list is of the form:
-        [(item, probability), (item, probability) . . .]
-    Returns one of the items, chosen probabilistically.
-    '''
+    """Returns one of the items, chosen probabilistically.
+
+    assoc_list is of the form: [(item, probability), (item, probability) ...]
+    """
     if assoc_list == []:
         return
 
@@ -71,32 +65,24 @@ def select_assoc(assoc_list):
             return item
 
 def flatten(sequence):
-    '''
-    Flattens a sequence so that it has no nested structure.
-    '''
+    """Flattens a sequence so that it has no nested structure."""
     if isinstance(sequence, list):
         return sum(map(flatten, sequence), [])
     else:
         return [sequence]
 
 def flip_coin(prob_of_true = .5):
-    '''
-    Returns either True or False based on the probabity of true sent as an
-    argument.
-    '''
+    """Returns either True or False based on the probabity of true sent as an
+    argument."""
     if prob_of_true >= 1:
         return True
     return select_assoc([[True, int(prob_of_true * 1000)]
                         ,[False, int((1 - prob_of_true) * 1000)]])
 
 def average(*args):
-    '''
-    Returns the arithmetic mean of its arguments.
-    '''
+    """Returns the arithmetic mean of its arguments."""
     return sum(args) / float(len(args))
 
 def blur(number):
-    '''
-    A normal distribution around number within square_root(number).
-    '''
+    """A normal distribution around number within square_root(number)."""
     return random.normalvariate(number, math.sqrt(number))

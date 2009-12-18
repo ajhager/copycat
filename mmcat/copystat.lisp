@@ -335,3 +335,16 @@
 			     (sqrt (send a :frequency))) 1)))
 
 	   (format verbose-ostream "------------------------------------~&~%")))))
+
+(defun std-dev (list-of-values &aux (cumulative 0) (cumulative-squares 0))
+  (cond ((= (length list-of-values) 0) nil)
+	((= (length list-of-values) 1) 0)
+        (t (loop for item in list-of-values do
+              (incf cumulative item)
+              (incf cumulative-squares (sqr item)))
+           (sqrt (/ (abs (- cumulative-squares
+	   	            (/ (sqr cumulative) (length list-of-values))))
+   	            (1- (length list-of-values)))))))
+
+(defun std-err (list-of-values)
+  (float (/ (std-dev list-of-values) (sqrt (length list-of-values)))))
