@@ -162,66 +162,25 @@
 ; workspace.uncorresponding-objects
 ;---------------------------------------------
 
-(defmethod (workspace :rough-num-of-unrelated-objects) (&aux n)
-; Returns either 'few, 'medium, or 'many.  This method is used for
-; "self-watching" in the function "get-num-of-codelets-to-post" in the file
-; "formulas.l" -- for deciding the number of bond-scout codelets that
-; should be posted.
-  (setq n (length (send self :unrelated-objects)))
-  (cond ((< n (blur 2)) 'few)
-	((< n (blur 4)) 'medium)
-	(t 'many)))
-	
+;---------------------------------------------
+; workspace.rough-num-of-unrelated-objects
 ;---------------------------------------------
 
-(defmethod (workspace :rough-num-of-ungrouped-objects) (&aux n)
-; Returns either 'few, 'medium, or 'many.  This method is used for
-; "self-watching" in the function "get-num-of-codelets-to-post" in the file
-; "formulas.l" -- for deciding the number of group-scout codelets that
-; should be posted.
-  (setq n (length (send self :ungrouped-objects)))
-  (cond ((< n (blur 2)) 'few)
-	((< n (blur 4)) 'medium)
-	(t 'many)))
-	
+;---------------------------------------------
+; workspace.rough-num-of-ungrouped-objects
 ;---------------------------------------------
 
-(defmethod (workspace :rough-num-of-unreplaced-objects) (&aux n)
-; Returns either 'few, 'medium, or 'many.  This method is used for
-; "self-watching" in the function "get-num-of-codelets-to-post" in the file
-; "formulas.l" -- for deciding the number of replacement-building codelets that
-; should be posted.
-  (setq n (length (send self :unreplaced-objects)))
-  (cond ((< n (blur 2)) 'few)
-	((< n (blur 4)) 'medium)
-	(t 'many)))
-	
+;---------------------------------------------
+; workspace.rough-num-of-unreplaced-objects
 ;---------------------------------------------
 
-(defmethod (workspace :rough-num-of-uncorresponding-objects) (&aux n)
-; Returns either 'few, 'medium, or 'many.  This method is used for
-; "self-watching" in the function "get-num-of-codelets-to-post" in the file
-; "formulas.l" -- for deciding the number of correspondence-scout codelets 
-; that should be posted.
-  (setq n (length (send self :uncorresponding-objects)))
-  (cond ((< n (blur 2)) 'few)
-	((< n (blur 4)) 'medium)
-	(t 'many)))
-	
+;---------------------------------------------
+; workspace.rough-num-of-uncorresponding-objects
 ;---------------------------------------------
 
-(defmethod (workspace :rough-importance-of-uncorresponding-objects) 
-           (&aux uncorresponding-objects n)
-; Returns either 'low, 'medium, or 'high.
-  (setq uncorresponding-objects (send self :uncorresponding-objects))
-  (if* (null uncorresponding-objects)
-   then 'low
-   else (setq n (list-max (send-method-to-list uncorresponding-objects
-	 		                       :relative-importance)))
-        (cond ((< n (blur 20)) 'low)
-	      ((< n (blur 40)) 'medium)
-	      (t 'high))))
-	
+;---------------------------------------------
+; workspace.rough-importance-of-uncorresponding-objects
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace.delete-proposed-structure | Workspace.remove_proposed_structure

@@ -644,20 +644,14 @@ class Workspace(object):
         return False
 
     def rough_importance_of_uncorresponding_objects(self):
-        '''
-        Return either "low", "medium" or "high".
-        '''
+        """Return 'low', 'medium' or 'high' indicating the rough importance of
+        uncorresponding objects in the workspace."""
         uncorresponding_objects = self.uncorresponding_objects()
         if not uncorresponding_objects:
-            return 'low'
+            n = 0
         else:
-            n = max([uo.relative_importance() for uo in uncorresponding_objects])
-            if n < uti.blur(20):
-                return 'low'
-            elif n < util.blur(40):
-                return 'medium'
-            else:
-                return 'high'
+            n = max([o.relative_importance() for o in uncorresponding_objects])
+        return self.rough_indication(n / 10)
 
     def propose_correspondence(self, object1, object2, mappings, flip_obj2):
         """Create a proposed correspondence and pots a correspondece strength
@@ -1081,48 +1075,42 @@ class Workspace(object):
         """Return a list of all objects in the initial string that do not
         have a replacement."""
         letters = self.initial_string.get_letters()
-        return [letter for letter in letters if not letter.replacment]
+        return [letter for letter in letters if not letter.replacement]
 
     def uncorresponding_objects(self):
         """Return a list of all objects in the workspace that don't have a
         correspondence."""
         return [obj for obj in self.objects() if not obj.correspondence]
 
-    def rough_number_of_unrelated_objects(self):
-        number_of_unrelated_objects = len(self.unrelated_objects())
-        if number_of_unrelated_objects < toolbox.blur(2):
+    def rough_indication(self, number):
+        """Return 'few', 'medium' or 'many' indicating a rought number based on
+        the concrete number given."""
+        if number < toolbox.blur(2):
             return 'few'
-        elif number_of_unrelated_objects < toolbox.blur(4):
+        elif number < toolbox.blur(4):
             return 'medium'
         else:
             return 'many'
+
+    def rough_number_of_unrelated_objects(self):
+        """Return 'few', 'medium' or 'many' indicating the rough number of
+        unrelated objects in the workspace."""
+        return self.rough_indication(len(self.unrelated_objects()))
 
     def rough_number_of_ungrouped_objects(self):
-        number_of_ungrouped_objects = len(self.ungrouped_objects())
-        if number_of_ungrouped_objects < toolbox.blur(2):
-            return 'few'
-        elif number_of_ungrouped_objects < toolbox.blur(4):
-            return 'medium'
-        else:
-            return 'many'
+        """Return 'few', 'medium' or 'many' indicating the rough number of
+        ungrouped objects in the workspace."""
+        return self.rough_indication(len(self.ungrouped_objects()))
 
     def rough_number_of_unreplaced_objects(self):
-        number_of_unreplaced_objects = len(self.unreplaced_objects())
-        if number_of_unreplaced_objects < toolbox.blur(2):
-            return 'few'
-        elif number_of_unreplaced_objects < toolbox.blur(4):
-            return 'medium'
-        else:
-            return 'many'
+        """Return 'few', 'medium' or 'many' indicating the rough number of
+        unreplaced objects in the workspace."""
+        return self.rough_indication(len(self.unreplaced_objects()))
 
     def rough_number_of_uncorresponding_objects(self):
-        number_of_uncorresponding_objects = len(self.uncorresponding_objects())
-        if number_of_uncorresponding_objects < toolbox.blur(2):
-            return 'few'
-        elif number_of_uncorresponding_objects < toolbox.blur(4):
-            return 'medium'
-        else:
-            return 'many'
+        """Return 'few', 'medium' or 'many' indicating the rough number of
+        uncorresponding objects in the workspace."""
+        return self.rough_indication(len(self.uncorresponding_objects()))
 
     def structure_vs_structure(self, structure1, weight1, structure2, weight2):
         '''
