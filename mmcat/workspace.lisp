@@ -10,20 +10,17 @@
 ; workspace.proposed-bond-list
 ;---------------------------------------------
 
-(defmethod (workspace :bond-list) ()
-; Returns a list of the built bonds on the workspace.
-  (append (send *initial-string* :bond-list)
-	  (send *target-string* :bond-list)))
-
+;---------------------------------------------
+; workspace.bond-list
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace.proposed-group-list
 ;---------------------------------------------
 
-(defmethod (workspace :group-list) ()
-; Returns a list of the built groups on the workspace.
-  (append (send *initial-string* :group-list)
-	  (send *target-string* :group-list)))
+;---------------------------------------------
+; workspace.group-list
+;---------------------------------------------
 
 ;---------------------------------------------
 ; proposed-correspondence-list
@@ -61,24 +58,16 @@
 ; workspace.slippage-present? | REMOVED
 ;---------------------------------------------
 
-(defmethod (workspace :object-list) ()
-; Returns a list of all the objects (letters and groups) on the 
-; workspace.
-  (append (send *initial-string* :object-list)
-	  (send *target-string* :object-list)))
-
+;---------------------------------------------
+; workspace.object-list
+;---------------------------------------------
 
 ;---------------------------------------------
 ; workspace.letter-list
 ;---------------------------------------------
 
-(defmethod (workspace :structure-list) ()
-; Returns a list of all the structures on the workspace.
-  (append (send self :bond-list)
-          (send self :group-list)
-	  (send self :correspondence-list)
-	  (if* *rule* then (list *rule*) else nil)))
-
+;---------------------------------------------
+; workspace.structure-list
 ;---------------------------------------------
 
 (defmethod (workspace :structure-in-snag-structure-list?) (s)

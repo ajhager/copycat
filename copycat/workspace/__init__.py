@@ -1026,10 +1026,12 @@ class Workspace(object):
         return codelets
 
     def objects(self):
+        """Return a list of all objects in the workspace."""
         return self.initial_string.get_objects() + \
             self.target_string.get_objects()
 
     def structures(self):
+        """Return a list of structures in the workspace."""
         structures = self.bonds() + self.groups() + self.correspondences()
         if self.rule:
             return structures + [self.rule]
@@ -1037,9 +1039,11 @@ class Workspace(object):
             return structures
 
     def bonds(self):
+        """Return all bonds in the workspace."""
         return self.initial_string.get_bonds() + self.target_string.get_bonds()
 
     def groups(self):
+        """Return all groups in the workspace."""
         return self.initial_string.get_groups() + self.target_string.get_groups()
 
     def unrelated_objects(self):
