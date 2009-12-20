@@ -46,22 +46,25 @@ class Slipnet(object):
                 x = node_x * node_w + node_w / 2.0
                 y = node_y * node_h - 5
                 sprite = pyglet.sprite.Sprite(square, x=x, y=y, batch=self.batch)
+                sprite.scale = 0
                 sprite.opacity = 100
                 sprite.rotation = 10
+                sprite.color = (20, 20, 30)
                 self.nodes.append(sprite)
                 label = pyglet.text.Label(node.short_name, "EraserDust", 12, x=x,
                                           y=y-30, anchor_x="center", batch=self.batch)
+                label.color = (200, 200, 200, 130)
                 self.labels.append(label)
                 index += 1
-
-        self.update(0)
         
     def update(self, dt):
         for image, label, node in zip(self.nodes, self.labels, self.slipnet.slipnodes):
             target = node.activation * .01
-            self.scales[node] += (target - self.scales[node]) * dt * 2
+            change = (target - self.scales[node]) * dt * 2
+            if abs(change) < .001:
+                continue
+            self.scales[node] += change
             image.scale = self.scales[node]
-
             if node.is_active():
                 label.color = (255, 255, 255, 200)
             else:

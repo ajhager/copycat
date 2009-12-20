@@ -31,8 +31,6 @@ class Letter(object):
     def update(self, dt):
         if self.letter.is_changed:
             self.label.color = (255, 100, 100, 130)
-        else:
-            self.label.color = (255, 255, 255, 100)
 
 class String(object):
     def __init__(self, string, x, y, batch):

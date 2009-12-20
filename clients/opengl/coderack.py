@@ -18,6 +18,7 @@
 # Intensity of the codelet count should be how probable that type is to be chosen
 
 import pyglet
+from collections import defaultdict as dd
 
 class Coderack(object):
     def __init__(self, coderack, x, y, w, h, batch):
@@ -63,7 +64,7 @@ class Coderack(object):
                 x += 270
                 y = self.h - 10
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
-                                      color=(200, 255, 200, 80),batch=self.batch)
+                                      color=(200, 255, 180, 80),batch=self.batch)
             label2 = pyglet.text.Label("", "EraserDust", 12, x=x - 25, y=y,
                                        color=(255, 255, 255, 0), batch=self.batch)
             label.name = name
@@ -72,10 +73,7 @@ class Coderack(object):
             y -= 25
             z += 1
 
-        self.update(0)
-
     def update(self, dt):
-        from collections import defaultdict as dd
         counts = dd(int)
         for codelet in self.coderack.codelets():
             counts[codelet.__class__.__name__] += 1
@@ -85,10 +83,12 @@ class Coderack(object):
                 name.color = (200, 255, 180, 200)
             else:
                 alpha = int(name.color[3] - (name.color[3] * dt))
-                if alpha >= 80:
-                    name.color = (200, 255, 180, int(alpha))
-
-            # Change this to probability instead of number.
+                if alpha > 80:
+                    name.color = (200, 255, 180, alpha)
+            
+            # Change this to urgency instead of number.
             num = counts[name.name]
-            number.text = str(num)
-            number.color = (255, 255, 255, min(200, int(num / 2.0 * 80)))
+            name = str(num)
+            if number.text != name:
+                number.text = name
+                number.color = (255, 255, 255, min(200, num * 40))
