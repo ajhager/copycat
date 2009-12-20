@@ -16,7 +16,6 @@
 
 import copycat.toolbox as toolbox
 from copycat.workspace import Structure, Letter, Group, Mapping
-import copycat.slipnet as slipnet
 
 class Correspondence(Structure):
     """Correspondence
@@ -33,6 +32,7 @@ class Correspondence(Structure):
         """Initialize Correspondence."""
         super(Correspondence, self).__init__()
         self.workspace = workspace
+        self.slipnet = self.workspace.slipnet
         self.object1 = object1
         self.object2 = object2
         self.concept_mappings = concept_mappings
@@ -219,7 +219,7 @@ class Correspondence(Structure):
                         self.object1.group != group_correspondence.object1:
                     incomp.append(group_correspondence)
 
-        direction_category = slipnet.plato_direction_category
+        direction_category = self.slipnet.plato_direction_category
         direction_category_cm = None
         for cm in self.concept_mappings:
             if cm.description_type1 == direction_category and \
@@ -247,9 +247,10 @@ class Correspondence(Structure):
 
         if bond1 and bond2 and \
            bond1.direction_category and bond2.direction_category:
-            plato_direction_category = slipnet.plato_direction_category
-            bond_concept_mappings = [Mapping(slipnet.plato_direction_category,
-                                             slipnet.plato_direction_category,
+            plato_direction_category = self.slipnet.plato_direction_category
+            bond_concept_mappings = [Mapping(self.workspace,
+                                             self.slipnet.plato_direction_category,
+                                             self.slipnet.plato_direction_category,
                                              bond1.direction_category,
                                              bond2.direction_category,
                                              None, None)]

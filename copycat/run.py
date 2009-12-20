@@ -36,7 +36,7 @@ class Run(object):
         """Initialize Run."""
         self.coderack = Coderack()
         self.slipnet = Slipnet()
-        self.workspace = Workspace(initial, modified, target)
+        self.workspace = Workspace(initial, modified, target, self.slipnet)
         random.seed(seed)
         self.timestep = 15
 

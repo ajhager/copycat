@@ -17,7 +17,6 @@
 import random
 
 import copycat.toolbox as toolbox
-import copycat.slipnet as slipnet
 
 class String(object):
     """String is a letter string in the workspace.
@@ -29,6 +28,7 @@ class String(object):
 
     def __init__(self, workspace, string):
         self.workspace = workspace
+        self.slipnet = self.workspace.slipnet
         self.name = string
         self.highest_string_number = -1
         self.length = len(string)
@@ -154,7 +154,7 @@ class String(object):
         to_number = bond.to_object.string_number
         self.from_to_bonds[(from_number, to_number)] = bond
 
-        if bond.bond_category == slipnet.plato_sameness:
+        if bond.bond_category == self.slipnet.plato_sameness:
             self.left_right_bonds[(right_number, left_number)] = bond
             self.from_to_bonds[(to_number, from_number)] = bond
 
@@ -170,7 +170,7 @@ class String(object):
         if (from_number, to_number) in self.from_to_bonds:
             del(self.from_to_bonds[(from_number, to_number)])
 
-        if bond.bond_category == slipnet.plato_sameness:
+        if bond.bond_category == self.slipnet.plato_sameness:
             if (right_number, left_number) in self.left_right_bonds:
                 del(self.left_right_bonds[(right_number, left_number)])
             if (to_number, from_number) in self.from_to_bonds:
@@ -225,9 +225,9 @@ class String(object):
 
         If no category is given, return all objects.
         """
-        if category == slipnet.plato_letter:
+        if category == self.slipnet.plato_letter:
             return self.get_letters()
-        elif category == slipnet.plato_group:
+        elif category == self.slipnet.plato_group:
             return self.get_groups()
         return self.get_letters() + self.get_groups()
 
@@ -247,9 +247,9 @@ class String(object):
     def get_random_leftmost_object(self):
         """Return a random leftmost object from the string."""
         leftmost_objects = []
-        category = slipnet.plato_string_position_category
+        category = self.slipnet.plato_string_position_category
         for obj in self.get_objects():
-            if obj.get_descriptor(category) == slipnet.plato_leftmost:
+            if obj.get_descriptor(category) == self.slipnet.plato_leftmost:
                 leftmost_objects.append(obj)
         if leftmost_objects:
             values = [obj.relative_importance for obj in leftmost_objects]

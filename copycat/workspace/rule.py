@@ -16,7 +16,6 @@
 
 from copycat.workspace import Structure
 import copycat.toolbox as toolbox
-import copycat.slipnet as nodes
 
 class Rule(Structure):
     """Rule
@@ -38,6 +37,7 @@ class Rule(Structure):
         """Initializes Rule."""
         super(Rule, self).__init__()
         self.workspace = workspace
+        self.slipnet = self.workspace.slipnet
         self.object_category1 = object_category1
         self.descriptor1_facet = descriptor1_facet
         self.descriptor1 = descriptor1
@@ -63,7 +63,7 @@ class Rule(Structure):
         if self.has_no_change():
             return "Don't replace anything."
 
-        if nodes.is_adjective(self.descriptor1):
+        if self.slipnet.is_adjective(self.descriptor1):
             part1 = "%s of %s %s" % (self.replaced_description_type.name,
                                      self.descriptor1.name,
                                      self.object_cateogry1.name)
@@ -78,7 +78,7 @@ class Rule(Structure):
         if self.relation != None:
             part2 = self.relation.name
         else:
-            if nodes.is_adjective(self.descriptor2):
+            if self.slipnet.is_adjective(self.descriptor2):
                 part2 = "%s of %s %s" % (self.replaced_description_type.name,
                                          self.descriptor2.name,
                                          self.object_category2.name)

@@ -18,7 +18,6 @@ import math
 
 import copycat.toolbox as toolbox
 from copycat.workspace import Object, Structure, Description, Mapping
-import copycat.slipnet as nodes
 
 class Group(Object, Structure):
     """Group
@@ -35,7 +34,7 @@ class Group(Object, Structure):
     def __init__(self, workspace, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):
         """Initialize Group."""
-        Object.__init__(self)
+        Object.__init__(self, workspace)
         Structure.__init__(self)
         self.type_name = 'group'
         self.workspace = workspace
@@ -50,8 +49,8 @@ class Group(Object, Structure):
 
         self.middle_object = None
         for obj in objects:
-            if obj.get_descriptor(nodes.plato_string_position_category) == \
-                    nodes.plato_middle:
+            if obj.get_descriptor(self.slipnet.plato_string_position_category) == \
+                    self.slipnet.plato_middle:
                 self.middle_object = obj
                 break
 
@@ -60,71 +59,71 @@ class Group(Object, Structure):
         self.left_string_position = self.left_object_position
         self.right_string_position = self.right_object_position
 
-        self.bond_category = nodes.get_related_node(group_category,
-                                                    nodes.plato_bond_category)
+        self.bond_category = self.slipnet.get_related_node(group_category,
+                                                    self.slipnet.plato_bond_category)
         self.bond_facet = None
         self.bond_descriptions = []
 
         if self.spans_whole_string():
-            self.add_description(Description(self,
-                                             nodes.plato_object_category,
-                                             nodes.plato_whole))
+            self.add_description(Description(self.workspace, self,
+                                             self.slipnet.plato_object_category,
+                                             self.slipnet.plato_whole))
 
-        self.add_description(Description(self,
-                                         nodes.plato_object_category,
-                                         nodes.plato_group))
+        self.add_description(Description(self.workspace, self,
+                                         self.slipnet.plato_object_category,
+                                         self.slipnet.plato_group))
 
-        category = nodes.plato_string_position_category
+        category = self.slipnet.plato_string_position_category
         if self.is_leftmost_in_string() and not self.spans_whole_string():
-            self.add_description(Description(self,
-                                             nodes.plato_string_position_category,
-                                             nodes.plato_leftmost))
+            self.add_description(Description(self.workspace, self,
+                                             self.slipnet.plato_string_position_category,
+                                             self.slipnet.plato_leftmost))
         elif self.is_middle_in_string():
-            self.add_description(Description(self,
-                                             nodes.plato_string_position_category,
-                                             nodes.plato_middle))
+            self.add_description(Description(self.workspace, self,
+                                             self.slipnet.plato_string_position_category,
+                                             self.slipnet.plato_middle))
         elif self.is_rightmost_in_string() and not self.spans_whole_string():
-            self.add_description(Description(self,
-                                             nodes.plato_string_position_category,
-                                             nodes.plato_rightmost))
+            self.add_description(Description(self.workspace, self,
+                                             self.slipnet.plato_string_position_category,
+                                             self.slipnet.plato_rightmost))
 
-        if group_category == nodes.plato_sameness_group and \
+        if group_category == self.slipnet.plato_sameness_group and \
                 (bonds == [] or \
-                    bonds[0].bond_facet == nodes.plato_letter_category):
-            category = nodes.plato_letter_category
+                    bonds[0].bond_facet == self.slipnet.plato_letter_category):
+            category = self.slipnet.plato_letter_category
             new_group_letter_category = left_object.get_descriptor(category)
-            self.add_description(Description(self,
+            self.add_description(Description(self.workspace, self,
                                              category,
                                              new_group_letter_category))
 
-        category = nodes.plato_group_category
-        self.add_description(Description(self,
-                                         nodes.plato_group_category,
+        category = self.slipnet.plato_group_category
+        self.add_description(Description(self.workspace, self,
+                                         self.slipnet.plato_group_category,
                                          group_category))
 
         if direction_category:
-            self.add_description(Description(self,
-                                             nodes.plato_direction_category,
+            self.add_description(Description(self.workspace, self,
+                                             self.slipnet.plato_direction_category,
                                              direction_category))
 
         if bonds:
             new_bond_facet = bonds[0].bond_facet
             self.bond_facet = new_bond_facet
-            category = nodes.plato_bond_facet
-            self.add_bond_description(Description(self,
-                                                  nodes.plato_bond_facet,
+            category = self.slipnet.plato_bond_facet
+            self.add_bond_description(Description(self.workspace, self,
+                                                  self.slipnet.plato_bond_facet,
                                                   new_bond_facet))
 
-        self.add_bond_description(Description(self,
-                                              nodes.plato_bond_category,
+        self.add_bond_description(Description(self.workspace, self,
+                                              self.slipnet.plato_bond_category,
                                               self.bond_category))
 
         if toolbox.flip_coin(self.length_description_probability()):
-            category = nodes.plato_length
-            plato_number = nodes.get_plato_number(self.length())
-            self.add_description(Description(self,
-                                             nodes.plato_length,
-                                             nodes.get_plato_number(self.length())))
+            category = self.slipnet.plato_length
+            plato_number = self.slipnet.get_plato_number(self.length())
+            self.add_description(Description(self.workspace, self,
+                                             self.slipnet.plato_length,
+                                             self.slipnet.get_plato_number(self.length())))
 
     def __eq__(self, other):
         """Return True if the given object is equal to this group."""
@@ -139,13 +138,13 @@ class Group(Object, Structure):
         """For now, groups based on letter category are stronger than groups
         based on other facets. This should be fixed; a more general mechanism is
         needed."""
-        if self.bond_facet == nodes.plato_letter_category:
+        if self.bond_facet == self.slipnet.plato_letter_category:
             bond_facet_factor = 1
         else:
             bond_facet_factor = .5
 
-        related = nodes.get_related_node(self.group_category,
-                                         nodes.plato_bond_category)
+        related = self.slipnet.get_related_node(self.group_category,
+                                         self.slipnet.plato_bond_category)
         bond_component = related.degree_of_association() * bond_facet_factor
         length_component = {1:5, 2:20, 3:60}.get(self.length(), 90)
 
@@ -270,7 +269,7 @@ class Group(Object, Structure):
         group."""
         concept_mapping = None
         for cm in correspondence.get_concept_mappings():
-            if cm.description_type1 == nodes.plato_string_position_category:
+            if cm.description_type1 == self.slipnet.plato_string_position_category:
                 concept_mapping = cm
                 break
         if concept_mapping == None:
@@ -285,8 +284,8 @@ class Group(Object, Structure):
         if other_bond != None:
             if other_bond.direction_category != None and \
                     self.direction_category != None:
-                direction = nodes.plato_direction_category
-                group_mapping = Mapping(direction, direction,
+                direction = self.slipnet.plato_direction_category
+                group_mapping = Mapping(self.workspace, direction, direction,
                                         self.direction_category,
                                         other_bond.direction_category,
                                         None, None)
@@ -348,12 +347,12 @@ class Group(Object, Structure):
 
     def flipped_version(self):
         """Return the flipped version of this group."""
-        if self.group_category == nodes.plato_predecessor_group or \
-                self.group_category == nodes.plato_successor_group:
+        if self.group_category == self.slipnet.plato_predecessor_group or \
+                self.group_category == self.slipnet.plato_successor_group:
             new_bonds = [bond.flipped_version() for bond in self.bonds]
-            opposite = nodes.plato_opposite
-            group_category = nodes.get_related_node(self.group_category, opposite)
-            direction_category = nodes.get_related_node(self.direction_category,
+            opposite = self.slipnet.plato_opposite
+            group_category = self.slipnet.get_related_node(self.group_category, opposite)
+            direction_category = self.slipnet.get_related_node(self.direction_category,
                                                         opposite)
             flipped_group = Group(self.workspace, self.string, group_category,
                                   direction_category, self.left_object,
@@ -386,7 +385,7 @@ class Group(Object, Structure):
         propose the single letter group."""
         exp = {1:4, 2:2}.get(self.number_of_local_supporting_groups(), 1)
         a = self.local_support() / 100.
-        b = nodes.plato_length.activation / 100.
+        b = self.slipnet.plato_length.activation / 100.
         prob = (a * b) ** exp
         return self.workspace.temperature_adjusted_probability(prob)
 
@@ -396,6 +395,6 @@ class Group(Object, Structure):
         if self.length() > 5:
             return 0
         a = self.length() ** 3
-        b = (100 - nodes.plato_length.activation) / 100.
+        b = (100 - self.slipnet.plato_length.activation) / 100.
         prob = .5 ** (a * b)
         return self.workspace.temperature_adjusted_probability(prob)

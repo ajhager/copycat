@@ -37,7 +37,6 @@ class AnswerBuilder(Codelet):
                 letters = workspace.get_modified_letters_for_answer(obj, desc_type)
                 answer_string_letters.extend(letters)
 
-        # DEAL WITH SNAG NEEDS CHECKED
         if workspace.snag_object:
             workspace.snag_count += 1
             workspace.last_snag_time = coderack.time
@@ -79,4 +78,3 @@ class AnswerBuilder(Codelet):
             workspace.answer_string.add_letter(letter)
         for letter in workspace.answer_string.get_letters():
             workspace.answer_string.name += letter.name
-

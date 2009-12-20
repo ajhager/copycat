@@ -19,7 +19,6 @@ import sys
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 from copycat.workspace import Rule, ExtrinsicDescription
-import copycat.slipnet as nodes
 
 class RuleBuilder(Codelet):
     """Try to build the proposed rule, fighting with competitors as needed."""
@@ -92,7 +91,7 @@ class RuleScout(Codelet):
         m_description = toolbox.weighted_select(m_probabilities, m_descriptions)
 
         if isinstance(m_description, ExtrinsicDescription):
-            related_descriptor = nodes.get_related_node(i_description.descriptor,
+            related_descriptor = slipnet.get_related_node(i_description.descriptor,
                                                         m_description.relation)
             if related_descriptor:
                 for description in m_object.descriptions:

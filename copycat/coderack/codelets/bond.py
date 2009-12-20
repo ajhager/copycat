@@ -16,7 +16,6 @@
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
-import copycat.slipnet as nodes
 
 class BondBottomUpScout(Codelet):
     """Choose an object and a neighbor of that object probabilistically by
@@ -41,7 +40,7 @@ class BondBottomUpScout(Codelet):
         if not from_descriptor or not to_descriptor:
             return # Fizzle
 
-        bond_category = nodes.get_bond_category(from_descriptor, to_descriptor)
+        bond_category = slipnet.get_bond_category(from_descriptor, to_descriptor)
         if not bond_category:
             return # Fizzle
 
@@ -162,13 +161,13 @@ class BondTopDownCategoryScout(Codelet):
         if object_descriptor == None or neighbor_descriptor == None:
             return # Fizzle
 
-        if nodes.get_bond_category(object_descriptor,
+        if slipnet.get_bond_category(object_descriptor,
                                    neighbor_descriptor) == category:
             from_object = obj
             to_object = neighbor
             from_descriptor = object_descriptor
             to_descriptor = neighbor_descriptor
-        elif nodes.get_bond_category(neighbor_descriptor,
+        elif slipnet.get_bond_category(neighbor_descriptor,
                                      object_descriptor) == category:
             from_object = neighbor
             to_object = obj
@@ -204,9 +203,9 @@ class BondTopDownDirectionScout(Codelet):
         string = toolbox.weighted_select(values, [initial_string, target_string])
 
         obj = string.get_random_object('intra_string_salience')
-        if category == nodes.plato_left:
+        if category == slipnet.plato_left:
             neighbor = obj.choose_left_neighbor()
-        elif category == nodes.plato_right:
+        elif category == slipnet.plato_right:
             neighbor = obj.choose_right_neighbor()
         if neighbor == None:
             return # Fizzle
@@ -220,7 +219,7 @@ class BondTopDownDirectionScout(Codelet):
         if object_descriptor == None or neighbor_descriptor == None:
             return # Fizzle
 
-        bond_category = nodes.get_bond_category(object_descriptor,
+        bond_category = slipnet.get_bond_category(object_descriptor,
                                                 neighbor_descriptor)
         if bond_category == None or not bond_category.directed:
             return # Fizzle

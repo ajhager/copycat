@@ -15,7 +15,6 @@
 # 02110-1301, USA.
 
 from copycat.workspace import Structure
-import copycat.slipnet as slipnet
 import copycat.toolbox as toolbox
 
 class Description(Structure):
@@ -29,9 +28,11 @@ class Description(Structure):
         description_number: A unique identifier within an object.
     """
 
-    def __init__(self, obj, description_type, descriptor):
+    def __init__(self, workspace, obj, description_type, descriptor):
         """Initialize Description."""
         super(Description, self).__init__()
+        self.workspace = workspace
+        self.slipnet = self.workspace.slipnet
         self.object = obj
         self.string = obj.string
         self.description_type = description_type
@@ -85,8 +86,8 @@ class Description(Structure):
     def is_bond_description(self):
         """Return True if the description refers to the bonds making up the
         group, either the bond category or the bond facet."""
-        return self.description_type == slipnet.plato_bond_category or \
-                self.description_type == slipnet.plato_bond_facet
+        return self.description_type == self.slipnet.plato_bond_category or \
+                self.description_type == self.slipnet.plato_bond_facet
 
     def apply_slippages(self, obj, slippages):
         """Return a new description with the slippages applied."""
@@ -98,7 +99,7 @@ class Description(Structure):
             if slippage.descriptor1 == self.descriptor:
                 new_descriptor == slippage.descriptor2
 
-        return Description(obj, new_description_type, new_descriptor)
+        return Description(self.workspace, obj, new_description_type, new_descriptor)
 
 class ExtrinsicDescription(object):
     """ExtrinsicDescription is a description with respect to another object

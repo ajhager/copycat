@@ -16,8 +16,7 @@
 
 import random
 
-from copycat import toolbox as toolbox
-from copycat import slipnet as slipnet
+import copycat.toolbox as toolbox
 
 class Object(object):
     """Object is either a letter or group in the workspace.
@@ -52,8 +51,10 @@ class Object(object):
         clamp_salience: True if the salience of the object is to be clamped.
     """
 
-    def __init__(self):
+    def __init__(self, workspace):
         """Initializes Object."""
+        self.workspace = workspace
+        self.slipnet = self.workspace.slipnet
         self.type_name = ''
         self.string = None
         self.string_number = None
@@ -352,9 +353,9 @@ class Object(object):
     def is_distinguishing_descriptor(self, descriptor):
         """Return True if no other object of the same type has the same
         descriptor."""
-        if descriptor == slipnet.plato_letter or \
-           descriptor == slipnet.plato_group or \
-           descriptor in slipnet.slipnet_numbers:
+        if descriptor == self.slipnet.plato_letter or \
+           descriptor == self.slipnet.plato_group or \
+           descriptor in self.slipnet.slipnet_numbers:
             return False
         if self.type_name == 'letter':
             other_objects = self.string.get_letters()
@@ -425,7 +426,7 @@ class Object(object):
         for d in self.descriptions:
             if d.description_type.is_active() and \
                self.is_distinguishing_descriptor(d.descriptor) and \
-               d.descriptor != slipnet.plato_object_category:
+               d.descriptor != self.slipnet.plato_object_category:
                 descriptions.append(d)
         return descriptions
 
@@ -434,8 +435,8 @@ class Object(object):
         the modified string part of the rule with this object as the object in
         string corresponding to the initial string changed object."""
         descriptions = []
-        categories = [slipnet.plato_string_position_category,
-                      slipnet.plato_object_category]
+        categories = [self.slipnet.plato_string_position_category,
+                      self.slipnet.plato_object_category]
         for d in self.descriptions:
             if d.description_type.is_active() and \
                self.is_distinguishing_descriptor(d.descriptor) and \

@@ -15,8 +15,6 @@
 # 02110-1301, USA.
 
 import copycat.toolbox as toolbox
-import copycat.slipnet as slipnet
-
 
 class Mapping(object):
     """Mapping
@@ -31,14 +29,16 @@ class Mapping(object):
         label:
     """
 
-    def __init__(self, description_type1, description_type2,
+    def __init__(self, workspace, description_type1, description_type2,
                  descriptor1, descriptor2, object1, object2):
         """Initializes Mapping."""
+        self.workspace = workspace
+        self.slipnet = self.workspace.slipnet
         self.description_type1 = description_type1
         self.description_type2 = description_type2
         self.descriptor1 = descriptor1
         self.descriptor2 = descriptor2
-        self.label = slipnet.get_label_node(descriptor1, descriptor2)
+        self.label = self.slipnet.get_label_node(descriptor1, descriptor2)
         self.object1 = object1
         self.object2 = object2
 
@@ -85,11 +85,11 @@ class Mapping(object):
 
     def is_slippage(self):
         """Return True if the concept mapping is not an identity."""
-        return self.label != slipnet.plato_identity
+        return self.label != self.slipnet.plato_identity
 
     def degree_of_association(self):
         """This method assumes the two descriptors in the concept mapping are
-        connected in the slipnet by at most one slip link. It should be
+        connected in the self.slipnet by at most one slip link. It should be
         generalized eventually."""
         if self.descriptor1 == self.descriptor2:
             return 100
@@ -112,8 +112,8 @@ class Mapping(object):
         """For now, the concept mapping "whole -> whole" is not considered
         distinguishing.  That is, a correspondence cannot be build on it
         alone.  This should eventually be generalized or changed."""
-        if self.descriptor1 == slipnet.plato_whole and \
-           self.descriptor2 == slipnet.plato_whole:
+        if self.descriptor1 == self.slipnet.plato_whole and \
+           self.descriptor2 == self.slipnet.plato_whole:
             return None
         else:
             return self.object1.is_distinguishing_descriptor(self.descriptor1) and \
@@ -134,13 +134,14 @@ class Mapping(object):
         For example, if the concept mapping is 'rightmost -> leftmost', return
         'leftmost -> rightmost'.
         """
-        if self.label == slipnet.plato_identity:
+        if self.label == self.slipnet.plato_identity:
             return self
-        elif slipnet.get_label_node(self.descriptor2, self.descriptor1) !=\
+        elif self.slipnet.get_label_node(self.descriptor2, self.descriptor1) !=\
                 self.label:
             return None
         else:
-            return Mapping(self.description_type2, self.description_type1,
+            return Mapping(self.workspace,
+                           self.description_type2, self.description_type1,
                            self.descriptor2, self.descriptor1,
                            self.object1, self.object2)
 

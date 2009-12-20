@@ -27,9 +27,9 @@ class Letter(Object):
         right_string_position: Position in the string.
     """
 
-    def __init__(self, name, string, category, string_position):
+    def __init__(self, workspace, name, string, category, string_position):
         """Initialize Letter."""
-        super(Letter, self).__init__()
+        super(Letter, self).__init__(workspace)
         self.type_name = 'letter'
         self.name = name
         self.string = string

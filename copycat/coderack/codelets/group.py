@@ -18,7 +18,6 @@ import random
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
-import copycat.slipnet as nodes
 from copycat.workspace import Group, Description
 
 class GroupBuilder(Codelet):
@@ -34,7 +33,8 @@ class GroupBuilder(Codelet):
                 description.descriptor.activation_buffer += workspace.activation
             for description in group.descriptions:
                 if not existing_group.is_description_present(description):
-                    new_description = Description(existing_group,
+                    new_description = Description(workspace,
+                                                  existing_group,
                                                   description.description_type,
                                                   description.descriptor)
                     workspace.build_description(new_description)
@@ -145,8 +145,8 @@ class GroupTopDownCategoryScout(Codelet):
     structure_category = 'group'
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
-        bond_category = nodes.get_related_node(category,
-                                               nodes.plato_bond_category)
+        bond_category = slipnet.get_related_node(category,
+                                               slipnet.plato_bond_category)
 
         i_string = workspace.initial_string
         i_relevance = i_string.local_bond_category_relevance(bond_category)
@@ -164,17 +164,17 @@ class GroupTopDownCategoryScout(Codelet):
             return # Fizzle
 
         if obj.is_leftmost_in_string():
-            direction = nodes.plato_right
+            direction = slipnet.plato_right
         elif obj.is_rightmost_in_string():
-            direction = nodes.plato_left
+            direction = slipnet.plato_left
         else:
-            activations = [nodes.plato_left.activation, nodes.plato_right.activation]
-            choices = [nodes.plato_left, nodes.plato_right]
+            activations = [slipnet.plato_left.activation, slipnet.plato_right.activation]
+            choices = [slipnet.plato_left, slipnet.plato_right]
             direction = toolbox.weighted_select(activations, choices) 
 
         number = toolbox.weighted_index(string.bonds_to_scan_distribution)
 
-        if direction == nodes.plato_left:
+        if direction == slipnet.plato_left:
             bond = obj.left_bond
         else:
             bond = obj.right_bond
@@ -184,11 +184,11 @@ class GroupTopDownCategoryScout(Codelet):
                 return # Fizzle
             objects = [obj]
             bonds = []
-            if category == nodes.plato_sameness_group:
+            if category == slipnet.plato_sameness_group:
                 single_letter_group_direction = None
             else:
-                choices = [nodes.plato_left, nodes.plato_right]
-                weights = [node.local_descriptor_support(string, nodes.plato_group) \
+                choices = [slipnet.plato_left, slipnet.plato_right]
+                weights = [node.local_descriptor_support(string, slipnet.plato_group) \
                             for node in choices]
                 index = toolbox.weighted_index(weights)
                 single_letter_group_direction = choices[index]
@@ -204,11 +204,11 @@ class GroupTopDownCategoryScout(Codelet):
         
         direction_category = bond.direction_category
         facet = bond.bond_facet
-        opposite_bond_category = nodes.get_related_node(bond_category, 
-                                                        nodes.plato_opposite)
+        opposite_bond_category = slipnet.get_related_node(bond_category, 
+                                                        slipnet.plato_opposite)
         if direction_category:
-            opposite_direction_category = nodes.get_related_node(direction_category,
-                                                                 nodes.plato_opposite)
+            opposite_direction_category = slipnet.get_related_node(direction_category,
+                                                                 slipnet.plato_opposite)
         else:
             opposite_direction_category = None
 
@@ -217,7 +217,7 @@ class GroupTopDownCategoryScout(Codelet):
         next_bond = bond
         for i in range(2, number):
             bond_to_add = None
-            if direction == nodes.plato_left:
+            if direction == slipnet.plato_left:
                 next_bond = next_bond.choose_left_neighbor()
                 if next_bond == None:
                     break
@@ -278,18 +278,18 @@ class GroupTopDownDirectionScout(Codelet):
             return # Fizzle
 
         if obj.is_leftmost_in_string():
-            direction = nodes.plato_right
+            direction = slipnet.plato_right
         elif obj.is_rightmost_in_string():
-            direction = nodes.plato_left
+            direction = slipnet.plato_left
         else:
-            choices = [nodes.plato_left, nodes.plato_right]
-            activations = [nodes.plato_left.activation,
-                           nodes.plato_right.activation]
+            choices = [slipnet.plato_left, slipnet.plato_right]
+            activations = [slipnet.plato_left.activation,
+                           slipnet.plato_right.activation]
             direction = toolbox.weighted_select(activations, choices)
 
         number = toolbox.weighted_index(string.bonds_to_scan_distribution)
 
-        if direction == nodes.plato_left:
+        if direction == slipnet.plato_left:
             bond = obj.left_bond
         else:
             bond = obj.right_bond
@@ -300,17 +300,17 @@ class GroupTopDownDirectionScout(Codelet):
         bond_category = bond.bond_category
         facet = bond.bond_facet
 
-        opposite_bond_category = nodes.get_related_node(bond_category,
-                                                        nodes.plato_opposite)
-        opposite_category = nodes.get_related_node(category,
-                                                   nodes.plato_opposite)
+        opposite_bond_category = slipnet.get_related_node(bond_category,
+                                                        slipnet.plato_opposite)
+        opposite_category = slipnet.get_related_node(category,
+                                                   slipnet.plato_opposite)
 
         objects = [bond.left_object, bond.right_object]
         bonds = [bond]
         next_bond = bond
         for i in range(2, number):
             bond_to_add = None
-            if direction == nodes.plato_left:
+            if direction == slipnet.plato_left:
                 next_bond = next_bond.choose_left_neighbor()
                 if not next_bond:
                     break
@@ -340,8 +340,8 @@ class GroupTopDownDirectionScout(Codelet):
             else:
                 break
 
-        group_category = nodes.get_related_node(bond_category,
-                                                nodes.plato_group_category)
+        group_category = slipnet.get_related_node(bond_category,
+                                                slipnet.plato_group_category)
 
         return workspace.propose_group(objects, bonds, group_category, category)
 
@@ -380,8 +380,8 @@ class GroupWholeStringScout(Codelet):
         if not bonds:
             return # Fizzle
 
-        group_category = nodes.get_related_node(bond_category,
-                                                nodes.plato_group_category)
+        group_category = slipnet.get_related_node(bond_category,
+                                                slipnet.plato_group_category)
 
         return workspace.propose_group(objects, bonds, group_category,
                                        direction_category)

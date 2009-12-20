@@ -15,7 +15,6 @@
 # 02110-1301, USA.
 
 from copycat.coderack import Codelet
-import copycat.slipnet as nodes
 from copycat.workspace import Replacement
 from copycat.workspace import ExtrinsicDescription
 
@@ -35,15 +34,15 @@ class ReplacementFinder(Codelet):
         index = i_letter.left_string_position
         m_letter = workspace.modified_string.get_letter(index)
 
-        i_letter_category = i_letter.get_descriptor(nodes.plato_letter_category)
-        m_letter_category = m_letter.get_descriptor(nodes.plato_letter_category)
+        i_letter_category = i_letter.get_descriptor(slipnet.plato_letter_category)
+        m_letter_category = m_letter.get_descriptor(slipnet.plato_letter_category)
         if i_letter_category != m_letter_category:
             i_letter.is_changed = True
-            change_relation = nodes.get_label_node(i_letter_category,
+            change_relation = slipnet.get_label_node(i_letter_category,
                                                    m_letter_category)
             if change_relation:
                 description = ExtrinsicDescription(change_relation,
-                                                   nodes.plato_letter_category,
+                                                   slipnet.plato_letter_category,
                                                    i_letter)
                 m_letter.add_extrinsic_description(description)
 

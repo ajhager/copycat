@@ -16,12 +16,11 @@
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
-import copycat.slipnet as nodes
 
 class CorrespondenceBottomUpScout(Codelet):
     """Choose two objects, one from the initial string and one from the
     target string, probabilistically by inter string salience. Finds all
-    concept mappings between nodes at most one link away. If any concept
+    concept mappings between slipnet at most one link away. If any concept
     mappings can be made between distinguishing descriptors, propoes a
     correspondence between the two objects, including all the concept
     mappings. Posts a correspondence strength tester codelet with urgency
@@ -57,16 +56,16 @@ class CorrespondenceBottomUpScout(Codelet):
         opposite_mappings = []
         for mapping in distinguished_mappings:
             description_type = mapping.description_type1
-            if description_type != nodes.plato_string_position_category and \
-               description_type != nodes.plato_bond_facet:
+            if description_type != slipnet.plato_string_position_category and \
+               description_type != slipnet.plato_bond_facet:
                    opposite_mappings.append(mapping)
 
         opposite_descriptions = [m.description_type1 for m in opposite_mappings]
         if all([object1.is_string_spanning_group(),
                 object2.is_string_spanning_group(),
-                not nodes.plato_opposite.is_active(),
-                nodes.are_all_opposite_concept_mappings(opposite_mappings),
-                nodes.plato_direction_category in opposite_descriptions]):
+                not slipnet.plato_opposite.is_active(),
+                slipnet.are_all_opposite_concept_mappings(opposite_mappings),
+                slipnet.plato_direction_category in opposite_descriptions]):
             old_object2_string_number = object2.string_number
             object2 = object2.flipped_version()
             object2.string_number = old_object2_string_number
@@ -95,7 +94,7 @@ class CorrespondenceBuilder(Codelet):
             flip = object2.flipped_version()
             existing_obj2_group = workspace.target_string.get_existing_group(flip)
 
-        if all([not obj1_present,
+        if any([not obj1_present,
                 not obj2_present,
                 (flip_obj2 and not existing_obj2_group)]):
             return # Fizzle
@@ -182,7 +181,7 @@ class CorrespondenceImportantObjectScout(Codelet):
     importance. Picks a description of the object probabilistically and
     looks for an object in the target string with the same description,
     modulo the appropriate slippage, if any of the slippages currently in
-    the workspace apply. Then finds all concept mappings between nodes at
+    the workspace apply. Then finds all concept mappings between slipnet at
     most one link away. Makes a proposed correspondence between the two
     objects, including all the concept mappings. Posts a correspondence
     strength tester codelet with urgency a function of the average
@@ -240,16 +239,16 @@ class CorrespondenceImportantObjectScout(Codelet):
         possible_opposite_mappings = []
         for mapping in distinguished_mappings:
             description_type = mapping.description_type1
-            if description_type != nodes.plato_string_position_category and \
-               description_type != nodes.plato_bond_facet:
+            if description_type != slipnet.plato_string_position_category and \
+               description_type != slipnet.plato_bond_facet:
                 possible_opposite_mappings.append(mapping)
 
         opposite_descriptions = [m.description_type1 for m in mappings]
         if all([object1.is_string_spanning_group(),
                 object2.is_string_spanning_group(),
-                not nodes.plato_opposite.is_active(),
-                nodes.are_all_opposite_concept_mappings(possible_opposite_mappings),
-                nodes.plato_direction_category in opposite_descriptions]):
+                not slipnet.plato_opposite.is_active(),
+                slipnet.are_all_opposite_concept_mappings(possible_opposite_mappings),
+                slipnet.plato_direction_category in opposite_descriptions]):
             old_object2_string_number = object2.string_number
             object2 = object2.flipped_version()
             object2.string_number = old_object2_string_number
