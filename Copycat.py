@@ -44,11 +44,6 @@ else:
     parser.error('must supply all three strings and a seed')
 
 if options.quiet:
-    if not initial:
-        initial = raw_input('Initial: ')
-        modified = raw_input('Modified: ')
-        target = raw_input('Target: ')
-        seed = int(raw_input('Seed: '))
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:
         run.step()

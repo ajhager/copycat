@@ -7,7 +7,7 @@ To find the original information and source code for Copycat, see her
 [website](http://web.cecs.pdx.edu/~mm/). Any questions, comments or
 issues should be directed to [me at github](http://github.com/ajhager/).
 
-![Copycat GUI](http://imgur.com/78VG8.png)
+![Copycat GUI](http://imgur.com/fgXeZ.png)
 
 ##Status
 
@@ -22,7 +22,5 @@ with the data from the orginal copycat.
 ##Issues
 
 *  The entire project needs a revamp for consistency and style.
-*  Having slipnodes in the global slipnet module level ruins enscapulation.
-*  Similarly there is a problem with using the default global random instance.
-*  Need to start thinking about multiplatform packaging.
 *  Missing both text and GUI tutorial/overview.
+*  Need an independent rng if we move to concurrent runs.
