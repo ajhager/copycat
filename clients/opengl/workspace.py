@@ -52,6 +52,14 @@ class Workspace(object):
         self.workspace = workspace
         self.batch = batch
 
+        arrow = pyglet.resource.image("arrow.png")
+        arrow.anchor_x = arrow.width / 2.0
+        arrow.anchor_y = arrow.height / 2.0
+        self.arrow1 = pyglet.sprite.Sprite(arrow, 512, 505, batch=self.batch)
+        self.arrow1.opacity = 100
+        self.arrow2 = pyglet.sprite.Sprite(arrow, 512, 390, batch=self.batch)
+        self.arrow2.opacity = 100
+
         left_x = w / 4.0
         right_x = left_x * 3.0
         bot_y = y + h / 4.0

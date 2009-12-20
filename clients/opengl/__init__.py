@@ -88,24 +88,15 @@ class Window(pyglet.window.Window):
 
         self.done = False
         self.time = 0
-        self.speed = 20
+        self.speed = 60
         self.playing = False
 
         self.run = run
-
 
         background = pyglet.resource.image("blackboard.png")
         self.background = pyglet.sprite.Sprite(background)
         self.saved_temp = 0
         self.batch = pyglet.graphics.Batch()
-
-        arrow = pyglet.resource.image("arrow.png")
-        arrow.anchor_x = arrow.width / 2.0
-        arrow.anchor_y = arrow.height / 2.0
-        self.arrow1 = pyglet.sprite.Sprite(arrow, 512, 505, batch=self.batch)
-        self.arrow1.opacity = 100
-        self.arrow2 = pyglet.sprite.Sprite(arrow, 512, 390, batch=self.batch)
-        self.arrow2.opacity = 100
 
         self.play = pyglet.resource.image("play.png")
         self.pause = pyglet.resource.image("pause.png")
@@ -116,7 +107,7 @@ class Window(pyglet.window.Window):
         self.button = Button(self.play, 30, 580,
                              self.on_play_button, self.batch)
 
-        self.timer = pyglet.text.Label("0", "EraserDust", 14, x=512, y=575,
+        self.timer = pyglet.text.Label("0", "EraserDust", 18, x=512, y=574,
                                        color=(255,255,255, 125), batch=self.batch,
                                        halign="center", anchor_x="center")
 

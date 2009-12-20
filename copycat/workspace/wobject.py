@@ -204,7 +204,10 @@ class Object(object):
         """Return a list of the letters at the lowest level of the object."""
         if self.type_name == 'letter':
             return [self]
-        return toolbox.flatten([obj.letters() for obj in self.objects])
+        letters = []
+        for obj in self.objects:
+            letters.extend(obj.letters())
+        return letters
 
     def is_leftmost_in_string(self):
         """Return True if object is leftmost in its string."""
@@ -369,8 +372,9 @@ class Object(object):
                 if obj.type_name == 'group':
                     if obj in other_objects:
                         other_objects.remove(obj)
-        descriptions = [o.descriptions for o in other_objects if o]
-        descriptions = toolbox.flatten(descriptions)
+        descriptions = []
+        for obj in other_objects:
+            descriptions.extend(obj.descriptions)
         other_descriptors = [d.descriptor for d in descriptions]
         return not descriptor in other_descriptors
 

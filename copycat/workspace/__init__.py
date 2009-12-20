@@ -393,7 +393,10 @@ class Workspace(object):
 
     def slippages(self):
         """Return a list of slippages in all correspondences."""
-        return toolbox.flatten([c.slippages() for c in self.correspondences()])
+        slippages =[]
+        for c in self.correspondences():
+            slippages.extend(c.slippages())
+        return slippages
 
     def intra_string_unhappiness(self):
         """Return the weighted average of the intra string unhappiness of
@@ -716,13 +719,13 @@ class Workspace(object):
             for i in range(self.target_string.highest_string_number):
                 c = self.get_proposed_correspondence(group.string_number, i)
                 if c:
-                    proposed_correspondences.append(c)
+                    proposed_correspondences.extend(c)
         else:
             for i in range(self.initial_string.highest_string_number):
                 c = self.get_proposed_correspondence(group.string_number, i)
                 if c:
-                    proposed_correspondences.append(c)
-        for c in toolbox.flatten(proposed_correspondences):
+                    proposed_correspondences.extend(c)
+        for c in proposed_correspondences:
             self.remove_proposed_correspondence(c)
 
         if group.correspondence:

@@ -117,7 +117,10 @@ class Coderack(object):
 
     def codelets(self):
         """Return a list of codelets in the coderack."""
-        return toolbox.flatten([bin.codelets for bin in self.bins])
+        codelets = []
+        for bin in self.bins:
+            codelets.extend(bin.codelets)
+        return codelets
 
     def is_empty(self):
         """Return True if the coderack is empty."""

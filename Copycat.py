@@ -42,7 +42,7 @@ elif len(args) == 4:
     seed = int(args[3])
 else:
     parser.error('must supply all three strings and a seed')
-
+    
 if options.quiet:
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:

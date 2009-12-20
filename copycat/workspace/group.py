@@ -249,11 +249,9 @@ class Group(Object, Structure):
 
     def get_incompatible_groups(self):
         """Return a list of the groups that are incompatible with the group."""
-        groups = [obj.group for obj in self.objects if obj.group]
-        groups = list(set(toolbox.flatten(groups)))
-        if self in groups:
-            groups.remove(self)
-        return groups
+        groups = set([obj.group for obj in self.objects])
+        groups.difference_update([self, None])
+        return list(groups)
 
     def get_incompatible_correspondences(self):
         """Return a list of the correspondences that are incompatible."""
