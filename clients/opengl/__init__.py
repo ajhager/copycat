@@ -88,7 +88,7 @@ class Window(pyglet.window.Window):
 
         self.done = False
         self.time = 0
-        self.speed = 60
+        self.speed = 12
         self.playing = False
 
         self.run = run
@@ -159,14 +159,17 @@ class Window(pyglet.window.Window):
             self.done = True
 
         # Update the timestep display.
-        self.timer.text = str(self.run.coderack.time / self.run.timestep)
+        time = str(self.run.coderack.time / self.run.timestep)
+        if self.timer.text != time:
+            self.timer.text = time
 
         # Update the temperature display.
         target_temp = self.run.workspace.temperature * 2.55
-        self.saved_temp += (target_temp - self.saved_temp) * dt
-        self.background.color = (240,
-                                 255 - self.saved_temp / 1.4,
-                                 255 - self.saved_temp / 1.15)
+        if abs(self.saved_temp - target_temp) > .001:
+            self.saved_temp += (target_temp - self.saved_temp) * dt
+            self.background.color = (240,
+                                     255 - self.saved_temp / 1.4,
+                                     255 - self.saved_temp / 1.15)
         
         # Update the simulation at the given speed.
         self.time += dt
