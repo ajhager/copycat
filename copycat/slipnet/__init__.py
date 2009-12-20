@@ -463,8 +463,8 @@ class Slipnet(object):
 
     def is_adjective(self, node):
         """Used for converting a rule to a sentence."""
-        return any([node.category == self.plato_string_position_category,
-                    node.category == self.plato_alphabetic_position_category])
+        return node.category == self.plato_string_position_category or \
+            node.category == self.plato_alphabetic_position_category
 
     def update(self):
         """Update activations and link lenths."""

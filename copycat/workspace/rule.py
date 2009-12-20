@@ -68,14 +68,14 @@ class Rule(Structure):
                                      self.descriptor1.name,
                                      self.object_cateogry1.name)
         else:
-            if self.object_category1 == None:
+            if not self.object_category1:
                 part1 = descriptor1.name
             else:
                 part1 = "%s of %s '%s'" % (self.replaced_description_type.name,
                                            self.object_category1.name,
                                            self.descriptor1.name)
                 
-        if self.relation != None:
+        if self.expresses_relation():
             part2 = self.relation.name
         else:
             if self.slipnet.is_adjective(self.descriptor2):
@@ -83,7 +83,7 @@ class Rule(Structure):
                                          self.descriptor2.name,
                                          self.object_category2.name)
             else:
-                part2 = "'%s'" % self.descriptor2.name
+                part2 = "%s" % self.descriptor2.name
 
         return "Replace %s by %s." % (part1, part2)
 
