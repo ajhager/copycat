@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -48,8 +48,7 @@ class Object(object):
         correspondence:
         is_change: True if the letter is the initial_string letter that changed.
         is_new_answer_letter: True if this is the new letter for the answer.
-        clamp_salience: True if the salience of the object is to be clamped.
-    """
+        clamp_salience: True if the salience of the object is to be clamped."""
 
     def __init__(self, workspace):
         """Initializes Object."""
@@ -94,8 +93,7 @@ class Object(object):
         This is a function of the number and activation of the object's relevant
         descriptions. In addition, the importance of the changed object is
         enhanced, and the importance of objects in groups is dimished. Sum the
-        activation of the descriptors of relevant descriptions up to 300.
-        """
+        activation of the descriptors of relevant descriptions up to 300."""
         descriptions = self.relevant_descriptions()
         result = min(300, sum([d.descriptor.activation for d in descriptions]))
         if self.is_changed:
@@ -109,8 +107,7 @@ class Object(object):
 
         This value represents how well the object is fitting into a structuring
         of its string and is a function of the strength of bonds or a group
-        involving the object.
-        """
+        involving the object."""
         if self.spans_whole_string():
             return 100
         if self.group:
@@ -130,8 +127,7 @@ class Object(object):
         """Return the inter string happiness.
 
         This value represents how well the object is fitting into a mapping
-        from the initial string to the target string.
-        """
+        from the initial string to the target string."""
         if self.correspondence:
             return self.correspondence.total_strength
         else:
@@ -154,8 +150,7 @@ class Object(object):
         """Return the intra string salience.
         
         This value represents how much the object is crying out for attention
-        from codelets that build structures inside a single string.
-        """
+        from codelets that build structures inside a single string."""
         if self.clamp_salience:
             return 100
         else:
@@ -167,8 +162,7 @@ class Object(object):
         """Return the inter string salience.
 
         This value represents how much the object is crying out for attention
-        from codelets that build structures between strings.
-        """
+        from codelets that build structures between strings."""
         if self.clamp_salience:
             return 100
         else:

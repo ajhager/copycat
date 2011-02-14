@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -26,8 +26,7 @@ class Mapping(object):
         descritpor2:
         object1:
         object2:
-        label:
-    """
+        label:"""
 
     def __init__(self, workspace, description_type1, description_type2,
                  descriptor1, descriptor2, object1, object2):
@@ -132,8 +131,7 @@ class Mapping(object):
         """Return a symmetric version of this mapping.
 
         For example, if the concept mapping is 'rightmost -> leftmost', return
-        'leftmost -> rightmost'.
-        """
+        'leftmost -> rightmost'."""
         if self.label == self.slipnet.plato_identity:
             return self
         elif self.slipnet.get_label_node(self.descriptor2, self.descriptor1) !=\

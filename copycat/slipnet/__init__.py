@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -29,8 +29,7 @@ class Slipnet(object):
     Attributes:
         slipnodes: The nodes in the slipnet.
         sliplinks: The links between the nodes.
-        clamp_time: The amount of steps to clamp activation in the slipnet.
-    """
+        clamp_time: The amount of steps to clamp activation in the slipnet."""
 
     def __init__(self):
         """Initializes Slipnet."""
@@ -414,8 +413,7 @@ class Slipnet(object):
     def get_bond_category(self, from_node, to_node):
         """Return the node representing the label of the link between the nodes.
         
-        There is either zero or one link between the two nodes.
-        """
+        There is either zero or one link between the two nodes."""
         if from_node == to_node:
             return self.plato_sameness
         else:
@@ -434,8 +432,7 @@ class Slipnet(object):
     def get_related_node(self, node, relation):
         """Return the node related to the given node by relation.
         
-        For example, if given 'left' and 'opposite', returns 'right'.
-        """
+        For example, if given 'left' and 'opposite', returns 'right'."""
         if relation == self.plato_identity:
             return node
         for link in node.outgoing_links():

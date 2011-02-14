@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -28,8 +28,7 @@ class Group(Object, Structure):
         bonds: A list of bonds in the group.
         objects: A list of objects in the group.
         bond_category: The category associated with the group category.
-        bond_descriptions: Descriptions involving the bonds in the group.
-    """
+        bond_descriptions: Descriptions involving the bonds in the group."""
 
     def __init__(self, workspace, string, group_category, direction_category,
                  left_object, right_object, objects, bonds):

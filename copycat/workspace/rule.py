@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -28,8 +28,7 @@ class Rule(Structure):
         descriptor1_facet:
         replace_description_type:
         relation:
-        structure_category:
-    """
+        structure_category:"""
 
     def __init__(self, workspace, object_category1, descriptor1_facet,
                  descriptor1, object_category2, replaced_description_type,

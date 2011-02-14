@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-20011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -46,8 +46,7 @@ def weighted_select(weights, items):
 def select_assoc(assoc_list):
     """Returns one of the items, chosen probabilistically.
 
-    assoc_list is of the form: [(item, probability), (item, probability) ...]
-    """
+    assoc_list is of the form: [(item, probability), (item, probability) ...]"""
     if assoc_list == []:
         return
 

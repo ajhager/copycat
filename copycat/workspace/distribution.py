@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -24,8 +24,8 @@ class Distribution(object):
 
     Attributes:
         name: The string name give to the distribution.
-        probabilities: A map of temperature to probabilities.
-    """
+        probabilities: A map of temperature to probabilities."""
+
     def __init__(self, name):
         """Initialize Distribution."""
         self.name = name

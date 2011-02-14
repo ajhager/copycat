@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -21,8 +21,7 @@ class Sliplink(object):
         from_node: The node this link starts at.
         to_node: The node this link ends at.
         label: The node that labels this link.
-        fixed_length: A static length of the link has no label.
-    """
+        fixed_length: A static length of the link has no label."""
 
     def __init__(self, from_node, to_node, label, fixed_length):
         """Initializes Sliplink."""

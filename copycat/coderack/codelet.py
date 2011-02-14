@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -20,8 +20,8 @@ class Codelet(object):
     Attributes:
         arguments: A tuple of arguments that the codelet can affect.
         timestamp: The time when the codelet was created.
-        bin: The coderack bin the codelet is stored in.
-    """
+        bin: The coderack bin the codelet is stored in."""
+
     def __init__(self, arguments=()):
         """Initialize Codelet."""
         self.arguments = arguments
@@ -31,6 +31,5 @@ class Codelet(object):
     def run(self, coderack, slipnet, workspace):
         """Run the codelet.
 
-        Each specific codelet must implement this for itself.
-        """
+        Each specific codelet must implement this for itself."""
         pass

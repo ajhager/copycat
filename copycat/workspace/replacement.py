@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -21,8 +21,7 @@ class Replacement(Structure):
 
     Attributes:
         object1: The object to replace.
-        object2: The object replaced with.
-    """
+        object2: The object replaced with."""
 
     def __init__(self, object1, object2):
         """Initialize Replacement."""

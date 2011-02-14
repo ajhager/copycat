@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -24,7 +24,9 @@ class BondBottomUpScout(Codelet):
     descriptors of this facet. Post a bond strength tester codelet with
     urgency a function of the degree of association of bonds of the bond
     category."""
+
     structure_category = 'bond'
+
     def run(self, coderack, slipnet, workspace):
         from_object = workspace.choose_object('intra_string_salience')
         to_object = from_object.choose_neighbor()
@@ -50,7 +52,9 @@ class BondBottomUpScout(Codelet):
 
 class BondBuilder(Codelet):
     """Attempt to build the proposed bond, fighting with any competitiors."""
+
     structure_category = 'bond'
+
     def run(self, coderack, slipnet, workspace):
         bond = self.arguments[0]
         string = bond.string
@@ -104,7 +108,9 @@ class BondStrengthTester(Codelet):
     """Calculate the proposed bond's strength and decide probabilistically
     whether to post a bond builder codelet with urgency a function of the
     strength."""
+
     structure_category = 'bond'
+
     def run(self, coderack, slipnet, workspace):
         bond = self.arguments[0]
 
@@ -133,7 +139,9 @@ class BondTopDownCategoryScout(Codelet):
     Checks if there is a bond of the category between the two descriptors of
     the facet, posting a bond strength tester codelet with urgency a function
     of the degree of association of bonds of the category."""
+
     structure_category = 'bond'
+
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
 
@@ -188,7 +196,9 @@ class BondTopDownDirectionScout(Codelet):
     bond of the given direction between the two descriptors of the facet,
     posting a bond strength tester codelet with urgency a function of the
     degree of association of bonds of the bond category."""
+
     structure_category = 'bond'
+
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
 

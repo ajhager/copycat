@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -22,7 +22,9 @@ from copycat.workspace import Group, Description
 
 class GroupBuilder(Codelet):
     """Attempt to build the proposed group, fighting with competitors."""
+
     structure_category = 'group'
+
     def run(self, coderack, slipnet, workspace):
         group = self.arguments[0]
         string = group.string
@@ -98,8 +100,9 @@ class GroupBuilder(Codelet):
                         new_bonds.append(existing_bond)
                     else:
                         new_bonds.append(bond)
+
         # FIXME: Actually replacing the bonds is not in the copycat source.
-        # group.bonds = new_bonds
+        group.bonds = new_bonds
 
         for incompatible_correspondence in incompatible_correspondences:
             workspace.break_correspondence(incompatible_correspondence)
@@ -110,7 +113,9 @@ class GroupStrengthTester(Codelet):
     """Calculate the proposed group's strength and probabilistically decide
     whether to post a group builder codelet with urgency a function of the
     strength."""
+
     structure_category = 'group'
+
     def run(self, coderack, slipnet, workspace):
         group = self.arguments[0]
 
@@ -142,7 +147,9 @@ class GroupTopDownCategoryScout(Codelet):
     objects scanned and posts a group length tester codelet with urgency
     a function of the degree of association of bonds of the given bond
     category."""
+
     structure_category = 'group'
+
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
         bond_category = slipnet.get_related_node(category,
@@ -257,7 +264,9 @@ class GroupTopDownDirectionScout(Codelet):
     proposed group of the given direction out of the objects scanned and
     posts a group strength tester codelet with urgency a function of the
     degree of association of bonds of the given bond category."""
+
     structure_category = 'group'
+
     def run(self, coderack, slipnet, workspace):
         category = self.arguments[0]
 
@@ -350,7 +359,9 @@ class GroupWholeStringScout(Codelet):
     proposed string spanning group and posts a group strength tester codelet
     with urgency a function of the degree of association of bonds of the given
     category."""
+
     structure_category = 'group'
+
     def run(self, coderack, slipnet, workspace):
         string = workspace.random_string()
         if not string.get_bonds():

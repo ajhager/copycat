@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -25,7 +25,9 @@ class DescriptionBottomUpScout(Codelet):
     association and activation. Then proposes a description based on the
     property and posts a description strength tester codelet with urgency
     a function of the activation of the property."""
+
     structure_category = 'description'
+
     def run(self, coderack, slipnet, workspace):
         obj = workspace.choose_object('total_salience')
 
@@ -48,7 +50,9 @@ class DescriptionBottomUpScout(Codelet):
 class DescriptionBuilder(Codelet):
     """Attempt to build the proposed description. If it already exists, its
     activations are boosted."""
+
     structure_category = 'description'
+
     def run(self, coderack, slipnet, workspace):
         description = self.arguments[0]
 
@@ -66,7 +70,9 @@ class DescriptionStrengthTester(Codelet):
     """Calculate the proposed descriptions's strength and probabilistically
     decides whether or not to post a description builder codelet with urgency
     as a function of the strength."""
+
     structure_category = 'description'
+
     def run(self, coderack, slipnet, workspace):
         description = self.arguments[0]
 
@@ -88,7 +94,9 @@ class DescriptionTopDownScout(Codelet):
     list. If so, proposes a description based on the property and posts a
     description strength tester codelet with urgency a funtion of the
     activation of the proposed descriptor."""
+
     structure_category = 'description'
+
     def run(self, coderack, slipnet, workspace):
         description_type = self.arguments[0]
 

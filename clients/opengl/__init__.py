@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -38,8 +38,7 @@ class Button(object):
     
     highlight when hovered.
     
-    make the keybinding settable
-    """
+    make the keybinding settable"""
 
     def __init__(self, image, x, y, callback, batch):
         self.sprite = pyglet.sprite.Sprite(image, x=x, y=y, batch=batch)
@@ -88,7 +87,7 @@ class Window(pyglet.window.Window):
 
         self.done = False
         self.time = 0
-        self.speed = 12
+        self.speed = 15
         self.playing = False
 
         self.run = run

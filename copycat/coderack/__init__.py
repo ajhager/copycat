@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-20011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -27,8 +27,7 @@ class Bin(object):
 
     Attributes:
         urgency_code: An integer indicating the level of urgency of the bin.
-        codelets: A list of the codelets in the bin.
-    """
+        codelets: A list of the codelets in the bin."""
 
     def __init__(self, urgency_code):
         """Initialize Bin."""
@@ -78,8 +77,7 @@ class Coderack(object):
         max_codelets: The maximum size of the coderack.
         temperature: The value indicating how random a codelet choice is.
         time: The number of codelets that have been chosen so far.
-        bins: A list of urgency bins in the coderack.
-    """
+        bins: A list of urgency bins in the coderack."""
 
     def __init__(self):
         """Initialize Coderack."""
@@ -131,8 +129,7 @@ class Coderack(object):
 
         If the coderack is already at its maximum size, remove a codelet to make
         room for the new one. The bin to post to is a function of the numver of
-        bins and the urgency of the codelet passed in.
-        """
+        bins and the urgency of the codelet passed in."""
         removed_codelet = None
         codelets = self.codelets()
         if len(codelets) == self.max_codelets:
@@ -155,8 +152,7 @@ class Coderack(object):
 
         Removal is a function of the codelet's bin urgency, biased toward
         deleting low urgency, older codelets. The '1 +' allows for some
-        possibility of the highest urgency being removed.
-        """
+        possibility of the highest urgency being removed."""
         codelet_age = self.time - codelet.timestamp
         codelet_bin_urgency = codelet.bin.urgency(self.temperature)
         highest_bin_urgency = self.extremely_high_bin.urgency(self.temperature)

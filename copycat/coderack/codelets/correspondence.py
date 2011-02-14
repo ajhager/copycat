@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -26,6 +26,7 @@ class CorrespondenceBottomUpScout(Codelet):
     mappings. Posts a correspondence strength tester codelet with urgency
     a funcion of the average strength of the distinguishing concept
     mappings."""
+
     def run(self, coderack, slipnet, workspace):
         flip_obj2 = False
 
@@ -79,6 +80,7 @@ class CorrespondenceBottomUpScout(Codelet):
 class CorrespondenceBuilder(Codelet):
     """Attempt to build the proposed correspondence, fighting it out with
     competitors if necessary."""
+
     def run(self, coderack, slipnet, workspace):
         correspondence = self.arguments[0]
         flip_obj2 = self.arguments[1]
@@ -186,6 +188,7 @@ class CorrespondenceImportantObjectScout(Codelet):
     objects, including all the concept mappings. Posts a correspondence
     strength tester codelet with urgency a function of the average
     strength of the distinguishing concept mappings."""
+
     def run(self, coderack, slipnet, workspace):
         flip_obj2 = False
 
@@ -263,6 +266,7 @@ class CorrespondenceStrengthTester(Codelet):
     """Calculate the proposed correspondence's strength and probabilistically
     decides whether or not to post a correspondence builder codelt with
     urgency a function of the strength."""
+
     def run(self, coderack, slipnet, workspace):
         correspondence = self.arguments[0]
         flip_object2 = self.arguments[1]

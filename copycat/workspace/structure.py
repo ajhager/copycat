@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -25,8 +25,7 @@ class Structure(object):
         group: True if the structure is inside a group.
         internal_strength:
         external_strength:
-        total_strength:
-    """
+        total_strength:"""
 
     def __init__(self):
         """Initialize Structure."""
@@ -61,6 +60,5 @@ class Structure(object):
     def total_weakness(self):
         """Return the total weakness of the structure.
         
-        Even structures with 100 strength have a chance of being broken.
-        """
+        Even structures with 100 strength have a chance of being broken."""
         return 100 - (self.total_strength ** .95)

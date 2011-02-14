@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -25,8 +25,7 @@ class Correspondence(Structure):
         object2:
         concept_mappings:
         accessory_concept_mappings:
-        structure_category:
-    """
+        structure_category:"""
 
     def __init__(self, workspace, object1, object2, concept_mappings):
         """Initialize Correspondence."""
@@ -76,8 +75,7 @@ class Correspondence(Structure):
             2. Not incompatible but not supporting
             3. Incompatible
         If one of the objects is the single letter in its string, then the
-        support is 100.
-        """
+        support is 100."""
         if (isinstance(self.object1, Letter) and self.object1.spans_whole_string()) or \
            (isinstance(self.object2, Letter) and self.object2.spans_whole_string()):
             return 100
@@ -99,8 +97,7 @@ class Correspondence(Structure):
         """Return the correspondence's internal strength.
 
         A function of how many concept mappings there are, how strong they
-        are and how much internal coherence there is among concept mappings.
-        """
+        are and how much internal coherence there is among concept mappings."""
         relevant_distinguishing_cms = self.relevant_distinguishing_concept_mappings()
         if relevant_distinguishing_cms == []:
             return 0

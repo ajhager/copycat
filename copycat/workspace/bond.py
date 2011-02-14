@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -29,8 +29,7 @@ class Bond(Structure):
         to_object:
         bond_facet: Which facet is being related.
         from_object_descriptor:
-        to_object_descriptor:
-    """
+        to_object_descriptor:"""
         
     def __init__(self, workspace, from_object, to_object, bond_category,
                  bond_facet, from_object_descriptor, to_object_descriptor):
@@ -236,8 +235,8 @@ class Bond(Structure):
         """Return the flipped version of this bond.
 
         For example, if the bond is a successor bond going to the right,
-        returns a predecessor bond going to the left using the same two objects.
-        """
+        returns a predecessor bond going to the left using the same two
+        objects."""
         category = self.slipnet.get_related_node(self.bond_category,
                                             self.slipnet.plato_opposite)
         flipped_bond = Bond(self.workspace, self.to_object, self.from_object,

@@ -7,9 +7,12 @@ To find the original information and source code for Copycat, see her
 [website](http://web.cecs.pdx.edu/~mm/). Any questions, comments or
 issues should be directed to [me at github](http://github.com/ajhager/).
 
-![Copycat GUI](http://imgur.com/fgXeZ.png)
+![Copycat GUI](http://i.imgur.com/lHMwn.png)
 
 ##Status
+
+###02/14/11
+Project updated to prepare for a new release.
 
 ###12/18/09
 Phase 2 (the accuracy phase) is now complete. There may still be some subtle
@@ -22,5 +25,7 @@ with the data from the orginal copycat.
 ##Issues
 
 *  The entire project needs a revamp for consistency and style.
-*  Missing both text and GUI tutorial/overview.
+*  Add and cleanup comments.
+*  Missing tutorial/overview.
 *  Need an independent rng if we move to concurrent runs.
+*  Module for batch runs for statistics.

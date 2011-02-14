@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -25,8 +25,7 @@ class Description(Structure):
         string: The string this description is in.
         description_type: The facet of the object this refers to.
         descriptor: the descriptor applying to the facet.
-        description_number: A unique identifier within an object.
-    """
+        description_number: A unique identifier within an object."""
 
     def __init__(self, workspace, obj, description_type, descriptor):
         """Initialize Description."""
@@ -106,8 +105,7 @@ class ExtrinsicDescription(object):
     on the workspace.
 
     For example, 'successor' of 'letter-category' of other-obj.
-    In 'abc -> abd', the 'd' might get the description "successor of the 'c'.
-    """
+    In 'abc -> abd', the 'd' might get the description "successor of the 'c'."""
 
     def __init__(self, relation, description_type_related, other_object):
         """Initialize ExtrinsicDescription."""

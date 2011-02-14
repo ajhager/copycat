@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -15,7 +15,6 @@
 # 02110-1301, USA.
 
 # IDEAS:
-# Add arrows to indicate the flow of the analogy
 # Add drawing routines for workspace structures
 
 import string

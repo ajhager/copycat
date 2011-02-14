@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -23,8 +23,7 @@ class String(object):
 
     This could be the initial string, modified string or target string.
     Each object in a string has a unique string number that identifies
-    it from other objects in the string.
-    """
+    it from other objects in the string."""
 
     def __init__(self, workspace, string):
         self.workspace = workspace
@@ -105,8 +104,7 @@ class String(object):
         """Return the group at the given position in letters.
 
         Positions start at 0 and refer to the position of the leftmost object
-        in the group.
-        """
+        in the group."""
         return self.get_letter(position).group
 
     def get_existing_group(self, group):
@@ -223,8 +221,7 @@ class String(object):
     def get_objects(self, category=None):
         """Return the list of objects of the given object category.
 
-        If no category is given, return all objects.
-        """
+        If no category is given, return all objects."""
         if category == self.slipnet.plato_letter:
             return self.get_letters()
         elif category == self.slipnet.plato_group:

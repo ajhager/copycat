@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -22,6 +22,7 @@ from copycat.workspace import Rule, ExtrinsicDescription
 
 class RuleBuilder(Codelet):
     """Try to build the proposed rule, fighting with competitors as needed."""
+
     def run(self, coderack, slipnet, workspace):
         rule = self.arguments[0]
 
@@ -41,8 +42,8 @@ class RuleScout(Codelet):
     string and the object in the modified string that replaces it. If a rule
     can be made, it is proposed, and a rule strength tester codelet is posted
     with urgency a function of the degree of conceptual depth of the chosen
-    descriptions.
-    """
+    descriptions."""
+
     def run(self, coderack, slipnet, workspace):
         if workspace.has_null_replacement():
             return # Fizzle
@@ -106,6 +107,7 @@ class RuleStrengthTester(Codelet):
     """Calculate the proposed rule's strength and probabilistically decides
     whether or not to post a rule builder codelet with urgency a fucntion
     for its strength."""
+
     def run(self, coderack, slipnet, workspace):
         rule = self.arguments[0]
 
@@ -121,6 +123,7 @@ class RuleStrengthTester(Codelet):
 class RuleTranslator(Codelet):
     """Translate the rule according to the translation rules given in the
     slippages on the workspace."""
+
     def run(self, coderack, slipnet, workspace):
         workspace_rule = workspace.rule
         if not workspace_rule:

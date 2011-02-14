@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -24,8 +24,7 @@ class Letter(Object):
         name: The character name of the letter.
         string: The string this letter is in.
         left_string_position: Position in the string.
-        right_string_position: Position in the string.
-    """
+        right_string_position: Position in the string."""
 
     def __init__(self, workspace, name, string, category, string_position):
         """Initialize Letter."""

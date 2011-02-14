@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Joseph Hager.
+# Copyright (c) 2007-2011 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -39,8 +39,7 @@ class Slipnode(object):
         lateral_nonslip_links:
         incoming_links:
         description_tester: Function testing for descriptor possibility.
-        iterate_group: Function used to iterate group nodes.
-    """
+        iterate_group: Function used to iterate group nodes."""
 
     def __init__(self, name, depth, codelets=[], intrinsic_link_length=None,
                  initially_clamped=False, directed=False):
@@ -124,8 +123,7 @@ class Slipnode(object):
         """Return the total description type support with string.
 
         A function of the local description type support and the node's
-        activation.
-        """
+        activation."""
         support = self.local_description_type_support(string)
         return round((support + self.activation) / 2.0)
 
@@ -141,8 +139,7 @@ class Slipnode(object):
         """Returns the category this node belongs to.
 
         For example, 'leftmost' belongs to 'string_position_category'. This code
-        assumes that each node belongs to at most one category.
-        """
+        assumes that each node belongs to at most one category."""
         if self.category_links:
             return self.category_links[0].to_node
         else:
@@ -151,8 +148,7 @@ class Slipnode(object):
     def intrinsic_degree_of_association(self):
         """Return the intrinsic degree of association.
 
-        This value is 100 minus the build in link length.
-        """
+        This value is 100 minus the build in link length."""
         return 100 - self.intrinsic_link_length
 
     def degree_of_association(self):
