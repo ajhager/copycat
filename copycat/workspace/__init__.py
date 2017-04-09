@@ -567,7 +567,7 @@ class Workspace(object):
 
     def correspondences(self):
         """Return a list of the built correspondences on the workspace."""
-        return self._correspondences.values()
+        return list(self._correspondences.values())
 
     def add_replacement(self, replacement):
         """Add a replacement to the workspace's list of replacements."""
@@ -967,7 +967,7 @@ class Workspace(object):
             number = case[self.rough_number_of_uncorresponding_objects()]
         elif category == 'rule':
             number = 2
-        elif category == 'translator_rule' and self.rule != None:
+        elif category == 'translator_rule' and self.rule is not None:
             number = 1
 
         return number

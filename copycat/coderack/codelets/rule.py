@@ -54,7 +54,7 @@ class RuleScout(Codelet):
                 changed_objects.append(obj)
 
         if len(changed_objects) > 1:
-            print "Can't solve problems with more than one letter changed."
+            print("Can't solve problems with more than one letter changed.")
             # FIXME: Too harsh.
             sys.exit()
 

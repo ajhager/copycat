@@ -94,7 +94,7 @@ class Slipnode(object):
         else:
             objects = string.get_groups()
 
-        objects = filter(lambda x: x != None, objects)
+        objects = list(filter(lambda x: x != None, objects))
 
         if not objects:
             return 0

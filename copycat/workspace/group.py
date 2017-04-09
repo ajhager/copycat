@@ -133,6 +133,10 @@ class Group(Object, Structure):
                     self.direction_category == other.direction_category,
                     self.group_category == other.group_category])
 
+    def __hash__(self):
+        return hash((self.left_object_position, self.right_object_position,
+                     self.direction_category, self.group_category))
+
     def calculate_internal_strength(self):
         """For now, groups based on letter category are stronger than groups
         based on other facets. This should be fixed; a more general mechanism is

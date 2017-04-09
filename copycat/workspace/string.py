@@ -63,7 +63,7 @@ class String(object):
 
     def get_letters(self):
         """Return a list of letters in the string."""
-        return self.letters.values()
+        return [self.letters[index] for index in sorted(self.letters.keys())]
 
     def get_letter(self, position):
         """Return the letter at the given position in the string."""
@@ -98,7 +98,7 @@ class String(object):
 
     def get_groups(self):
         """Return a list of groups in the string."""
-        return self.groups.values()
+        return list(self.groups.values())
 
     def get_group(self, position):
         """Return the group at the given position in letters.

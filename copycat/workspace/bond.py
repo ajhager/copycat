@@ -74,6 +74,10 @@ class Bond(Structure):
                     self.bond_category == other.bond_category,
                     self.direction_category == other.direction_category])
 
+    def __hash__(self):
+        return hash((self.from_object, self.to_object,
+                     self.bond_category, self.direction_category))
+
     def calculate_external_strength(self):
         """Return the bond's external strength."""
         return self.local_support()

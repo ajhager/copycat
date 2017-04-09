@@ -17,8 +17,8 @@
 import string
 
 import copycat.toolbox as toolbox
-from slipnode import Slipnode
-from sliplink import Sliplink
+from copycat.slipnet.slipnode import Slipnode
+from copycat.slipnet.sliplink import Sliplink
 
 class Slipnet(object):
     """Slipnet contains nodes and the links between them.

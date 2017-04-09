@@ -45,10 +45,10 @@ if options.quiet:
     run = Run(initial, modified, target, seed)
     while not run.workspace.answer_string:
         run.step()
-    print run.workspace.rule.to_string()
-    print "Answer: " + run.workspace.answer_string.name
-    print "Temperature: " + str(run.workspace.temperature)
-    print "Steps: " + str(run.coderack.time)
+    print(run.workspace.rule.to_string())
+    print("Answer: " + run.workspace.answer_string.name)
+    print("Temperature: " + str(run.workspace.temperature))
+    print("Steps: " + str(run.coderack.time))
 else:
     from clients import OpenglClient
     OpenglClient(initial, modified, target, seed)
