@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright (c) 2007-2011 Joseph Hager.
+# Copyright (c) 2007-2017 Joseph Hager.
 #
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
@@ -23,7 +21,7 @@ import optparse
 from copycat.run import Run
 
 usage = '%prog [OPTIONS] [INITIAL MODIFIED TARGET SEED]'
-version = '%prog 0.1 - (c) 2007-2011 Joseph Hager.\nReleased under the GPLv2'
+version = '%prog 0.1 - (c) 2007-2017 Joseph Hager.\nReleased under the GPLv2'
 parser = optparse.OptionParser(usage=usage, version=version)
 parser.add_option("-q", "--quiet",
                   action="store_true", dest="quiet", default=False,
