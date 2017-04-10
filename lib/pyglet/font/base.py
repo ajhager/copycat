@@ -38,9 +38,14 @@ These classes should not be constructed directly.  Instead, use the functions
 in `pyglet.font` to obtain platform-specific instances.  You can use these
 classes as a documented interface to the concrete classes.
 '''
+from builtins import chr
+from builtins import str
+from builtins import map
+from builtins import range
+from builtins import object
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: base.py 2278 2008-09-23 12:18:50Z Alex.Holkner $'
+__version__ = '$Id$'
 
 import unicodedata
 
@@ -48,11 +53,11 @@ from pyglet.gl import *
 from pyglet import image
 
 _other_grapheme_extend = \
-    map(unichr, [0x09be, 0x09d7, 0x0be3, 0x0b57, 0x0bbe, 0x0bd7, 0x0cc2,
+    list(map(chr, [0x09be, 0x09d7, 0x0be3, 0x0b57, 0x0bbe, 0x0bd7, 0x0cc2,
                  0x0cd5, 0x0cd6, 0x0d3e, 0x0d57, 0x0dcf, 0x0ddf, 0x200c,
-                 0x200d, 0xff9e, 0xff9f]) # skip codepoints above U+10000
+                 0x200d, 0xff9e, 0xff9f])) # skip codepoints above U+10000
 _logical_order_exception = \
-    map(unichr, range(0xe40, 0xe45) + range(0xec0, 0xec4))
+    list(map(chr, list(range(0xe40, 0xe45)) + list(range(0xec0, 0xec4))))
 
 _grapheme_extend = lambda c, cc: \
     cc in ('Me', 'Mn') or c in _other_grapheme_extend
@@ -60,9 +65,9 @@ _grapheme_extend = lambda c, cc: \
 _CR = u'\u000d'
 _LF = u'\u000a'
 _control = lambda c, cc: cc in ('ZI', 'Zp', 'Cc', 'Cf') and not \
-    c in map(unichr, [0x000d, 0x000a, 0x200c, 0x200d])
+    c in list(map(chr, [0x000d, 0x000a, 0x200c, 0x200d]))
 _extend = lambda c, cc: _grapheme_extend(c, cc) or \
-    c in map(unichr, [0xe30, 0xe32, 0xe33, 0xe45, 0xeb0, 0xeb2, 0xeb3])
+    c in list(map(chr, [0xe30, 0xe32, 0xe33, 0xe45, 0xeb0, 0xeb2, 0xeb3]))
 _prepend = lambda c, cc: c in _logical_order_exception
 _spacing_mark = lambda c, cc: cc == 'Mc' and c not in _other_grapheme_extend
 
@@ -74,7 +79,7 @@ def _grapheme_break(left, right):
     # GB2 not required, see end of get_grapheme_clusters
 
     # GB3
-    if left == _CR and right == LF:
+    if left == _CR and right == _LF:
         return False
     
     left_cc = unicodedata.category(left)
@@ -230,9 +235,12 @@ class GlyphTextureAtlas(image.Texture):
         :return: The glyph representing the image from this texture, or None
             if the image doesn't fit.
         '''
+        if image.width > self.width or image.height > self.height:
+            return None
+
         if self.x + image.width > self.width:
             self.x = 0
-            self.y += self.line_height
+            self.y += self.line_height + 1
             self.line_height = 0
         if self.y + image.height > self.height:
             return None
@@ -333,25 +341,24 @@ class Font(object):
         :rtype: `Glyph`
         '''
         glyph = None
+        self._adapt_texture_size(image)
         for texture in self.textures:
             glyph = texture.fit(image)
             if glyph:
                 break
         if not glyph:
-            if image.width > self.texture_width or \
-               image.height > self.texture_height:
-                texture = self.texture_class.create_for_size(GL_TEXTURE_2D,
-                    image.width * 2, image.height * 2,
-                    self.texture_internalformat)
-                self.texture_width = texture.width
-                self.texture_height = texture.height
-            else:
-                texture = self.texture_class.create_for_size(GL_TEXTURE_2D,
-                    self.texture_width, self.texture_height,
-                    self.texture_internalformat)
+            texture = self.texture_class.create_for_size(GL_TEXTURE_2D,
+                self.texture_width, self.texture_height,
+                self.texture_internalformat)
             self.textures.insert(0, texture)
             glyph = texture.fit(image)
         return glyph
+
+    def _adapt_texture_size(self, image):
+        if image.width > self.texture_width or \
+           image.height > self.texture_height:
+            largest_dimension = max(image.width, image.height)
+            self.texture_height = self.texture_width = largest_dimension * 4
 
     def get_glyphs(self, text):
         '''Create and return a list of Glyphs for `text`.
@@ -367,7 +374,7 @@ class Font(object):
         '''
         glyph_renderer = None
         glyphs = []         # glyphs that are committed.
-        for c in get_grapheme_clusters(unicode(text)):
+        for c in get_grapheme_clusters(str(text)):
             # Get the glyph for 'c'.  Hide tabs (Windows and Linux render
             # boxes)
             if c == '\t':
@@ -385,7 +392,7 @@ class Font(object):
         
         If the entire text is larger than 'width', as much as possible will be
         used while breaking after a space or zero-width space character.  If a
-        newline is enountered in text, only text up to that newline will be
+        newline is encountered in text, only text up to that newline will be
         used.  If no break opportunities (newlines or spaces) occur within
         `width`, the text up to the first break opportunity will be used (this
         will exceed `width`).  If there are no break opportunities, the entire

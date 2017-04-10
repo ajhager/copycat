@@ -42,16 +42,13 @@ __version__ = '$Id: $'
 # independence?
 
 from ctypes import *
-import string
 import math
 from sys import byteorder
 
 from pyglet.font import base
 import pyglet.image
-from pyglet.window.carbon import carbon, _oscheck
-from pyglet.window.carbon import _create_cfstring
-from pyglet.window.carbon.types import *
-
+from pyglet.libs.darwin import *
+from pyglet.libs.darwin import _oscheck
 
 class FixedPoint(Structure):
     _fields_ = [
@@ -217,6 +214,9 @@ class CarbonGlyphRenderer(base.GlyphRenderer):
             pass
 
     def _layout_callback(self, operation, line, ref, extra, callback_status):
+        if not line:
+            return 0
+
         records = c_void_p()
         n_records = c_uint()
 

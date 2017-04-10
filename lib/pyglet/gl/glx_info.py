@@ -50,24 +50,29 @@ Or, if using more than one display::
         # ...
 
 '''
+from builtins import object
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: glx_info.py 1579 2008-01-15 14:47:19Z Alex.Holkner $'
+__version__ = '$Id$'
 
 from ctypes import *
 
 from pyglet.gl.glx import *
-from pyglet.gl.glx import Display
+from pyglet.compat import asstr
 
 class GLXInfoException(Exception):
     pass
 
 class GLXInfo(object):
     def __init__(self, display=None):
+        # Set default display if not set
+        if display and not _glx_info.display:
+            _glx_info.set_display(display)
+
         self.display = display
 
     def set_display(self, display):
-        self.display = cast(pointer(display), POINTER(Display))
+        self.display = display
 
     def check_display(self):
         if not self.display:
@@ -88,7 +93,7 @@ class GLXInfo(object):
 
     def get_server_vendor(self):
         self.check_display()
-        return glXQueryServerString(self.display, 0, GLX_VENDOR)
+        return asstr(glXQueryServerString(self.display, 0, GLX_VENDOR))
     
     def get_server_version(self):
         # glXQueryServerString was introduced in GLX 1.1, so we need to use the
@@ -103,23 +108,23 @@ class GLXInfo(object):
 
     def get_server_extensions(self):
         self.check_display()
-        return glXQueryServerString(self.display, 0, GLX_EXTENSIONS).split()
+        return asstr(glXQueryServerString(self.display, 0, GLX_EXTENSIONS)).split()
 
     def get_client_vendor(self):
         self.check_display()
-        return glXGetClientString(self.display, GLX_VENDOR)
+        return asstr(glXGetClientString(self.display, GLX_VENDOR))
 
     def get_client_version(self):
         self.check_display()
-        return glXGetClientString(self.display, GLX_VERSION)
+        return asstr(glXGetClientString(self.display, GLX_VERSION))
 
     def get_client_extensions(self):
         self.check_display()
-        return glXGetClientString(self.display, GLX_EXTENSIONS).split()
+        return asstr(glXGetClientString(self.display, GLX_EXTENSIONS)).split()
 
     def get_extensions(self):
         self.check_display()
-        return glXQueryExtensionsString(self.display, 0).split()
+        return asstr(glXQueryExtensionsString(self.display, 0)).split()
 
     def have_extension(self, extension):
         self.check_display()

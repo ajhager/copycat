@@ -2,14 +2,14 @@
 # pyglet
 # Copyright (c) 2006-2008 Alex Holkner
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions 
+# modification, are permitted provided that the following conditions
 # are met:
 #
 #  * Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright 
+#  * Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in
 #    the documentation and/or other materials provided with the
 #    distribution.
@@ -36,20 +36,42 @@
 
 Detailed documentation is available at http://www.pyglet.org
 '''
+from __future__ import print_function
+from __future__ import absolute_import
 
-__docformat__ = 'restructuredtext'
-__version__ = '$Id: __init__.py 2444 2009-03-22 08:51:01Z Alex.Holkner $'
+# Check if future is installed, if not use included batteries
+try:
+    import future
+except ImportError:
+    import os.path as op
+    import sys
+    future_base = op.abspath(op.join(op.dirname(__file__), 'extlibs', 'future'))
+    sys.path.insert(0, op.join(future_base, 'py2_3'))
+    if sys.version_info[:2] < (3, 0):
+        sys.path.insert(0, op.join(future_base, 'py2'))
+    del future_base
+    del sys
+    del op
+    try:
+        import future
+    except ImportError:
+        print('Failed to get python-future')
+        raise
+
+from builtins import range
+from builtins import object
 
 import os
 import sys
+import warnings
 
 _is_epydoc = hasattr(sys, 'is_epydoc') and sys.is_epydoc
 
-#: The release version of this pyglet installation.  
+#: The release version of this pyglet installation.
 #:
 #: Valid only if pyglet was installed from a source or binary distribution
 #: (i.e. not in a checked-out copy from SVN).
-#: 
+#:
 #: Use setuptools if you need to check for a specific release version, e.g.::
 #:
 #:    >>> import pyglet
@@ -57,7 +79,12 @@ _is_epydoc = hasattr(sys, 'is_epydoc') and sys.is_epydoc
 #:    >>> parse_version(pyglet.version) >= parse_version('1.1')
 #:    True
 #:
-version = '1.1.3'
+version = '1.2.2'
+
+# Pyglet platform treats *BSD systems as Linux
+compat_platform = sys.platform
+if "bsd" in compat_platform:
+    compat_platform = "linux-compat"
 
 def _require_ctypes_version(version):
     # Check ctypes version
@@ -83,7 +110,7 @@ if getattr(sys, 'frozen', None):
 #: ``PYGLET_``.  For example, in Bash you can set the ``debug_gl`` option with::
 #:
 #:      PYGLET_DEBUG_GL=True; export PYGLET_DEBUG_GL
-#: 
+#:
 #: For options requiring a tuple of values, separate each value with a comma.
 #:
 #: The non-development options are:
@@ -93,7 +120,7 @@ if getattr(sys, 'frozen', None):
 #:     order of preference.  Valid driver names are:
 #:
 #:     * directsound, the Windows DirectSound audio module (Windows only)
-#:     * alsa, the ALSA audio module (Linux only) 
+#:     * pulse, the PulseAudio module (Linux only)
 #:     * openal, the OpenAL audio module
 #:     * silent, no audio
 #: debug_lib
@@ -111,7 +138,12 @@ if getattr(sys, 'frozen', None):
 #:     the application window is created, and permits GL objects to be
 #:     shared between windows even after they've been closed.  You can
 #:     disable the creation of the shadow window by setting this option to
-#:     False.  Recommended for advanced devlopers only.
+#:     False.
+#:
+#:     Some OpenGL driver implementations may not support shared OpenGL
+#:     contexts and may require disabling the shadow window (and all resources
+#:     must be loaded after the window using them was created).  Recommended
+#:     for advanced developers only.
 #:
 #:     **Since:** pyglet 1.1
 #: vsync
@@ -128,9 +160,24 @@ if getattr(sys, 'frozen', None):
 #:     that implements the _NET_WM_SYNC_REQUEST protocol.
 #:
 #:     **Since:** pyglet 1.1
+#: darwin_cocoa
+#:     If True, the Cocoa-based pyglet implementation is used as opposed to
+#:     the 32-bit Carbon implementation.  When python is running in 64-bit mode
+#:     on Mac OS X 10.6 or later, this option is set to True by default.
+#:     Otherwise the Carbon implementation is preferred.
+#:
+#:     **Since:** pyglet 1.2
+#:
+#: search_local_libs
+#:     If False, pyglet won't try to search for libraries in the script
+#:     directory and its `lib` subdirectory. This is useful to load a local
+#:     library instead of the system installed version. This option is set
+#:     to True by default.
+#:
+#:     **Since:** pyglet 1.2
 #:
 options = {
-    'audio': ('directsound', 'openal', 'alsa', 'silent'),
+    'audio': ('directsound', 'pulse', 'openal', 'silent'),
     'font': ('gdiplus', 'win32'), # ignored outside win32; win32 is deprecated
     'debug_font': False,
     'debug_gl': not _enable_optimisations,
@@ -150,6 +197,9 @@ options = {
     'shadow_window': True,
     'vsync': None,
     'xsync': True,
+    'xlib_fullscreen_override_redirect': False,
+    'darwin_cocoa': False,
+    'search_local_libs': True,
 }
 
 _option_types = {
@@ -173,14 +223,32 @@ _option_types = {
     'shadow_window': bool,
     'vsync': bool,
     'xsync': bool,
+    'xlib_fullscreen_override_redirect': bool,
+    'darwin_cocoa': bool,
 }
+
+def _choose_darwin_platform():
+    """Choose between Darwin's Carbon and Cocoa implementations."""
+    if compat_platform != 'darwin':
+        return
+    import struct
+    numbits = 8*struct.calcsize("P")
+    if numbits == 64:
+        import platform
+        osx_version = platform.mac_ver()[0].split(".")
+        if int(osx_version[0]) == 10 and int(osx_version[1]) < 6:
+            raise Exception('pyglet is not compatible with 64-bit Python for versions of Mac OS X prior to 10.6.')
+        options['darwin_cocoa'] = True
+    else:
+        options['darwin_cocoa'] = False
+_choose_darwin_platform()  # can be overridden by an environment variable below
 
 def _read_environment():
     '''Read defaults for options from environment'''
     for key in options:
         env = 'PYGLET_%s' % key.upper()
         try:
-            value = os.environ['PYGLET_%s' % key.upper()]
+            value = os.environ[env]
             if _option_types[key] is tuple:
                 options[key] = value.split(',')
             elif _option_types[key] is bool:
@@ -191,7 +259,7 @@ def _read_environment():
             pass
 _read_environment()
 
-if sys.platform == 'cygwin':
+if compat_platform == 'cygwin':
     # This hack pretends that the posix-like ctypes provides windows
     # functionality.  COM does not work with this hack, so there is no
     # DirectSound support.
@@ -200,6 +268,9 @@ if sys.platform == 'cygwin':
     ctypes.oledll = ctypes.cdll
     ctypes.WINFUNCTYPE = ctypes.CFUNCTYPE
     ctypes.HRESULT = ctypes.c_long
+
+if compat_platform == 'darwin' and not options['darwin_cocoa']:
+    warnings.warn('Carbon support is to be deprecated in Pyglet 1.4', PendingDeprecationWarning)
 
 # Call tracing
 # ------------
@@ -212,10 +283,9 @@ def _trace_repr(value, size=40):
         value = value[:size//2-2] + '...' + value[-size//2-1:]
     return value
 
-def _trace_frame(frame, indent):
+def _trace_frame(thread, frame, indent):
     from pyglet import lib
-    import os
-    if frame.f_code is lib._TraceFunction.__call__.func_code:
+    if frame.f_code is lib._TraceFunction.__call__.__code__:
         is_ctypes = True
         func = frame.f_locals['self']._func
         name = func.__name__
@@ -226,10 +296,10 @@ def _trace_frame(frame, indent):
         name = code.co_name
         path = code.co_filename
         line = code.co_firstlineno
-    
+
         try:
             filename = _trace_filename_abbreviations[path]
-        except KeyError: 
+        except KeyError:
             # Trim path down
             dir = ''
             path, filename = os.path.split(path)
@@ -247,40 +317,45 @@ def _trace_frame(frame, indent):
 
     if indent:
         name = 'Called from %s' % name
-    print '%s%s %s' % (indent, name, location)
+    print('[%d] %s%s %s' % (thread, indent, name, location))
 
     if _trace_args:
         if is_ctypes:
             args = [_trace_repr(arg) for arg in frame.f_locals['args']]
-            print '  %sargs=(%s)' % (indent, ', '.join(args))
+            print('  %sargs=(%s)' % (indent, ', '.join(args)))
         else:
             for argname in code.co_varnames[:code.co_argcount]:
                 try:
                     argvalue = _trace_repr(frame.f_locals[argname])
-                    print '  %s%s=%s' % (indent, argname, argvalue)
+                    print('  %s%s=%s' % (indent, argname, argvalue))
                 except:
                     pass
 
     if _trace_flush:
         sys.stdout.flush()
 
-def _trace_func(frame, event, arg):
-    if event == 'call':
-        indent = ''
-        for i in range(_trace_depth):
-            _trace_frame(frame, indent)
-            indent += '  '
-            frame = frame.f_back
-            if not frame:
-                break
-            
-    elif event == 'exception':
-        (exception, value, traceback) = arg
-        print 'First chance exception raised:', repr(exception)
+def _thread_trace_func(thread):
+    def _trace_func(frame, event, arg):
+        if event == 'call':
+            indent = ''
+            for i in range(_trace_depth):
+                _trace_frame(thread, frame, indent)
+                indent += '  '
+                frame = frame.f_back
+                if not frame:
+                    break
+
+        elif event == 'exception':
+            (exception, value, traceback) = arg
+            print('First chance exception raised:', repr(exception))
+    return _trace_func
 
 def _install_trace():
-    sys.setprofile(_trace_func)
+    global _trace_thread_count
+    sys.setprofile(_thread_trace_func(_trace_thread_count))
+    _trace_thread_count += 1
 
+_trace_thread_count = 0
 _trace_args = options['debug_trace_args']
 _trace_depth = options['debug_trace_depth']
 _trace_flush = options['debug_trace_flush']
@@ -311,9 +386,9 @@ class _ModuleProxy(object):
             return getattr(module, name)
 
     def __setattr__(self, name, value):
-       try:
+        try:
             setattr(self._module, name, value)
-       except AttributeError:
+        except AttributeError:
             if self._module is not None:
                 raise
 
@@ -322,10 +397,11 @@ class _ModuleProxy(object):
             module = sys.modules[import_name]
             object.__setattr__(self, '_module', module)
             globals()[self._module_name] = module
-            setattr(module, name, value) 
+            setattr(module, name, value)
 
-if not _is_epydoc:
+if True:
     app = _ModuleProxy('app')
+    canvas = _ModuleProxy('canvas')
     clock = _ModuleProxy('clock')
     com = _ModuleProxy('com')
     event = _ModuleProxy('event')
@@ -333,6 +409,7 @@ if not _is_epydoc:
     gl = _ModuleProxy('gl')
     graphics = _ModuleProxy('graphics')
     image = _ModuleProxy('image')
+    input = _ModuleProxy('input')
     lib = _ModuleProxy('lib')
     media = _ModuleProxy('media')
     resource = _ModuleProxy('resource')
@@ -343,21 +420,23 @@ if not _is_epydoc:
 # Fool py2exe, py2app into including all top-level modules (doesn't understand
 # lazy loading)
 if False:
-    import app
-    import clock
-    import com
-    import event
-    import font
-    import gl
-    import graphics
-    import image
-    import lib
-    import media
-    import resource
-    import sprite
-    import text
-    import window
+    from . import app
+    from . import canvas
+    from . import clock
+    from . import com
+    from . import event
+    from . import font
+    from . import gl
+    from . import graphics
+    from . import input
+    from . import image
+    from . import lib
+    from . import media
+    from . import resource
+    from . import sprite
+    from . import text
+    from . import window
 
 # Hack around some epydoc bug that causes it to think pyglet.window is None.
-if _is_epydoc:
-    import window
+if False:
+    from . import window

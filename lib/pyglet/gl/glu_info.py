@@ -55,14 +55,16 @@ each GLUInfo::
 Note that GLUInfo only returns meaningful information if a context has been
 created.
 '''
+from builtins import object
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: glu_info.py 1979 2008-03-28 15:23:51Z Alex.Holkner $'
+__version__ = '$Id$'
 
 from ctypes import *
 import warnings
 
 from pyglet.gl.glu import *
+from pyglet.compat import asstr
 
 class GLUInfo(object):
     '''Information interface for the GLU library. 
@@ -88,8 +90,8 @@ class GLUInfo(object):
         self.have_context = True
         if not self._have_info:
             self.extensions = \
-                cast(gluGetString(GLU_EXTENSIONS), c_char_p).value.split()
-            self.version = cast(gluGetString(GLU_VERSION), c_char_p).value
+                asstr(cast(gluGetString(GLU_EXTENSIONS), c_char_p).value).split()
+            self.version = asstr(cast(gluGetString(GLU_VERSION), c_char_p).value)
             self._have_info = True
 
     def have_version(self, major, minor=0, release=0):

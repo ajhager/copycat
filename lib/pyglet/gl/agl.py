@@ -42,7 +42,6 @@ __version__ = '$Id: gengl.py 601 2007-02-04 05:36:59Z Alex.Holkner $'
 
 from ctypes import *
 from pyglet.gl.lib import link_AGL as _link_function
-from pyglet.gl.lib import c_ptrdiff_t
 
 if not _link_function:
     raise ImportError('AGL framework is not available.')
@@ -388,7 +387,6 @@ aglGetCGLContext = _link_function('aglGetCGLContext', GLboolean, [AGLContext, PO
 
 # /System/Library/Frameworks/AGL.framework/Headers/agl.h:369
 aglGetCGLPixelFormat = _link_function('aglGetCGLPixelFormat', GLboolean, [AGLPixelFormat, POINTER(POINTER(None))], None)
-
 
 __all__ = ['AGL_VERSION_2_0', 'AGLDevice', 'AGLDrawable', 'AGLRendererInfo',
 'AGLPixelFormat', 'AGLContext', 'AGLPbuffer', 'AGL_NONE', 'AGL_ALL_RENDERERS',

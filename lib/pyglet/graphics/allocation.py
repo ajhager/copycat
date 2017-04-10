@@ -44,8 +44,13 @@ policy is to double the buffer size when there is not enough room to fulfil an
 allocation.  The buffer is never resized smaller.
 
 The allocator maintains references to free space only; it is the caller's
-responsibility to mantain the allocated regions.
+responsibility to maintain the allocated regions.
 '''
+from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import zip
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
@@ -142,7 +147,10 @@ class Allocator(object):
         :rtype: int
         :return: Starting index of the allocated region.
         '''
-        assert size > 0
+        assert size >= 0
+
+        if size == 0:
+            return 0
 
         # return start
         # or raise AllocatorMemoryException
@@ -204,8 +212,15 @@ class Allocator(object):
                 New size of the region.
 
         '''
-        assert size > 0 and new_size > 0
+        assert size >= 0 and new_size >= 0
         
+        if new_size == 0:
+            if size != 0:
+                self.dealloc(start, size)
+            return 0
+        elif size == 0:
+            return self.alloc(new_size)
+
         # return start
         # or raise AllocatorMemoryException
 
@@ -221,9 +236,9 @@ class Allocator(object):
             if p >= 0 and size <= alloc_size - p:
                 break
         if not (p >= 0 and size <= alloc_size - p):
-            print zip(self.starts, self.sizes)
-            print start, size, new_size
-            print p, alloc_start, alloc_size
+            print(list(zip(self.starts, self.sizes)))
+            print(start, size, new_size)
+            print(p, alloc_start, alloc_size)
         assert p >= 0 and size <= alloc_size - p, 'Region not allocated'
 
         if size == alloc_size - p:
@@ -275,7 +290,11 @@ class Allocator(object):
                 Size of the region.
 
         '''
-        assert size > 0
+        assert size >= 0
+
+        if size == 0:
+            return
+
         assert self.starts
         
         # Find which block needs to be split
@@ -384,7 +403,7 @@ class Allocator(object):
         return not self.starts
 
     def __str__(self):
-        return 'allocs=' + repr(zip(self.starts, self.sizes))
+        return 'allocs=' + repr(list(zip(self.starts, self.sizes)))
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, str(self))

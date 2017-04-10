@@ -37,10 +37,11 @@
 
 http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_compression_s3tc.txt
 '''
+from __future__ import division
+from builtins import range
 
 import ctypes
 import re
-import sys
 
 from pyglet.gl import *
 from pyglet.gl import gl_info
@@ -62,7 +63,7 @@ class PackedImageData(AbstractImage):
         if self.packed_format == GL_UNSIGNED_SHORT_5_6_5:
             # Unpack to GL_RGB.  Assume self.data is already 16-bit
             i = 0
-            out = (c_ubyte * (self.width * self.height * 3))()
+            out = (ctypes.c_ubyte * (self.width * self.height * 3))()
             for c in self.data:
                 out[i+2] = (c & 0x1f) << 3
                 out[i+1] = (c & 0x7e0) >> 3
@@ -92,13 +93,18 @@ class PackedImageData(AbstractImage):
     
     texture = property(_get_texture)
 
+    def get_texture(self, rectangle=False, force_rectangle=False):
+        '''The parameters 'rectangle' and 'force_rectangle' are ignored.
+           See the documentation of the method 'AbstractImage.get_texture' for
+           a more detailed documentation of the method. '''
+        return self._get_texture()
+
 def decode_dxt1_rgb(data, width, height):
     # Decode to 16-bit RGB UNSIGNED_SHORT_5_6_5
     out = (ctypes.c_uint16 * (width * height))()
 
     # Read 8 bytes at a time
     image_offset = 0
-    col = 0
     for c0_lo, c0_hi, c1_lo, c1_hi, b0, b1, b2, b3 in split_8byte.findall(data):
         color0 = ord(c0_lo) | ord(c0_hi) << 8
         color1 = ord(c1_lo) | ord(c1_hi) << 8
@@ -125,18 +131,18 @@ def decode_dxt1_rgb(data, width, height):
                     out[i] = 0
                 else:
                     if code == 2 and color0 > color1:
-                        r = (2 * r0 + r1) / 3
-                        g = (2 * g0 + g1) / 3
-                        b = (2 * b0 + b1) / 3
+                        r = (2 * r0 + r1) // 3
+                        g = (2 * g0 + g1) // 3
+                        b = (2 * b0 + b1) // 3
                     elif code == 3 and color0 > color1:
-                        r = (r0 + 2 * r1) / 3
-                        g = (g0 + 2 * g1) / 3
-                        b = (b0 + 2 * b1) / 3
+                        r = (r0 + 2 * r1) // 3
+                        g = (g0 + 2 * g1) // 3
+                        b = (b0 + 2 * b1) // 3
                     else:
                         assert code == 2 and color0 <= color1
-                        r = (r0 + r1) / 2
-                        g = (g0 + g1) / 2
-                        b = (b0 + b1) / 2
+                        r = (r0 + r1) // 2
+                        g = (g0 + g1) // 2
+                        b = (b0 + b1) // 2
                     out[i] = r | g << 5 | b << 11
 
                 bits >>= 2
@@ -157,7 +163,6 @@ def decode_dxt1_rgba(data, width, height):
 
     # Read 8 bytes at a time
     image_offset = 0
-    col = 0
     for c0_lo, c0_hi, c1_lo, c1_hi, b0, b1, b2, b3 in split_8byte.findall(data):
         color0 = ord(c0_lo) | ord(c0_hi) << 8
         color1 = ord(c1_lo) | ord(c1_hi) << 8
@@ -185,18 +190,18 @@ def decode_dxt1_rgba(data, width, height):
                     r = g = b = a = 0
                 else:
                     if code == 2 and color0 > color1:
-                        r = (2 * r0 + r1) / 3
-                        g = (2 * g0 + g1) / 3
-                        b = (2 * b0 + b1) / 3
+                        r = (2 * r0 + r1) // 3
+                        g = (2 * g0 + g1) // 3
+                        b = (2 * b0 + b1) // 3
                     elif code == 3 and color0 > color1:
-                        r = (r0 + 2 * r1) / 3
-                        g = (g0 + 2 * g1) / 3
-                        b = (b0 + 2 * b1) / 3
+                        r = (r0 + 2 * r1) // 3
+                        g = (g0 + 2 * g1) // 3
+                        b = (b0 + 2 * b1) // 3
                     else:
                         assert code == 2 and color0 <= color1
-                        r = (r0 + r1) / 2
-                        g = (g0 + g1) / 2
-                        b = (b0 + b1) / 2
+                        r = (r0 + r1) // 2
+                        g = (g0 + g1) // 2
+                        b = (b0 + b1) // 2
 
                 out[i] = b << 3
                 out[i+1] = g << 2
@@ -221,7 +226,6 @@ def decode_dxt3(data, width, height):
 
     # Read 16 bytes at a time
     image_offset = 0
-    col = 0
     for (a0, a1, a2, a3, a4, a5, a6, a7,
          c0_lo, c0_hi, c1_lo, c1_hi, 
          b0, b1, b2, b3) in split_16byte.findall(data):
@@ -253,18 +257,18 @@ def decode_dxt3(data, width, height):
                     r = g = b = 0
                 else:
                     if code == 2 and color0 > color1:
-                        r = (2 * r0 + r1) / 3
-                        g = (2 * g0 + g1) / 3
-                        b = (2 * b0 + b1) / 3
+                        r = (2 * r0 + r1) // 3
+                        g = (2 * g0 + g1) // 3
+                        b = (2 * b0 + b1) // 3
                     elif code == 3 and color0 > color1:
-                        r = (r0 + 2 * r1) / 3
-                        g = (g0 + 2 * g1) / 3
-                        b = (b0 + 2 * b1) / 3
+                        r = (r0 + 2 * r1) // 3
+                        g = (g0 + 2 * g1) // 3
+                        b = (b0 + 2 * b1) // 3
                     else:
                         assert code == 2 and color0 <= color1
-                        r = (r0 + r1) / 2
-                        g = (g0 + g1) / 2
-                        b = (b0 + b1) / 2
+                        r = (r0 + r1) // 2
+                        g = (g0 + g1) // 2
+                        b = (b0 + b1) // 2
 
                 out[i] = b << 3
                 out[i+1] = g << 2
@@ -289,7 +293,6 @@ def decode_dxt5(data, width, height):
 
     # Read 16 bytes at a time
     image_offset = 0
-    col = 0
     for (alpha0, alpha1, ab0, ab1, ab2, ab3, ab4, ab5, 
          c0_lo, c0_hi, c1_lo, c1_hi, 
          b0, b1, b2, b3) in split_16byte.findall(data):
@@ -323,13 +326,13 @@ def decode_dxt5(data, width, height):
                     r = g = b = 0
                 else:
                     if code == 2 and color0 > color1:
-                        r = (2 * r0 + r1) / 3
-                        g = (2 * g0 + g1) / 3
-                        b = (2 * b0 + b1) / 3
+                        r = (2 * r0 + r1) // 3
+                        g = (2 * g0 + g1) // 3
+                        b = (2 * b0 + b1) // 3
                     elif code == 3 and color0 > color1:
-                        r = (r0 + 2 * r1) / 3
-                        g = (g0 + 2 * g1) / 3
-                        b = (b0 + 2 * b1) / 3
+                        r = (r0 + 2 * r1) // 3
+                        g = (g0 + 2 * g1) // 3
+                        b = (b0 + 2 * b1) // 3
                     else:
                         assert code == 2 and color0 <= color1
                         r = (r0 + r1) / 2
@@ -342,27 +345,27 @@ def decode_dxt5(data, width, height):
                     a = alpha1
                 elif alpha0 > alpha1:
                     if acode == 2:
-                        a = (6 * alpha0 + 1 * alpha1) / 7
+                        a = (6 * alpha0 + 1 * alpha1) // 7
                     elif acode == 3:
-                        a = (5 * alpha0 + 2 * alpha1) / 7
+                        a = (5 * alpha0 + 2 * alpha1) // 7
                     elif acode == 4:
-                        a = (4 * alpha0 + 3 * alpha1) / 7
+                        a = (4 * alpha0 + 3 * alpha1) // 7
                     elif acode == 5:
-                        a = (3 * alpha0 + 4 * alpha1) / 7
+                        a = (3 * alpha0 + 4 * alpha1) // 7
                     elif acode == 6:
-                        a = (2 * alpha0 + 5 * alpha1) / 7
+                        a = (2 * alpha0 + 5 * alpha1) // 7
                     else:
                         assert acode == 7
-                        a = (1 * alpha0 + 6 * alpha1) / 7
+                        a = (1 * alpha0 + 6 * alpha1) // 7
                 else:
                     if acode == 2:
-                        a = (4 * alpha0 + 1 * alpha1) / 5
+                        a = (4 * alpha0 + 1 * alpha1) // 5
                     elif acode == 3:
-                        a = (3 * alpha0 + 2 * alpha1) / 5
+                        a = (3 * alpha0 + 2 * alpha1) // 5
                     elif acode == 4:
-                        a = (2 * alpha0 + 3 * alpha1) / 5
+                        a = (2 * alpha0 + 3 * alpha1) // 5
                     elif acode == 5:
-                        a = (1 * alpha0 + 4 * alpha1) / 5
+                        a = (1 * alpha0 + 4 * alpha1) // 5
                     elif acode == 6:
                         a = 0
                     else:

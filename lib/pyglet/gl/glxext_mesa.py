@@ -36,7 +36,7 @@ off.
 '''
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: glxext_mesa.py 1579 2008-01-15 14:47:19Z Alex.Holkner $'
+__version__ = '$Id$'
 
 import ctypes
 from ctypes import *

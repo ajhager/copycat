@@ -35,6 +35,7 @@
 '''Cached information about version and extensions of current WGL
 implementation.
 '''
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: glx_info.py 615 2007-02-07 13:17:05Z Alex.Holkner $'
@@ -47,6 +48,7 @@ from pyglet.gl.gl import *
 from pyglet.gl import gl_info
 from pyglet.gl.wgl import *
 from pyglet.gl.wglext_arb import *
+from pyglet.compat import asstr
 
 class WGLInfoException(Exception):
     pass
@@ -58,9 +60,9 @@ class WGLInfo(object):
             return []
 
         try:
-            return wglGetExtensionsStringEXT().split()
+            return asstr(wglGetExtensionsStringEXT()).split()
         except MissingFunctionException:
-            return cast(glGetString(GL_EXTENSIONS), c_char_p).value.split()
+            return asstr(cast(glGetString(GL_EXTENSIONS), c_char_p).value).split()
 
     def have_extension(self, extension):
         return extension in self.get_extensions()

@@ -34,6 +34,7 @@
 
 '''
 '''
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: lib_glx.py 597 2007-02-03 16:13:07Z Alex.Holkner $'
@@ -43,6 +44,7 @@ from ctypes import *
 
 import pyglet
 from pyglet.gl.lib import missing_function, decorate_function
+from pyglet.compat import asbytes
 
 __all__ = ['link_GL', 'link_GLU', 'link_WGL']
 
@@ -84,7 +86,7 @@ class WGLFunctionProxy(object):
         if not current_context:
             raise Exception(
                 'Call to function "%s" before GL context created' % self.name)
-        address = wglGetProcAddress(self.name)
+        address = wglGetProcAddress(asbytes(self.name))
         if cast(address, POINTER(c_int)):  # check cast because address is func
             self.func = cast(address, self.ftype)
             decorate_function(self.func, self.name)
@@ -101,7 +103,7 @@ def link_GL(name, restype, argtypes, requires=None, suggestions=None):
         func.argtypes = argtypes
         decorate_function(func, name)
         return func
-    except AttributeError, e:
+    except AttributeError:
         # Not in opengl32.dll. Try and get a pointer from WGL.
         try:
             fargs = (restype,) + tuple(argtypes)
@@ -129,7 +131,7 @@ def link_GLU(name, restype, argtypes, requires=None, suggestions=None):
         func.argtypes = argtypes
         decorate_function(func, name)
         return func
-    except AttributeError, e:
+    except AttributeError:
         # Not in glu32.dll. Try and get a pointer from WGL.
         try:
             fargs = (restype,) + tuple(argtypes)

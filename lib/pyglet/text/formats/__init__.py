@@ -37,4 +37,4 @@
 '''
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: __init__.py 1848 2008-03-01 04:21:43Z Alex.Holkner $'
+__version__ = '$Id$'

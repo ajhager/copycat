@@ -37,6 +37,7 @@
 Currently supports version 3 and 4 bitmaps with BI_RGB and BI_BITFIELDS
 encoding.  Alpha channel is supported for 32-bit BI_RGB only.
 '''
+from builtins import range
 
 # Official docs are at
 # http://msdn2.microsoft.com/en-us/library/ms532311.aspx
@@ -45,7 +46,7 @@ encoding.  Alpha channel is supported for 32-bit BI_RGB only.
 # http://www.fileformat.info/format/bmp/egff.htm
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: bmp.py 2019 2008-04-18 14:30:48Z Alex.Holkner $'
+__version__ = '$Id$'
 
 import ctypes
 
@@ -157,7 +158,7 @@ class BMPImageDecoder(ImageDecoder):
         bytes = file.read()
         buffer = ctypes.c_buffer(bytes)
 
-        if bytes[:2] != 'BM':
+        if bytes[:2] != b'BM':
             raise ImageDecodeException(
                 'Not a Windows bitmap file: %r' % (filename or file))
 

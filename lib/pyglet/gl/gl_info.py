@@ -54,6 +54,8 @@ context::
         # ...
 
 '''
+from builtins import range
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
@@ -62,6 +64,7 @@ from ctypes import *
 import warnings
 
 from pyglet.gl.gl import *
+from pyglet.compat import asstr
 
 class GLInfo(object):
     '''Information interface for a single GL context.
@@ -88,16 +91,26 @@ class GLInfo(object):
         '''
         self.have_context = True
         if not self._have_info:
-            self.vendor = cast(glGetString(GL_VENDOR), c_char_p).value
-            self.renderer = cast(glGetString(GL_RENDERER), c_char_p).value
-            self.extensions = cast(glGetString(GL_EXTENSIONS), c_char_p).value
+            self.vendor = asstr(cast(glGetString(GL_VENDOR), c_char_p).value)
+            self.renderer = asstr(cast(glGetString(GL_RENDERER),
+                                       c_char_p).value)
+            self.version = asstr(cast(glGetString(GL_VERSION), c_char_p).value)
+            if self.have_version(3):
+                from pyglet.gl.glext_arb import glGetStringi, GL_NUM_EXTENSIONS
+                num_extensions = GLint()
+                glGetIntegerv(GL_NUM_EXTENSIONS, num_extensions)
+                self.extensions = (asstr(cast(glGetStringi(GL_EXTENSIONS, i),
+                                         c_char_p).value) for i in range(num_extensions.value))
+            else:
+                self.extensions = asstr(cast(glGetString(GL_EXTENSIONS),
+                         c_char_p).value).split()
             if self.extensions:
-                self.extensions = set(self.extensions.split())
-            self.version = cast(glGetString(GL_VERSION), c_char_p).value
+                self.extensions = set(self.extensions)
             self._have_info = True
 
     def remove_active_context(self):
         self.have_context = False
+        self._have_info = False
 
     def have_extension(self, extension):
         '''Determine if an OpenGL extension is available.
@@ -151,6 +164,8 @@ class GLInfo(object):
 
         if not self.have_context:
             warnings.warn('No GL context created yet.')
+        if 'None' in self.version: 
+            return False 
         ver = '%s.0.0' % self.version.split(' ', 1)[0]
         imajor, iminor, irelease = [int(v) for v in ver.split('.', 3)[:3]]
         return imajor > major or \

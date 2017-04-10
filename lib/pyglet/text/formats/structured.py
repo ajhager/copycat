@@ -34,6 +34,9 @@
 
 '''Base class for structured (hierarchical) document formats.
 '''
+from __future__ import division
+from builtins import range
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
@@ -49,7 +52,7 @@ class ImageElement(pyglet.text.document.InlineElement):
         self.height = height is None and image.height or height
         self.vertex_lists = {}
 
-        anchor_y = self.height / image.height * image.anchor_y
+        anchor_y = self.height // image.height * image.anchor_y
         ascent = max(0, self.height - anchor_y)
         descent = min(0, -anchor_y)
         super(ImageElement, self).__init__(ascent, descent, self.width)
@@ -74,12 +77,12 @@ class ImageElement(pyglet.text.document.InlineElement):
 def _int_to_roman(input):
     # From http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/81611
     if not 0 < input < 4000:
-        raise ValueError, "Argument must be between 1 and 3999"    
+        raise ValueError("Argument must be between 1 and 3999")    
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,   4,  1)
     nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
     result = ""
     for i in range(len(ints)):
-        count = int(input / ints[i])
+        count = int(input // ints[i])
         result += nums[i] * count
         input -= ints[i] * count
     return result
@@ -164,7 +167,7 @@ class OrderedListBuilder(ListBuilder):
         ``1``
             Decimal Arabic
         ``a``
-            Lowercase alphanumberic
+            Lowercase alphanumeric
         ``A``
             Uppercase alphanumeric
         ``i``

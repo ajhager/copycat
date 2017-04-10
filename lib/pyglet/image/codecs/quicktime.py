@@ -34,6 +34,8 @@
 
 '''
 '''
+from __future__ import division
+from builtins import chr
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: pil.py 163 2006-11-13 04:15:46Z Alex.Holkner $'
@@ -47,8 +49,8 @@ from pyglet.image import *
 from pyglet.image.codecs import *
 
 from pyglet.window.carbon import carbon, quicktime, _oscheck
-from pyglet.window.carbon.constants import _name
-from pyglet.window.carbon.types import *
+from pyglet.libs.darwin.constants import _name
+from pyglet.libs.darwin.types import *
 
 Handle = POINTER(POINTER(c_byte))
 
@@ -74,6 +76,9 @@ k2IndexedGrayPixelFormat      = 0x00000022
 k4IndexedGrayPixelFormat      = 0x00000024
 k8IndexedGrayPixelFormat      = 0x00000028
 kNativeEndianPixMap           = 1 << 8
+
+kGraphicsImporterDontDoGammaCorrection = 1 << 0
+kGraphicsImporterDontUseColorMatching = 1 << 3
 
 newMovieActive                = 1
 noErr                         = 0
@@ -166,9 +171,14 @@ class QuickTimeImageDecoder(ImageDecoder):
             byref(rect), c_void_p(), c_void_p(), 0, buffer,
             len(format) * width)
 
+        flags = (kGraphicsImporterDontUseColorMatching |
+                 kGraphicsImporterDontDoGammaCorrection)
+        quicktime.GraphicsImportSetFlags(importer, flags)
         quicktime.GraphicsImportSetGWorld(importer, world, c_void_p())
+        
         result = quicktime.GraphicsImportDraw(importer)
         quicktime.DisposeGWorld(world)
+        quicktime.CloseComponent(importer)
 
         if result != 0:
             raise ImageDecodeException(filename or file)

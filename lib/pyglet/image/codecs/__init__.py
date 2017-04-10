@@ -48,11 +48,13 @@ Modules must also implement the two functions::
         return []
     
 '''
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
 
 import os.path
+from pyglet import compat_platform
 
 _decoders = []              # List of registered ImageDecoders
 _decoder_extensions = {}    # Map str -> list of matching ImageDecoders
@@ -62,7 +64,7 @@ _encoders = []              # List of registered ImageEncoders
 _encoder_extensions = {}    # Map str -> list of matching ImageEncoders
 
 class ImageDecodeException(Exception):
-    pass
+    exception_priority = 10
 
 class ImageEncodeException(Exception):
     pass
@@ -182,29 +184,39 @@ def add_default_image_codecs():
     except ImportError:
         pass
 
-    # Mac OS X default: QuickTime
-    try:
-        import pyglet.image.codecs.quicktime
-        add_encoders(quicktime)
-        add_decoders(quicktime)
-    except ImportError:
-        pass
+    # Mac OS X default: Quicktime for Carbon, Quartz for Cocoa.
+    # TODO: Make ctypes Quartz the default for both Carbon & Cocoa.
+    if compat_platform == 'darwin':
+        try:
+            from pyglet import options as pyglet_options
+            if pyglet_options['darwin_cocoa']:
+                import pyglet.image.codecs.quartz
+                add_encoders(quartz)
+                add_decoders(quartz)
+            else:
+                import pyglet.image.codecs.quicktime
+                add_encoders(quicktime)
+                add_decoders(quicktime)
+        except ImportError:
+            pass
 
     # Windows XP default: GDI+
-    try:
-        import pyglet.image.codecs.gdiplus
-        add_encoders(gdiplus)
-        add_decoders(gdiplus)
-    except ImportError:
-        pass
+    if compat_platform in ('win32', 'cygwin'):
+        try:
+            import pyglet.image.codecs.gdiplus
+            add_encoders(gdiplus)
+            add_decoders(gdiplus)
+        except ImportError:
+            pass
 
     # Linux default: GdkPixbuf 2.0
-    try:
-        import pyglet.image.codecs.gdkpixbuf2
-        add_encoders(gdkpixbuf2)
-        add_decoders(gdkpixbuf2)
-    except ImportError:
-        pass
+    if compat_platform.startswith('linux'):
+        try:
+            import pyglet.image.codecs.gdkpixbuf2
+            add_encoders(gdkpixbuf2)
+            add_decoders(gdkpixbuf2)
+        except ImportError:
+            pass
 
     # Fallback: PIL
     try:

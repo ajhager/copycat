@@ -31,7 +31,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-# $Id:$
 
 '''Minimal Windows COM interface.
 
@@ -68,9 +67,14 @@ the return value.
 Don't forget to manually manage memory... call Release() when you're done with
 an interface.
 '''
+from builtins import object
 
 import ctypes
 import sys
+
+from pyglet.debug import debug_print
+
+_debug_com = debug_print('debug_com')
 
 if sys.platform != 'win32':
     raise ImportError('pyglet.com requires a Windows build of Python')
@@ -88,6 +92,11 @@ class GUID(ctypes.Structure):
         self.Data2 = w1
         self.Data3 = w2
         self.Data4[:] = (b1, b2, b3, b4, b5, b6, b7, b8)
+
+    def __repr__(self):
+        b1, b2, b3, b4, b5, b6, b7, b8 = self.Data4
+        return 'GUID(%x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x)' % (
+            self.Data1, self.Data2, self.Data3, b1, b2, b3, b4, b5, b6, b7, b8)
 
 LPGUID = ctypes.POINTER(GUID)
 IID = GUID
@@ -116,8 +125,14 @@ class COMMethodInstance(object):
 
     def __get__(self, obj, tp):
         if obj is not None:
-            return lambda *args: \
-                self.method.get_field()(self.i, self.name)(obj, *args)
+            def _call(*args):
+                assert _debug_com('COM: IN {}({}, {})'.format(self.name, obj.__class__.__name__, args))
+                ret = self.method.get_field()(self.i, self.name)(obj, *args)
+                assert _debug_com('COM: OUT {}({}, {})'.format(self.name, obj.__class__.__name__, args))
+                assert _debug_com('COM: RETURN {}'.format(ret))
+                return ret
+            return _call
+
         raise AttributeError()
 
 class COMInterface(ctypes.Structure):
@@ -141,9 +156,11 @@ class InterfaceMetaclass(type(ctypes.POINTER(COMInterface))):
 
         return super(InterfaceMetaclass, cls).__new__(cls, name, bases, dct)
 
-class Interface(ctypes.POINTER(COMInterface)):
-    '''Base COM interface pointer.'''
-    __metaclass__ = InterfaceMetaclass
+# future.utils.with_metaclass does not work here, as the base class is from _ctypes.lib
+# See https://wiki.python.org/moin/PortingToPy3k/BilingualQuickRef
+Interface = InterfaceMetaclass(str('Interface'), (ctypes.POINTER(COMInterface),), {
+    '__doc__': 'Base COM interface pointer.',
+    })
 
 class IUnknown(Interface):
     _methods_ = [

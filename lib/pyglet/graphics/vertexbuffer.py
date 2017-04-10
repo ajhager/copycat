@@ -43,6 +43,8 @@ Buffers can optionally be created "mappable" (incorporating the
 method which provides the most efficient path for updating partial data within
 the buffer.
 '''
+from builtins import range
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
@@ -52,7 +54,6 @@ import sys
 
 import pyglet
 from pyglet.gl import *
-from pyglet.gl import gl_info
 
 _enable_vbo = pyglet.options['graphics_vbo']
 
@@ -383,7 +384,7 @@ class MappableVertexBufferObject(VertexBufferObject, AbstractMappable):
         super(MappableVertexBufferObject, self).__init__(size, target, usage)
         self.data = (ctypes.c_byte * size)()
         self.data_ptr = ctypes.cast(self.data, ctypes.c_void_p).value
-        self._dirty_min = sys.maxint
+        self._dirty_min = sys.maxsize
         self._dirty_max = 0
 
     def bind(self):
@@ -396,7 +397,7 @@ class MappableVertexBufferObject(VertexBufferObject, AbstractMappable):
             else:
                 glBufferSubData(self.target, self._dirty_min, size,
                     self.data_ptr + self._dirty_min)
-            self._dirty_min = sys.maxint
+            self._dirty_min = sys.maxsize
             self._dirty_max = 0
 
     def set_data(self, data):
@@ -434,7 +435,7 @@ class MappableVertexBufferObject(VertexBufferObject, AbstractMappable):
         glBufferData(self.target, self.size, self.data, self.usage)
         glPopClientAttrib()
 
-        self._dirty_min = sys.maxint
+        self._dirty_min = sys.maxsize
         self._dirty_max = 0
 
 class AbstractBufferRegion(object):

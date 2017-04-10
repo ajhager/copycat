@@ -40,7 +40,7 @@ Generated with:
 '''
 
 __docformat__ =  'restructuredtext'
-__version__ = '$Id: lib_alc.py 1579 2008-01-15 14:47:19Z Alex.Holkner $'
+__version__ = '$Id$'
 
 import ctypes
 from ctypes import *

@@ -36,9 +36,12 @@
 
 http://www.w3.org/Graphics/GIF/spec-gif89a.txt
 '''
+from __future__ import print_function
+from __future__ import division
+from builtins import object
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: gif.py 1938 2008-03-21 11:47:05Z Alex.Holkner $'
+__version__ = '$Id$'
 
 import struct
 
@@ -81,7 +84,7 @@ def read(file):
     # 17. Header
     signature = file.read(3)
     version = file.read(3)
-    if signature != 'GIF':
+    if signature != b'GIF':
         raise ImageDecodeException('Not a GIF stream')
 
     stream = GIFStream()
@@ -115,7 +118,7 @@ def read(file):
                 skip_data_sub_blocks(file)
         else:
             # Skip bytes until a valid start character is found
-            print block_type
+            print(block_type)
             pass
         block_type = read_byte(file)
 
@@ -159,7 +162,7 @@ def read_graphic_control_extension(file, stream, graphics_scope):
      transparent_color_index,
      terminator) = unpack('BBHBB', file)
     if block_size != 4:
-        raise ImageFormatException('Incorrect block size')
+        raise ImageDecodeException('Incorrect block size')
     
     if delay_time:
         # Follow Firefox/Mac behaviour: use 100ms delay for any delay

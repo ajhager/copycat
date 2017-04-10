@@ -35,6 +35,10 @@
 
 :since: pyglet 1.1
 '''
+from builtins import str
+from builtins import zip
+from builtins import next
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
@@ -285,20 +289,24 @@ class AbstractRunIterator(object):
 
 class RunIterator(AbstractRunIterator):
     def __init__(self, run_list):
-        self.next = iter(run_list).next
-        self.start, self.end, self.value = self.next()
+        self._run_list_iter = iter(run_list)
+        self.start, self.end, self.value = next(self)
+        
+    def __next__(self):
+        return next(self._run_list_iter)
 
     def __getitem__(self, index):
-        while index >= self.end:
-            self.start, self.end, self.value = self.next()
+        while index >= self.end and index > self.start:
+            # condition has special case for 0-length run (fixes issue 471)
+            self.start, self.end, self.value = next(self)
         return self.value
 
     def ranges(self, start, end):
         while start >= self.end:
-            self.start, self.end, self.value = self.next()
+            self.start, self.end, self.value = next(self)
         yield start, min(self.end, end), self.value
         while end > self.end:
-            self.start, self.end, self.value = self.next()
+            self.start, self.end, self.value = next(self)
             yield self.start, min(self.end, end), self.value
 
 class OverriddenRunIterator(AbstractRunIterator):
@@ -387,7 +395,7 @@ class ZipRunIterator(AbstractRunIterator):
 
     def ranges(self, start, end):
         iterators = [i.ranges(start, end) for i in self.range_iterators]
-        starts, ends, values = zip(*[i.next() for i in iterators])
+        starts, ends, values = zip(*[next(i) for i in iterators])
         starts = list(starts)
         ends = list(ends)
         values = list(values)
@@ -397,7 +405,7 @@ class ZipRunIterator(AbstractRunIterator):
             start = min_end
             for i, iterator in enumerate(iterators):
                 if ends[i] == min_end:
-                    starts[i], ends[i], values[i] = iterator.next()
+                    starts[i], ends[i], values[i] = next(iterator)
 
     def __getitem__(self, index):
         return [i[index] for i in self.range_iterators]
@@ -408,7 +416,7 @@ class ConstRunIterator(AbstractRunIterator):
         self.length = length
         self.value = value
 
-    def next(self):
+    def __next__(self):
         yield 0, self.length, self.value
 
     def ranges(self, start, end):

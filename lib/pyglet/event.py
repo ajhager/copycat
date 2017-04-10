@@ -82,7 +82,7 @@ There are two main use cases for "pushing" event handlers:
 * Temporarily intercepting the events coming from the dispatcher by pushing a
   custom set of handlers onto the dispatcher, then later "popping" them all
   off at once.
-* Creating "chains" of event handlers, where the event propogates from the
+* Creating "chains" of event handlers, where the event propagates from the
   top-most (most recently added) handler to the bottom, until a handler
   takes care of it.
 
@@ -99,7 +99,7 @@ keyword arguments::
 
 After an event handler has processed an event, it is passed on to the
 next-lowest event handler, unless the handler returns `EVENT_HANDLED`, which
-prevents further propogation.
+prevents further propagation.
 
 To remove all handlers on the top stack level, use
 `EventDispatcher.pop_handlers`.
@@ -124,7 +124,7 @@ It is up to the specific event dispatcher to queue relevant events until they
 can be dispatched, at which point the handlers are called in the order the
 events were originally generated.
 
-This implies that your application runs with a main loop that continously
+This implies that your application runs with a main loop that continuously
 updates the application state and checks for new events::
 
     while True:
@@ -135,9 +135,11 @@ Not all event dispatchers require the call to ``dispatch_events``; check with
 the particular class documentation.
 
 '''
+from builtins import object
+from past.builtins import basestring
 
 __docformat__ = 'restructuredtext'
-__version__ = '$Id: event.py 1824 2008-02-28 09:22:01Z Alex.Holkner $'
+__version__ = '$Id$'
 
 import inspect
 
@@ -309,7 +311,7 @@ class EventDispatcher(object):
         '''
         for frame in self._event_stack:
             try:
-                if frame[name] is handler:
+                if frame[name] == handler:
                     del frame[name]
                     break
             except KeyError:
@@ -318,10 +320,15 @@ class EventDispatcher(object):
     def dispatch_event(self, event_type, *args):
         '''Dispatch a single event to the attached handlers.
         
-        The event is propogated to all handlers from from the top of the stack
+        The event is propagated to all handlers from from the top of the stack
         until one returns `EVENT_HANDLED`.  This method should be used only by
         `EventDispatcher` implementors; applications should call
         the ``dispatch_events`` method.
+
+        Since pyglet 1.2, the method returns `EVENT_HANDLED` if an event
+        handler returned `EVENT_HANDLED` or `EVENT_UNHANDLED` if all events
+        returned `EVENT_UNHANDLED`.  If no matching event handlers are in the
+        stack, ``False`` is returned.
 
         :Parameters:
             `event_type` : str
@@ -329,16 +336,26 @@ class EventDispatcher(object):
             `args` : sequence
                 Arguments to pass to the event handler.
 
+        :rtype: bool or None
+        :return: (Since pyglet 1.2) `EVENT_HANDLED` if an event handler 
+            returned `EVENT_HANDLED`; `EVENT_UNHANDLED` if one or more event
+            handlers were invoked but returned only `EVENT_UNHANDLED`;
+            otherwise ``False``.  In pyglet 1.1 and earler, the return value
+            is always ``None``.
+
         '''
-        assert event_type in self.event_types
+        assert event_type in self.event_types, "%r not found in %r.event_types == %r" % (event_type, self, self.event_types)
+
+        invoked = False
 
         # Search handler stack for matching event handlers
         for frame in list(self._event_stack):
             handler = frame.get(event_type, None)
             if handler:
                 try:
+                    invoked = True
                     if handler(*args):
-                        return
+                        return EVENT_HANDLED
                 except TypeError:
                     self._raise_dispatch_exception(event_type, args, handler)
 
@@ -346,10 +363,17 @@ class EventDispatcher(object):
         # Check instance for an event handler
         if hasattr(self, event_type):
             try:
-                getattr(self, event_type)(*args)
+                invoked = True
+                if getattr(self, event_type)(*args):
+                    return EVENT_HANDLED
             except TypeError:
                 self._raise_dispatch_exception(
                     event_type, args, getattr(self, event_type))
+
+        if invoked:
+            return EVENT_UNHANDLED
+
+        return False
 
     def _raise_dispatch_exception(self, event_type, args, handler):
         # A common problem in applications is having the wrong number of
@@ -369,7 +393,7 @@ class EventDispatcher(object):
         n_handler_args = len(handler_args)
 
         # Remove "self" arg from handler if it's a bound method
-        if inspect.ismethod(handler) and handler.im_self:
+        if inspect.ismethod(handler) and handler.__self__:
             n_handler_args -= 1
 
         # Allow *args varargs to overspecify arguments
@@ -385,9 +409,9 @@ class EventDispatcher(object):
         if n_handler_args != n_args:
             if inspect.isfunction(handler) or inspect.ismethod(handler):
                 descr = '%s at %s:%d' % (
-                    handler.func_name,
-                    handler.func_code.co_filename,
-                    handler.func_code.co_firstlineno)
+                    handler.__name__,
+                    handler.__code__.co_filename,
+                    handler.__code__.co_firstlineno)
             else:
                 descr = repr(handler)
             
@@ -427,7 +451,7 @@ class EventDispatcher(object):
             name = func.__name__
             self.set_handler(name, func)
             return args[0]
-        elif type(args[0]) in (str, unicode):   # @window.event('on_resize')
+        elif isinstance(args[0], basestring):   # @window.event('on_resize')
             name = args[0]
             def decorator(func):
                 self.set_handler(name, func)

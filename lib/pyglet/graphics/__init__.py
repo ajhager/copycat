@@ -104,7 +104,7 @@ to initialise that attribute.  Examples of common attribute formats are:
 ``"v3f"``
     Vertex position, specified as three floats.
 ``"c4B"``
-    Vertex color, specifed as four unsigned bytes.
+    Vertex color, specified as four unsigned bytes.
 ``"t2f"``
     Texture coordinate, specified as two floats.
 
@@ -128,15 +128,20 @@ Drawing modes
 =============
 
 Methods in this module that accept a ``mode`` parameter will accept any value
-in the OpenGL drawing mode enumeration; for example, ``GL_POINTS``,
-``GL_LINES``, ``GL_TRIANGLES``, etc.  
+in the OpenGL drawing mode enumeration: ``GL_POINTS``, ``GL_LINE_STRIP``,
+``GL_LINE_LOOP``, ``GL_LINES``, ``GL_TRIANGLE_STRIP``, ``GL_TRIANGLE_FAN``,
+``GL_TRIANGLES``, ``GL_QUAD_STRIP``, ``GL_QUADS``, and ``GL_POLYGON``.
 
-Because of the way the graphics API renders multiple primitives with shared
-state, ``GL_POLYGON``, ``GL_LINE_LOOP`` and ``GL_TRIANGLE_FAN`` cannot be used
---- the results are undefined.
+:: 
+
+    pyglet.graphics.draw(1, GL_POINTS, ('v2i',(10,20)))
+
+However, because of the way the graphics API renders multiple primitives with 
+shared state, ``GL_POLYGON``, ``GL_LINE_LOOP`` and ``GL_TRIANGLE_FAN`` cannot
+be used --- the results are undefined.
 
 When using ``GL_LINE_STRIP``, ``GL_TRIANGLE_STRIP`` or ``GL_QUAD_STRIP`` care
-must be taken to insert degenrate vertices at the beginning and end of each
+must be taken to insert degenerate vertices at the beginning and end of each
 vertex list.  For example, given the vertex list::
 
     A, B, C, D
@@ -147,11 +152,14 @@ the correct vertex list to provide the vertex list is::
 
 Alternatively, the ``NV_primitive_restart`` extension can be used if it is
 present.  This also permits use of ``GL_POLYGON``, ``GL_LINE_LOOP`` and
-``GL_TRIANGLE_FAN``.   Unfortunatley the extension is not provided by older
+``GL_TRIANGLE_FAN``.   Unfortunately the extension is not provided by older
 video drivers, and requires indexed vertex lists.
 
 :since: pyglet 1.1
 '''
+from __future__ import print_function
+from builtins import zip
+from builtins import object
 
 __docformat__ = 'restructuredtext'
 __version__ = '$Id: $'
@@ -171,8 +179,9 @@ def draw(size, mode, *data):
     :Parameters:
         `size` : int
             Number of vertices given
-        `mode` : int
-            OpenGL drawing mode, e.g. ``GL_TRIANGLES``
+        `mode` : gl primitive type 
+            OpenGL drawing mode, e.g. ``GL_TRIANGLES``, 
+            avoiding quotes.
         `data` : data items
             Attribute formats and data.  See the module summary for 
             details.
@@ -326,6 +335,16 @@ class Batch(object):
         self._draw_list = []
         self._draw_list_dirty = False
 
+    def invalidate(self):
+        '''Force the batch to update the draw list.
+
+        This method can be used to force the batch to re-compute the draw list
+        when the ordering of groups has changed.
+
+        :since: pyglet 1.2
+        '''
+        self._draw_list_dirty = True
+
     def add(self, count, mode, group, *data):
         '''Add a vertex list to the batch.
 
@@ -346,7 +365,6 @@ class Batch(object):
         '''
         formats, initial_arrays = _parse_data(data)
         domain = self._get_domain(False, mode, group, formats)
-        domain.__formats = formats
             
         # Create vertex list and initialize
         vlist = domain.create(count)
@@ -381,7 +399,7 @@ class Batch(object):
         # Create vertex list and initialize
         vlist = domain.create(count, len(indices))
         start = vlist.start
-        vlist._set_index_data(map(lambda i: i + start, indices))
+        vlist._set_index_data([i + start for i in indices])
         for i, array in initial_arrays:
             vlist._set_attribute_data(i, array)
 
@@ -411,7 +429,10 @@ class Batch(object):
 
         '''
         formats = vertex_list.domain.__formats
-        domain = batch._get_domain(False, mode, group, formats)
+        if isinstance(vertex_list, vertexdomain.IndexedVertexList):
+            domain = batch._get_domain(True, mode, group, formats)
+        else:
+            domain = batch._get_domain(False, mode, group, formats)
         vertex_list.migrate(domain)
 
     def _get_domain(self, indexed, mode, group, formats):
@@ -434,6 +455,7 @@ class Batch(object):
                 domain = vertexdomain.create_indexed_domain(*formats)
             else:
                 domain = vertexdomain.create_domain(*formats)
+            domain.__formats = formats
             domain_map[key] = domain
             self._draw_list_dirty = True 
 
@@ -506,25 +528,25 @@ class Batch(object):
 
     def _dump_draw_list(self):
         def dump(group, indent=''):
-            print indent, 'Begin group', group
+            print(indent, 'Begin group', group)
             domain_map = self.group_map[group]
             for _, domain in domain_map.items():
-                print indent, '  ', domain
+                print(indent, '  ', domain)
                 for start, size in zip(*domain.allocator.get_allocated_regions()):
-                    print indent, '    ', 'Region %d size %d:' % (start, size)
+                    print(indent, '    ', 'Region %d size %d:' % (start, size))
                     for key, attribute in domain.attribute_names.items():
-                        print indent, '      ',
+                        print(indent, '      ', end=' ')
                         try:
                             region = attribute.get_region(attribute.buffer,
                                                           start, size)
-                            print key, region.array[:]
+                            print(key, region.array[:])
                         except:
-                            print key, '(unmappable)'
+                            print(key, '(unmappable)')
             for child in self.group_children.get(group, ()):
                 dump(child, indent + '  ')
-            print indent, 'End group', group
+            print(indent, 'End group', group)
 
-        print 'Draw list for %r:' % self
+        print('Draw list for %r:' % self)
         for group in self.top_groups:
             dump(group)
         
@@ -559,9 +581,9 @@ class Batch(object):
             # Draw domains using this group
             domain_map = self.group_map[group]
             for (_, mode, _), domain in domain_map.items():
-                for list in vertex_lists:
-                    if list.domain is domain:
-                        list.draw(mode)
+                for alist in vertex_lists:
+                    if alist.domain is domain:
+                        alist.draw(mode)
 
             # Sort and visit child groups of this group
             children = self.group_children.get(group)
@@ -594,6 +616,9 @@ class Group(object):
 
         '''
         self.parent = parent
+
+    def __lt__(self, other):
+        return hash(self) < hash(other)
 
     def set_state(self):
         '''Apply the OpenGL state change.  
@@ -704,10 +729,10 @@ class OrderedGroup(Group):
         super(OrderedGroup, self).__init__(parent)
         self.order = order
 
-    def __cmp__(self, other):
+    def __lt__(self, other):
         if isinstance(other, OrderedGroup):
-            return cmp(self.order, other.order)
-        return -1
+            return self.order < other.order
+        return super(OrderedGroup, self).__lt__(other)
 
     def __eq__(self, other):
         return (self.__class__ is other.__class__ and
