@@ -3,23 +3,25 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Rule"""
 
 from copycat.workspace import Structure
 import copycat.toolbox as toolbox
 
 class Rule(Structure):
     """Rule
-    
+
     Attributes:
         object_category1:
         object_category2:
@@ -68,12 +70,12 @@ class Rule(Structure):
                                      self.object_cateogry1.name)
         else:
             if not self.object_category1:
-                part1 = descriptor1.name
+                part1 = self.descriptor1.name
             else:
                 part1 = "%s of %s '%s'" % (self.replaced_description_type.name,
                                            self.object_category1.name,
                                            self.descriptor1.name)
-                
+
         if self.expresses_relation():
             part2 = self.relation.name
         else:
@@ -93,7 +95,7 @@ class Rule(Structure):
 
     def has_no_change(self):
         """Return True if the rule specifies no changes are to be made."""
-        return self.descriptor1 == None
+        return self.descriptor1 is None
 
     def calculate_internal_strength(self):
         """Return the rule's internal strength."""
@@ -122,15 +124,15 @@ class Rule(Structure):
             shared_descriptor_term = 0
         else:
             slipped_descriptors = []
-            for d in i_object_corresponding_object.relevant_descriptions():
-                ds = d.apply_slippages(i_object_corresponding_object,
-                                       self.workspace.slippages())
-                slipped_descriptors.append(ds.descriptor)
+            for description in i_object_corresponding_object.relevant_descriptions():
+                slips = description.apply_slippages(i_object_corresponding_object,
+                                                    self.workspace.slippages())
+                slipped_descriptors.append(slips.descriptor)
             if self.descriptor1 in slipped_descriptors:
                 shared_descriptor_term = 100
             else:
                 return 0
-            
+
         depth = (100 - self.descriptor1.conceptual_depth) / 10.
         shared_descriptor_weight = round(depth ** 1.4)
         weights = [18, 12, shared_descriptor_weight]

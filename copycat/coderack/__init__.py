@@ -3,19 +3,20 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import random
+"""Coderack"""
 
+import random
 import copycat.toolbox as toolbox
 from copycat.coderack.codelet import Codelet
 
@@ -103,21 +104,21 @@ class Coderack(object):
         if self.is_empty():
             return None
         urgencies = [bin.urgency_sum(self.temperature) for bin in self.bins]
-        bin = toolbox.weighted_select(urgencies, self.bins)
+        pbin = toolbox.weighted_select(urgencies, self.bins)
         self.time += 1
-        self.last_chosen = bin.choose()
+        self.last_chosen = pbin.choose()
         return self.last_chosen
 
     def clear(self):
         """Empty the coderack of all codelets."""
-        for bin in self.bins:
-            bin.clear()
+        for pbin in self.bins:
+            pbin.clear()
 
     def codelets(self):
         """Return a list of codelets in the coderack."""
         codelets = []
-        for bin in self.bins:
-            codelets.extend(bin.codelets)
+        for pbin in self.bins:
+            codelets.extend(pbin.codelets)
         return codelets
 
     def is_empty(self):
@@ -138,11 +139,11 @@ class Coderack(object):
             removed_codelet.bin.remove(removed_codelet)
 
         if urgency >= 100:
-            bin = self.extremely_high_bin
+            pbin = self.extremely_high_bin
         else:
             index = int((len(self.bins) * urgency) / 100.0)
-            bin = self.bins[index]
-        bin.add(codelet)
+            pbin = self.bins[index]
+        pbin.add(codelet)
         codelet.timestamp = self.time
 
         return removed_codelet

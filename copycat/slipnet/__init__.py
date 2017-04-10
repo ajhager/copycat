@@ -3,26 +3,27 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import string
+"""Slipnet"""
 
+import string
 import copycat.toolbox as toolbox
 from copycat.slipnet.slipnode import Slipnode
 from copycat.slipnet.sliplink import Sliplink
 
 class Slipnet(object):
     """Slipnet contains nodes and the links between them.
-    
+
     The Slipnet manages the activation and decay of nodes and the conceptual
     distance between them.
 
@@ -44,11 +45,31 @@ class Slipnet(object):
 
         # Number nodes
         self.slipnet_numbers = []
-        for number in range(1, 6):
-            node = self.add_node(str(number), 30)
-            node.description_tester = (lambda obj:
-                obj.type_name == 'group' and obj.length() == number)
-            self.slipnet_numbers.append(node)
+
+        node = self.add_node("1", 30)
+        node.description_tester = (lambda obj:
+            obj.type_name == 'group' and obj.length() == 1)
+        self.slipnet_numbers.append(node)
+
+        node = self.add_node("2", 30)
+        node.description_tester = (lambda obj:
+            obj.type_name == 'group' and obj.length() == 2)
+        self.slipnet_numbers.append(node)
+
+        node = self.add_node("3", 30)
+        node.description_tester = (lambda obj:
+            obj.type_name == 'group' and obj.length() == 3)
+        self.slipnet_numbers.append(node)
+
+        node = self.add_node("4", 30)
+        node.description_tester = (lambda obj:
+            obj.type_name == 'group' and obj.length() == 4)
+        self.slipnet_numbers.append(node)
+
+        node = self.add_node("5", 30)
+        node.description_tester = (lambda obj:
+            obj.type_name == 'group' and obj.length() == 5)
+        self.slipnet_numbers.append(node)
 
         # String position nodes.
         self.plato_leftmost = self.add_node(('leftmost', 'lmost'), 40)
@@ -79,7 +100,7 @@ class Slipnet(object):
             self.slipnet_letters[len(self.slipnet_letters) - 1])
 
         # Direction nodes
-        self.plato_left = self.add_node('left', 40, 
+        self.plato_left = self.add_node('left', 40,
                                         ['BondTopDownDirectionScout',
                                          'GroupTopDownDirectionScout'])
         self.plato_right = self.add_node('right', 40,
@@ -102,13 +123,13 @@ class Slipnet(object):
                                                      ['GroupTopDownCategoryScout'],
                                                      directed=True)
         self.plato_predecessor_group.iterate_group = (lambda category:
-            get_related_node(category, self.plato_predecessor))
+            self.get_related_node(category, self.plato_predecessor))
         self.plato_successor_group = self.add_node(('succesor group',
                                                     'succgr'), 50,
                                                    ['GroupTopDownCategoryScout'],
                                                    directed=True)
         self.plato_successor_group.iterate_group = (lambda category:
-            get_related_node(category, self.plato_successor))
+            self.get_related_node(category, self.plato_successor))
         self.plato_sameness_group = self.add_node(('sameness group', 'samegr'),
                                                   80, ['GroupTopDownCategoryScout'])
         self.plato_sameness_group.iterate_group = lambda category: category
@@ -116,7 +137,7 @@ class Slipnet(object):
         # Other relation nodes
         self.plato_identity = self.add_node(('identity', 'ident'), 90, [], 0)
         self.plato_opposite = self.add_node(('opposite', 'oppos'), 90, [], 80)
-        
+
         # Object nodes
         self.plato_letter = self.add_node('letter', 20)
         self.plato_letter.description_tester = (lambda obj:
@@ -161,21 +182,21 @@ class Slipnet(object):
 
         # Letter category links
         for i in range(26):
-            l = self.slipnet_letters[i]
+            letter = self.slipnet_letters[i]
             fixed_length = (self.plato_letter_category.conceptual_depth -
-                            l.conceptual_depth)
-            self.add_link('category', l, self.plato_letter_category,
+                            letter.conceptual_depth)
+            self.add_link('category', letter, self.plato_letter_category,
                           None, fixed_length)
-            self.add_link('instance', self.plato_letter_category, l, None, 97)
+            self.add_link('instance', self.plato_letter_category, letter, None, 97)
         self.add_link('category', self.plato_sameness_group,
                       self.plato_letter_category, None, 50)
 
         # Length links
         for i in range(5):
-            n = self.slipnet_numbers[i]
-            fixed_length = self.plato_length.conceptual_depth - n.conceptual_depth
-            self.add_link('category', n, self.plato_length, None, fixed_length)
-            self.add_link('instance', self.plato_length, n, None, 100)
+            num = self.slipnet_numbers[i]
+            fixed_length = self.plato_length.conceptual_depth - num.conceptual_depth
+            self.add_link('category', num, self.plato_length, None, fixed_length)
+            self.add_link('instance', self.plato_length, num, None, 100)
         self.add_link('nonslip', self.plato_predecessor_group,
                       self.plato_length, None, 95)
         self.add_link('nonslip', self.plato_successor_group,
@@ -192,7 +213,7 @@ class Slipnet(object):
                       self.plato_opposite, None)
         self.add_link('slip', self.plato_rightmost, self.plato_leftmost,
                       self.plato_opposite, None)
-        self.add_link('slip', self.plato_left, self.plato_right, 
+        self.add_link('slip', self.plato_left, self.plato_right,
                       self.plato_opposite, None)
         self.add_link('slip', self.plato_right, self.plato_left,
                       self.plato_opposite, None)
@@ -204,10 +225,10 @@ class Slipnet(object):
                       self.plato_predecessor_group, self.plato_opposite, None)
         self.add_link('slip', self.plato_predecessor_group,
                       self.plato_successor_group, self.plato_opposite, None)
-        
+
         # Has property links
         self.add_link('property', self.slipnet_letters[0],
-                      self.plato_first, None,  75)
+                      self.plato_first, None, 75)
         self.add_link('property', self.slipnet_letters[25],
                       self.plato_last, None, 75)
 
@@ -237,7 +258,7 @@ class Slipnet(object):
                       (self.plato_string_position_category.conceptual_depth -
                        self.plato_rightmost.conceptual_depth))
         self.add_link('instance', self.plato_string_position_category,
-                      self.plato_rightmost, None,  100)
+                      self.plato_rightmost, None, 100)
         self.add_link('category', self.plato_middle,
                       self.plato_string_position_category, None,
                       (self.plato_string_position_category.conceptual_depth -
@@ -277,7 +298,7 @@ class Slipnet(object):
                       (self.plato_direction_category.conceptual_depth -
                        self.plato_left.conceptual_depth))
         self.add_link('instance', self.plato_direction_category,
-                      self.plato_left, None,  100)
+                      self.plato_left, None, 100)
         self.add_link('category', self.plato_right,
                       self.plato_direction_category, None,
                       (self.plato_direction_category.conceptual_depth -
@@ -304,7 +325,7 @@ class Slipnet(object):
                        self.plato_sameness.conceptual_depth))
         self.add_link('instance', self.plato_bond_category,
                       self.plato_sameness, None, 100)
-        
+
         # Group category links
         self.add_link('category', self.plato_predecessor_group,
                       self.plato_group_category, None,
@@ -314,7 +335,7 @@ class Slipnet(object):
                       self.plato_predecessor_group, None, 100)
         self.add_link('category', self.plato_successor_group,
                       self.plato_group_category, None,
-                      (self.plato_group_category.conceptual_depth - 
+                      (self.plato_group_category.conceptual_depth -
                        self.plato_successor_group.conceptual_depth))
         self.add_link('instance', self.plato_group_category,
                       self.plato_successor_group, None, 100)
@@ -332,7 +353,7 @@ class Slipnet(object):
                       self.plato_group_category, 60)
         self.add_link('nonslip', self.plato_predecessor,
                       self.plato_predecessor_group, self.plato_group_category, 60)
-        
+
         # Associated bond links
         self.add_link('nonslip', self.plato_sameness_group, self.plato_sameness,
                       self.plato_bond_category, 90)
@@ -354,14 +375,14 @@ class Slipnet(object):
                        self.plato_length.conceptual_depth))
         self.add_link('instance', self.plato_bond_facet,
                       self.plato_length, None, 100)
-        
+
         # Letter category links
         self.add_link('slip', self.plato_letter_category,
                       self.plato_length, None, 95)
         self.add_link('slip', self.plato_length,
                       self.plato_letter_category, None, 95)
-        
-        # Letter group links 
+
+        # Letter group links
         self.add_link('slip', self.plato_letter, self.plato_group, None, 90)
         self.add_link('slip', self.plato_group, self.plato_letter, None, 90)
 
@@ -382,7 +403,7 @@ class Slipnet(object):
         self.add_link('nonslip', self.plato_last, self.plato_leftmost, None, 100)
         self.add_link('nonslip', self.plato_rightmost, self.plato_last, None, 100)
         self.add_link('nonslip', self.plato_last, self.plato_rightmost, None, 100)
-        
+
         # Other links
         self.add_link('slip', self.plato_single, self.plato_whole, None, 90)
         self.add_link('slip', self.plato_whole, self.plato_single, None, 90)
@@ -412,7 +433,7 @@ class Slipnet(object):
 
     def get_bond_category(self, from_node, to_node):
         """Return the node representing the label of the link between the nodes.
-        
+
         There is either zero or one link between the two nodes."""
         if from_node == to_node:
             return self.plato_sameness
@@ -431,7 +452,7 @@ class Slipnet(object):
 
     def get_related_node(self, node, relation):
         """Return the node related to the given node by relation.
-        
+
         For example, if given 'left' and 'opposite', returns 'right'."""
         if relation == self.plato_identity:
             return node
@@ -472,7 +493,7 @@ class Slipnet(object):
                     amount_to_spread = round(node.activation * \
                             (link.intrinsic_degree_of_association() / 100.0))
                     link.to_node.activation_buffer += amount_to_spread
-            
+
         for node in self.slipnodes:
             node.activation = min(100, node.activation + node.activation_buffer)
             if node.clamp:

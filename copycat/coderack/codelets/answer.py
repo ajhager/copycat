@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Answer Codelet"""
 
 from copycat.coderack import Codelet
 from copycat.workspace import String
@@ -48,7 +50,7 @@ class AnswerBuilder(Codelet):
                 group.string.remove_proposed_group(group)
             for correspondence in workspace.get_proposed_correspondences():
                 workspace.remove_proposed_correspondence(correspondence)
-        
+
             workspace.translated_rule = None
             workspace.answer_string = None
             workspace.snag_condition = True
@@ -57,7 +59,7 @@ class AnswerBuilder(Codelet):
             for description in workspace.snag_object.descriptions:
                 description.descriptor.clamp = True
             workspace.snag_object.clamp_salience = True
-            
+
             coderack.clear()
 
             return workspace.initial_codelets()

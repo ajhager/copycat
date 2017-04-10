@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Description"""
 
 from copycat.workspace import Structure
 import copycat.toolbox as toolbox
@@ -40,7 +42,7 @@ class Description(Structure):
 
     def __eq__(self, other):
         """Return True if the two descriptions are equal."""
-        if other == None or not isinstance(other, Description):
+        if other is None or not isinstance(other, Description):
             return False
         return self.description_type == other.description_type and \
                 self.descriptor == other.descriptor
@@ -96,7 +98,7 @@ class Description(Structure):
             if slippage.descriptor1 == self.description_type:
                 new_description_type = slippage.descriptor2
             if slippage.descriptor1 == self.descriptor:
-                new_descriptor == slippage.descriptor2
+                new_descriptor = slippage.descriptor2
 
         return Description(self.workspace, obj, new_description_type, new_descriptor)
 

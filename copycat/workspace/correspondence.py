@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Correspondence."""
 
 import copycat.toolbox as toolbox
 from copycat.workspace import Structure, Letter, Group, Mapping
@@ -84,9 +86,9 @@ class Correspondence(Structure):
             other_correspondences = self.workspace.correspondences()
             if self in other_correspondences:
                 other_correspondences.remove(self)
-            for c in other_correspondences:
-                if self.is_supporting_correspondence(c):
-                    support_sum += c.total_strength
+            for correspondence in other_correspondences:
+                if self.is_supporting_correspondence(correspondence):
+                    support_sum += correspondence.total_strength
             return min(100, support_sum)
 
     def calculate_external_strength(self):
@@ -109,7 +111,7 @@ class Correspondence(Structure):
         if self.is_internally_coherent():
             internal_coherence_factor = 2.5
         else:
-            internal_coherence_factor = 1
+            internal_coherence_factor = 1.0
 
         return min(100, round(average_strength * internal_coherence_factor * \
                               number_of_cms_factor))
@@ -117,12 +119,12 @@ class Correspondence(Structure):
     def is_internally_coherent(self):
         """Return True if there is any pair of relevant distinguishing
         concept mappings that support each other."""
-        cms = self.relevant_distinguishing_concept_mappings()
-        if len(cms) > 1:
-            for cm in cms:
-                for other_cm in cms:
-                    if other_cm != cm:
-                        if cm.is_supporting_concept_mapping(other_cm):
+        mappings = self.relevant_distinguishing_concept_mappings()
+        if len(mappings) > 1:
+            for mapping in mappings:
+                for other_mapping in mappings:
+                    if other_mapping != mapping:
+                        if mapping.is_supporting_concept_mapping(other_mapping):
                             return True
 
     def other_object(self, obj):
@@ -150,18 +152,18 @@ class Correspondence(Structure):
 
     def is_concept_mapping_present(self, mapping):
         """Return True if the correspondence contains the given mapping."""
-        for cm in self.concept_mappings:
-            if cm.descriptor1 == mapping.descriptor1 and \
-               cm.descriptor2 == mapping.descriptor2:
+        for mapping2 in self.concept_mappings:
+            if mapping2.descriptor1 == mapping.descriptor1 and \
+               mapping2.descriptor2 == mapping.descriptor2:
                 return True
         return False
 
     def add_concept_mappings(self, new_mappings):
         """Add a list of concept mapping to the correspondence."""
         self.concept_mappings.extend(new_mappings)
-        for cm in new_mappings:
-            if cm.label:
-                cm.label.activation_buffer += self.workspace.activation
+        for mapping in new_mappings:
+            if mapping.label:
+                mapping.label.activation_buffer += self.workspace.activation
 
     def slippages(self):
         """Return the list of slippages in this correspondence."""
@@ -185,9 +187,9 @@ class Correspondence(Structure):
         """Return a list of all the already existing correspondences that are
         incompatible with the correspondence"""
         incomp = []
-        for c in self.workspace.correspondences():
-            if c and self.is_incompatible_correspondence(c):
-                incomp.append(c)
+        for correspondence in self.workspace.correspondences():
+            if correspondence and self.is_incompatible_correspondence(correspondence):
+                incomp.append(correspondence)
 
         if isinstance(self.object1, Group):
             for obj in self.object1.objects:
@@ -218,10 +220,10 @@ class Correspondence(Structure):
 
         direction_category = self.slipnet.plato_direction_category
         direction_category_cm = None
-        for cm in self.concept_mappings:
-            if cm.description_type1 == direction_category and \
-               cm.description_type2 == direction_category:
-                direction_category_cm = cm
+        for mapping in self.concept_mappings:
+            if mapping.description_type1 == direction_category and \
+               mapping.description_type2 == direction_category:
+                direction_category_cm = mapping
                 break
         if self.object1.is_string_spanning_group() and \
            self.object2.is_string_spanning_group() and \
@@ -244,16 +246,15 @@ class Correspondence(Structure):
 
         if bond1 and bond2 and \
            bond1.direction_category and bond2.direction_category:
-            plato_direction_category = self.slipnet.plato_direction_category
             bond_concept_mappings = [Mapping(self.workspace,
                                              self.slipnet.plato_direction_category,
                                              self.slipnet.plato_direction_category,
                                              bond1.direction_category,
                                              bond2.direction_category,
                                              None, None)]
-            for m1 in bond_concept_mappings:
-                for m2 in self.get_concept_mappings():
-                    if m1.is_incompatible_concept_mapping(m2):
+            for mapping1 in bond_concept_mappings:
+                for mapping2 in self.get_concept_mappings():
+                    if mapping1.is_incompatible_concept_mapping(mapping2):
                         return bond2
 
     def is_incompatible_rule(self):

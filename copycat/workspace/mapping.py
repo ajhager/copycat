@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Mapping"""
 
 import copycat.toolbox as toolbox
 
@@ -62,7 +64,7 @@ class Mapping(object):
         if not (self.descriptor1.are_related(other.descriptor1) or \
                 self.descriptor2.are_related(other.descriptor2)):
             return False
-        if self.label == None or other.label == None:
+        if self.label is None or other.label is None:
             return False
         if self.label != other.label:
             return True
@@ -76,7 +78,7 @@ class Mapping(object):
         elif not (self.descriptor1.are_related(other.descriptor1) or \
                   self.descriptor2.are_related(other.descriptor2)):
             return False
-        elif self.label == None or other.label == None:
+        elif self.label is None or other.label is None:
             return False
         elif self.label == other.label:
             return True
@@ -120,7 +122,7 @@ class Mapping(object):
 
     def label_relevance(self):
         """Return the relevance of the mapping's label."""
-        if self.label == None:
+        if self.label is None:
             return 50
         elif self.label.is_active():
             return 100

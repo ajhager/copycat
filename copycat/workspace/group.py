@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Group"""
 
 import math
 
@@ -45,6 +47,7 @@ class Group(Object, Structure):
         self.right_object = right_object
         self.objects = objects
         self.bonds = bonds
+        self.proposal_level = None
 
         self.middle_object = None
         for obj in objects:
@@ -59,7 +62,7 @@ class Group(Object, Structure):
         self.right_string_position = self.right_object_position
 
         self.bond_category = self.slipnet.get_related_node(group_category,
-                                                    self.slipnet.plato_bond_category)
+                                                           self.slipnet.plato_bond_category)
         self.bond_facet = None
         self.bond_descriptions = []
 
@@ -118,15 +121,13 @@ class Group(Object, Structure):
                                               self.bond_category))
 
         if toolbox.flip_coin(self.length_description_probability()):
-            category = self.slipnet.plato_length
-            plato_number = self.slipnet.get_plato_number(self.length())
             self.add_description(Description(self.workspace, self,
                                              self.slipnet.plato_length,
                                              self.slipnet.get_plato_number(self.length())))
 
     def __eq__(self, other):
         """Return True if the given object is equal to this group."""
-        if other == None or not isinstance(other, Group):
+        if other is None or not isinstance(other, Group):
             return False
         return all([self.left_object_position == other.left_object_position,
                     self.right_object_position == other.right_object_position,
@@ -142,12 +143,12 @@ class Group(Object, Structure):
         based on other facets. This should be fixed; a more general mechanism is
         needed."""
         if self.bond_facet == self.slipnet.plato_letter_category:
-            bond_facet_factor = 1
+            bond_facet_factor = 1.0
         else:
             bond_facet_factor = .5
 
         related = self.slipnet.get_related_node(self.group_category,
-                                         self.slipnet.plato_bond_category)
+                                                self.slipnet.plato_bond_category)
         bond_component = related.degree_of_association() * bond_facet_factor
         length_component = {1:5, 2:20, 3:60}.get(self.length(), 90)
 
@@ -182,7 +183,7 @@ class Group(Object, Structure):
                          other_group.direction_category == self.direction_category:
                 number_of_supporting_groups += 1
         return number_of_supporting_groups
-    
+
     def local_density(self):
         """Return the rough measure of the density in the string of groups of
         the same group category and directin category as the given group. This
@@ -239,6 +240,7 @@ class Group(Object, Structure):
         return round(adjusted_density * number_factor)
 
     def sharing_group(self, other):
+        """Return True if this group is the same as the given group."""
         return self.group == other.group
 
     def is_subgroup_of(self, other):
@@ -269,11 +271,11 @@ class Group(Object, Structure):
         """Return True if the given corresponence is incompatible with the
         group."""
         concept_mapping = None
-        for cm in correspondence.get_concept_mappings():
-            if cm.description_type1 == self.slipnet.plato_string_position_category:
-                concept_mapping = cm
+        for mapping in correspondence.get_concept_mappings():
+            if mapping.description_type1 == self.slipnet.plato_string_position_category:
+                concept_mapping = mapping
                 break
-        if concept_mapping == None:
+        if concept_mapping is None:
             return False
 
         other_object = correspondence.other_object(obj)
@@ -354,7 +356,7 @@ class Group(Object, Structure):
             opposite = self.slipnet.plato_opposite
             group_category = self.slipnet.get_related_node(self.group_category, opposite)
             direction_category = self.slipnet.get_related_node(self.direction_category,
-                                                        opposite)
+                                                               opposite)
             flipped_group = Group(self.workspace, self.string, group_category,
                                   direction_category, self.left_object,
                                   self.right_object, self.objects, new_bonds)
@@ -367,9 +369,9 @@ class Group(Object, Structure):
         """Return a list of the bonds that need to be flipped in order for the
         group to be built."""
         bonds_to_be_flipped = []
-        for b in self.bonds:
-            to_be_flipped = self.string.get_bond(b.to_object, b.from_object)
-            if to_be_flipped and b == to_be_flipped.flipped_version():
+        for bond in self.bonds:
+            to_be_flipped = self.string.get_bond(bond.to_object, bond.from_object)
+            if to_be_flipped and bond == to_be_flipped.flipped_version():
                 bonds_to_be_flipped.append(to_be_flipped)
         return bonds_to_be_flipped
 
@@ -385,9 +387,9 @@ class Group(Object, Structure):
         """Return the probability to be used in deciding whether or not to
         propose the single letter group."""
         exp = {1:4, 2:2}.get(self.number_of_local_supporting_groups(), 1)
-        a = self.local_support() / 100.
-        b = self.slipnet.plato_length.activation / 100.
-        prob = (a * b) ** exp
+        support = self.local_support() / 100.
+        percent = self.slipnet.plato_length.activation / 100.
+        prob = (support * percent) ** exp
         return self.workspace.temperature_adjusted_probability(prob)
 
     def length_description_probability(self):
@@ -395,7 +397,7 @@ class Group(Object, Structure):
         description."""
         if self.length() > 5:
             return 0
-        a = self.length() ** 3
-        b = (100 - self.slipnet.plato_length.activation) / 100.
-        prob = .5 ** (a * b)
+        value = self.length() ** 3
+        percent = (100 - self.slipnet.plato_length.activation) / 100.
+        prob = .5 ** (value * percent)
         return self.workspace.temperature_adjusted_probability(prob)

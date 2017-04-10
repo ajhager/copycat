@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Toolbox of utility functions."""
 
 import math
 import random
@@ -70,13 +72,13 @@ def flatten(sequence):
     else:
         return [sequence]
 
-def flip_coin(prob_of_true = .5):
+def flip_coin(prob_of_true=.5):
     """Returns either True or False based on the probabity of true sent as an
     argument."""
     if prob_of_true >= 1:
         return True
-    return select_assoc([[True, int(prob_of_true * 1000)]
-                        ,[False, int((1 - prob_of_true) * 1000)]])
+    return select_assoc([[True, int(prob_of_true * 1000)],
+                         [False, int((1 - prob_of_true) * 1000)]])
 
 def average(*args):
     """Returns the arithmetic mean of its arguments."""

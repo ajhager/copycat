@@ -3,12 +3,12 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -60,7 +60,7 @@ class Slipnode(object):
             self.shrunk_link_length = round(intrinsic_link_length * .4)
         else:
             self.shrunk_link_length = None
-        
+
         self.activation = 0
         self.activation_buffer = 0
 
@@ -112,7 +112,7 @@ class Slipnode(object):
         objects = string.get_objects()
         description_type_count = 0
         for obj in objects:
-            if obj == None:
+            if obj is None:
                 continue
             if obj.is_description_type_present(self):
                 description_type_count += 1
@@ -195,8 +195,6 @@ class Slipnode(object):
         similar_links = []
         for link in self.has_property_links:
             prob = link.degree_of_association() / 100.0
-            # FIXME: Requires access to the workspace.  Is it needed?
-            #prob = get_temperature_adjusted_probability(prob)
             if toolbox.flip_coin(prob):
                 similar_links.append(link)
         return similar_links

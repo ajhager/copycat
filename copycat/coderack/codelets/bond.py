@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Bond Codelets"""
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
@@ -48,7 +50,7 @@ class BondBottomUpScout(Codelet):
 
         return workspace.propose_bond(from_object, to_object, bond_category,
                                       bond_facet, from_descriptor, to_descriptor)
-        
+
 
 class BondBuilder(Codelet):
     """Attempt to build the proposed bond, fighting with any competitiors."""
@@ -157,26 +159,26 @@ class BondTopDownCategoryScout(Codelet):
 
         obj = string.get_random_object('intra_string_salience')
         neighbor = obj.choose_neighbor()
-        if neighbor == None:
+        if neighbor is None:
             return # Fizzle
 
         facet = workspace.choose_bond_facet(obj, neighbor)
-        if facet == None:
+        if facet is None:
             return # Fizzle
 
         object_descriptor = obj.get_descriptor(facet)
         neighbor_descriptor = neighbor.get_descriptor(facet)
-        if object_descriptor == None or neighbor_descriptor == None:
+        if object_descriptor is None or neighbor_descriptor is None:
             return # Fizzle
 
         if slipnet.get_bond_category(object_descriptor,
-                                   neighbor_descriptor) == category:
+                                     neighbor_descriptor) == category:
             from_object = obj
             to_object = neighbor
             from_descriptor = object_descriptor
             to_descriptor = neighbor_descriptor
         elif slipnet.get_bond_category(neighbor_descriptor,
-                                     object_descriptor) == category:
+                                       object_descriptor) == category:
             from_object = neighbor
             to_object = obj
             from_descriptor = neighbor_descriptor
@@ -217,21 +219,21 @@ class BondTopDownDirectionScout(Codelet):
             neighbor = obj.choose_left_neighbor()
         elif category == slipnet.plato_right:
             neighbor = obj.choose_right_neighbor()
-        if neighbor == None:
+        if neighbor is None:
             return # Fizzle
 
         facet = workspace.choose_bond_facet(obj, neighbor)
-        if facet == None:
+        if facet is None:
             return # Fizzle
-        
+
         object_descriptor = obj.get_descriptor(facet)
         neighbor_descriptor = neighbor.get_descriptor(facet)
-        if object_descriptor == None or neighbor_descriptor == None:
+        if object_descriptor is None or neighbor_descriptor is None:
             return # Fizzle
 
         bond_category = slipnet.get_bond_category(object_descriptor,
-                                                neighbor_descriptor)
-        if bond_category == None or not bond_category.directed:
+                                                  neighbor_descriptor)
+        if bond_category is None or not bond_category.directed:
             return # Fizzle
 
         return workspace.propose_bond(obj, neighbor,

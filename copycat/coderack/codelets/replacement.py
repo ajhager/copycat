@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Rune Codelets"""
 
 from copycat.coderack import Codelet
 from copycat.workspace import Replacement
@@ -39,7 +41,7 @@ class ReplacementFinder(Codelet):
         if i_letter_category != m_letter_category:
             i_letter.is_changed = True
             change_relation = slipnet.get_label_node(i_letter_category,
-                                                   m_letter_category)
+                                                     m_letter_category)
             if change_relation:
                 description = ExtrinsicDescription(change_relation,
                                                    slipnet.plato_letter_category,

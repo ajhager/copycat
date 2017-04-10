@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""String"""
 
 import random
 
@@ -92,7 +94,7 @@ class String(object):
     def remove_group(self, group):
         """Remove a group from the string."""
         if group.left_object.string_number in self.groups:
-            del(self.groups[group.left_object.string_number])
+            del self.groups[group.left_object.string_number]
         self.remove_from_object_positions(group, group.left_string_position)
         self.remove_from_object_positions(group, group.right_string_position)
 
@@ -161,18 +163,18 @@ class String(object):
         left_number = bond.left_object.string_number
         right_number = bond.right_object.string_number
         if (left_number, right_number) in self.left_right_bonds:
-            del(self.left_right_bonds[(left_number, right_number)])
+            del self.left_right_bonds[(left_number, right_number)]
 
         from_number = bond.from_object.string_number
         to_number = bond.to_object.string_number
         if (from_number, to_number) in self.from_to_bonds:
-            del(self.from_to_bonds[(from_number, to_number)])
+            del self.from_to_bonds[(from_number, to_number)]
 
         if bond.bond_category == self.slipnet.plato_sameness:
             if (right_number, left_number) in self.left_right_bonds:
-                del(self.left_right_bonds[(right_number, left_number)])
+                del self.left_right_bonds[(right_number, left_number)]
             if (to_number, from_number) in self.from_to_bonds:
-                del(self.from_to_bonds[(to_number, from_number)])
+                del self.from_to_bonds[(to_number, from_number)]
 
     def get_bonds(self):
         """Return a list of the built bonds in the string."""

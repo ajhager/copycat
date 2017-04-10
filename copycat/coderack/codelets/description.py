@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Description Codelets"""
 
 from copycat.coderack import Codelet
 import copycat.toolbox as toolbox
@@ -32,7 +34,7 @@ class DescriptionBottomUpScout(Codelet):
         obj = workspace.choose_object('total_salience')
 
         description = obj.choose_relevant_description_by_activation()
-        if description == None:
+        if description is None:
             return # Fizzle
         descriptor = description.descriptor
 
@@ -44,7 +46,7 @@ class DescriptionBottomUpScout(Codelet):
         activations = [link.to_node.activation for link in links]
         choices = map(lambda a, b: a * b, associations, activations)
         prop = toolbox.weighted_select(choices, links).to_node
-        
+
         return workspace.propose_description(obj, prop.category(), prop)
 
 class DescriptionBuilder(Codelet):
@@ -85,7 +87,7 @@ class DescriptionStrengthTester(Codelet):
         probability = workspace.temperature_adjusted_probability(probability)
         if not toolbox.flip_coin(probability):
             return # Fizzle
-        
+
         return [(DescriptionBuilder([description]), strength)]
 
 class DescriptionTopDownScout(Codelet):

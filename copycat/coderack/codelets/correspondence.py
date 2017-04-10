@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Correspondence Codelets"""
 
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
@@ -59,7 +61,7 @@ class CorrespondenceBottomUpScout(Codelet):
             description_type = mapping.description_type1
             if description_type != slipnet.plato_string_position_category and \
                description_type != slipnet.plato_bond_facet:
-                   opposite_mappings.append(mapping)
+                opposite_mappings.append(mapping)
 
         opposite_descriptions = [m.description_type1 for m in opposite_mappings]
         if all([object1.is_string_spanning_group(),
@@ -129,7 +131,7 @@ class CorrespondenceBuilder(Codelet):
                                           [incompatible_correspondence],
                                           incompatible_correspondence.letter_span()):
                 return # Fizzle
-        
+
         incompatible_bond = None
         incompatible_group = None
         if (object1.is_leftmost_in_string() or object1.is_rightmost_in_string()) and \
@@ -164,7 +166,7 @@ class CorrespondenceBuilder(Codelet):
 
         if incompatible_group:
             workspace.break_group(incompatible_group)
-        
+
         if existing_obj2_group:
             workspace.break_group(existing_obj2_group)
             for bond in existing_obj2_group.bonds:

@@ -3,24 +3,25 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import random
+"""Workspace Object."""
 
+import random
 import copycat.toolbox as toolbox
 
 class Object(object):
     """Object is either a letter or group in the workspace.
-    
+
     Attributes:
         string: Workspace String the object is a part of.
         string_number: A unique identifying number in its string.
@@ -82,14 +83,15 @@ class Object(object):
         self.is_changed = False
         self.is_new_answer_letter = False
         self.clamp_salience = False
-        
+        self.objects = []
+
     def flipped_version(self):
         """Return the default flipped version of an object, itself."""
         return self
 
     def calculate_raw_importance(self):
         """Return the raw importance of the object.
-        
+
         This is a function of the number and activation of the object's relevant
         descriptions. In addition, the importance of the changed object is
         enhanced, and the importance of objects in groups is dimished. Sum the
@@ -140,7 +142,7 @@ class Object(object):
     def calculate_total_happiness(self):
         """Return the total string happiness."""
         return round(toolbox.average(self.intra_string_happiness,
-                                      self.inter_string_happiness))
+                                     self.inter_string_happiness))
 
     def calculate_total_unhappiness(self):
         """Return the total string unhappiness."""
@@ -148,7 +150,7 @@ class Object(object):
 
     def calculate_intra_string_salience(self):
         """Return the intra string salience.
-        
+
         This value represents how much the object is crying out for attention
         from codelets that build structures inside a single string."""
         if self.clamp_salience:
@@ -187,7 +189,7 @@ class Object(object):
         self.intra_string_salience = self.calculate_intra_string_salience()
         self.inter_string_salience = self.calculate_inter_string_salience()
         self.total_salience = self.calculate_total_salience()
-        
+
     def letter_span(self):
         """Return the number of letters spanned by the object."""
         if self.type_name == 'letter':
@@ -339,13 +341,13 @@ class Object(object):
     def distinguishing_descriptions(self):
         """Return a list of the object's distinguishing descriptions; those
         which distinguish it in a string."""
-        f = self.is_distinguishing_descriptor
-        return [d for d in self.descriptions if f(d.descriptor)]
+        dist = self.is_distinguishing_descriptor
+        return [d for d in self.descriptions if dist(d.descriptor)]
 
     def non_distinguishing_descriptions(self):
         """Return a list of the object's non distinguishing descriptions."""
-        f = self.is_distinguishing_descriptor
-        return [d for d in self.descriptions if not f(d.descriptor)]
+        dist = self.is_distinguishing_descriptor
+        return [d for d in self.descriptions if not dist(d.descriptor)]
 
     def is_distinguishing_descriptor(self, descriptor):
         """Return True if no other object of the same type has the same
@@ -412,20 +414,20 @@ class Object(object):
 
     def is_description_present(self, description):
         """Return True if this object already has this description."""
-        for d in self.descriptions:
-            if d.description_type == description.description_type and \
-               d.descriptor == description.descriptor:
+        for description in self.descriptions:
+            if description.description_type == description.description_type and \
+               description.descriptor == description.descriptor:
                 return True
 
     def rule_initial_string_descriptions(self):
         """Return all the descriptions that can be used in making the initial
         string part of the rule, with this object as the changed object."""
         descriptions = []
-        for d in self.descriptions:
-            if d.description_type.is_active() and \
-               self.is_distinguishing_descriptor(d.descriptor) and \
-               d.descriptor != self.slipnet.plato_object_category:
-                descriptions.append(d)
+        for description in self.descriptions:
+            if description.description_type.is_active() and \
+               self.is_distinguishing_descriptor(description.descriptor) and \
+               description.descriptor != self.slipnet.plato_object_category:
+                descriptions.append(description)
         return descriptions
 
     def rule_modified_string_descriptions(self):
@@ -435,11 +437,11 @@ class Object(object):
         descriptions = []
         categories = [self.slipnet.plato_string_position_category,
                       self.slipnet.plato_object_category]
-        for d in self.descriptions:
-            if d.description_type.is_active() and \
-               self.is_distinguishing_descriptor(d.descriptor) and \
-               d.description_type not in categories:
-                descriptions.append(d)
+        for description in self.descriptions:
+            if description.description_type.is_active() and \
+               self.is_distinguishing_descriptor(description.descriptor) and \
+               description.description_type not in categories:
+                descriptions.append(description)
         return descriptions
 
     def add_incoming_bond(self, bond):
@@ -467,12 +469,12 @@ class Object(object):
 
     def is_descriptor_present(self, descriptor):
         """Return True if this object has a description with descriptor."""
-        for d in self.descriptions:
-            if d.descriptor == descriptor:
+        for description in self.descriptions:
+            if description.descriptor == descriptor:
                 return True
 
     def is_description_type_present(self, description_type):
         """Return True if this object has a description with the given type."""
-        for d in self.descriptions:
-            if d.description_type == description_type:
+        for description in self.descriptions:
+            if description.description_type == description_type:
                 return True

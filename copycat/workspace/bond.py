@@ -3,16 +3,18 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
+
+"""Bond"""
 
 import math
 
@@ -30,7 +32,7 @@ class Bond(Structure):
         bond_facet: Which facet is being related.
         from_object_descriptor:
         to_object_descriptor:"""
-        
+
     def __init__(self, workspace, from_object, to_object, bond_category,
                  bond_facet, from_object_descriptor, to_object_descriptor):
         """Initialize Bond."""
@@ -54,6 +56,7 @@ class Bond(Structure):
         self.right_string_position = max(from_object.right_string_position,
                                          to_object.right_string_position)
 
+        self.proposal_level = None
         self.string = from_object.string
         self.structure_category = Bond
         self.bond_category = bond_category
@@ -67,7 +70,7 @@ class Bond(Structure):
 
     def __eq__(self, other):
         """Return True if this and the given bond represent the same bond."""
-        if other == None or not isinstance(other, Bond):
+        if other is None or not isinstance(other, Bond):
             return False
         return all([self.from_object == other.from_object,
                     self.to_object == other.to_object,
@@ -86,13 +89,13 @@ class Bond(Structure):
         """Bonds between objects of the same type are stronger than bonds
         between different types. Letter category bonds are stronger than other
         types of bonds.  A more general mechanism is needed."""
-        if type(self.from_object) == type(self.to_object):
-            member_compatibility_factor = 1
+        if type(self.from_object) is type(self.to_object):
+            member_compatibility_factor = 1.0
         else:
             member_compatibility_factor = .7
 
         if self.bond_facet == self.slipnet.plato_letter_category:
-            bond_facet_factor = 1
+            bond_facet_factor = 1.0
         else:
             bond_facet_factor = .7
 
@@ -106,9 +109,9 @@ class Bond(Structure):
             return None
         left_neighbors = []
         for left_neighbor_object in self.left_object.all_left_neighbors():
-            x = left_neighbor_object.string_number
-            y = self.left_object.string_number
-            possible_left_neighbor = self.string.left_right_bonds.get((x, y))
+            left1 = left_neighbor_object.string_number
+            left2 = self.left_object.string_number
+            possible_left_neighbor = self.string.left_right_bonds.get((left1, left2))
             if possible_left_neighbor != None:
                 left_neighbors.append(possible_left_neighbor)
         saliences = [neighbor.salience() for neighbor in left_neighbors]
@@ -120,9 +123,9 @@ class Bond(Structure):
             return None
         right_neighbors = []
         for right_neighbor_object in self.right_object.all_right_neighbors():
-            x = self.right_object.string_number
-            y = right_neighbor_object.string_number
-            possible_right_neighbor = self.string.left_right_bonds.get((x, y))
+            right1 = self.right_object.string_number
+            right2 = right_neighbor_object.string_number
+            possible_right_neighbor = self.string.left_right_bonds.get((right1, right2))
             if possible_right_neighbor != None:
                 right_neighbors.append(possible_right_neighbor)
         saliences = [neighbor.salience() for neighbor in right_neighbors]
@@ -191,7 +194,7 @@ class Bond(Structure):
         for mapping in correspondence.get_concept_mappings():
             if mapping.description_type1 == plato_string_position_category:
                 string_position_category_mapping = mapping
-        if string_position_category_mapping == None:
+        if string_position_category_mapping is None:
             return []
 
         if other_object.is_leftmost_in_string():
@@ -203,7 +206,7 @@ class Bond(Structure):
 
         if not other_bond:
             return []
-        if other_bond.direction_category == None:
+        if other_bond.direction_category is None:
             return []
 
         mapping = Mapping(self.workspace,
@@ -242,7 +245,7 @@ class Bond(Structure):
         returns a predecessor bond going to the left using the same two
         objects."""
         category = self.slipnet.get_related_node(self.bond_category,
-                                            self.slipnet.plato_opposite)
+                                                 self.slipnet.plato_opposite)
         flipped_bond = Bond(self.workspace, self.to_object, self.from_object,
                             category, self.bond_facet, self.to_object_descriptor,
                             self.from_object_descriptor)
@@ -260,6 +263,7 @@ class Bond(Structure):
         same bond category and direction category as the given bond. This method
         is used in calculating the external strength of a bond."""
         def calc(direction):
+            """Inner calculation."""
             slot_sum = 0
             support_sum = 0
             method_name = 'choose_%s_neighbor' % direction
@@ -268,9 +272,9 @@ class Bond(Structure):
             next_object = getattr(last_object, method_name)()
             while next_object:
                 slot_sum += 1
-                x = next_object.string_number
-                y = last_object.string_number
-                bond = self.string.left_right_bonds.get((x, y))
+                first = next_object.string_number
+                last = last_object.string_number
+                bond = self.string.left_right_bonds.get((first, last))
                 if bond:
                     if bond.bond_category == self.bond_category and \
                        bond.direction_category == self.direction_category:

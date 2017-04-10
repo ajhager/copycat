@@ -3,19 +3,20 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-import sys
+"""Rule Codelets"""
 
+import sys
 import copycat.toolbox as toolbox
 from copycat.coderack import Codelet
 from copycat.workspace import Rule, ExtrinsicDescription
@@ -55,7 +56,7 @@ class RuleScout(Codelet):
 
         if len(changed_objects) > 1:
             print("Can't solve problems with more than one letter changed.")
-            # FIXME: Too harsh.
+            # FIXME: Too harsh, especially for graphical clients.
             sys.exit()
 
         if not changed_objects:
@@ -93,7 +94,7 @@ class RuleScout(Codelet):
 
         if isinstance(m_description, ExtrinsicDescription):
             related_descriptor = slipnet.get_related_node(i_description.descriptor,
-                                                        m_description.relation)
+                                                          m_description.relation)
             if related_descriptor:
                 for description in m_object.descriptions:
                     if description.descriptor == related_descriptor:

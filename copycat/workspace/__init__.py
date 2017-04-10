@@ -3,22 +3,22 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+"""Workspace is the blackboard or workspace of copycat."""
+
 import math
 import random
-
 import copycat.toolbox as toolbox
-
 from copycat.workspace.structure import Structure
 from copycat.workspace.wobject import Object
 from copycat.workspace.description import Description
@@ -32,38 +32,37 @@ from copycat.workspace.replacement import Replacement
 from copycat.workspace.rule import Rule
 from copycat.workspace.string import String
 from copycat.workspace.distribution import Distribution
-
 from copycat.coderack.codelets import *
 
-very_low_distribution = Distribution("very_low")
+VERY_LOW_DISTRIBUTION = Distribution("very_low")
 for i, v in {10:5, 20:150, 30:5, 40:2, 50:1,
              60:1, 70:1, 80:1, 90:1, 100:1}.items():
-    very_low_distribution.set(i, v)
+    VERY_LOW_DISTRIBUTION.set(i, v)
 
-low_distribution = Distribution("low")
+LOW_DISTRIBUTION = Distribution("low")
 for i, v in {10:2, 20:5, 30:150, 40:5, 50:2,
              60:1, 70:1, 80:1, 90:1, 100:1}.items():
-    low_distribution.set(i, v)
+    LOW_DISTRIBUTION.set(i, v)
 
-medium_distribution = Distribution("medium")
+MEDIUM_DISTRIBUTION = Distribution("medium")
 for i, v in {10:1, 20:2, 30:5, 40:150, 50:5,
              60:2, 70:1, 80:1, 90:1, 100:1}.items():
-    medium_distribution.set(i, v)
+    MEDIUM_DISTRIBUTION.set(i, v)
 
-high_distribution = Distribution("high")
+HIGH_DISTRIBUTION = Distribution("high")
 for i, v in {10:1, 20:1, 30:2, 40:5, 50:150,
              60:5, 70:2, 80:1, 90:1, 100:1}.items():
-    high_distribution.set(i, v)
+    HIGH_DISTRIBUTION.set(i, v)
 
-very_high_distribution = Distribution("very_high")
+VERY_HIGH_DISTRIBUTION = Distribution("very_high")
 for i, v in {10:5, 20:150, 30:5, 40:2, 50:1,
              60:1, 70:1, 80:1, 90:1, 100:1}.items():
-    very_high_distribution.set(i, v)
+    VERY_HIGH_DISTRIBUTION.set(i, v)
 
 class Workspace(object):
     """Workspace
 
-    The workspace contains a list of replacements (mappings from the 
+    The workspace contains a list of replacements (mappings from the
     initial string to the modified string, e.g., from "abc" to "abd"),
     a vector of correspondences (mappings from the initial-string to the
     target string, e.g., from "abc" to "pqrs"), and an array of proposed
@@ -101,6 +100,10 @@ class Workspace(object):
         self.snag_count = 0
         self.last_snag_time = 0
         self.snag_structures = []
+
+        self.changed_length_group = None
+        self.amount_length_changed = None
+        self.modified_letters = None
 
         if self.initial_string.length == 1 or self.target_string.length == 1:
             self.slipnet.plato_object_category.activation_buffer += self.activation
@@ -150,7 +153,7 @@ class Workspace(object):
             else:
                 description = Description(self, leftmost_letter,
                                           self.slipnet.plato_string_position_category,
-                                          self.slipet.plato_single)
+                                          self.slipnet.plato_single)
                 leftmost_letter.add_description(description)
 
             if string.length == 3:
@@ -201,7 +204,7 @@ class Workspace(object):
                 if not isinstance(structure, Bond) and \
                         not self.is_structure_in_snag_structures(structure):
                     new_structures.append(structure)
-            
+
             unclamp_probability = 0
             if new_structures:
                 strengths = [s.total_strength for s in new_structures]
@@ -290,10 +293,10 @@ class Workspace(object):
                         return [] # Snag
 
                 group_direction = obj.direction_category
-                a = int(new_descriptor.name)
-                b = int(obj.get_descriptor(self.slipnet.plato_length).name)
-                
-                self.amount_length_changed = a - b
+                initial = int(new_descriptor.name)
+                end = int(obj.get_descriptor(self.slipnet.plato_length).name)
+
+                self.amount_length_changed = initial - end
 
                 if not group_direction or group_direction == self.slipnet.plato_right:
                     first_letter = obj.string.get_letter(obj.left_object_position)
@@ -309,7 +312,7 @@ class Workspace(object):
                 modified_letters.append(new_letter)
                 new_string_position = new_letter.left_string_position
 
-                for i in range(1, int(new_descriptor.name) - 1):
+                for _ in range(1, int(new_descriptor.name) - 1):
                     if not new_letter:
                         break
                     if not group_direction or \
@@ -377,7 +380,7 @@ class Workspace(object):
             return None
         if self.translated_rule.relation:
             return self.slipnet.get_related_node(old_descriptor,
-                                            self.translated_rule.relation)
+                                                 self.translated_rule.relation)
         else:
             return self.translated_rule.descriptor2
 
@@ -392,34 +395,34 @@ class Workspace(object):
 
     def slippages(self):
         """Return a list of slippages in all correspondences."""
-        slippages =[]
-        for c in self.correspondences():
-            slippages.extend(c.slippages())
+        slippages = []
+        for correspondence in self.correspondences():
+            slippages.extend(correspondence.slippages())
         return slippages
 
     def intra_string_unhappiness(self):
         """Return the weighted average of the intra string unhappiness of
         objects on the workspace, weighted by each object's relative imoprtance
         in the string."""
-        s = sum([obj.relative_importance * obj.intra_string_unhappiness
-                 for obj in self.objects()])
-        return min(100, s / 200.0)
+        unhappiness = sum([obj.relative_importance * obj.intra_string_unhappiness
+                           for obj in self.objects()])
+        return min(100, unhappiness / 200.0)
 
     def inter_string_unhappiness(self):
         """Return a weighted average of the inter string unhappiness of ojbects
         on the workspace, weighted by each object's relative importnace in the
         string."""
-        s = sum([obj.relative_importance * obj.inter_string_unhappiness
-                 for obj in self.objects()])
-        return min(100, s / 200.0)
+        unhappiness = sum([obj.relative_importance * obj.inter_string_unhappiness
+                           for obj in self.objects()])
+        return min(100, unhappiness / 200.0)
 
     def total_unhappiness(self):
         """Return a weighted average of the total unhappiness of ojbects on
         the workspace, weighted by each object's relative importnace in the
         string."""
-        s = sum([obj.relative_importance * obj.total_unhappiness
-                 for obj in self.objects()])
-        return min(100, s / 200.0)
+        unhappiness = sum([obj.relative_importance * obj.total_unhappiness
+                           for obj in self.objects()])
+        return min(100, unhappiness / 200.0)
 
     def is_structure_in_snag_structures(self, structure):
         """This method is used after a snag has been hit and the temperature has
@@ -434,7 +437,7 @@ class Workspace(object):
                     if struct.from_object == structure.from_object and \
                        struct.to_object == structure.to_object and \
                        struct.bond_category == structure.bond_category and \
-                       struct.direction_category ==   structure.direction_category:
+                       struct.direction_category == structure.direction_category:
                         return True
         elif isinstance(structure, Group):
             for struct in self.snag_structures:
@@ -522,7 +525,7 @@ class Workspace(object):
         """Return any groups that contain both objects at the same level."""
         common_groups = []
         for group in object1.string.get_groups():
-            if group == None:
+            if group is None:
                 continue
             if group.is_recursive_member(object1) and \
                     group.is_recursive_member(object2):
@@ -575,13 +578,13 @@ class Workspace(object):
 
     def add_correspondence(self, correspondence):
         """Add a correspondence to the workspace."""
-        i = correspondence.object1.string_number
-        self._correspondences[i] = correspondence
+        index = correspondence.object1.string_number
+        self._correspondences[index] = correspondence
 
     def delete_correspondence(self, correspondence):
         """Delete a correspondence from the workpace."""
-        i = correspondence.object1.string_number
-        del(self._correspondences[i])
+        index = correspondence.object1.string_number
+        del(self._correspondences[index])
 
     def is_correspondence_present(self, correspondence):
         """Return True if the given correspondence exists on the workspace."""
@@ -632,10 +635,11 @@ class Workspace(object):
         uncorresponding objects in the workspace."""
         uncorresponding_objects = self.uncorresponding_objects()
         if not uncorresponding_objects:
-            n = 0
+            importance = 0
         else:
-            n = max([o.relative_importance() for o in uncorresponding_objects])
-        return self.rough_indication(n / 10)
+            importance = max([o.relative_importance()
+                              for o in uncorresponding_objects])
+        return self.rough_indication(importance / 10)
 
     def propose_correspondence(self, object1, object2, mappings, flip_obj2):
         """Create a proposed correspondence and pots a correspondece strength
@@ -643,11 +647,11 @@ class Workspace(object):
         distinguishing concept mappings underlying the correspondence."""
         correspondence = Correspondence(self, object1, object2, mappings)
         correspondence.proposal_level = 1
-        for cm in correspondence.get_concept_mappings():
-            cm.description_type1.activation_buffer += self.activation
-            cm.descriptor1.activation_buffer += self.activation
-            cm.description_type2.activation_buffer += self.activation
-            cm.descriptor2.activation_buffer += self.activation
+        for maps in correspondence.get_concept_mappings():
+            maps.description_type1.activation_buffer += self.activation
+            maps.descriptor1.activation_buffer += self.activation
+            maps.description_type2.activation_buffer += self.activation
+            maps.descriptor2.activation_buffer += self.activation
         self.add_proposed_correspondence(correspondence)
         dist_mappings = correspondence.get_distinguishing_mappings()
         return [(CorrespondenceStrengthTester([correspondence, flip_obj2]),
@@ -689,8 +693,8 @@ class Workspace(object):
             obj.group = group
         for bond in group.bonds:
             bond.group = group
-        for d in group.descriptions:
-            d.descriptor.activation_buffer += self.activation
+        for description in group.descriptions:
+            description.descriptor.activation_buffer += self.activation
 
     def break_group(self, group):
         """Break the given group."""
@@ -716,16 +720,16 @@ class Workspace(object):
         proposed_correspondences = []
         if string == self.initial_string:
             for i in range(self.target_string.highest_string_number):
-                c = self.get_proposed_correspondence(group.string_number, i)
-                if c:
-                    proposed_correspondences.extend(c)
+                proposed = self.get_proposed_correspondence(group.string_number, i)
+                if proposed:
+                    proposed_correspondences.extend(proposed)
         else:
             for i in range(self.initial_string.highest_string_number):
-                c = self.get_proposed_correspondence(group.string_number, i)
-                if c:
-                    proposed_correspondences.extend(c)
-        for c in proposed_correspondences:
-            self.remove_proposed_correspondence(c)
+                proposed = self.get_proposed_correspondence(group.string_number, i)
+                if proposed:
+                    proposed_correspondences.extend(proposed)
+        for proposed in proposed_correspondences:
+            self.remove_proposed_correspondence(proposed)
 
         if group.correspondence:
             self.break_correspondence(group.correspondence)
@@ -829,22 +833,22 @@ class Workspace(object):
 
         mappings = correspondence.relevant_distinguishing_concept_mappings() + \
                    correspondence.accessory_concept_mappings
-        for cm in mappings:
-            if cm.is_slippage():
-                correspondence.add_accessory_concept_mapping(cm.symmetric_version())
+        for mapping in mappings:
+            if mapping.is_slippage():
+                correspondence.add_accessory_concept_mapping(mapping.symmetric_version())
 
         if isinstance(object1, Group) and isinstance(object2, Group):
-            for cm in self.get_concept_mappings(object1, object2,
-                                                object1.bond_descriptions,
-                                                object2.bond_descriptions):
-                correspondence.add_accessory_concept_mapping(cm)
-                if cm.is_slippage():
-                    cm_sym = cm.symmetric_version()
-                    correspondence.add_accessory_concept_mapping(cm_sym)
+            for mapping in self.get_concept_mappings(object1, object2,
+                                                     object1.bond_descriptions,
+                                                     object2.bond_descriptions):
+                correspondence.add_accessory_concept_mapping(mapping)
+                if mapping.is_slippage():
+                    mapping_sym = mapping.symmetric_version()
+                    correspondence.add_accessory_concept_mapping(mapping_sym)
 
-        for cm in correspondence.concept_mappings:
-            if cm.label:
-                cm.label.activation_buffer += self.activation
+        for mapping in correspondence.concept_mappings:
+            if mapping.label:
+                mapping.label.activation_buffer += self.activation
 
     def break_correspondence(self, correspondence):
         """Break a correspondence in the workspace."""
@@ -886,22 +890,22 @@ class Workspace(object):
            self.target_string.length == 1:
             bond_density = 1
         else:
-            a = len(self.initial_string.get_bonds() + \
+            bonds = len(self.initial_string.get_bonds() + \
                     self.target_string.get_bonds())
-            b = (1 - self.initial_string.length) + \
+            letters = (1 - self.initial_string.length) + \
                     (1 - self.target_string.length)
-            bond_density = a / float(b)
+            bond_density = bonds / float(letters)
 
         if bond_density >= .8:
-            return very_low_distribution
+            return VERY_LOW_DISTRIBUTION
         elif bond_density >= .6:
-            return low_distribution
+            return LOW_DISTRIBUTION
         elif bond_density >= .4:
-            return medium_distribution
+            return MEDIUM_DISTRIBUTION
         elif bond_density >= .2:
-            return high_distribution
+            return HIGH_DISTRIBUTION
         else:
-            return very_high_distribution
+            return VERY_HIGH_DISTRIBUTION
 
     def temperature_adjusted_probability(self, probability):
         """Takes a probability and returns a new probability from 0 to 1 based
@@ -947,7 +951,7 @@ class Workspace(object):
             probability = 100
         elif category == 'translator_rule' and self.rule:
             probability = 100
-        
+
         return probability / 100.
 
     def post_codelet_number(self, category):
@@ -981,10 +985,10 @@ class Workspace(object):
         probability = self.post_codelet_probability(category)
         number = self.post_codelet_number(category)
         if toolbox.flip_coin(probability):
-            for i in range(number):
+            for _ in range(number):
                 codelets.append((codelet(args), urgency))
         return codelets
-            
+
     def bottom_up_codelets(self):
         """Returns various bottom up codelets, with urgency and number based on
         how many of each type of codelet is needed."""
@@ -1126,7 +1130,7 @@ class Workspace(object):
         """Build the translated rule."""
         self.translated_rule = translated_rule
 
-    def break_rule(self, rule):
+    def break_rule(self, _):
         """Break the rule. The only reason this function has an argument is so
         that it matchs the form of the other "break" functions and thus the
         break codelets that call it."""
