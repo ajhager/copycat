@@ -3,12 +3,12 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -17,17 +17,15 @@
 # IDEAS:
 # Add drawing routines for workspace structures
 
-import string
-
 import pyglet
 
 class Letter(object):
     def __init__(self, letter, x, y, batch):
         self.letter = letter
         self.label = pyglet.text.Label(letter.name, "EraserDust", 36, x=x, y=y,
-                                       color=(255,255,255, 100), batch=batch)
+                                       color=(255, 255, 255, 100), batch=batch)
 
-    def update(self, dt):
+    def update(self, _):
         if self.letter.is_changed:
             self.label.color = (255, 100, 100, 130)
 

@@ -3,12 +3,12 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -17,8 +17,8 @@
 # IDEAS:
 # Intensity of the codelet count should be how probable that type is to be chosen
 
-import pyglet
 from collections import defaultdict as dd
+import pyglet
 
 class Coderack(object):
     def __init__(self, coderack, x, y, w, h, batch):
@@ -53,7 +53,7 @@ class Coderack(object):
                   'Group Direction Scout', 'Group Whole String Scout',
                   'Replacement Finder', 'Rule Builder', 'Rule Scout',
                   'Rule Strenth Tester', 'Rule Translator']
-        
+
         self.codelets = []
         self.counts = []
         x = self.x + 43
@@ -64,7 +64,7 @@ class Coderack(object):
                 x += 270
                 y = self.h - 10
             label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
-                                      color=(200, 255, 180, 80),batch=self.batch)
+                                      color=(200, 255, 180, 80), batch=self.batch)
             label2 = pyglet.text.Label("", "EraserDust", 12, x=x - 25, y=y,
                                        color=(255, 255, 255, 0), batch=self.batch)
             label.name = name
@@ -85,7 +85,7 @@ class Coderack(object):
                 alpha = int(name.color[3] - (name.color[3] * dt))
                 if alpha > 80:
                     name.color = (200, 255, 180, alpha)
-            
+
             # Change this to urgency instead of number.
             num = counts[name.name]
             name = str(num)

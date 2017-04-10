@@ -3,12 +3,12 @@
 # Copycat is free software; you can redistribute it and/or modify
 # it under the terms of version 2 of the GNU General Public License,
 # as published by the Free Software Foundation.
-# 
+#
 # Copycat is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with Copycat; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -29,15 +29,15 @@ pyglet.resource.add_font("erasdust.ttf")
 
 from copycat.run import Run
 
-from coderack import Coderack
-from slipnet import Slipnet
-from workspace import Workspace
+from .coderack import Coderack
+from .slipnet import Slipnet
+from .workspace import Workspace
 
 class Button(object):
     """Make this function as a normal os button would.
-    
+
     highlight when hovered.
-    
+
     make the keybinding settable"""
 
     def __init__(self, image, x, y, callback, batch):
@@ -71,7 +71,7 @@ class Button(object):
     def on_key_press(self, symbol, modifiers):
         if symbol == pyglet.window.key.SPACE:
             self.callback()
-        
+
 class Window(pyglet.window.Window):
     """The main window keeps track of what scene is currently being viewed,
     manages the gui elements that are always on screen, and takes care of
@@ -107,12 +107,12 @@ class Window(pyglet.window.Window):
                              self.on_play_button, self.batch)
 
         self.timer = pyglet.text.Label("0", "EraserDust", 18, x=512, y=574,
-                                       color=(255,255,255, 125), batch=self.batch,
-                                       halign="center", anchor_x="center")
+                                       color=(255, 255, 255, 125), batch=self.batch,
+                                       anchor_x="center")
 
         self.rule = pyglet.text.Label("", "EraserDust", 16, x=512, y=445,
-                                      color=(255,255,255, 190), batch=self.batch,
-                                      halign="center", anchor_x="center")
+                                      color=(255, 255, 255, 190), batch=self.batch,
+                                      anchor_x="center")
 
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300, self.batch)
         self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300, self.batch)
@@ -127,10 +127,10 @@ class Window(pyglet.window.Window):
             self.show_fps = not self.show_fps
         elif symbol == pyglet.window.key.SPACE:
             self.button.on_key_press(symbol, modifiers)
-    
+
     def on_mouse_press(self, x, y, button, modifiers):
         self.button.on_mouse_press(x, y, button, modifiers)
-        
+
     def on_mouse_release(self, x, y, button, modifiers):
         self.button.on_mouse_release(x, y, button, modifiers)
 
@@ -169,7 +169,7 @@ class Window(pyglet.window.Window):
             self.background.color = (240,
                                      255 - self.saved_temp / 1.4,
                                      255 - self.saved_temp / 1.15)
-        
+
         # Update the simulation at the given speed.
         self.time += dt
         if self.time >= 1.0 / self.speed:
