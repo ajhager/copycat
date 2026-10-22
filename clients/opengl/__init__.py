@@ -21,11 +21,10 @@
 # Add the ability to type in the problem and seed in client
 # Add a module for doing bulk runs showing a graph of stats
 
-import os
-
+import os  # GUI-2026
 import pyglet
 from pyglet.gl import *
-# The data folder is found from this file, so the GUI runs from any directory.
+# GUI-2026: the data folder is found from this file, so the GUI runs from any directory.
 pyglet.resource.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
 pyglet.resource.reindex()
 pyglet.resource.add_font("erasdust.ttf")
@@ -85,7 +84,7 @@ class Window(pyglet.window.Window):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        self.clock = pyglet.window.FPSDisplay(self)  # pyglet 1.4+ API
+        self.clock = pyglet.window.FPSDisplay(self)  # LINUX-2026: pyglet 1.4+ API
         self.show_fps = False
 
         self.done = False
@@ -113,13 +112,17 @@ class Window(pyglet.window.Window):
                                        color=(255, 255, 255, 125), batch=self.batch,
                                        anchor_x="center")
 
-        self.rule = pyglet.text.Label("", font_name="EraserDust", font_size=16, x=512, y=445,
+        # GUI-2026: the rule moved to the right half, between the modified string and the
+        # answer, so the correspondences drawn on the left stay legible; it may wrap.
+        self.rule = pyglet.text.Label("", font_name="EraserDust", font_size=16, x=768, y=445,
                                       color=(255, 255, 255, 190), batch=self.batch,
-                                      anchor_x="center")
+                                      anchor_x="center", anchor_y="center",
+                                      multiline=True, width=470, align="center")
 
         self.slipnet = Slipnet(self.run.slipnet, 0, 0, 512, 300, self.batch)
         self.coderack = Coderack(self.run.coderack, 512, 0, 512, 300, self.batch)
-        self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300, self.batch)
+        self.workspace = Workspace(self.run.workspace, 0, 300, 1024, 300, self.batch,
+                                   rule_label=self.rule)  # GUI-2026: it draws the rule as it is built
 
         pyglet.clock.schedule(self.update)
 
@@ -161,7 +164,7 @@ class Window(pyglet.window.Window):
             self.done = True
 
         # Update the timestep display.
-        time = str(self.run.coderack.time // self.run.timestep)  # integer division
+        time = str(self.run.coderack.time // self.run.timestep)  # PY3-FIX: integer division
         if self.timer.text != time:
             self.timer.text = time
 
@@ -169,7 +172,7 @@ class Window(pyglet.window.Window):
         target_temp = self.run.workspace.temperature * 2.55
         if abs(self.saved_temp - target_temp) > .001:
             self.saved_temp += (target_temp - self.saved_temp) * dt
-            self.background.color = (240,  # pyglet 2 wants integer colour components
+            self.background.color = (240,  # PYGLET2-FIX: integer colour components
                                      int(255 - self.saved_temp / 1.4),
                                      int(255 - self.saved_temp / 1.15))
 
