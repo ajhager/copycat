@@ -711,7 +711,7 @@ class Workspace(object):
             bonds = string.get_proposed_bond(i, group.string_number)
             if bonds:
                 proposed_bonds.extend(bonds)
-        for bond in set(proposed_bonds):
+        for bond in toolbox.unique(proposed_bonds):  # DETERMINISM-FIX
             string.remove_proposed_bond(bond)
 
         for bond in group.incoming_bonds + group.outgoing_bonds:
@@ -802,7 +802,7 @@ class Workspace(object):
             if description_type.category() == self.slipnet.plato_bond_facet:
                 obj2_bond_facets.append(description_type)
 
-        items = list(set(obj1_bond_facets).intersection(set(obj2_bond_facets)))
+        items = [f for f in toolbox.unique(obj1_bond_facets) if f in obj2_bond_facets]  # DETERMINISM-FIX
         support = [f.total_description_type_support(obj1.string) for f in items]
         return toolbox.weighted_select(support, items)
 
@@ -965,7 +965,11 @@ class Workspace(object):
             number = case[self.rough_number_of_unrelated_objects()]
         elif category == 'group' and self.bonds:
             number = case[self.rough_number_of_ungrouped_objects()]
-        elif category == 'replacement' and self.rule:
+        elif category == 'replacement' and not self.rule:
+            # BUG-FIX: was `and self.rule`, the inverse of Mitchell's formulas.l (0 once there
+            # is a rule, else by the number of unreplaced objects): no replacement finder was
+            # re-posted, a letter missed by the initial batch never got its replacement, and
+            # the rule scout fizzled forever (see PORTING_NOTES.md).
             number = case[self.rough_number_of_unreplaced_objects()]
         elif category == 'correspondence':
             number = case[self.rough_number_of_uncorresponding_objects()]

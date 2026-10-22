@@ -254,9 +254,8 @@ class Group(Object, Structure):
 
     def get_incompatible_groups(self):
         """Return a list of the groups that are incompatible with the group."""
-        groups = set([obj.group for obj in self.objects])
-        groups.difference_update([self, None])
-        return list(groups)
+        groups = toolbox.unique([obj.group for obj in self.objects])  # DETERMINISM-FIX
+        return [g for g in groups if g is not self and g is not None]
 
     def get_incompatible_correspondences(self):
         """Return a list of the correspondences that are incompatible."""

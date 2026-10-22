@@ -230,7 +230,7 @@ class Correspondence(Structure):
            direction_category_cm:
             incomp.extend(self.workspace.get_leftmost_and_rightmost_incompatible_correspondences(self.object1, self.object2, direction_category_cm))
 
-        return list(set(incomp))
+        return toolbox.unique(incomp)  # DETERMINISM-FIX
 
     def incompatible_bond(self):
         """Return the bond that is incompatible with this correspondence."""

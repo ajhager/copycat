@@ -161,8 +161,8 @@ class Bond(Structure):
 
     def incompatible_bonds(self):
         """Return the bonds that are incompatible with the bond."""
-        return list(set([self.left_object.right_bond,
-                         self.right_object.left_bond]) - set([None]))
+        return [b for b in toolbox.unique([self.left_object.right_bond,  # DETERMINISM-FIX
+                                           self.right_object.left_bond]) if b is not None]
 
     def incompatible_correspondences(self):
         """Return the correspondences that are incompatible with this bond. This

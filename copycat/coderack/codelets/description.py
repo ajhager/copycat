@@ -44,7 +44,9 @@ class DescriptionBottomUpScout(Codelet):
 
         associations = [link.degree_of_association() for link in links]
         activations = [link.to_node.activation for link in links]
-        choices = map(lambda a, b: a * b, associations, activations)
+        # PY3-FIX: map() is lazy in Python 3; weighted_select sums the weights and then
+        # iterates them again, so a map object made it return None (see PORTING_NOTES.md).
+        choices = list(map(lambda a, b: a * b, associations, activations))
         prop = toolbox.weighted_select(choices, links).to_node
 
         return workspace.propose_description(obj, prop.category(), prop)

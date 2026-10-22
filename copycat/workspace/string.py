@@ -138,7 +138,7 @@ class String(object):
 
     def get_proposed_groups(self):
         """Return a list of the proposed groups in the string."""
-        return list(set(toolbox.flatten(self.proposed_groups.values())))
+        return toolbox.unique(toolbox.flatten(self.proposed_groups.values()))  # DETERMINISM-FIX
 
     def get_proposed_group(self, first, second):
         """Return the proposed group at first, second position."""
@@ -178,7 +178,7 @@ class String(object):
 
     def get_bonds(self):
         """Return a list of the built bonds in the string."""
-        return list(set(self.from_to_bonds.values()))
+        return toolbox.unique(self.from_to_bonds.values())  # DETERMINISM-FIX
 
     def get_bond(self, from_object, to_object):
         """Return the bond between the two objects, if any."""
@@ -214,7 +214,7 @@ class String(object):
 
     def get_proposed_bonds(self):
         """Return a list of proposed bonds in the string."""
-        return list(set(toolbox.flatten(self.proposed_bonds.values())))
+        return toolbox.unique(toolbox.flatten(self.proposed_bonds.values()))  # DETERMINISM-FIX
 
     def get_proposed_bond(self, first, second):
         """Return a proposed bonds at first, second in the string."""
