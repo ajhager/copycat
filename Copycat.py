@@ -17,9 +17,7 @@
 """Copycat creates a run with a supplied problem and displays the result."""
 
 import argparse
-import sys
 from copycat.run import Run
-sys.path.insert(0, "lib")
 
 def main():
     """Prompt for default strings to supply to the run."""

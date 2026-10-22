@@ -63,9 +63,9 @@ class Coderack(object):
             if z == 12:
                 x += 270
                 y = self.h - 10
-            label = pyglet.text.Label(vname, "EraserDust", 12, x=x, y=y,
+            label = pyglet.text.Label(vname, font_name="EraserDust", font_size=12, x=x, y=y,
                                       color=(200, 255, 180, 80), batch=self.batch)
-            label2 = pyglet.text.Label("", "EraserDust", 12, x=x - 25, y=y,
+            label2 = pyglet.text.Label("", font_name="EraserDust", font_size=12, x=x - 25, y=y,
                                        color=(255, 255, 255, 0), batch=self.batch)
             label.name = name
             self.codelets.append(label)

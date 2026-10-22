@@ -21,9 +21,12 @@
 # Add the ability to type in the problem and seed in client
 # Add a module for doing bulk runs showing a graph of stats
 
+import os
+
 import pyglet
 from pyglet.gl import *
-pyglet.resource.path.append("clients/opengl/data")
+# The data folder is found from this file, so the GUI runs from any directory.
+pyglet.resource.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
 pyglet.resource.reindex()
 pyglet.resource.add_font("erasdust.ttf")
 
@@ -82,7 +85,7 @@ class Window(pyglet.window.Window):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        self.clock = pyglet.clock.ClockDisplay()
+        self.clock = pyglet.window.FPSDisplay(self)  # pyglet 1.4+ API
         self.show_fps = False
 
         self.done = False
@@ -106,11 +109,11 @@ class Window(pyglet.window.Window):
         self.button = Button(self.play, 30, 580,
                              self.on_play_button, self.batch)
 
-        self.timer = pyglet.text.Label("0", "EraserDust", 18, x=512, y=574,
+        self.timer = pyglet.text.Label("0", font_name="EraserDust", font_size=18, x=512, y=574,
                                        color=(255, 255, 255, 125), batch=self.batch,
                                        anchor_x="center")
 
-        self.rule = pyglet.text.Label("", "EraserDust", 16, x=512, y=445,
+        self.rule = pyglet.text.Label("", font_name="EraserDust", font_size=16, x=512, y=445,
                                       color=(255, 255, 255, 190), batch=self.batch,
                                       anchor_x="center")
 
@@ -158,7 +161,7 @@ class Window(pyglet.window.Window):
             self.done = True
 
         # Update the timestep display.
-        time = str(self.run.coderack.time / self.run.timestep)
+        time = str(self.run.coderack.time // self.run.timestep)  # integer division
         if self.timer.text != time:
             self.timer.text = time
 
@@ -166,9 +169,9 @@ class Window(pyglet.window.Window):
         target_temp = self.run.workspace.temperature * 2.55
         if abs(self.saved_temp - target_temp) > .001:
             self.saved_temp += (target_temp - self.saved_temp) * dt
-            self.background.color = (240,
-                                     255 - self.saved_temp / 1.4,
-                                     255 - self.saved_temp / 1.15)
+            self.background.color = (240,  # pyglet 2 wants integer colour components
+                                     int(255 - self.saved_temp / 1.4),
+                                     int(255 - self.saved_temp / 1.15))
 
         # Update the simulation at the given speed.
         self.time += dt
