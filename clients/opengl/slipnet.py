@@ -51,7 +51,7 @@ class Slipnet(object):
                 sprite.rotation = 10
                 sprite.color = (20, 20, 30)
                 self.nodes.append(sprite)
-                label = pyglet.text.Label(node.short_name, "EraserDust", 12, x=x,
+                label = pyglet.text.Label(node.short_name, font_name="EraserDust", font_size=12, x=x,
                                           y=y-30, anchor_x="center", batch=self.batch)
                 label.color = (200, 200, 200, 130)
                 self.labels.append(label)
@@ -71,7 +71,8 @@ class Slipnet(object):
                 label.color = (200, 200, 200, 130)
 
             c = self.scales[node] * 100
+            # PYGLET2-FIX: pyglet 2 wants integer colour components.
             if node.clamp:
-                image.color = (c * 2, c * 2.55, c * 2.55)
+                image.color = (int(c * 2), int(c * 2.55), int(c * 2.55))
             else:
-                image.color = (20, 20 + c * 1.7, 30 + c * 2.2)
+                image.color = (20, int(20 + c * 1.7), int(30 + c * 2.2))

@@ -69,7 +69,7 @@ class Run(object):
         for codelet, urgency in codelets:
             deleted = self.coderack.post(codelet, urgency)
             if deleted:
-                for structure in deleted.agruments:
+                for structure in deleted.arguments:  # BUG-FIX: was the typo 'agruments'
                     self.workspace.remove_proposed_structure(structure)
 
     def update(self):

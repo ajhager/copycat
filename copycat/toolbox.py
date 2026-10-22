@@ -67,10 +67,21 @@ def select_assoc(assoc_list):
 
 def flatten(sequence):
     """Flattens a sequence so that it has no nested structure."""
-    if isinstance(sequence, list):
+    # PY3-FIX: dict.values() is a view in Python 3, not a list; the workspace passes
+    # such views here, and they used to pass through unflattened (see PORTING_NOTES.md).
+    if isinstance(sequence, (list, tuple, type({}.values()))):
         return sum(map(flatten, sequence), [])
     else:
         return [sequence]
+
+def unique(sequence):
+    """The distinct items of sequence, first occurrence first.
+
+    DETERMINISM-FIX: the engine used list(set(...)) to drop duplicates, and a set of
+    workspace objects is ordered by their memory addresses, which differ from one process
+    to the next; so the same seed gave different runs. This keeps the original order
+    (see PORTING_NOTES.md)."""
+    return list(dict.fromkeys(sequence))
 
 def flip_coin(prob_of_true=.5):
     """Returns either True or False based on the probabity of true sent as an
@@ -82,6 +93,11 @@ def flip_coin(prob_of_true=.5):
 
 def average(*args):
     """Returns the arithmetic mean of its arguments."""
+    if not args:
+        # BUG-FIX: a correspondence proposed after flipping a string-spanning group can
+        # have no distinguishing concept mappings; the urgency was then 0/0 and the run
+        # died with ZeroDivisionError (see PORTING_NOTES.md).
+        return 0
     return sum(args) / float(len(args))
 
 def blur(number):
